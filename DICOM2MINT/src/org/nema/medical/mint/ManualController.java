@@ -27,9 +27,13 @@ public class ManualController {
         response.getWriter().println("Manual processing done.");
     }
 
-    private void runProcess() {
+    private void runProcess() throws Exception {
         final CheckFileExists checkFileExists = new CheckFileExists();
         final Collection<File> files = checkFileExists.run();
+        final HandleFileItemProcessor fileItemProcessor = new HandleFileItemProcessor();
+        for (final File item: files) {
+            fileItemProcessor.process(item);
+        }
         final ProcessStudyFiles processStudyFiles = new ProcessStudyFiles();
         processStudyFiles.run();
     }
