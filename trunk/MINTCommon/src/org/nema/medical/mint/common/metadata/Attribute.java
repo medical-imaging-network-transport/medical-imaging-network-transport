@@ -1,12 +1,13 @@
 
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vitalimages.contentserver.mint.Mint2Gpb.AttributeData;
-import com.vitalimages.contentserver.mint.Mint2Gpb.ItemData;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.AttributeData;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.ItemData;
+
 
 /**
  * Schema fragment(s) for this class:
