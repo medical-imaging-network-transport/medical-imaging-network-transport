@@ -1,7 +1,7 @@
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
-import com.vitalimages.contentserver.mint.Mint2Gpb.BulkItemData;
-import com.vitalimages.contentserver.mint.Mint2Gpb.ECompressionMethod;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkItemData;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.ECompressionMethod;
 
 public class BinaryItem {
 

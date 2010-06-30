@@ -1,4 +1,4 @@
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import com.vitalimages.contentserver.mint.Mint2Gpb.BulkDataTable;
-import com.vitalimages.contentserver.mint.Mint2Gpb.BulkItemData;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkDataTable;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkItemData;
+
 
 public class BinaryItemIO {
 

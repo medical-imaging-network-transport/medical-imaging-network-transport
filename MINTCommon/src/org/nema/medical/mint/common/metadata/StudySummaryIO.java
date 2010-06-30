@@ -1,4 +1,4 @@
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
 import java.io.File;
 import java.io.FileWriter;

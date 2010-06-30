@@ -1,4 +1,4 @@
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,9 +16,9 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.common.metadata.Mint2Gpb.StudyData;
 
 import com.google.gson.Gson;
-import com.vitalimages.contentserver.mint.Mint2Gpb.StudyData;
 
 public class StudyIO {
 	

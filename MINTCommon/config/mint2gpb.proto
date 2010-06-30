@@ -17,8 +17,8 @@
 //
 //------------------------------------------------------------------------------
 
-package vtal.dcm2metalib;
-option java_package = "com.vitalimages.contentserver.mint";
+package mint.metadata;
+option java_package = "org.nema.medical.mint.common.metadata";
 option optimize_for = SPEED;
 
 //------------------------------------------------------------------------------

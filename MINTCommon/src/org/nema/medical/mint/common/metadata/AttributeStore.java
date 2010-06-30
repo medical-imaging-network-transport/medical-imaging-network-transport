@@ -14,7 +14,7 @@
 *    the United States.
 */
 
-package org.nema.medical.mint.common.mint;
+package org.nema.medical.mint.common.metadata;
 
 import java.util.Iterator;
 
