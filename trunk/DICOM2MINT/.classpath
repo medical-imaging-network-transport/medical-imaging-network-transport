@@ -6,14 +6,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MINTCommon"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="ant-lib/dcm4che-core-2.0.23.jar"/>
-	<classpathentry kind="lib" path="ant-lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.asm-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.beans-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.context-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.context.support-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.core-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/org.springframework.expression-3.0.3.RELEASE.jar"/>
-	<classpathentry kind="lib" path="ant-lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="ant-lib/servlet-api.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
