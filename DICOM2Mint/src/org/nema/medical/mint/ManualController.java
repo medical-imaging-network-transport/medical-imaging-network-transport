@@ -1,5 +1,8 @@
 package org.nema.medical.mint;
 
+import java.io.File;
+import java.util.Collection;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -25,6 +28,9 @@ public class ManualController {
     }
 
     private void runProcess() {
-
+        final CheckFileExists checkFileExists = new CheckFileExists();
+        final Collection<File> files = checkFileExists.run();
+        final ProcessStudyFiles processStudyFiles = new ProcessStudyFiles();
+        processStudyFiles.run();
     }
 }
