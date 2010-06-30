@@ -17,9 +17,14 @@
 	</appender>
 
 	<logger name="org.nema.medical.mint" additivity="false">
-		<level value="info" />
+		<level value="debug" />
 		<appender-ref ref="console" />
 		<appender-ref ref="daily" />
+	</logger>
+
+	<logger name="org.hibernate" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="console" />
 	</logger>
 
 	<root>
