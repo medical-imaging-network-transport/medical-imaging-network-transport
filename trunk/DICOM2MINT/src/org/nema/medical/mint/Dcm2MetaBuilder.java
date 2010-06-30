@@ -17,12 +17,12 @@ import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.data.VR;
 import org.dcm4che2.io.DicomInputStream;
-import org.nema.medical.mint.common.mint.Attribute;
-import org.nema.medical.mint.common.mint.AttributeStore;
-import org.nema.medical.mint.common.mint.Instance;
-import org.nema.medical.mint.common.mint.Item;
-import org.nema.medical.mint.common.mint.Series;
-import org.nema.medical.mint.common.mint.Study;
+import org.nema.medical.mint.common.metadata.Attribute;
+import org.nema.medical.mint.common.metadata.AttributeStore;
+import org.nema.medical.mint.common.metadata.Instance;
+import org.nema.medical.mint.common.metadata.Item;
+import org.nema.medical.mint.common.metadata.Series;
+import org.nema.medical.mint.common.metadata.Study;
 import org.nema.medical.mint.util.Iter;
 
 /* Copyright (c) Vital Images, Inc. 2010. All Rights Reserved.
