@@ -1,0 +1,33 @@
+<!DOCTYPE project>
+<project basedir="." default="jar" name="MINTCommon">
+	<property file="build.properties" />
+	<property name="build.dir" value="${basedir}/ant-build" />
+
+	<target name="clean">
+		<mkdir dir="${build.dir}" />
+		<delete includeemptydirs="true">
+			<fileset dir="${build.dir}" includes="**/*" />
+		</delete>
+	</target>
+
+	<target name="build" depends="clean" description="Compile the Java files">
+		<path id="build.classpath">
+			<fileset dir="${basedir}/lib" includes="*.jar" />
+		</path>
+		<property name="build.classpath" refid="build.classpath" />
+
+		<mkdir dir="${build.dir}/bin" />
+		<javac srcdir="${basedir}/src" destdir="${build.dir}/bin" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+			<compilerarg value="-Xlint:-path" />
+		</javac>
+	</target>
+
+	<target name="jar" depends="build" description="Make JAR of compiled classes">
+		<jar destfile="${build.dir}/${ant.project.name}.jar">
+			<fileset dir="${build.dir}/bin" />
+			<fileset dir="${basedir}/src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</jar>
+	</target>
+</project>

@@ -1,0 +1,51 @@
+<binding xmlns:tns="http://vitalimages.com/contentserver/mint" name="binding" package="com.vitalimages.contentserver.mint" trim-whitespace="true">
+  <namespace uri="http://vitalimages.com/contentserver/mint" default="elements"/> <!--   prefix="mint" -->
+  <format label="int.hex" type="int" serializer="com.vitalimages.contentserver.mint.StudyIO.int2hex"
+          deserializer="com.vitalimages.contentserver.mint.StudyIO.hex2int"/>
+  <format label="int.bid" type="int" serializer="com.vitalimages.contentserver.mint.StudyIO.int2bid"
+          deserializer="com.vitalimages.contentserver.mint.StudyIO.bid2int"/>
+  <mapping abstract="true" type-name="StudyMetaType" class="com.vitalimages.contentserver.mint.Study">
+    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="com.vitalimages.contentserver.mint.Attribute">
+    	<structure name="Attr" map-as="AttrType"/>
+    </collection>
+    <collection name="SeriesList" add-method="putSeries" iter-method="seriesIterator" item-type="com.vitalimages.contentserver.mint.Series">
+    	<structure name="Series" map-as="SeriesType"/>
+    </collection>
+    <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID"/>
+  </mapping>
+  <mapping class="com.vitalimages.contentserver.mint.Study" name="StudyMeta">
+    <structure map-as="StudyMetaType"/>
+  </mapping>
+  <mapping abstract="true" type-name="AttrType" class="com.vitalimages.contentserver.mint.Attribute">
+    <collection add-method="addItem" iter-method="itemIterator" item-type="com.vitalimages.contentserver.mint.Item">
+    	<structure name="Item" map-as="ItemType"/>
+    </collection>
+    <value style="attribute" name="tag" get-method="getTag" set-method="setTag" format="int.hex" />
+    <value style="attribute" name="vr" get-method="getVr" set-method="setVr"/>
+    <value style="attribute" name="val" get-method="getVal" set-method="setVal" usage="optional"/>
+    <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>    
+  </mapping>
+  <mapping abstract="true" type-name="SeriesType" class="com.vitalimages.contentserver.mint.Series">
+    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="com.vitalimages.contentserver.mint.Attribute">
+    	<structure name="Attr" map-as="AttrType"/>
+    </collection>
+    <collection name="NormalizedInstanceAttributes" add-method="putNormalizedInstanceAttribute" iter-method="normalizedInstanceAttributeIterator" item-type="com.vitalimages.contentserver.mint.Attribute">
+    	<structure name="Attr" map-as="AttrType"/>
+    </collection>
+    <collection name="Instances" add-method="putInstance" iter-method="instanceIterator" item-type="com.vitalimages.contentserver.mint.Instance">
+    	<structure name="Instance" map-as="InstanceType"/>
+    </collection>
+    <value style="attribute" name="seriesInstanceUID" field="seriesInstanceUID"/>
+  </mapping>
+  <mapping abstract="true" type-name="ItemType" class="com.vitalimages.contentserver.mint.Item">
+    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="com.vitalimages.contentserver.mint.Attribute">
+    	<structure name="Attr" map-as="AttrType"/>
+    </collection>
+  </mapping>
+  <mapping abstract="true" type-name="InstanceType" class="com.vitalimages.contentserver.mint.Instance">
+    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="com.vitalimages.contentserver.mint.Attribute">
+    	<structure name="Attr" map-as="AttrType"/>
+    </collection>
+    <value style="attribute" name="xfer" field="xfer"/>
+  </mapping>
+</binding>
