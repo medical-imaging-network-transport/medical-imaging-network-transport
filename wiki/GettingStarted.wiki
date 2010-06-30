@@ -6,8 +6,10 @@ How to get started with developing on MINT
 
 = Details =
 
+Operating System: Windows
+
 Prerequisites
   * [http://java.sun.com/javase/downloads/widget/jdk6.jsp JDK 1.6_20]
   * [http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/galileosr2 Eclipse IDE for Java EE Galileo 3.5 SR2] 
   * [http://tomcat.apache.org/download-60.cgi Tomcat 6.0]
-  * [http://www.mysql.com/downloads/mysql/ MySQL 5.2]
+  * [http://www.mysql.com/downloads/mysql/ MySQL 5.1.48]
