@@ -26,9 +26,10 @@
     		<element name="Item" type="tns:ItemType" maxOccurs="unbounded" minOccurs="0"></element>
     	</sequence>
     	<attribute name="tag" type="string" use="required"></attribute>
-    	<attribute name="vr" type="string" use="required"></attribute>
+    	<attribute name="vr" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
     	<attribute name="val" type="string" use="optional"></attribute>
     	<attribute name="bid" type="string" use="optional"></attribute>
+    	<attribute name="exclude" type="string" use="optional"></attribute>
     </complexType>
 
     <complexType name="SeriesType">
@@ -40,6 +41,7 @@
     		<element name="Instances" type="tns:InstancesType" maxOccurs="unbounded" minOccurs="1"></element>
     	</sequence>
     	<attribute name="seriesInstanceUID" type="string" use="required"></attribute>
+    	<attribute name="exclude" type="string" use="optional"></attribute>
     </complexType>
 
     <complexType name="ItemType">
@@ -66,7 +68,9 @@
     			maxOccurs="unbounded" minOccurs="0">
     		</element>
     	</sequence>
-    	<attribute name="xfer" type="string" use="required"></attribute>
+    	<attribute name="sopInstanceUID" type="string" use="required"></attribute>
+    	<attribute name="transferSyntaxUID" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
+    	<attribute name="exclude" type="string" use="optional"></attribute>
     </complexType>
 
     <element name="StudyMeta" type="tns:StudyMetaType"></element>
