@@ -10,7 +10,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class InstanceLogDAO extends HibernateDaoSupport {
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public InstanceLog logInstance(String associationKey, boolean associationComplete,
 			String studyInstanceUID, Timestamp studyDateTime,
 			String patientName, String patientID, String accessionNumber,
