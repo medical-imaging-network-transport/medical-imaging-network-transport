@@ -1,0 +1,92 @@
+//------------------------------------------------------------------------------ 
+//
+//Copyright (c) 2010 Vital Images, Inc. All Rights Reserved.
+//
+//This is UNPUBLISHED PROPRIETARY SOURCE CODE of Vital Images, Inc.;
+//the contents of this file may not be disclosed to third parties,
+//copied or duplicated in any form, in whole or in part, without the
+//prior written permission of Vital Images, Inc.
+//
+//RESTRICTED RIGHTS LEGEND:
+//Use, duplication or disclosure by the Government is subject to
+//restrictions as set forth in subdivision (c)(1)(ii) of the Rights
+//in Technical Data and Computer Software clause at DFARS 252.227-7013,
+//and/or in similar or successor clauses in the FAR, DOD or NASA FAR
+//Supplement. Unpublished rights reserved under the Copyright Laws of
+//the United States.
+//
+//------------------------------------------------------------------------------
+
+package vtal.dcm2metalib;
+option java_package = "com.vitalimages.contentserver.mint";
+option optimize_for = SPEED;
+
+//------------------------------------------------------------------------------
+message StudyData
+{
+	optional string study_instance_uid = 1;
+	repeated AttributeData attributes = 2;
+	repeated SeriesData series = 3;
+}
+
+//------------------------------------------------------------------------------
+message SeriesData
+{
+    optional string series_instance_uid = 1;
+    repeated AttributeData attributes = 2;
+    repeated AttributeData normalized_instance_attributes = 3;
+    repeated InstanceData instances = 4;
+}
+
+//------------------------------------------------------------------------------
+message InstanceData
+{
+	optional string transfer_syntax_uid = 1;
+	repeated AttributeData attributes = 2;
+}
+
+//------------------------------------------------------------------------------
+message ItemData
+{
+    repeated AttributeData attributes = 1;
+}
+
+//------------------------------------------------------------------------------
+message AttributeData
+{
+	optional uint32 tag = 1;
+	optional string vr = 2; // 2-character VR.
+
+    // Only one of the following three will be set.
+	optional string string_value = 3;
+	optional uint32 binary_item_id = 4;
+	repeated ItemData items = 5; // If an item sequence.
+}
+
+//------------------------------------------------------------------------------
+enum ECompressionMethod
+{
+    kNone = 0;
+    kZip = 1;
+}
+
+//------------------------------------------------------------------------------
+message BulkItemData
+{
+    optional uint64 offset = 1;
+    optional ECompressionMethod compression_method = 2;
+    optional uint64 expanded_length_bytes = 3;
+}
+
+//------------------------------------------------------------------------------
+message BulkDataTable
+{
+    repeated BulkItemData items = 1;
+}
+
+//------------------------------------------------------------------------------
+message StudySummaryData
+{
+    repeated AttributeData attributes = 1;
+}
+
