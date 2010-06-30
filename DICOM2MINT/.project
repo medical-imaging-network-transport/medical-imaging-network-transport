@@ -3,6 +3,7 @@
 	<name>DICOM2MINT</name>
 	<comment></comment>
 	<projects>
+		<project>MINTCommon</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
