@@ -47,7 +47,7 @@ public class StudiesController {
 	protected File studyRoot;
 
 	@Autowired
-	protected StudyDAO studyDao = null;
+	protected StudyDAO studyDAO = null;
 
 	private void bufferedRead(final InputStream inputStream, final OutputStream outputStream) throws IOException {
 		final byte[] bytes = new byte[8 * 1024];
@@ -74,12 +74,12 @@ public class StudiesController {
 			throws IOException {
 
 		if (StringUtils.isNotBlank(studyUid)) {
-			final Study study = studyDao.findStudy(studyUid);
+			final Study study = studyDAO.findStudy(studyUid);
 			if (study != null) {
 				studies.add(study);
 			}
 		} else {
-			studies.addAll(studyDao.getMostRecentStudies(50, 24 * 60 * 60));
+			studies.addAll(studyDAO.getMostRecentStudies(50, 24 * 60 * 60));
 		}
 		
 		// this will render the studies list using studies.jsp

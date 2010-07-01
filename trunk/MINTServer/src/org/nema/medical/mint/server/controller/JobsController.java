@@ -35,7 +35,11 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.domain.JobInfo;
+import org.nema.medical.mint.common.domain.JobInfoDAO;
 import org.nema.medical.mint.common.domain.JobStatus;
+import org.nema.medical.mint.common.domain.StudyDAO;
+import org.nema.medical.mint.common.metadata.Study;
+import org.nema.medical.mint.common.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -55,25 +59,35 @@ public class JobsController {
 	@Autowired
 	protected File studyRoot;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
-	public void getCreateStatus(@PathVariable final String uuid,
-			final HttpServletResponse response) throws IOException {
+	@Autowired
+	protected StudyDAO studyDAO = null;
+	@Autowired
+	protected JobInfoDAO jobInfoDAO = null;
 
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
-	public void getUpdateStatus(@PathVariable final String uuid,
-			final HttpServletResponse response) throws IOException {
-
+	@RequestMapping(method = RequestMethod.GET, value = {"/jobs/createstudy/{uuid}","/jobs/updatestudy/{uuid}"})
+	public String getJobStatus(@PathVariable final String uuid,
+			HttpServletResponse res, ModelMap map) throws IOException {
+		
+		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
+		if (JobInfo.now().getTime() - jobInfo.getUpdateTime().getTime() > 5000) {
+			jobInfo.setStatus(JobStatus.SUCCESS);
+			jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
+		}
+		
+		map.addAttribute("jobinfo", jobInfo);
+		
+		// this will render the job info using jobinfo.jsp
+		return "jobinfo";
+		
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
-	public String createStudy(HttpServletRequest req, HttpServletResponse res, ModelMap map)
-			throws IOException {
+	public String createStudy(HttpServletRequest req, HttpServletResponse res,
+			ModelMap map) throws IOException {
 
 		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
-		
+
 		File jobFolder = new File(mintHome, jobID);
 		jobFolder.mkdir();
 
@@ -87,8 +101,7 @@ public class JobsController {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			
-			map.put("error","expected multipart form data");
+			map.put("error_msg", "expected multipart form data");
 			return "error";
 		}
 
@@ -96,47 +109,46 @@ public class JobsController {
 			handleUpload(req, res, jobFolder, files, params);
 		} catch (FileUploadException e) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			
-			map.put("error","unable to parse multipart form data");
+			map.put("error_msg", "unable to parse multipart form data");
 			return "error";
 		}
 
 		if (files.size() < 1) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			
-			map.put("error","At least one file (containing metadata) is required.");
+			map.put("error_msg",
+					"at least one file (containing metadata) is required.");
 			return "error";
 		} else {
 			File metadata = files.get(0);
-			//Study study;
+			Study study;
 			if (metadata.getPath().endsWith(".xml")) {
-				//study = StudyIO.parseFromXML(metadata);
-			} else if (metadata.getPath().endsWith(".gbp")) {
-				//study = StudyIO.parseFromGPB(metadata);
+				study = StudyIO.parseFromXML(metadata);
+			} else if (metadata.getPath().endsWith(".gpb")) {
+				study = StudyIO.parseFromGPB(metadata);
 			} else {
 				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				
-				map.put("error","Unknown metadata format");
+				map.put("error_msg", "unknown metadata format.");
 				return "error";
 			}
 
 		}
+
+		JobInfo jobInfo = new JobInfo();
+		jobInfo.setId(jobID);
+		jobInfo.setStudyID(studyUUID);
+		jobInfo.setStatus(JobStatus.IN_PROGRESS);
+		jobInfo.setStatusDescription("0% complete");
+		map.addAttribute("jobinfo", jobInfo);
+
+		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 		
-
-		JobInfo info = new JobInfo();
-		info.setId(jobID);
-		info.setStudyID(studyUUID);
-		info.setStatus(JobStatus.IN_PROGRESS);
-		info.setStatusDescription("0% complete");
-		map.addAttribute("jobinfo",info);
-
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
-		}
+	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
-	public void updateStudy(HttpServletRequest req, HttpServletResponse res)
-			throws IOException {
+	public String updateStudy(HttpServletRequest req, HttpServletResponse res,
+			ModelMap map) throws IOException {
 
 		String jobID = UUID.randomUUID().toString();
 		File jobFolder = new File(mintHome, jobID);
@@ -151,30 +163,34 @@ public class JobsController {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"expected multipart form data");
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "expected multipart form data");
+			return "error";
 		}
 
 		try {
 			handleUpload(req, res, jobFolder, files, params);
 		} catch (FileUploadException e) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"unable to parse multipart form data");
-			return;
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "unable to parse multipart form data");
+			return "error";
 		}
 
 		if (files.size() < 1) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"At least one file (containing metadata) is required.");
-			return;
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg",
+					"at least one file (containing metadata) is required.");
+			return "error";
 		}
 
 		if (!params.containsKey("studyUUID")) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"Missing parameter studyUUID.");
-			return;
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "missing parameter studyUUID");
+			return "error";
 		}
 
+		// this will render the job info using jobinfo.jsp
+		return "jobinfo";
 	}
 
 	// returns false if a response.sendError() was discovered
@@ -203,7 +219,7 @@ public class JobsController {
 					String contentType = item.getContentType();
 					if ("text/xml".equals(contentType)) {
 						file = new File(jobFolder, "metadata.xml");
-					} else if("application/octet-stream".equals(contentType)) {
+					} else if ("application/octet-stream".equals(contentType)) {
 						file = new File(jobFolder, "metadata.gpb");
 					} else {
 						file = new File(jobFolder, "metadata.dat");
@@ -228,10 +244,11 @@ public class JobsController {
 						out.write(buf, 0, len);
 					}
 				} finally {
-					if (out != null)
+					if (out != null) {
 						out.close();
+						files.add(file);
+					}
 				}
-				files.add(file);
 			}
 		}
 	}
