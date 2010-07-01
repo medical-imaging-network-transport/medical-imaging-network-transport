@@ -4,9 +4,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Error</title>
 </head>
 <body>
-
+<h1>A error occured on the server</h1>
+<p>${error}</p>
 </body>
 </html>
