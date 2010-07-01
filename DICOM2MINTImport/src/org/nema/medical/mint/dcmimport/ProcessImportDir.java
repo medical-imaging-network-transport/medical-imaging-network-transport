@@ -13,6 +13,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dcm4che2.data.DicomObject;
+import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.nema.medical.mint.dcm2mint.BinaryFileData;
 import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
@@ -32,12 +34,17 @@ public final class ProcessImportDir {
 			try {
 				final DicomInputStream dcmStream = new DicomInputStream(plainFile);
 				try {
-					final String studyUID = Dcm2MetaBuilder.extractStudyInstanceUID(dcmStream);
-					final Collection<File> dcmFileData = studyFileMap.get(studyUID);
+					final DicomObject dcmObj = dcmStream.readDicomObject();
+					final String studyUID = Dcm2MetaBuilder.extractStudyInstanceUID(dcmObj);
+					final Collection<DICOMFileData> dcmFileData = studyFileMap.get(studyUID);
+					final DICOMFileData dcmData = new DICOMFileData();
+					dcmData.dicomFile = plainFile;
+					dcmData.dcmObj = dcmObj;
+					dcmData.transferSyntax = dcmStream.getTransferSyntax();
 					if (dcmFileData == null) {
-						studyFileMap.put(studyUID, Collections.singleton(plainFile));
+						studyFileMap.put(studyUID, Collections.singleton(dcmData));
 					} else {
-						dcmFileData.add(plainFile);
+						dcmFileData.add(dcmData);
 					}
 				} finally {
 					dcmStream.close();
@@ -51,7 +58,7 @@ public final class ProcessImportDir {
         final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
         final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
 
-        for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
+        for (final Map.Entry<String, Collection<DICOMFileData>> studyFiles: studyFileMap.entrySet()) {
 	        final String studyUID = studyFiles.getKey();
 	        assert studyUID != null;
 
@@ -61,18 +68,8 @@ public final class ProcessImportDir {
 	        //Constrain processing
 	        metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
 	        final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
-	        for (final File instanceFile: studyFiles.getValue()) {
-	            try {
-	            	final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
-	            	try {
-	                    builder.accumulateFile(instanceFile, dcmStream);
-	            	} finally {
-	            		dcmStream.close();
-	            	}
-	            } catch (final IOException ex) {
-					//Not a valid DICOM file?!
-					System.err.println("Mostly skipping file (inconsistent data may exist): " + instanceFile);
-	            }
+	        for (final DICOMFileData instanceFile: studyFiles.getValue()) {
+	        	builder.accumulateFile(instanceFile.dicomFile, instanceFile.dcmObj, instanceFile.transferSyntax);
 	        }
 	        builder.finish();
 	        mintConsumer.send(metaBinaryPair);
@@ -112,7 +109,13 @@ public final class ProcessImportDir {
         return tagSet;
     }
 
+    private static final class DICOMFileData {
+    	File dicomFile;
+    	DicomObject dcmObj;
+    	TransferSyntax transferSyntax;
+    }
+
 	private final File importDir;
 	private final MINTSend mintConsumer;
-	private final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
+	private final Map<String, Collection<DICOMFileData>> studyFileMap = new HashMap<String, Collection<DICOMFileData>>();
 }

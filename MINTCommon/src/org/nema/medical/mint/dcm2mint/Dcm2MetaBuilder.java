@@ -16,7 +16,6 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +28,6 @@ import org.dcm4che2.data.SpecificCharacterSet;
 import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.data.VR;
-import org.dcm4che2.io.DicomInputStream;
 import org.nema.medical.mint.common.metadata.Attribute;
 import org.nema.medical.mint.common.metadata.AttributeStore;
 import org.nema.medical.mint.common.metadata.Instance;
@@ -106,11 +104,7 @@ public final class Dcm2MetaBuilder {
        this.metaBinaryPair = metaBinaryPair;
    }
 
-   public static String extractStudyInstanceUID(final DicomInputStream dicomStream) throws IOException {
-	   DicomObject dcmObj = dicomStream.getDicomObject();
-	   if (dcmObj == null) {
-		   dcmObj = dicomStream.readDicomObject();
-	   }
+   public static String extractStudyInstanceUID(final DicomObject dcmObj) {
        return dcmObj.getString(Tag.SeriesInstanceUID);
    }
 
@@ -171,13 +165,8 @@ public final class Dcm2MetaBuilder {
      @throws vtal::InvalidArgument The instance referred to by the path either doesn't have a study
      instance UID or its study instance UID is not the same as previously accumulated instances.
       */
-     public void accumulateFile(final File dcmPath, final DicomInputStream dicomStream) throws IOException {
-         DicomObject dcmObj = dicomStream.getDicomObject();
-         if (dcmObj == null) {
-	         //Read and cache
-	         dcmObj = dicomStream.readDicomObject();
-         }
-
+     public void accumulateFile(final File dcmPath, final DicomObject dcmObj,
+    		 final TransferSyntax transferSyntax) {
          final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
 
          final String dataStudyInstanceUID = dcmObj.getString(Tag.StudyInstanceUID);
@@ -207,8 +196,7 @@ public final class Dcm2MetaBuilder {
 
          final Instance instance = new Instance();
          //TODO without this, we could simplify the code - find another way to get this (NOT from the stream directly, but from the DicomObject)
-         final TransferSyntax xfer = dicomStream.getTransferSyntax();
-         instance.setXfer(xfer.uid());
+         instance.setXfer(transferSyntax.uid());
          series.putInstance(instance);
 
          // Now, iterate through all items in the object and store each appropriately.
