@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkDataTable;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkItemData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.BulkDataTable;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.BulkItemData;
 
 
 public class BinaryItemIO {

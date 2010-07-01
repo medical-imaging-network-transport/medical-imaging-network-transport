@@ -1,7 +1,7 @@
 package org.nema.medical.mint.common.metadata;
 
-import org.nema.medical.mint.common.metadata.Mint2Gpb.BulkItemData;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.ECompressionMethod;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.BulkItemData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.ECompressionMethod;
 
 public class BinaryItem {
 

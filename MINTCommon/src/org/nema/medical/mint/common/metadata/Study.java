@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.nema.medical.mint.common.metadata.Mint2Gpb.AttributeData;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.SeriesData;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.StudyData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.AttributeData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.SeriesData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.StudyData;
 
 
 /**

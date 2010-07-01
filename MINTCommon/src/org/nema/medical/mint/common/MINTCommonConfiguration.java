@@ -1,5 +1,6 @@
 package org.nema.medical.mint.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -9,7 +10,9 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
@@ -19,6 +22,10 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 
 public abstract class MINTCommonConfiguration {
 
+	private static final Logger LOG = Logger.getLogger(MINTCommonConfiguration.class);
+
+	protected File mintHome = null;
+
 	protected static HibernateTransactionManager hibernateTransactionManager = null;
 
 	protected static SessionFactory sessionFactory = null;
@@ -26,6 +33,21 @@ public abstract class MINTCommonConfiguration {
 	protected Context envContext = null;
 
 	protected Properties properties = null;
+
+	@Bean(name = "mintHome", autowire = Autowire.BY_NAME)
+	public File mintHome() throws Exception {
+		String path = System.getenv("MINT_HOME");
+		if (path == null) {
+			path = System.getProperty("user.home") + "/MINT_HOME";
+			LOG.warn("MINT_HOME enviornment variable not found, using " + path);
+		}
+		mintHome = new File(path);
+		if (!mintHome.exists()) {
+			LOG.warn("MINT_HOME does not exist, creating");
+			mintHome.mkdirs();
+		}
+		return mintHome;
+	}
 
 	public Properties envSpecificProperties() {
 		if (properties == null) {
