@@ -16,6 +16,8 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,17 +86,41 @@ behavior is deemed acceptable.
 */
 public final class Dcm2MetaBuilder {
 
+//    /**
+//    Type used to contain the result of the build.
+//
+//    This is returned by Dcm2MetaBuilder::finish().
+//    */
+//    public class MetaBinaryPair {
+//    /** The study's metadata */
+//    public final Study metadata;
+//
+//    /** The study's binary data */
+//    public final List<byte[]> binaryItems;
+//
+//    /**
+//    Constructor
+//
+//    @param metadata The resulting normalized metadata for the study
+//    @param binaryItems All binary items for the study
+//    */
+//    private MetaBinaryPair(final Study metadata, final List<byte[]> binaryItems) {
+//            this.metadata = metadata;
+//            this.binaryItems = binaryItems;
+//        }
+//    }
+
     /**
     Type used to contain the result of the build.
 
     This is returned by Dcm2MetaBuilder::finish().
     */
-    public class MetaBinaryPair {
+    public class MetaBinaryFilePair {
     /** The study's metadata */
     public final Study metadata;
 
     /** The study's binary data */
-    public final List<byte[]> binaryItems;
+    public final List<File> binaryItems;
 
     /**
     Constructor
@@ -102,7 +128,7 @@ public final class Dcm2MetaBuilder {
     @param metadata The resulting normalized metadata for the study
     @param binaryItems All binary items for the study
     */
-    private MetaBinaryPair(final Study metadata, final List<byte[]> binaryItems) {
+    private MetaBinaryFilePair(final Study metadata, final List<File> binaryItems) {
             this.metadata = metadata;
             this.binaryItems = binaryItems;
         }
@@ -172,7 +198,8 @@ public final class Dcm2MetaBuilder {
    @return A MetaBinaryPair instance containing the normalized metadata for the study and all the
    binary data blobs for the study.
     */
-   public MetaBinaryPair finish() {
+//   public MetaBinaryPair finish() {
+   public MetaBinaryFilePair finish() {
        for (final Entry<String, Map<Integer, NormalizationCounter>> seriesTagsEntry: tagNormalizerTable.entrySet()) {
            final Series series = study.getSeries(seriesTagsEntry.getKey());
            if (series == null) {
@@ -194,7 +221,7 @@ public final class Dcm2MetaBuilder {
                }
            }
        }
-       return new MetaBinaryPair(study, binaryItems);
+       return new MetaBinaryFilePair(study, binaryItems);
    }
 
      private static SpecificCharacterSet checkCharacterSet(final File dcmPath, final DicomObject dataset) {
@@ -409,7 +436,26 @@ public final class Dcm2MetaBuilder {
              if (attr == null) {
                  attr = newAttr(binData);
                  attr.setBid(binaryItems.size()); // Before we do the push back...
-                 binaryItems.add(data);
+
+                 //Stream to file
+                 assert data != null;
+                 try {
+                     final File tmpFile = File.createTempFile("mint", ".bin");
+                     //The file should be deleted as soon as it is passed on to somewhere else;
+                     //we have a deleteOnExit here just as a backup.
+                     tmpFile.deleteOnExit();
+                     final FileOutputStream outStream = new FileOutputStream(tmpFile);
+                     try {
+                         outStream.write(data);
+                     } finally {
+                         outStream.close();
+                     }
+
+                     binaryItems.add(tmpFile);
+                 } catch (final IOException ex) {
+        			 //This would happen only in a catastrophic case
+        			 throw new RuntimeException(ex);
+                 }
 
                  if (seriesNormMap != null && normCounter == null) {
                      // This is the first occurrence of this particular attribute
@@ -428,22 +474,63 @@ public final class Dcm2MetaBuilder {
          return a.getTag() == obj.tag() && obj.vr().toString().equals(a.getVr().toString());
      }
 
-     private static boolean areEqual(
-         final Attribute a,
-         final DicomElement binData,
-         final byte[] binDataValue,
-         final List<byte[]> binaryItems) {
-         if (areNonValueFieldsEqual(a, binData)) {
-             final byte[] binaryItem = binaryItems.get(a.getBid());
-             if (binDataValue == null) {
-                 return binaryItem == null;
-             }
-             return (binaryItem != null)
-                 && (Arrays.equals(binaryItem, binDataValue));
-         }
+//     private static boolean areEqual(
+//         final Attribute a,
+//         final DicomElement binData,
+//         final byte[] binDataValue,
+//         final List<byte[]> binaryItems) {
+//         if (areNonValueFieldsEqual(a, binData)) {
+//             final byte[] binaryItem = binaryItems.get(a.getBid());
+//             if (binDataValue == null) {
+//                 return binaryItem == null;
+//             }
+//             return (binaryItem != null)
+//                 && (Arrays.equals(binaryItem, binDataValue));
+//         }
+//
+//         return false;
+//     }
 
-         return false;
-     }
+     private static boolean areEqual(
+             final Attribute a,
+             final DicomElement binData,
+             final byte[] binDataValue,
+             final List<File> binaryItems) {
+             if (areNonValueFieldsEqual(a, binData)) {
+                 final File binaryItem = binaryItems.get(a.getBid());
+                 if (binDataValue == null) {
+                     return binaryItem == null;
+                 }
+                 if (binaryItem != null) {
+                	 final long fileSize = binaryItem.length();
+            		 //This should always be true, since we also wrote it from a byte array (which is bound by Integer.MAX_VALUE)
+                	 assert fileSize <= Integer.MAX_VALUE;
+            		 final byte[] dataBytes = new byte[(int)fileSize];
+            		 try {
+                    	 final FileInputStream binStream = new FileInputStream(binaryItem);
+                    	 try {
+                    		 int offset = 0;
+                    		 for(;;) {
+                    			 final int bytesRead = binStream.read(dataBytes, 0, (int)fileSize - offset);
+                    			 if (bytesRead == 0) {
+                    				 break;
+                    			 }
+                    			 offset += bytesRead;
+                    		 }
+                    	 } finally {
+                    		 binStream.close();
+                    	 }
+            		 } catch (final IOException ex) {
+            			 //This would happen only in a catastrophic case
+            			 throw new RuntimeException(ex);
+            		 }
+
+            		 Arrays.equals(dataBytes, binDataValue);
+                 }
+             }
+
+             return false;
+         }
 
      private static String getStringValue(final DicomElement elem, final SpecificCharacterSet charSet) {
          return elem.getString(charSet, false);
@@ -481,5 +568,6 @@ public final class Dcm2MetaBuilder {
      private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =
          new HashMap<String, Map<Integer, NormalizationCounter>>();
      private final Study study = new Study();
-     private final List<byte[]> binaryItems = new ArrayList<byte[]>();
+     private final List<File> binaryItems = new ArrayList<File>();
+//     private final List<byte[]> binaryItems = new ArrayList<byte[]>();
 }
