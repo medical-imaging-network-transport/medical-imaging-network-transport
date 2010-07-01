@@ -27,8 +27,10 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.InboundStudyMap.StudyInfo;
+import org.nema.medical.mint.dcm2mint.BinaryMemoryData;
 import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
-import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder.MetaBinaryPair;
+import org.nema.medical.mint.dcm2mint.MetaBinaryPair;
+import org.nema.medical.mint.dcm2mint.MetaBinaryPairImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 final class ProcessStudyFiles {
@@ -62,11 +64,20 @@ final class ProcessStudyFiles {
 
         final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
         final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
-        final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, studyUID);
+        final BinaryMemoryData binaryData = new BinaryMemoryData();
+        final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
+        metaBinaryPair.setBinaryData(binaryData);
+        //Constrain processing
+        metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
+        final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
         for (final File instanceFile: item.instances) {
-            builder.accumulateFile(instanceFile);
+            try {
+                builder.accumulateFile(instanceFile);
+            } catch (final IOException ex) {
+                throw new RuntimeException(instanceFile + " -- failed to load file: " + ex, ex);
+            }
         }
-        final MetaBinaryPair metaBinaryPair = builder.finish();
+        builder.finish();
         return metaBinaryPair;
     }
 
