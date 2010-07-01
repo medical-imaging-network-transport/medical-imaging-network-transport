@@ -106,18 +106,12 @@ public final class Dcm2MetaBuilder {
        this.metaBinaryPair = metaBinaryPair;
    }
 
-   /**
-   Accumulates the tags for the DICOM P10 instance specified by path into the overall study
-   metadata.
-
-   @param dcmPath The path to the DICOM P10 instance. All instances accumulated for a given
-   StudyMeta must be part of the same study or an exception will be thrown.
-   @throws vtal::InvalidArgument The instance referred to by the path either doesn't have a study
-   instance UID or its study instance UID is not the same as previously accumulated instances.
-    */
-   public void accumulateFile(final File dcmPath) throws IOException {
-       final DicomInputStream dicomStream = new DicomInputStream(dcmPath);
-       storeInstance(dcmPath, dicomStream);
+   public static String extractStudyInstanceUID(final DicomInputStream dicomStream) throws IOException {
+	   DicomObject dcmObj = dicomStream.getDicomObject();
+	   if (dcmObj == null) {
+		   dcmObj = dicomStream.readDicomObject();
+	   }
+       return dcmObj.getString(Tag.SeriesInstanceUID);
    }
 
    /**
@@ -168,7 +162,16 @@ public final class Dcm2MetaBuilder {
          return specificCharacterSet;
      }
 
-     private void storeInstance(final File dcmPath, final DicomInputStream dicomStream) throws IOException {
+     /**
+     Accumulates the tags for the DICOM P10 instance specified by path into the overall study
+     metadata.
+
+     @param dcmPath The path to the DICOM P10 instance. All instances accumulated for a given
+     StudyMeta must be part of the same study or an exception will be thrown.
+     @throws vtal::InvalidArgument The instance referred to by the path either doesn't have a study
+     instance UID or its study instance UID is not the same as previously accumulated instances.
+      */
+     public void accumulateFile(final File dcmPath, final DicomInputStream dicomStream) throws IOException {
          //Read and cache
          final DicomObject dcmObj = dicomStream.readDicomObject();
          final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
@@ -199,6 +202,7 @@ public final class Dcm2MetaBuilder {
          }
 
          final Instance instance = new Instance();
+         //TODO without this, we could simplify the code - find another way to get this (NOT from the stream directly, but from the DicomObject)
          final TransferSyntax xfer = dicomStream.getTransferSyntax();
          instance.setXfer(xfer.uid());
          series.putInstance(instance);
