@@ -172,8 +172,12 @@ public final class Dcm2MetaBuilder {
      instance UID or its study instance UID is not the same as previously accumulated instances.
       */
      public void accumulateFile(final File dcmPath, final DicomInputStream dicomStream) throws IOException {
-         //Read and cache
-         final DicomObject dcmObj = dicomStream.readDicomObject();
+         DicomObject dcmObj = dicomStream.getDicomObject();
+         if (dcmObj == null) {
+	         //Read and cache
+	         dcmObj = dicomStream.readDicomObject();
+         }
+
          final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
 
          final String dataStudyInstanceUID = dcmObj.getString(Tag.StudyInstanceUID);
