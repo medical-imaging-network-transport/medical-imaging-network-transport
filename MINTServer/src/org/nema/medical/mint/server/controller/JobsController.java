@@ -74,21 +74,23 @@ public class JobsController {
 		if (!isMultipart) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"expected multipart form data");
+			map.put("error","expected multipart form data");
+			return "error";
 		}
 
 		try {
 			handleUpload(req, res, jobFolder, files, params);
 		} catch (FileUploadException e) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			
 			map.put("error","unable to parse multipart form data");
 			return "error";
 		}
 
 		if (files.size() < 1) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"At least on file (containing metadata) is required.");
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			
+			map.put("error","At least one file (containing metadata) is required.");
 			return "error";
 		} else {
 			File metadata = files.get(0);
@@ -98,8 +100,9 @@ public class JobsController {
 			} else if (metadata.getPath().endsWith(".gbp")) {
 				//study = StudyIO.parseFromGPB(metadata);
 			} else {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Unknown metadata format");
+				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				
+				map.put("error","Unknown metadata format");
 				return "error";
 			}
 
