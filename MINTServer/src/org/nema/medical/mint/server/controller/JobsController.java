@@ -19,10 +19,12 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.common.domain.JobInfo;
+import org.nema.medical.mint.common.domain.JobStatus;
 import org.nema.medical.mint.common.metadata.Study;
-import org.nema.medical.mint.common.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,10 +54,12 @@ public class JobsController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
-	public void createStudy(HttpServletRequest req, HttpServletResponse res)
+	public String createStudy(HttpServletRequest req, HttpServletResponse res, ModelMap map)
 			throws IOException {
 
+		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
+		
 		File jobFolder = new File(mintHome, jobID);
 		jobFolder.mkdir();
 
@@ -68,6 +72,8 @@ public class JobsController {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"expected multipart form data");
 		}
@@ -75,15 +81,15 @@ public class JobsController {
 		try {
 			handleUpload(req, res, jobFolder, files, params);
 		} catch (FileUploadException e) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
-					"unable to parse multipart form data");
-			return;
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error","unable to parse multipart form data");
+			return "error";
 		}
 
 		if (files.size() < 1) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"At least on file (containing metadata) is required.");
-			return;
+			return "error";
 		} else {
 			File metadata = files.get(0);
 			Study study;
@@ -94,13 +100,22 @@ public class JobsController {
 			} else {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						"Unknown metadata format");
-				return;
+				return "error";
 			}
 
 		}
+		
 
-		// String studyUUID = UUID.randomUUID().toString();
-	}
+		JobInfo info = new JobInfo();
+		info.setId(jobID);
+		info.setStudyID(studyUUID);
+		info.setStatus(JobStatus.IN_PROGRESS);
+		info.setStatusDescription("0% complete");
+		map.addAttribute("jobinfo",info);
+
+		// this will render the job info using jobinfo.jsp
+		return "jobinfo";
+		}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
 	public void updateStudy(HttpServletRequest req, HttpServletResponse res)

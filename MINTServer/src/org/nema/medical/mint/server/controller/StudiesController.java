@@ -66,6 +66,8 @@ public class StudiesController {
 		} else {
 			studies.addAll(studyDao.getMostRecentStudies(50, 24 * 60 * 60));
 		}
+		
+		// this will render the studies list using studies.jsp
 		return "studies";
 	}
 
