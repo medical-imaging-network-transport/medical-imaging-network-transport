@@ -1,11 +1,11 @@
 package org.nema.medical.mint.common.domain;
 
-public enum JobStatusEnum {
+public enum JobStatus {
 	IN_PROGRESS("IN_PROGRESS"), SUCCESS("SUCCESS"), FAILED("FAILED");
 	
 	private String value;
 	
-	private JobStatusEnum(String value)
+	private JobStatus(String value)
 	{
 		this.value = value;
 	}

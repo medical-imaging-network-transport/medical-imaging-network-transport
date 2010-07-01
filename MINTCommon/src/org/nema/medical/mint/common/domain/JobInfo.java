@@ -29,7 +29,7 @@ public class JobInfo {
 	private String studyID;
 	
 	@Column
-	private JobStatusEnum status;
+	private JobStatus status;
 	
 	@Column
 	private String statusDescription;
@@ -56,11 +56,11 @@ public class JobInfo {
 		this.studyID = studyID;
 	}
 
-	public JobStatusEnum getStatus() {
+	public JobStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(JobStatusEnum status) {
+	public void setStatus(JobStatus status) {
 		this.status = status;
 	}
 
