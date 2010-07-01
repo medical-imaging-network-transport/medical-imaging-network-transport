@@ -16,13 +16,9 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -39,7 +35,6 @@ import org.nema.medical.mint.common.metadata.AttributeStore;
 import org.nema.medical.mint.common.metadata.Instance;
 import org.nema.medical.mint.common.metadata.Item;
 import org.nema.medical.mint.common.metadata.Series;
-import org.nema.medical.mint.common.metadata.Study;
 import org.nema.medical.mint.util.Iter;
 
 /**
@@ -86,55 +81,7 @@ behavior is deemed acceptable.
 */
 public final class Dcm2MetaBuilder {
 
-//    /**
-//    Type used to contain the result of the build.
-//
-//    This is returned by Dcm2MetaBuilder::finish().
-//    */
-//    public class MetaBinaryPair {
-//    /** The study's metadata */
-//    public final Study metadata;
-//
-//    /** The study's binary data */
-//    public final List<byte[]> binaryItems;
-//
-//    /**
-//    Constructor
-//
-//    @param metadata The resulting normalized metadata for the study
-//    @param binaryItems All binary items for the study
-//    */
-//    private MetaBinaryPair(final Study metadata, final List<byte[]> binaryItems) {
-//            this.metadata = metadata;
-//            this.binaryItems = binaryItems;
-//        }
-//    }
-
-    /**
-    Type used to contain the result of the build.
-
-    This is returned by Dcm2MetaBuilder::finish().
-    */
-    public class MetaBinaryFilePair {
-    /** The study's metadata */
-    public final Study metadata;
-
-    /** The study's binary data */
-    public final List<File> binaryItems;
-
-    /**
-    Constructor
-
-    @param metadata The resulting normalized metadata for the study
-    @param binaryItems All binary items for the study
-    */
-    private MetaBinaryFilePair(final Study metadata, final List<File> binaryItems) {
-            this.metadata = metadata;
-            this.binaryItems = binaryItems;
-        }
-    }
-
-   /**
+	/**
    Create an instance of the class with the specified summary-level tag maps.
 
    The maps are used in subsequent calls to accumulateFile().
@@ -146,22 +93,17 @@ public final class Dcm2MetaBuilder {
    @param seriesLevelTags The caller must fill this in with tags that are considered to be part of
    the series-level set for each series. See the note below for tag insertion rules.
 
+	The caller may set a StudyInstanceUID on the study to constrain processing.
    \note If a given attribute tag is present in both maps, the studyLevelTags map takes
    precedence.
     */
    public Dcm2MetaBuilder(
            final Set<Integer> studyLevelTags,
            final Set<Integer> seriesLevelTags,
-           final String studyInstanceUID) {
+           final MetaBinaryPair metaBinaryPair) {
        this.studyLevelTags = studyLevelTags;
        this.seriesLevelTags = seriesLevelTags;
-       this.study.setStudyInstanceUID(studyInstanceUID);
-   }
-
-   public Dcm2MetaBuilder(
-           final Set<Integer> studyLevelTags,
-           final Set<Integer> seriesLevelTags) {
-       this(studyLevelTags, seriesLevelTags, null);
+       this.metaBinaryPair = metaBinaryPair;
    }
 
    /**
@@ -173,17 +115,9 @@ public final class Dcm2MetaBuilder {
    @throws vtal::InvalidArgument The instance referred to by the path either doesn't have a study
    instance UID or its study instance UID is not the same as previously accumulated instances.
     */
-   public void accumulateFile(final File dcmPath) {
-       try {
-           final DicomInputStream dicomStream = new DicomInputStream(dcmPath);
-           try {
-               storeInstance(dcmPath, dicomStream);
-           } finally {
-               dicomStream.close();
-           }
-       } catch (IOException ex) {
-           throw new RuntimeException(dcmPath + " -- failed to load file: " + ex, ex);
-       }
+   public void accumulateFile(final File dcmPath) throws IOException {
+       final DicomInputStream dicomStream = new DicomInputStream(dcmPath);
+       storeInstance(dcmPath, dicomStream);
    }
 
    /**
@@ -199,9 +133,9 @@ public final class Dcm2MetaBuilder {
    binary data blobs for the study.
     */
 //   public MetaBinaryPair finish() {
-   public MetaBinaryFilePair finish() {
+   public void finish() {
        for (final Entry<String, Map<Integer, NormalizationCounter>> seriesTagsEntry: tagNormalizerTable.entrySet()) {
-           final Series series = study.getSeries(seriesTagsEntry.getKey());
+           final Series series = metaBinaryPair.getMetadata().getSeries(seriesTagsEntry.getKey());
            if (series == null) {
                throw new RuntimeException(
                        "Normalization: cannot find series " + seriesTagsEntry.getKey() + " in study data.");
@@ -221,7 +155,6 @@ public final class Dcm2MetaBuilder {
                }
            }
        }
-       return new MetaBinaryFilePair(study, binaryItems);
    }
 
      private static SpecificCharacterSet checkCharacterSet(final File dcmPath, final DicomObject dataset) {
@@ -242,12 +175,12 @@ public final class Dcm2MetaBuilder {
 
          final String dataStudyInstanceUID = dcmObj.getString(Tag.StudyInstanceUID);
          if (dataStudyInstanceUID != null) {
-             if (study.getStudyInstanceUID() == null) {
-                 study.setStudyInstanceUID(dataStudyInstanceUID);
+             if (metaBinaryPair.getMetadata().getStudyInstanceUID() == null) {
+            	 metaBinaryPair.getMetadata().setStudyInstanceUID(dataStudyInstanceUID);
              }
-             else if (!study.getStudyInstanceUID().equals(dataStudyInstanceUID)) {
+             else if (!metaBinaryPair.getMetadata().getStudyInstanceUID().equals(dataStudyInstanceUID)) {
                  throw new RuntimeException(dcmPath + " -- study instance uid (" + dataStudyInstanceUID +
-                         ") does not match current study (" + study.getStudyInstanceUID() + ')');
+                         ") does not match current study (" + metaBinaryPair.getMetadata().getStudyInstanceUID() + ')');
              }
          }
 
@@ -256,11 +189,11 @@ public final class Dcm2MetaBuilder {
              throw new RuntimeException(dcmPath + " -- missing series instance uid");
          }
 
-         Series series = study.getSeries(seriesInstanceUID);
+         Series series = metaBinaryPair.getMetadata().getSeries(seriesInstanceUID);
          if (series == null) {
              series = new Series();
              series.setSeriesInstanceUID(seriesInstanceUID);
-             study.putSeries(series);
+             metaBinaryPair.getMetadata().putSeries(series);
              assert !tagNormalizerTable.containsKey(seriesInstanceUID);
              tagNormalizerTable.put(seriesInstanceUID, new HashMap<Integer, NormalizationCounter>());
          }
@@ -276,8 +209,8 @@ public final class Dcm2MetaBuilder {
          for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
              final int tag = dcmElement.tag();
              if (studyLevelTags.contains(tag)) {
-                 if (study.getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, study, null);
+                 if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
+                     handleDICOMElement(dcmPath, charSet, dcmElement, metaBinaryPair.getMetadata(), null);
                  }
              }
              else if (seriesLevelTags.contains(tag)) {
@@ -424,7 +357,9 @@ public final class Dcm2MetaBuilder {
                  normCounter = seriesNormMap.get(binData.tag());
                  if (normCounter != null) {
                      final Attribute ncAttr = normCounter.attr;
-                     if (areEqual(ncAttr, binData, data, binaryItems)) {
+                     final byte[] binaryItem = metaBinaryPair.getBinaryData().getBinaryItem(ncAttr.getBid());
+
+                     if (areEqual(ncAttr, binData, data, binaryItem)) {
                          // The data is the same. Instead of creating a new Attribute just to throw it
                          // away shortly, re-use the previously created attribute.
                          attr = ncAttr;
@@ -435,27 +370,9 @@ public final class Dcm2MetaBuilder {
 
              if (attr == null) {
                  attr = newAttr(binData);
-                 attr.setBid(binaryItems.size()); // Before we do the push back...
+                 attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
 
-                 //Stream to file
-                 assert data != null;
-                 try {
-                     final File tmpFile = File.createTempFile("mint", ".bin");
-                     //The file should be deleted as soon as it is passed on to somewhere else;
-                     //we have a deleteOnExit here just as a backup.
-                     tmpFile.deleteOnExit();
-                     final FileOutputStream outStream = new FileOutputStream(tmpFile);
-                     try {
-                         outStream.write(data);
-                     } finally {
-                         outStream.close();
-                     }
-
-                     binaryItems.add(tmpFile);
-                 } catch (final IOException ex) {
-        			 //This would happen only in a catastrophic case
-        			 throw new RuntimeException(ex);
-                 }
+                 metaBinaryPair.getBinaryData().add(data);
 
                  if (seriesNormMap != null && normCounter == null) {
                      // This is the first occurrence of this particular attribute
@@ -474,63 +391,21 @@ public final class Dcm2MetaBuilder {
          return a.getTag() == obj.tag() && obj.vr().toString().equals(a.getVr().toString());
      }
 
-//     private static boolean areEqual(
-//         final Attribute a,
-//         final DicomElement binData,
-//         final byte[] binDataValue,
-//         final List<byte[]> binaryItems) {
-//         if (areNonValueFieldsEqual(a, binData)) {
-//             final byte[] binaryItem = binaryItems.get(a.getBid());
-//             if (binDataValue == null) {
-//                 return binaryItem == null;
-//             }
-//             return (binaryItem != null)
-//                 && (Arrays.equals(binaryItem, binDataValue));
-//         }
-//
-//         return false;
-//     }
-
      private static boolean areEqual(
-             final Attribute a,
-             final DicomElement binData,
-             final byte[] binDataValue,
-             final List<File> binaryItems) {
-             if (areNonValueFieldsEqual(a, binData)) {
-                 final File binaryItem = binaryItems.get(a.getBid());
-                 if (binDataValue == null) {
-                     return binaryItem == null;
-                 }
-                 if (binaryItem != null) {
-                	 final long fileSize = binaryItem.length();
-            		 //This should always be true, since we also wrote it from a byte array (which is bound by Integer.MAX_VALUE)
-                	 assert fileSize <= Integer.MAX_VALUE;
-            		 final byte[] dataBytes = new byte[(int)fileSize];
-            		 try {
-                    	 final FileInputStream binStream = new FileInputStream(binaryItem);
-                    	 try {
-                    		 int offset = 0;
-                    		 for(;;) {
-                    			 final int bytesRead = binStream.read(dataBytes, 0, (int)fileSize - offset);
-                    			 if (bytesRead == 0) {
-                    				 break;
-                    			 }
-                    			 offset += bytesRead;
-                    		 }
-                    	 } finally {
-                    		 binStream.close();
-                    	 }
-            		 } catch (final IOException ex) {
-            			 //This would happen only in a catastrophic case
-            			 throw new RuntimeException(ex);
-            		 }
-
-            		 Arrays.equals(dataBytes, binDataValue);
-                 }
+         final Attribute a,
+         final DicomElement binData,
+         final byte[] binDataValue,
+         final byte[] binaryItem) {
+         if (areNonValueFieldsEqual(a, binData)) {
+             if (binDataValue == null) {
+                 return binaryItem == null;
              }
-
-             return false;
+             return (binaryItem != null)
+                 && (Arrays.equals(binaryItem, binDataValue));
          }
+
+         return false;
+     }
 
      private static String getStringValue(final DicomElement elem, final SpecificCharacterSet charSet) {
          return elem.getString(charSet, false);
@@ -567,7 +442,5 @@ public final class Dcm2MetaBuilder {
      private final Set<Integer> seriesLevelTags;
      private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =
          new HashMap<String, Map<Integer, NormalizationCounter>>();
-     private final Study study = new Study();
-     private final List<File> binaryItems = new ArrayList<File>();
-//     private final List<byte[]> binaryItems = new ArrayList<byte[]>();
+     private final MetaBinaryPair metaBinaryPair;
 }
