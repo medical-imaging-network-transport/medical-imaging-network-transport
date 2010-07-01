@@ -115,7 +115,7 @@ public abstract class MINTCommonConfiguration {
 	}
 
 	protected String[] getPackagesToScan() {
-		return new String[] { "com.vitalimages.contentserver.domain" };
+		return new String[] { "org.nema.medical.mint.common" };
 	}
 
 	@Bean(destroyMethod = "close")

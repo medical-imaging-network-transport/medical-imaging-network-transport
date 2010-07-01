@@ -82,10 +82,11 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="../"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="ant-lib/jibx-bind-1.2.2.jar"/>
-	<classpathentry kind="lib" path="ant-lib/jibx-tools-1.2.2.jar"/>
-	<classpathentry kind="lib" path="ant-lib/jibx-schema-1.2.2.jar"/>
-	<classpathentry kind="lib" path="ant-lib/jibx-extras-1.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javassist-3.9.0.GA.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="../"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
