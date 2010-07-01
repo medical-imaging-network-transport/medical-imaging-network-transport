@@ -19,6 +19,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.common.metadata.Study;
+import org.nema.medical.mint.common.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +84,19 @@ public class JobsController {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST,
 					"At least on file (containing metadata) is required.");
 			return;
+		} else {
+			File metadata = files.get(0);
+			Study study;
+			if (metadata.getPath().endsWith(".xml")) {
+				//study = StudyIO.parseFromXML(metadata);
+			} else if (metadata.getPath().endsWith(".gbp")) {
+				//study = StudyIO.parseFromGPB(metadata);
+			} else {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						"Unknown metadata format");
+				return;
+			}
+
 		}
 
 		// String studyUUID = UUID.randomUUID().toString();
@@ -145,13 +160,27 @@ public class JobsController {
 			FileItemStream item = iter.next();
 			String name = item.getFieldName();
 			InputStream in = item.openStream();
+
 			if (item.isFormField()) {
 				String value = Streams.asString(in);
 				LOG.debug("found form field " + name + " = " + value);
 				params.put(name, Streams.asString(in));
 			} else {
-				File binaryFile = new File(jobFolder, String.format(
-						"file%04d.dat", bid++));
+				File file;
+				if (files.isEmpty()) {
+					String contentType = item.getContentType();
+					if ("text/xml".equals(contentType)) {
+						file = new File(jobFolder, "metadata.xml");
+					} else if("application/octet-stream".equals(contentType)) {
+						file = new File(jobFolder, "metadata.gpb");
+					} else {
+						file = new File(jobFolder, "metadata.dat");
+					}
+				} else {
+					file = new File(jobFolder, String.format("file%04d.dat",
+							bid++));
+				}
+
 				FileOutputStream out = null;
 				try {
 					while (true) {
@@ -160,16 +189,17 @@ public class JobsController {
 						if (len < 0)
 							break;
 						if (out == null) {
-							// defer create so we don't create an empty file if filesize=0
-							out = new FileOutputStream(binaryFile);
-							LOG.info("creating... " + binaryFile);
+							// defer create so we don't create empty files
+							out = new FileOutputStream(file);
+							LOG.info("creating... " + file);
 						}
 						out.write(buf, 0, len);
 					}
 				} finally {
-					if (out != null) out.close();
+					if (out != null)
+						out.close();
 				}
-				files.add(binaryFile);
+				files.add(file);
 			}
 		}
 	}
