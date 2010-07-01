@@ -4,7 +4,7 @@ import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder.MetaBinaryPair;
 
 public interface MINTSend {
 	/**
-	 * Sends mint data for one complete study off to a handling instance.
+	 * Sends mint data for one complete study off to a consumer.
 	 * @param studyData
 	 */
 	void send(MetaBinaryPair studyData);
