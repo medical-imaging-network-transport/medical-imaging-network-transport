@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.nema.medical.mint.common.domain.ConfigurationDAO;
 import org.nema.medical.mint.common.domain.Study;
 import org.nema.medical.mint.common.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,6 @@ import com.sun.syndication.io.SyndFeedOutput;
 
 @Controller
 public class AtomController {
-
-	@Autowired
-	protected ConfigurationDAO configurationDao = null;
 
 	@Autowired
 	protected StudyDAO studyDao = null;

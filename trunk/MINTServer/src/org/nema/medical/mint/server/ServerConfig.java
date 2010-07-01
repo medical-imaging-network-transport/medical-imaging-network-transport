@@ -1,9 +1,9 @@
 package org.nema.medical.mint.server;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.nema.medical.mint.common.MINTCommonConfiguration;
-import org.nema.medical.mint.common.domain.ConfigurationDAO;
 import org.nema.medical.mint.common.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
@@ -14,20 +14,22 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
-public class MintServerConfiguration extends MINTCommonConfiguration {
-
-	protected ConfigurationDAO configurationDao = null;
+public class ServerConfig extends MINTCommonConfiguration {
 
 	protected StudyDAO studyDao = null;
+	protected File jobTemp = null;
+	protected File studyRoot = null;
 
-	@Bean(name = "configurationDao", autowire = Autowire.BY_NAME)
-	public ConfigurationDAO configurationDao() throws Exception {
-		if (configurationDao == null) {
-			configurationDao = new ConfigurationDAO();
-			configurationDao.setSessionFactory(sessionFactory());
-			configurationDao.afterPropertiesSet();
-		}
-		return configurationDao;
+	@Bean(name = "jobTemp", autowire = Autowire.BY_NAME)
+	public File jobTemp() throws Exception {
+		jobTemp = new File(mintHome(), "jobs");
+		return jobTemp;
+	}
+
+	@Bean(name = "studyRoot", autowire = Autowire.BY_NAME)
+	public File studyRoot() throws Exception {
+		studyRoot = new File(mintHome(), "studies");
+		return studyRoot;
 	}
 
 	@Bean(name = "studyDao", autowire = Autowire.BY_NAME)
