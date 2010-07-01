@@ -24,8 +24,8 @@ public class InstanceLogDAO extends HibernateDaoSupport {
 		DetachedCriteria studyCriteria = DetachedCriteria.forClass(Study.class)
 				.add(Restrictions.eq("studyInstanceUID", studyInstanceUID));
 		
-		List studies = template.findByCriteria(studyCriteria);
-		Study study = (studies.isEmpty()) ? null : (Study)studies.get(0);
+		List<Study> studies = template.findByCriteria(studyCriteria);
+		Study study = (studies.isEmpty()) ? null : studies.get(0);
 		if (study == null) {
 			// create the study and initialize
 			study = new Study();
@@ -42,8 +42,8 @@ public class InstanceLogDAO extends HibernateDaoSupport {
 		DetachedCriteria deviceCriteria = DetachedCriteria.forClass(Device.class)
 				.add(Restrictions.eq("aeTitle", aeTitle))
 				.add(Restrictions.eq("ipAddress", ipAddress));
-		List devices = template.findByCriteria(deviceCriteria);
-		Device device = (devices.isEmpty()) ? null : (Device)devices.get(0);
+		List<Device> devices = template.findByCriteria(deviceCriteria);
+		Device device = (devices.isEmpty()) ? null : devices.get(0);
 		if (device == null) {
 			device = new Device();
 			device.setAeTitle(aeTitle);
