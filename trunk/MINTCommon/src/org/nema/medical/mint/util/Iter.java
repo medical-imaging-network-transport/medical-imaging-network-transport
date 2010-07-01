@@ -1,22 +1,21 @@
+/*
+ *   Copyright 2010 MINT Working Group
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 package org.nema.medical.mint.util;
 
 import java.util.Iterator;
-
-/* Copyright (c) Vital Images, Inc. 2010. All Rights Reserved.
- *
- *    This is UNPUBLISHED PROPRIETARY SOURCE CODE of Vital Images, Inc.;
- *    the contents of this file may not be disclosed to third parties,
- *    copied or duplicated in any form, in whole or in part, without the
- *    prior written permission of Vital Images, Inc.
- *
- *    RESTRICTED RIGHTS LEGEND:
- *    Use, duplication or disclosure by the Government is subject to
- *    restrictions as set forth in subdivision (c)(1)(ii) of the Rights
- *    in Technical Data and Computer Software clause at DFARS 252.227-7013,
- *    and/or in similar or successor clauses in the FAR, DOD or NASA FAR
- *    Supplement. Unpublished rights reserved under the Copyright Laws of
- *    the United States.
- */
 
 public final class Iter {
 
