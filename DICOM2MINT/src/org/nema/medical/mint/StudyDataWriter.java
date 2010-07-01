@@ -18,7 +18,7 @@ package org.nema.medical.mint;
 
 import java.util.Collection;
 
-import org.nema.medical.mint.Dcm2MetaBuilder.MetaBinaryPair;
+import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder.MetaBinaryPair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 

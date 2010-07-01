@@ -11,8 +11,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.Dcm2MetaBuilder.MetaBinaryPair;
 import org.nema.medical.mint.InboundStudyMap.StudyInfo;
+import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
+import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder.MetaBinaryPair;
 import org.springframework.beans.factory.annotation.Autowired;
 
 final class ProcessStudyFiles {
