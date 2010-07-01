@@ -36,7 +36,6 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.domain.JobInfo;
 import org.nema.medical.mint.common.domain.JobStatus;
-import org.nema.medical.mint.common.metadata.Study;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -109,7 +108,7 @@ public class JobsController {
 			return "error";
 		} else {
 			File metadata = files.get(0);
-			Study study;
+			//Study study;
 			if (metadata.getPath().endsWith(".xml")) {
 				//study = StudyIO.parseFromXML(metadata);
 			} else if (metadata.getPath().endsWith(".gbp")) {
