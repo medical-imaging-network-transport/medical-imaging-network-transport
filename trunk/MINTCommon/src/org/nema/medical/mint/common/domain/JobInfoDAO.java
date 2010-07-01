@@ -30,7 +30,7 @@ public class JobInfoDAO extends HibernateDaoSupport {
 	@SuppressWarnings("unchecked")
 	public JobInfo findJobInfo(final String uid) {
 		if (StringUtils.isNotBlank(uid)) {
-			final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class).add(
+			final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(JobInfo.class).add(
 					Restrictions.eq("id", uid));
 			final List<JobInfo> list = getHibernateTemplate().findByCriteria(detachedCriteria);
 			if (!list.isEmpty()) {

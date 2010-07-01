@@ -42,7 +42,7 @@ import com.sun.syndication.io.SyndFeedOutput;
 public class AtomController {
 
 	@Autowired
-	protected StudyDAO studyDao = null;
+	protected StudyDAO studyDAO = null;
 
 	@RequestMapping("atom")
 	public void atom(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
@@ -62,7 +62,7 @@ public class AtomController {
 			link.append("/studies/");
 
 			final List<SyndEntry> list = new LinkedList<SyndEntry>();
-			for (final Study study : studyDao.getMostRecentStudies(50, 24 * 60 * 60)) {
+			for (final Study study : studyDAO.getMostRecentStudies(50, 24 * 60 * 60)) {
 				final SyndEntry syndEntry = new SyndEntryImpl();
 				syndEntry.setLink(link + study.getId() + "/summary");
 				syndEntry.setPublishedDate(study.getUpdateTime());

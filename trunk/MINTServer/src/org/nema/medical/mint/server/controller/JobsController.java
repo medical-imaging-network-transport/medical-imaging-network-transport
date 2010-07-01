@@ -69,10 +69,12 @@ public class JobsController {
 			HttpServletResponse res, ModelMap map) throws IOException {
 		
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		if (JobInfo.now().getTime() - jobInfo.getUpdateTime().getTime() > 5000) {
-			jobInfo.setStatus(JobStatus.SUCCESS);
-			jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
-		}
+		
+		// just a test to show that the status changes
+//		if (JobInfo.now().getTime() - jobInfo.getUpdateTime().getTime() > 5000) {
+//			jobInfo.setStatus(JobStatus.SUCCESS);
+//			jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
+//		}
 		
 		map.addAttribute("jobinfo", jobInfo);
 		

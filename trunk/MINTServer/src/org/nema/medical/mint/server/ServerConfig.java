@@ -31,7 +31,7 @@ import org.springframework.web.servlet.view.JstlView;
 @Configuration
 public class ServerConfig extends MINTCommonConfiguration {
 
-	protected StudyDAO studyDao = null;
+	protected StudyDAO studyDAO = null;
 	protected JobInfoDAO jobInfoDAO = null;
 	protected File jobTemp = null;
 	protected File studyRoot = null;
@@ -50,12 +50,12 @@ public class ServerConfig extends MINTCommonConfiguration {
 
 	@Bean(name = "studyDAO", autowire = Autowire.BY_NAME)
 	public StudyDAO studyDAO() throws Exception {
-		if (studyDao == null) {
-			studyDao = new StudyDAO();
-			studyDao.setSessionFactory(sessionFactory());
-			studyDao.afterPropertiesSet();
+		if (studyDAO == null) {
+			studyDAO = new StudyDAO();
+			studyDAO.setSessionFactory(sessionFactory());
+			studyDAO.afterPropertiesSet();
 		}
-		return studyDao;
+		return studyDAO;
 	}
 
 	@Bean(name = "jobInfoDAO", autowire = Autowire.BY_NAME)
