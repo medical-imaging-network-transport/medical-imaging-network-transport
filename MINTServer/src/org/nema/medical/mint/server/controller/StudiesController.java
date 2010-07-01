@@ -70,7 +70,7 @@ public class StudiesController {
 
 	@RequestMapping("/studies")
 	public String studies(@RequestParam(value = "studyuid", required = false) final String studyUid,
-			@ModelAttribute("Studies") final List<Study> studies, final HttpServletResponse httpServletResponse)
+			@ModelAttribute("Studies") final List<Study> studies)
 			throws IOException {
 
 		if (StringUtils.isNotBlank(studyUid)) {

@@ -16,7 +16,6 @@
 package org.nema.medical.mint.server;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.nema.medical.mint.common.MINTCommonConfiguration;
 import org.nema.medical.mint.common.domain.StudyDAO;
@@ -60,7 +59,6 @@ public class ServerConfig extends MINTCommonConfiguration {
 	@Bean
 	public ViewResolver viewResolver() {
 		final InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
-		internalResourceViewResolver.setAttributes(new Properties());
 		internalResourceViewResolver.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		internalResourceViewResolver.setPrefix("/WEB-INF/jsp/");
 		internalResourceViewResolver.setSuffix(".jsp");
