@@ -56,7 +56,9 @@ public class AtomController {
 			syndFeed.setTitle("Latest Studies");
 
 			final StringBuffer link = httpServletRequest.getRequestURL();
-			link.setLength(link.indexOf(httpServletRequest.getPathInfo()));
+			if (StringUtils.isNotBlank(httpServletRequest.getPathInfo())) {
+				link.setLength(link.indexOf(httpServletRequest.getPathInfo()));
+			}
 			link.append("/studies/");
 
 			final List<SyndEntry> list = new LinkedList<SyndEntry>();

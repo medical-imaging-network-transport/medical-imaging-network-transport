@@ -151,7 +151,7 @@ public class StudiesController {
 		}
 		try {
 			String metadata = null;
-			if (httpServletRequest.getPathInfo().endsWith(".gpb")) {
+			if (StringUtils.endsWith(httpServletRequest.getPathInfo(),".gpb")) {
 				httpServletResponse.setContentType("application/octet-stream");
 				metadata = "/metadata.gpb";
 			} else {
@@ -188,7 +188,7 @@ public class StudiesController {
 		}
 		try {
 			String summary = null;
-			if (httpServletRequest.getPathInfo().endsWith(".gpb")) {
+			if (StringUtils.endsWith(httpServletRequest.getPathInfo(),".gpb")) {
 				httpServletResponse.setContentType("application/octet-stream");
 				summary = "/summary.gpb";
 			} else {
