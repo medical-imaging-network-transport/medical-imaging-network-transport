@@ -77,7 +77,7 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="../"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/dcm4che-core-2.0.23.jar">
+	<classpathentry exported="true" kind="lib" path="lib/dcm4che-core-2.0.23.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="../"/>
 		</attributes>
