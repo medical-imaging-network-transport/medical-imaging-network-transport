@@ -4,9 +4,23 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Job Information</title>
 </head>
 <body>
-
+<c:if test="${not empty jobinfo}">
+<h1>Job Information for Job ID: ${jobinfo.id}</h1>
+	<ul>
+		<li>
+		<ul>
+			<li class='UID'>${jobinfo.id}</li>
+			<li>Study ID: ${jobinfo.studyID}</li>
+			<li>Status: ${jobinfo.status}</li>
+			<li>Status Description: ${jobinfo.statusDescription}</li>
+			<li>Create Time: ${jobinfo.createTime}</li>
+			<li>Update Time: ${jobinfo.updateTime}</li>
+		</ul>
+		</li>
+	</ul>
+</c:if>
 </body>
 </html>
