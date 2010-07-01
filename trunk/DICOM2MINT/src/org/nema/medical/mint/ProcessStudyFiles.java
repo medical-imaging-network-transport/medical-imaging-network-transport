@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.dcm4che2.data.DicomObject;
+import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.nema.medical.mint.InboundStudyMap.StudyInfo;
 import org.nema.medical.mint.dcm2mint.BinaryMemoryData;
@@ -75,7 +77,9 @@ final class ProcessStudyFiles {
             try {
             	final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
             	try {
-                    builder.accumulateFile(instanceFile, dcmStream);
+            		final DicomObject dcmObj = dcmStream.readDicomObject();
+            		final TransferSyntax transferSyntax = dcmStream.getTransferSyntax();
+                    builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
             	} finally {
             		dcmStream.close();
             	}
