@@ -54,6 +54,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/index.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>MINTServer</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
