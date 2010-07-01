@@ -18,6 +18,7 @@ package org.nema.medical.mint.server;
 import java.io.File;
 
 import org.nema.medical.mint.common.MINTCommonConfiguration;
+import org.nema.medical.mint.common.domain.JobInfoDAO;
 import org.nema.medical.mint.common.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.view.JstlView;
 public class ServerConfig extends MINTCommonConfiguration {
 
 	protected StudyDAO studyDao = null;
+	protected JobInfoDAO jobInfoDAO = null;
 	protected File jobTemp = null;
 	protected File studyRoot = null;
 
@@ -46,14 +48,24 @@ public class ServerConfig extends MINTCommonConfiguration {
 		return studyRoot;
 	}
 
-	@Bean(name = "studyDao", autowire = Autowire.BY_NAME)
-	public StudyDAO studyDao() throws Exception {
+	@Bean(name = "studyDAO", autowire = Autowire.BY_NAME)
+	public StudyDAO studyDAO() throws Exception {
 		if (studyDao == null) {
 			studyDao = new StudyDAO();
 			studyDao.setSessionFactory(sessionFactory());
 			studyDao.afterPropertiesSet();
 		}
 		return studyDao;
+	}
+
+	@Bean(name = "jobInfoDAO", autowire = Autowire.BY_NAME)
+	public JobInfoDAO jobInfoDAO() throws Exception {
+		if (jobInfoDAO == null) {
+			jobInfoDAO = new JobInfoDAO();
+			jobInfoDAO.setSessionFactory(sessionFactory());
+			jobInfoDAO.afterPropertiesSet();
+		}
+		return jobInfoDAO;
 	}
 
 	@Bean

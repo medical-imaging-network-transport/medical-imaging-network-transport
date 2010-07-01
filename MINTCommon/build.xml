@@ -22,7 +22,24 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="build" description="Make JAR of compiled classes">
+	<target name="jibx" depends="build">
+		<bind verbose="true" load="true" binding="config/mint-binding.xml">
+			<classpath>
+				<pathelement path="ant-build\bin"/>
+				<pathelement location="lib/jibx-run.jar" />
+			</classpath>
+		</bind>
+	</target>
+
+	<!-- JiBX binding compiler task definition -->
+	<taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
+		<classpath>
+			<fileset dir="lib" includes="*.jar" />
+			<fileset dir="ant-lib" includes="*.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}.jar">
 			<fileset dir="${build.dir}/bin" />
 			<fileset dir="${basedir}/src">

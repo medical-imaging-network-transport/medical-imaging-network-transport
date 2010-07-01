@@ -8,6 +8,6 @@
 </head>
 <body>
 <h1>A error occured on the server</h1>
-<p>${error}</p>
+<p>Detail: ${error_msg}</p>
 </body>
 </html>

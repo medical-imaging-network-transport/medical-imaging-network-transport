@@ -30,7 +30,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "mint_job_status")
+@Table(name = "mint_jobinfo")
 public class JobInfo {
 	public static Timestamp now() {
 		return new Timestamp(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTimeInMillis());
