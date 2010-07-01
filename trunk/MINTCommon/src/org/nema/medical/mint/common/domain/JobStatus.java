@@ -1,5 +1,9 @@
 package org.nema.medical.mint.common.domain;
 
+/**
+ * @author Rex
+ *
+ */
 public enum JobStatus {
 	IN_PROGRESS("IN_PROGRESS"), SUCCESS("SUCCESS"), FAILED("FAILED");
 	

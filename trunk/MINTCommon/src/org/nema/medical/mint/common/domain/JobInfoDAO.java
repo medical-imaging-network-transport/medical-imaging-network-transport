@@ -7,6 +7,10 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+/**
+ * @author Rex
+ *
+ */
 public class JobInfoDAO extends HibernateDaoSupport {
 	@SuppressWarnings("unchecked")
 	public JobInfo findJobInfo(final String uid) {
