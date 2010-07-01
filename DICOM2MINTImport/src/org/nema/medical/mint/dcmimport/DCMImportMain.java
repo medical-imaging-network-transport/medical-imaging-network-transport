@@ -22,9 +22,9 @@ public class DCMImportMain {
 			{
 				PrintUsage();
 				return;
-			}			
+			}
 		}
-		
+
 		//Too many or not enough arguments
 		if( args.length != 2 )
 		{
@@ -42,9 +42,9 @@ public class DCMImportMain {
 			{
 				Exception noExist = new Exception("File path is a valid format but the path does not exist on this machine.");
 				throw noExist;
-				
+
 			}
-			
+
 		}
 		catch(Exception e)
 		{
@@ -53,15 +53,15 @@ public class DCMImportMain {
 			PrintUsage();
 			return;
 		}
-		
+
 		//Get the Server URL and make sure it is a valid HTTP address
 		String serverURL = args[1].toString();
 		if( !serverURL.startsWith("http://") )
 		{
 			serverURL = "http://" + serverURL;
-			
+
 		}
-		
+
 		//Now check that the server exists
 		if( !CheckServerExists(serverURL) )
 		{
@@ -70,12 +70,13 @@ public class DCMImportMain {
 			PrintUsage();
 			return;
 		}
-		
+
 		//Finished validating inputs, call the actual processing code
 		try
 		{
 			//Create an instance of the Directory Processing Class
-			ProcessImportDir importProcessor = new ProcessImportDir(inputDir, serverURL);
+			//TODO must construct MINTSend instance from serverURL somehow
+			ProcessImportDir importProcessor = new ProcessImportDir(inputDir, null);
 
 			//Run the importing process against the specified directory
 			//This will process and send the resulting MINT message to the MINTServer
@@ -87,9 +88,9 @@ public class DCMImportMain {
 			System.out.println(e.toString());
 			System.out.println(e.getStackTrace().toString());
 		}
-		
+
 	}
-	
+
 	private static void PrintUsage()
 	{
 		System.out.println("Usage: DICOM2MINTImport [DIRECTORY] [URL]");
@@ -99,9 +100,9 @@ public class DCMImportMain {
 		System.out.println("  Inputs:");
 		System.out.println("    [DIRECTORY]  the file path where DICOM files are located");
 		System.out.println("    [URL]        the Base URL path of the MINTServer.");
-		
+
 	}
-	
+
 	private static boolean CheckServerExists(String URLName){
 		try
 		{
@@ -115,6 +116,6 @@ public class DCMImportMain {
 			System.out.println(e.toString());
 			return false;
 		}
-	} 
+	}
 
 }
