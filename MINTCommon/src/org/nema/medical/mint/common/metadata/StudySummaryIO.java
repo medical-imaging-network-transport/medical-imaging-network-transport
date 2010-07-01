@@ -14,8 +14,8 @@ import org.apache.velocity.app.VelocityEngine;
 public class StudySummaryIO {
 
 	static private final String VELOCITY_PROPERTIES = "velocity.properties";
-	static private final String STUDY_ATTRIBUTES = "com/vitalimages/contentserver/mint/StudySummary.properties";
-	static private final String SUMMARY_TEMPLATE = "com/vitalimages/contentserver/mint/StudySummary.vm";
+	static private final String STUDY_ATTRIBUTES = "org/nema/medical/mint/common/metadata/StudySummary.properties";
+	static private final String SUMMARY_TEMPLATE = "org/nema/medical/mint/common/metadata/StudySummary.vm";
 	static private Properties summaryAttrProps;
 	static private Properties velocityProps;
 
