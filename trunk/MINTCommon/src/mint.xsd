@@ -28,7 +28,7 @@
     	<attribute name="tag" type="string" use="required"></attribute>
     	<attribute name="vr" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
     	<attribute name="val" type="string" use="optional"></attribute>
-    	<attribute name="bid" type="string" use="optional"></attribute>
+    	<attribute name="bid" type="unsignedInt" use="optional"></attribute>
     	<attribute name="exclude" type="string" use="optional"></attribute>
     </complexType>
 
@@ -48,6 +48,7 @@
     	<complexContent>
     		<extension base="tns:AttributesType"></extension>
     	</complexContent>
+    	<attribute name="id" type="unsignedInt" use="required"></attribute>
     </complexType>
 
     <complexType name="NormalizedInstanceAttributesType">
