@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.nema.medical.mint.common.metadata.Mint2Gpb.AttributeData;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.ItemData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.AttributeData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.ItemData;
 
 
 /**

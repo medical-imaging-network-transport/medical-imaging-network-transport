@@ -16,7 +16,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.nema.medical.mint.common.metadata.Mint2Gpb.StudyData;
+import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.StudyData;
 
 import com.google.gson.Gson;
 

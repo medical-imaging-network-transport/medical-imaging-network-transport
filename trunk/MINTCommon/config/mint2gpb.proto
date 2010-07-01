@@ -19,6 +19,7 @@
 
 package mint.metadata;
 option java_package = "org.nema.medical.mint.common.metadata";
+option java_outer_classname = "MINT2GPB";
 option optimize_for = SPEED;
 
 //------------------------------------------------------------------------------
