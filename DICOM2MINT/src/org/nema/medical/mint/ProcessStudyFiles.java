@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.dcm4che2.io.DicomInputStream;
 import org.nema.medical.mint.InboundStudyMap.StudyInfo;
 import org.nema.medical.mint.dcm2mint.BinaryMemoryData;
 import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
@@ -72,7 +73,12 @@ final class ProcessStudyFiles {
         final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
         for (final File instanceFile: item.instances) {
             try {
-                builder.accumulateFile(instanceFile);
+            	final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
+            	try {
+                    builder.accumulateFile(instanceFile, dcmStream);
+            	} finally {
+            		dcmStream.close();
+            	}
             } catch (final IOException ex) {
                 throw new RuntimeException(instanceFile + " -- failed to load file: " + ex, ex);
             }
