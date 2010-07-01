@@ -8,12 +8,10 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.nema.medical.mint.common.domain.ConfigurationDAO;
 import org.nema.medical.mint.common.domain.Study;
 import org.nema.medical.mint.common.domain.StudyDAO;
 import org.nema.medical.mint.common.metadata.BinaryItem;
@@ -28,12 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class StudiesController {
 
-	protected static String dataPath = null;
-
 	public static final String NEWLINE = System.getProperty("line.separator");
 
 	@Autowired
-	protected ConfigurationDAO configurationDao = null;
+	protected File studyRoot;
 
 	@Autowired
 	protected StudyDAO studyDao = null;
@@ -55,14 +51,6 @@ public class StudiesController {
 	@ModelAttribute("Studies")
 	public List<Study> getStudies() {
 		return new LinkedList<Study>();
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		dataPath = configurationDao.getValue("dataPath");
-		if (dataPath == null) {
-			dataPath = System.getenv("MINT_HOME");
-		}
 	}
 
 	@RequestMapping("/studies")
@@ -106,8 +94,8 @@ public class StudiesController {
 		}
 
 		try {
-			final File binaryIndexFile = new File(dataPath + "/" + uuid + "/binaryindex.gpb");
-			final File binaryItemsFile = new File(dataPath + "/" + uuid + "/binaryitems.dat");
+			final File binaryIndexFile = new File(studyRoot, uuid + "/binaryindex.gpb");
+			final File binaryItemsFile = new File(studyRoot, uuid + "/binaryitems.dat");
 			if (binaryIndexFile.exists() && binaryIndexFile.canRead() && binaryItemsFile.exists()
 					&& binaryItemsFile.canRead()) {
 				final FileInputStream binaryIndexFileInputStream = new FileInputStream(binaryIndexFile);
@@ -153,7 +141,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/xml");
 				metadata = "/metadata.xml";
 			}
-			final File file = new File(dataPath + "/" + uuid + metadata);
+			final File file = new File(studyRoot , uuid + metadata);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
@@ -190,7 +178,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/html");
 				summary = "/summary.html";
 			}
-			final File file = new File(dataPath + "/" + uuid + summary);
+			final File file = new File(studyRoot, uuid + summary);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
