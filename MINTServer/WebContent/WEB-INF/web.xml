@@ -17,7 +17,7 @@
 
 	<context-param>
 		<param-name>db.url</param-name>
-		<param-value>jdbc:h2:~/mint</param-value>
+		<param-value>jdbc:h2:file:$MINT_HOME/mint</param-value>
 	</context-param>
 	<context-param>
 		<param-name>db.user</param-name>
