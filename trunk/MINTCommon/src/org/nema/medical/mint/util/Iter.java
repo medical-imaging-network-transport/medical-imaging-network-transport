@@ -17,6 +17,9 @@ package org.nema.medical.mint.util;
 
 import java.util.Iterator;
 
+/**
+ * @author Uli Bubenheimer
+ */
 public final class Iter {
 
     public static <Element> Iterable<Element> iter(final Iterator<Element> baseIter) {

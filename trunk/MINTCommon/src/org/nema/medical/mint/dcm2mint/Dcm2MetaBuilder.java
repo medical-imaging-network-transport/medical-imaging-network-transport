@@ -76,10 +76,12 @@ This behavior may result in summary tags whose values differ between instances b
 It may also result in attributes appearing to be present in all instances even if some instances
 happened to not have the attributes. Both of these cases would be extremely rare and the current
 behavior is deemed acceptable.
+
+@author Uli Bubenheimer
 */
 public final class Dcm2MetaBuilder {
 
-	/**
+    /**
    Create an instance of the class with the specified summary-level tag maps.
 
    The maps are used in subsequent calls to accumulateFile().
@@ -91,7 +93,7 @@ public final class Dcm2MetaBuilder {
    @param seriesLevelTags The caller must fill this in with tags that are considered to be part of
    the series-level set for each series. See the note below for tag insertion rules.
 
-	The caller may set a StudyInstanceUID on the study to constrain processing.
+    The caller may set a StudyInstanceUID on the study to constrain processing.
    \note If a given attribute tag is present in both maps, the studyLevelTags map takes
    precedence.
     */
@@ -166,13 +168,13 @@ public final class Dcm2MetaBuilder {
      instance UID or its study instance UID is not the same as previously accumulated instances.
       */
      public void accumulateFile(final File dcmPath, final DicomObject dcmObj,
-    		 final TransferSyntax transferSyntax) {
+             final TransferSyntax transferSyntax) {
          final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
 
          final String dataStudyInstanceUID = dcmObj.getString(Tag.StudyInstanceUID);
          if (dataStudyInstanceUID != null) {
              if (metaBinaryPair.getMetadata().getStudyInstanceUID() == null) {
-            	 metaBinaryPair.getMetadata().setStudyInstanceUID(dataStudyInstanceUID);
+                 metaBinaryPair.getMetadata().setStudyInstanceUID(dataStudyInstanceUID);
              }
              else if (!metaBinaryPair.getMetadata().getStudyInstanceUID().equals(dataStudyInstanceUID)) {
                  throw new RuntimeException(dcmPath + " -- study instance uid (" + dataStudyInstanceUID +
