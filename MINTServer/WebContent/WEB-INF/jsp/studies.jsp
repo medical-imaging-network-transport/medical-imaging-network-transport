@@ -16,9 +16,9 @@
 			<li>
 			<ul>
 				<li class='UID'>${study.studyInstanceUID}</li>
-				<li class='meta'><a href='studies/${study.id}/metadata'>Meta
+				<li class='meta'><a href='studies/${study.id}/DICOM/metadata'>Meta
 				Data</a></li>
-				<li class='summary'><a href='studies/${study.id}/summary'>Study
+				<li class='summary'><a href='studies/${study.id}/DICOM/summary'>Study
 				Summary</a></li>
 			</ul>
 			</li>

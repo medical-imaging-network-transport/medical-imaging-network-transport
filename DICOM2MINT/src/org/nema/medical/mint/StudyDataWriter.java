@@ -29,10 +29,6 @@ public final class StudyDataWriter {
     @Autowired
     FileSystemResource dicomProcessorOutputDir;
 
-    //TODO
-//    @Autowired
-//    InstanceLogDAO instanceLogDAO;
-
     public void write(final Collection<MetaBinaryPair> items) throws Exception {
         //TODO
 //        for (final MetaBinaryPair metaBinaryPair : items) {
@@ -60,30 +56,5 @@ public final class StudyDataWriter {
 //                binaryItems.add(binaryItem);
 //            }
 //            BinaryItemIO.writeIndex(binaryItems, new File(studyOutputDir, "binaryindex.gpb"));
-
-            //TODO
-//            Iterator<Series> seriesIter = study.seriesIterator();
-//            for (Series series; seriesIter.hasNext();) {
-//                series = seriesIter.next();
-//                Iterator<Instance> instanceIter = series.instanceIterator();
-//                for (Instance instance; instanceIter.hasNext();) {
-//                    instance = instanceIter.next();
-//                    instanceLogDAO.logInstance("assoc", false, study.getStudyInstanceUID(),
-//                            new Timestamp(System.currentTimeMillis()),
-//                            study.getValueForAttribute(0x00100010), // patient name
-//                            study.getValueForAttribute(0x00100020), // patient ID
-//                            study.getValueForAttribute(0x00080050), // accession number
-//                            instance.getXfer(),
-//                            new Timestamp(System.currentTimeMillis()),
-//                            new Timestamp(System.currentTimeMillis()),
-//                            instance.getValueForAttribute(Tag.SOPInstanceUID),
-//                            instance.getValueForAttribute(Tag.SOPClassUID),
-//                            "aeTitle",
-//                            "127.0.0.1",
-//                            1L);
-//                }
-//
-//            }
-//        }
     }
 }

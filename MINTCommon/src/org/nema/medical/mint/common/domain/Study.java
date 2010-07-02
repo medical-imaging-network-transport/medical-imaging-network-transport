@@ -18,16 +18,12 @@ package org.nema.medical.mint.common.domain;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TimeZone;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -59,14 +55,8 @@ public class Study implements Serializable {
 	@Column
 	private String accessionNumber;
 
-	// set of devices that submitted instances for this study
-	@ManyToMany(cascade = CascadeType.PERSIST)
-	private Set<Device> devices = new HashSet<Device>();
-
-	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	@Column(name = "studyID")
+	// this is a UUID, generated externally for new instances by Java's UUID class
+	@Id @Column(name = "studyID")
 	private String id;
 
 	// Patient ID (0010,0020) T2
@@ -156,10 +146,11 @@ public class Study implements Serializable {
 		return accessionNumber;
 	}
 
-	public Set<Device> getDevices() {
-		return devices;
+	public String getID() {
+		return id;
 	}
 
+	// hack so that {study.id} works in JSP
 	public String getId() {
 		return id;
 	}
@@ -193,11 +184,7 @@ public class Study implements Serializable {
 		this.accessionNumber = accessionNumber;
 	}
 
-	public void setDevices(final Set<Device> devices) {
-		this.devices = devices;
-	}
-
-	public void setId(final String id) {
+	public void setID(final String id) {
 		this.id = id;
 	}
 
