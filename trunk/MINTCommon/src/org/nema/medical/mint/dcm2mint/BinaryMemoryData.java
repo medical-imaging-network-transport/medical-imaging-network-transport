@@ -17,6 +17,7 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,5 +40,10 @@ public final class BinaryMemoryData implements BinaryData {
     @Override
     public int size() {
         return binaryItems.size();
+    }
+
+    @Override
+    public Iterator<byte[]> iterator() {
+        return binaryItems.iterator();
     }
 }
