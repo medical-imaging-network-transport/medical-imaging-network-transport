@@ -122,7 +122,6 @@ public final class Dcm2MetaBuilder {
    @return A MetaBinaryPair instance containing the normalized metadata for the study and all the
    binary data blobs for the study.
     */
-//   public MetaBinaryPair finish() {
    public void finish() {
        for (final Entry<String, Map<Integer, NormalizationCounter>> seriesTagsEntry: tagNormalizerTable.entrySet()) {
            final Series series = metaBinaryPair.getMetadata().getSeries(seriesTagsEntry.getKey());
@@ -197,7 +196,6 @@ public final class Dcm2MetaBuilder {
          }
 
          final Instance instance = new Instance();
-         //TODO without this, we could simplify the code - find another way to get this (NOT from the stream directly, but from the DicomObject)
          instance.setXfer(transferSyntax.uid());
          series.putInstance(instance);
 
@@ -237,7 +235,6 @@ public final class Dcm2MetaBuilder {
          final IStore storeBinary = new StoreBinary(dcmPath, charSet, attrs, seriesNormMap);
          final VR vr = dcmElem.vr();
          if (vr == null) {
-             //TODO can't handle (possibly private tag?)
              throw new RuntimeException("Null VR");
          } else if (vr == VR.OW || vr == VR.OB || vr == VR.UN || vr == VR.UN_SIEMENS) {
              //TODO define complete list of binary types
@@ -247,7 +244,6 @@ public final class Dcm2MetaBuilder {
              storeSequence.store(dcmElem);
          } else {
              //Non-binary, non-sequence
-             //TODO need to restrict list to actual non-binary types
              storePlain.store(dcmElem);
          }
      }
@@ -355,6 +351,7 @@ public final class Dcm2MetaBuilder {
                  normCounter = seriesNormMap.get(binData.tag());
                  if (normCounter != null) {
                      final Attribute ncAttr = normCounter.attr;
+                     //TODO This is expensive if we're reading the item from disk; consider not comparing binary items
                      final byte[] binaryItem = metaBinaryPair.getBinaryData().getBinaryItem(ncAttr.getBid());
 
                      if (areEqual(ncAttr, binData, data, binaryItem)) {
