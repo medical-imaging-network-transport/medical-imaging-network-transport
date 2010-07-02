@@ -165,10 +165,10 @@ public class Attribute
     static Attribute fromGPB(AttributeData attrData) {
         Attribute attr = new Attribute();
         //todo convert BID to int like we did with tag
-        attr.setBid(attrData.getBinaryItemId());
         attr.setTag(attrData.getTag());
         attr.setVr(attrData.getVr());
-        attr.setVal(attrData.getStringValue());
+        if (attrData.hasStringValue()) attr.setVal(attrData.getStringValue());
+        if (attrData.hasBinaryItemId()) { attr.setBid(attrData.getBinaryItemId()); }
         for (ItemData itemData : attrData.getItemsList()) {
             attr.addItem(Item.fromGPB(itemData));
         }
