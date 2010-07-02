@@ -37,7 +37,7 @@
 		<delete>
 			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class"/>
 		</delete>
-		<copy todir="${build.dir}/classes" verbose="true" overwrite="true">			
+		<copy todir="${build.dir}/classes" overwrite="true">			
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class"/>
 			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/common/metadata/*.class"/>
 		</copy>
