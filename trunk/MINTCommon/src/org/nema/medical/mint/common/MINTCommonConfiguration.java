@@ -134,7 +134,10 @@ public abstract class MINTCommonConfiguration {
 				// Not using JNDI data source
 				final BasicDataSource dataSource = new BasicDataSource();
 				dataSource.setDriverClassName(getFromEnvironmentOrProperties("hibernate.connection.driver_class"));
-				dataSource.setUrl(getFromEnvironmentOrProperties("hibernate.connection.url"));
+				String url = getFromEnvironmentOrProperties("hibernate.connection.url");
+				url = url.replace("$MINT_HOME", mintHome().getPath());
+				dataSource.setUrl(url);
+				
 				dataSource.setUsername(getFromEnvironmentOrProperties("hibernate.connection.username"));
 				dataSource.setPassword(getFromEnvironmentOrProperties("hibernate.connection.password"));
 				annotationSessionFactoryBean.setDataSource(dataSource);
