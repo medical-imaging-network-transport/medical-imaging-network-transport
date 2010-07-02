@@ -6,7 +6,9 @@
 	lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<c:if test="${not jobinfo.complete}">
 <meta http-equiv="refresh" content="3;URL=${joburi}">
+</c:if>
 <title>Job Information</title>
 </head>
 <body>

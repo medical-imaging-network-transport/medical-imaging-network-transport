@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,8 +40,7 @@ import org.nema.medical.mint.common.domain.JobInfo;
 import org.nema.medical.mint.common.domain.JobInfoDAO;
 import org.nema.medical.mint.common.domain.JobStatus;
 import org.nema.medical.mint.common.domain.StudyDAO;
-import org.nema.medical.mint.common.metadata.Study;
-import org.nema.medical.mint.common.metadata.StudyIO;
+import org.nema.medical.mint.server.processor.StudyProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -50,6 +50,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class JobsController {
+
+    private final Timer timer = new Timer("ProcessTimer",true);
 
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
 
@@ -63,17 +65,18 @@ public class JobsController {
 	@Autowired
 	protected JobInfoDAO jobInfoDAO = null;
 
-	@RequestMapping(method = RequestMethod.GET, value = {"/jobs/createstudy/{uuid}","/jobs/updatestudy/{uuid}"})
+	@RequestMapping(method = RequestMethod.GET, value = {
+			"/jobs/createstudy/{uuid}", "/jobs/updatestudy/{uuid}" })
 	public String getJobStatus(@PathVariable final String uuid,
 			HttpServletResponse res, ModelMap map) throws IOException {
-		
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);		
+
+		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("jobinfo", jobInfo);
 		map.addAttribute("joburi", jobInfo.getId());
-		
+
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
-		
+
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
@@ -114,39 +117,8 @@ public class JobsController {
 			map.put("error_msg",
 					"at least one file (containing metadata) is required.");
 			return "error";
-		}		
-
-		File studyRoot = new File(studiesRoot,studyUUID + "/DICOM");
-		File metadata = iterator.next();
-		Study study = null;
-		
-		if (metadata.getName().equals("metadata.xml")) {
-			study = StudyIO.parseFromXML(metadata);
-		} else if (metadata.getName().equals("metadata.gpb")) {
-			study = StudyIO.parseFromGPB(metadata);
-		} else {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "unable to parse metadata");
-			return "error";
 		}
-		
-		studyRoot.mkdirs();
-		StudyIO.writeToGPB(study, new File(studyRoot,"metadata.gpb"));
-		StudyIO.writeToXML(study, new File(studyRoot,"metadata.xml"));
-		File binaryRoot = new File(studyRoot,"binaryitems");
-		binaryRoot.mkdirs();
-		while (iterator.hasNext()) {
-			File tempfile = iterator.next(); 
-			File permfile = new File(binaryRoot,tempfile.getName());
-			// just moving the file since the reference implementation
-			// is using the same MINT_ROOT for temp and perm storage
-			// other implementations may want to copy/delete the file
-			// if the temp storage is on a different device
-			tempfile.renameTo(permfile);
-		}
-		metadata.delete();
-		metadata.getParentFile().delete();
-
+						
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
@@ -154,12 +126,11 @@ public class JobsController {
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("jobinfo", jobInfo);
 		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
-
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
-		
-		
-		
-		
+
+		StudyProcessor processor = new StudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO);
+        timer.schedule(processor, 0); // process immediately in the background
+
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
 	}
@@ -243,7 +214,7 @@ public class JobsController {
 						file = new File(jobFolder, "metadata.dat");
 					}
 				} else {
-					file = new File(jobFolder, String.format("%d.dat",bid++));
+					file = new File(jobFolder, String.format("%d.dat", bid++));
 				}
 
 				FileOutputStream out = null;

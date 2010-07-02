@@ -64,9 +64,9 @@ public class AtomController {
 			final List<SyndEntry> list = new LinkedList<SyndEntry>();
 			for (final Study study : studyDAO.getMostRecentStudies(50, 24 * 60 * 60)) {
 				final SyndEntry syndEntry = new SyndEntryImpl();
-				syndEntry.setLink(link + study.getId() + "/summary");
+				syndEntry.setLink(link + study.getID() + "/summary");
 				syndEntry.setPublishedDate(study.getUpdateTime());
-				syndEntry.setTitle(study.getId());
+				syndEntry.setTitle(study.getID());
 
 				final SyndContent syndContent = new SyndContentImpl();
 				syndContent.setType("text/html");

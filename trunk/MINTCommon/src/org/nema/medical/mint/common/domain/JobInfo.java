@@ -103,5 +103,9 @@ public class JobInfo {
 		this.updateTime = updateTime;
 	}
 	
-	
+
+	public boolean getComplete() {
+		return status == JobStatus.SUCCESS || status == JobStatus.FAILED;
+	}
+
 }
