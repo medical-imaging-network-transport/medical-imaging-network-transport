@@ -1,0 +1,22 @@
+#summary One-sentence summary of this page.
+
+= Decisions =
+  * Performance Data Sets for Phase 1
+    * MR BREAST (use the one we used before)
+    * CR CHEST PA/LAT (use the one we used before)
+    * CT CTA (need new one)
+  * Phase 1 Conformance Test - Iteration 1, 2 and 3
+  * Phase 1 Target Completion Date - July 30, 2010
+
+= Actions =
+
+  * Define performance test environment [Jim Philbin]
+  * Setup Test Environment [Jim Philbin]
+  * Provide Test Data Sets [Jim Philbin]
+  * Provide anonymous FTP site to access data sets [Jim Philbin]
+  * Create MINT2DICOM Converter [Jack Vining]
+  * Iteration 1,2 & 3 Conformance Test [Tim Culp]
+  * MINT Server Implementation [Tim Dawson]
+  * ClearCanvas Implementation [Chris Hafey]
+  * DICOM2MINTImport [Tim Dawson]
+
