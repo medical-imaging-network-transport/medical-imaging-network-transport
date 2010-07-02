@@ -19,7 +19,7 @@ package org.nema.medical.mint.dcm2mint;
 /**
  * @author Uli Bubenheimer
  */
-public interface BinaryData {
+public interface BinaryData extends Iterable<byte[]> {
     byte[] getBinaryItem(int index);
     int size();
     void add(byte[] item);

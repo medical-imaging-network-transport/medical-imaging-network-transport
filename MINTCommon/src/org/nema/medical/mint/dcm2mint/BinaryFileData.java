@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -60,33 +61,65 @@ public final class BinaryFileData implements BinaryData {
     @Override
     public byte[] getBinaryItem(final int index) {
          final File binaryItem = getBinaryFile(index);
-            final long fileSize = binaryItem.length();
-            //This should always be true, since we also wrote it from a byte array (which is bound by Integer.MAX_VALUE)
-            assert fileSize <= Integer.MAX_VALUE;
-            final byte[] dataBytes = new byte[(int)fileSize];
-            try {
-                final FileInputStream binStream = new FileInputStream(binaryItem);
-                try {
-                    int offset = 0;
-                    for(;;) {
-                        final int bytesRead = binStream.read(dataBytes, 0, (int)fileSize - offset);
-                        if (bytesRead == 0) {
-                            break;
-                        }
-                        offset += bytesRead;
-                    }
-                } finally {
-                    binStream.close();
-                }
-            } catch (final IOException ex) {
-                //This would happen only in a catastrophic case
-                throw new RuntimeException(ex);
-            }
-            return dataBytes;
+         return fileToByteArray(binaryItem);
     }
 
     @Override
     public int size() {
         return binaryItems.size();
+    }
+
+    @Override
+    public Iterator<byte[]> iterator() {
+        return new Iterator<byte[]>() {
+
+            {
+                fileListIterator = binaryItems.iterator();
+            }
+
+            @Override
+            public boolean hasNext() {
+                return fileListIterator.hasNext();
+            }
+
+            @Override
+            public byte[] next() {
+                final File nextFile = fileListIterator.next();
+                return fileToByteArray(nextFile);
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private final Iterator<File> fileListIterator;
+        };
+    }
+
+    private static final byte[] fileToByteArray(final File file) {
+        final long fileSize = file.length();
+        //This should always be true, since we also wrote it from a byte array (which is bound by Integer.MAX_VALUE)
+        assert fileSize <= Integer.MAX_VALUE;
+        final byte[] dataBytes = new byte[(int)fileSize];
+        try {
+            final FileInputStream binStream = new FileInputStream(file);
+            try {
+                int offset = 0;
+                for(;;) {
+                    final int bytesRead = binStream.read(dataBytes, 0, (int)fileSize - offset);
+                    if (bytesRead == 0) {
+                        break;
+                    }
+                    offset += bytesRead;
+                }
+            } finally {
+                binStream.close();
+            }
+        } catch (final IOException ex) {
+            //This would happen only in a catastrophic case
+            throw new RuntimeException(ex);
+        }
+        return dataBytes;
     }
 }
