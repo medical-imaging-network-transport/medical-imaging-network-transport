@@ -17,5 +17,5 @@
   * Create MINT2DICOM Converter (Jack Vining)
   * Iteration 1,2 & 3 Conformance Test (Tim Culp)
   * MINT Server Implementation (Tim Dawson)
-  * ClearCanvas Implementation (Chris Hafey)
+  * Clear Canvas Implementation (Chris Hafey)
   * DICOM2MINTImport (Tim Dawson)
