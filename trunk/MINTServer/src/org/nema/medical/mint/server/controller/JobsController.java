@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,11 +54,9 @@ public class JobsController {
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
 
 	@Autowired
-	protected File mintHome;
-	@Autowired
 	protected File jobTemp;
 	@Autowired
-	protected File studyRoot;
+	protected File studiesRoot;
 
 	@Autowired
 	protected StudyDAO studyDAO = null;
@@ -68,15 +67,9 @@ public class JobsController {
 	public String getJobStatus(@PathVariable final String uuid,
 			HttpServletResponse res, ModelMap map) throws IOException {
 		
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		
-		// just a test to show that the status changes
-//		if (JobInfo.now().getTime() - jobInfo.getUpdateTime().getTime() > 5000) {
-//			jobInfo.setStatus(JobStatus.SUCCESS);
-//			jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
-//		}
-		
+		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);		
 		map.addAttribute("jobinfo", jobInfo);
+		map.addAttribute("joburi", jobInfo.getId());
 		
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
@@ -90,7 +83,7 @@ public class JobsController {
 		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
 
-		File jobFolder = new File(mintHome, jobID);
+		File jobFolder = new File(jobTemp, jobID);
 		jobFolder.mkdir();
 
 		// the list of files uploaded
@@ -115,25 +108,44 @@ public class JobsController {
 			return "error";
 		}
 
-		if (files.size() < 1) {
+		Iterator<File> iterator = files.iterator();
+		if (!iterator.hasNext()) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg",
 					"at least one file (containing metadata) is required.");
 			return "error";
-		} else {
-			File metadata = files.get(0);
-			Study study;
-			if (metadata.getPath().endsWith(".xml")) {
-				study = StudyIO.parseFromXML(metadata);
-			} else if (metadata.getPath().endsWith(".gpb")) {
-				study = StudyIO.parseFromGPB(metadata);
-			} else {
-				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				map.put("error_msg", "unknown metadata format.");
-				return "error";
-			}
+		}		
 
+		File studyRoot = new File(studiesRoot,studyUUID + "/DICOM");
+		File metadata = iterator.next();
+		Study study = null;
+		
+		if (metadata.getName().equals("metadata.xml")) {
+			study = StudyIO.parseFromXML(metadata);
+		} else if (metadata.getName().equals("metadata.gpb")) {
+			study = StudyIO.parseFromGPB(metadata);
+		} else {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "unable to parse metadata");
+			return "error";
 		}
+		
+		studyRoot.mkdirs();
+		StudyIO.writeToGPB(study, new File(studyRoot,"metadata.gpb"));
+		StudyIO.writeToXML(study, new File(studyRoot,"metadata.xml"));
+		File binaryRoot = new File(studyRoot,"binaryitems");
+		binaryRoot.mkdirs();
+		while (iterator.hasNext()) {
+			File tempfile = iterator.next(); 
+			File permfile = new File(binaryRoot,tempfile.getName());
+			// just moving the file since the reference implementation
+			// is using the same MINT_ROOT for temp and perm storage
+			// other implementations may want to copy/delete the file
+			// if the temp storage is on a different device
+			tempfile.renameTo(permfile);
+		}
+		metadata.delete();
+		metadata.getParentFile().delete();
 
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -141,8 +153,12 @@ public class JobsController {
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("jobinfo", jobInfo);
+		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
 
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
+		
+		
+		
 		
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
@@ -153,7 +169,7 @@ public class JobsController {
 			ModelMap map) throws IOException {
 
 		String jobID = UUID.randomUUID().toString();
-		File jobFolder = new File(mintHome, jobID);
+		File jobFolder = new File(jobTemp, jobID);
 		jobFolder.mkdir();
 
 		// the list of files uploaded
@@ -227,8 +243,7 @@ public class JobsController {
 						file = new File(jobFolder, "metadata.dat");
 					}
 				} else {
-					file = new File(jobFolder, String.format("file%04d.dat",
-							bid++));
+					file = new File(jobFolder, String.format("%d.dat",bid++));
 				}
 
 				FileOutputStream out = null;
