@@ -1,7 +1,7 @@
 <!DOCTYPE project>
 <project basedir="." default="war" name="MINTServer">
 	<property file="build.properties" />
-	<property name="build.dir" value="${basedir}/ant-build" />
+	<property name="build.dir" value="${basedir}/build" />
 
 	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
@@ -21,7 +21,7 @@
 			<fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
 			<fileset dir="${basedir}/ant-lib" includes="*.jar" />
 			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/ant-build" includes="*.jar" />
+			<fileset dir="${common.project.basedir}/build" includes="*.jar" />
 		</path>
 		<property name="build.classpath" refid="build.classpath" />
 
@@ -48,7 +48,7 @@
 			</fileset>
 			<lib refid="jar.file" />
 			<lib dir="${common.project.basedir}/lib" includes="*.jar" />
-			<lib dir="${common.project.basedir}/ant-build" includes="*.jar" />
+			<lib dir="${common.project.basedir}/build" includes="*.jar" />
 			<metainf dir="WebContent/META-INF" />
 		</war>
 	</target>

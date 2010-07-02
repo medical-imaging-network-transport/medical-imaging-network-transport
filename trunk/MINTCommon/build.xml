@@ -1,34 +1,47 @@
 <!DOCTYPE project>
 <project basedir="." default="jar" name="MINTCommon">
 	<property file="build.properties" />
-	<property name="build.dir" value="${basedir}/ant-build" />
+	<property name="build.dir" value="${basedir}/build" />
 
 	<target name="clean">
-		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
-			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset dir="${build.dir}/ant-classes" includes="**/*" />
 		</delete>
 	</target>
 
-	<target name="build" depends="clean" description="Compile the Java files">
+	<target name="build" description="Compile the Java files">
 		<path id="build.classpath">
 			<fileset dir="${basedir}/lib" includes="*.jar" />
 		</path>
 		<property name="build.classpath" refid="build.classpath" />
 
-		<mkdir dir="${build.dir}/bin" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/bin" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+		<mkdir dir="${build.dir}/ant-classes" />
+		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
 	</target>
 
 	<target name="jibx" depends="build">
-		<bind verbose="true" load="true" binding="config/mint-binding.xml">
+		<echo>My basedir is ${basedir}.</echo>
+		<mkdir dir="${build.dir}/classes" />
+		<delete>
+			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class"/>
+		</delete>
+		<bind verbose="true" load="true" binding="${basedir}/config/mint-binding.xml">
 			<classpath>
-				<pathelement path="ant-build\bin"/>
+				<pathelement path="${build.dir}/ant-classes" />
 				<pathelement location="lib/jibx-run.jar" />
 			</classpath>
 		</bind>
+		<delete>
+			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class"/>
+		</delete>
+		<copy todir="${build.dir}/classes" verbose="true" overwrite="true">			
+			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class"/>
+			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/common/metadata/*.class"/>
+		</copy>
+		
 	</target>
 
 	<!-- JiBX binding compiler task definition -->
@@ -41,7 +54,7 @@
 
 	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}.jar">
-			<fileset dir="${build.dir}/bin" />
+			<fileset dir="${build.dir}/ant-classes" />
 			<fileset dir="${basedir}/src">
 				<exclude name="**/*.java" />
 			</fileset>

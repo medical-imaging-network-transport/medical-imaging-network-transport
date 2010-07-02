@@ -27,7 +27,7 @@ import org.nema.medical.mint.common.metadata.gpb.MINT2GPB.ItemData;
  * Schema fragment(s) for this class:
  *
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://vitalimages.com/contentserver/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="ItemType">
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="ItemType">
  *   &lt;xs:complexContent>
  *     &lt;xs:extension base="ns:AttributesType"/>
  *   &lt;/xs:complexContent>
