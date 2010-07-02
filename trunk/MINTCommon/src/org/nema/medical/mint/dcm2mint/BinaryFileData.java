@@ -69,22 +69,22 @@ public final class BinaryFileData implements BinaryData {
         return binaryItems.size();
     }
 
+    public Iterator<File> fileIterator() {
+        return binaryItems.iterator();
+    }
+
     @Override
     public Iterator<byte[]> iterator() {
         return new Iterator<byte[]>() {
 
-            {
-                fileListIterator = binaryItems.iterator();
-            }
-
             @Override
             public boolean hasNext() {
-                return fileListIterator.hasNext();
+                return fileIterator.hasNext();
             }
 
             @Override
             public byte[] next() {
-                final File nextFile = fileListIterator.next();
+                final File nextFile = fileIterator.next();
                 return fileToByteArray(nextFile);
             }
 
@@ -93,7 +93,7 @@ public final class BinaryFileData implements BinaryData {
                 throw new UnsupportedOperationException();
             }
 
-            private final Iterator<File> fileListIterator;
+            private final Iterator<File> fileIterator = fileIterator();
         };
     }
 
