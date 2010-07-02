@@ -31,49 +31,50 @@ public class DCMImportMain {
         //Make sure we have arguments and someone isn't looking for usage
         if( args.length == 0 )
         {
-            PrintUsage();
+            printUsage();
             return;
         }
         else if (args.length > 0)
         {
             if( args[0].toString().startsWith("-h") || args[0].startsWith("--h") || args[0].toString().equals("/?") )
             {
-                PrintUsage();
+                printUsage();
                 return;
             }
         }
 
         //Too many or not enough arguments
-        if( args.length != 2 )
+        if( args.length != 3 )
         {
-            System.out.println("An invalid number of arguments was specified, [DIRECTORY] and [URL] must be defined.\n");
-            PrintUsage();
+            System.err.println("An invalid number of arguments was specified: xml|gpb, [DIRECTORY], and [URL] must be defined.\n");
+            printUsage();
+            return;
+        }
+
+        //Get the metadata output format
+        final boolean useXMLNotGPB;
+        final String formatString = args[0];
+        if (formatString.equalsIgnoreCase("xml")) {
+            useXMLNotGPB = true;
+        } else if (formatString.equalsIgnoreCase("gpb")) {
+            useXMLNotGPB = false;
+        } else {
+            System.err.println("Invalid format option (" + formatString + "): specify either xml or gpb.");
+            printUsage();
             return;
         }
 
         //Attempt to set the DIRECTORY input as a file
-        File inputDir;
-        try
+        final File inputDir = new File(args[1].toString());
+        if( !inputDir.exists())
         {
-            inputDir = new File(args[0].toString());
-            if( !inputDir.exists())
-            {
-                Exception noExist = new Exception("File path is a valid format but the path does not exist on this machine.");
-                throw noExist;
-
-            }
-
-        }
-        catch(Exception e)
-        {
-            System.err.println(e.toString());
             System.err.println("Failed to create a file object for the input directory. Check that the directory specified exists.\n");
-            PrintUsage();
+            printUsage();
             return;
         }
 
         //Get the Server URL and make sure it is a valid HTTP address
-        String serverURL = args[1].toString();
+        String serverURL = args[2].toString();
         if( !serverURL.startsWith("http://") )
         {
             serverURL = "http://" + serverURL;
@@ -81,11 +82,11 @@ public class DCMImportMain {
         }
 
         //Now check that the server exists
-        if( !CheckServerExists(serverURL) )
+        if( !checkServerExists(serverURL) )
         {
             System.err.println("Could not connect to the input MINTServer URL (" + serverURL + ")");
             System.err.println("Check that the specified URL is correct and currently active.\n");
-            PrintUsage();
+            printUsage();
             return;
         }
 
@@ -93,7 +94,7 @@ public class DCMImportMain {
         try
         {
             //Create an instance of the Directory Processing Class
-            final MINTSend mintSender = new MINTSender(new URI(serverURL));
+            final MINTSend mintSender = new MINTSender(new URI(serverURL), useXMLNotGPB);
             final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, mintSender);
 
             //Run the importing process against the specified directory
@@ -109,19 +110,20 @@ public class DCMImportMain {
 
     }
 
-    private static void PrintUsage()
+    private static void printUsage()
     {
-        System.out.println("Usage: DICOM2MINTImport [DIRECTORY] [URL]");
-        System.out.println("Converts any and all DICOM files in the specified directory into the MINT standard");
-        System.out.println("format and sends Create Study messages for each study found in the directory");
-        System.out.println("to the MINTServer defined by the input URL.");
-        System.out.println("  Inputs:");
-        System.out.println("    [DIRECTORY]  the file path where DICOM files are located");
-        System.out.println("    [URL]        the Base URL path of the MINTServer.");
+        System.err.println("Usage: DICOM2MINTImport xml|gpb [DIRECTORY] [URL]");
+        System.err.println("Converts any and all DICOM files in the specified directory into the MINT standard");
+        System.err.println("format and sends Create Study messages for each study found in the directory");
+        System.err.println("to the MINTServer defined by the input URL.");
+        System.err.println("  Inputs:");
+        System.err.println("    xml|gpb      specify either option to define the DICOM metadata output format");
+        System.err.println("    [DIRECTORY]  the file path where DICOM files are located");
+        System.err.println("    [URL]        the Base URL path of the MINTServer.");
 
     }
 
-    private static boolean CheckServerExists(String URLName){
+    private static boolean checkServerExists(String URLName){
         try
         {
             HttpURLConnection.setFollowRedirects(false);
@@ -131,7 +133,7 @@ public class DCMImportMain {
         }
         catch (Exception e)
         {
-            System.out.println(e.toString());
+            System.err.println(e.toString());
             return false;
         }
     }

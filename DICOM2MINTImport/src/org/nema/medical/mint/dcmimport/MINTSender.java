@@ -20,7 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -40,8 +42,9 @@ import org.nema.medical.mint.util.Iter;
  */
 public final class MINTSender implements MINTSend {
 
-    public MINTSender(final URI serverURL) {
+    public MINTSender(final URI serverURL, final boolean useXMLNotGPB) {
         this.serverURI = serverURL;
+        this.useXMLNotGPB = useXMLNotGPB;
     }
 
     @Override
@@ -52,9 +55,14 @@ public final class MINTSender implements MINTSend {
 
         final Study study = studyData.getMetadata();
         final ByteArrayOutputStream studyOutStream = new ByteArrayOutputStream();
-        StudyIO.writeToGPB(study, studyOutStream);
+        final String fileName = useXMLNotGPB ? "metadata.xml" : "metadata.gpb";
+        if (useXMLNotGPB) {
+            StudyIO.writeToXML(study, new OutputStreamWriter(studyOutStream, utf8Charset));
+        } else {
+            StudyIO.writeToGPB(study, studyOutStream);
+        }
         final ByteArrayInputStream studyInStream = new ByteArrayInputStream(studyOutStream.toByteArray());
-        entity.addPart("metadata.gpb", new InputStreamBody(studyInStream, "metadata.gpb"));
+        entity.addPart(fileName, new InputStreamBody(studyInStream, fileName));
 
         for (final File binaryItemFile: Iter.iter(((BinaryFileData)(studyData.getBinaryData())).fileIterator())) {
             entity.addPart("binary", new FileBody(binaryItemFile));
@@ -67,5 +75,8 @@ public final class MINTSender implements MINTSend {
         System.out.println(result);
     }
 
-    final URI serverURI;
+    private final URI serverURI;
+    private final boolean useXMLNotGPB;
+
+    private static final Charset utf8Charset = Charset.forName("UTF-8");
 }
