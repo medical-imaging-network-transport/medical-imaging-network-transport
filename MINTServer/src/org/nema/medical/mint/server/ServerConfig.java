@@ -34,18 +34,18 @@ public class ServerConfig extends MINTCommonConfiguration {
 	protected StudyDAO studyDAO = null;
 	protected JobInfoDAO jobInfoDAO = null;
 	protected File jobTemp = null;
-	protected File studyRoot = null;
+	protected File studiesRoot = null;
 
 	@Bean(name = "jobTemp", autowire = Autowire.BY_NAME)
 	public File jobTemp() throws Exception {
-		jobTemp = new File(mintHome(), "jobs");
+		jobTemp = new File(mintHome(), "jobtemp");
 		return jobTemp;
 	}
 
-	@Bean(name = "studyRoot", autowire = Autowire.BY_NAME)
-	public File studyRoot() throws Exception {
-		studyRoot = new File(mintHome(), "studies");
-		return studyRoot;
+	@Bean(name = "studiesRoot", autowire = Autowire.BY_NAME)
+	public File studiesRoot() throws Exception {
+		studiesRoot = new File(mintHome(), "studies");
+		return studiesRoot;
 	}
 
 	@Bean(name = "studyDAO", autowire = Autowire.BY_NAME)

@@ -44,7 +44,7 @@ public class StudiesController {
 	public static final String NEWLINE = System.getProperty("line.separator");
 
 	@Autowired
-	protected File studyRoot;
+	protected File studiesRoot;
 
 	@Autowired
 	protected StudyDAO studyDAO = null;
@@ -86,7 +86,7 @@ public class StudiesController {
 		return "studies";
 	}
 
-	@RequestMapping("/studies/{uuid}/binaryitems/{seq}")
+	@RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
 	public void studiesBinaryItems(@PathVariable final String uuid, @PathVariable final String seq,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
@@ -111,24 +111,25 @@ public class StudiesController {
 		}
 
 		try {
-			final File binaryIndexFile = new File(studyRoot, uuid + "/binaryindex.gpb");
-			final File binaryItemsFile = new File(studyRoot, uuid + "/binaryitems.dat");
-			if (binaryIndexFile.exists() && binaryIndexFile.canRead() && binaryItemsFile.exists()
-					&& binaryItemsFile.canRead()) {
-				final FileInputStream binaryIndexFileInputStream = new FileInputStream(binaryIndexFile);
+			final File binaryItemFile = new File(studiesRoot, uuid + "/DICOM/binaryitems/" + sequence + ".dat");
+			if (binaryItemFile.exists() && binaryItemFile.canRead()) {
+				final InputStream in = new FileInputStream(binaryItemFile);
+				final OutputStream out = httpServletResponse.getOutputStream();
 				try {
-					final BinaryItem binaryItem = BinaryItemIO.getItemFromIndex(binaryIndexFile, sequence.intValue());
-					if (binaryItem == null) {
-						httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-								"Invalid sequence requested: Out of range");
-						return;
-					}
-					httpServletResponse.setContentLength(Long.valueOf(binaryItem.getSize()).intValue());
+					final long itemsize = binaryItemFile.length();
+					httpServletResponse.setContentLength((int)itemsize);
 					httpServletResponse.setContentType("application/octet-stream");
-					BinaryItemIO.streamBinaryItem(binaryItemsFile, binaryItem, httpServletResponse.getOutputStream());
+					final int bufsize = 16384;
+					byte[] buf = new byte[bufsize];
+					for (long i = 0; i < itemsize; i += bufsize) {
+						int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
+						in.read(buf,0,len);
+						out.write(buf,0,len);
+					}
+
 					httpServletResponse.getOutputStream().flush();
 				} finally {
-					binaryIndexFileInputStream.close();
+					in.close();
 				}
 			} else {
 				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
@@ -141,7 +142,7 @@ public class StudiesController {
 		}
 	}
 
-	@RequestMapping(value = { "/studies/{uuid}/metadata", "/studies/{uuid}/metadata.gpb",
+	@RequestMapping(value = { "/studies/{uuid}/DICOM/metadata", "/studies/{uuid}/metadata.gpb",
 			"/studies/{uuid}/metadata.xml" })
 	public void studiesMetadata(@PathVariable final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
@@ -158,7 +159,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/xml");
 				metadata = "/metadata.xml";
 			}
-			final File file = new File(studyRoot , uuid + metadata);
+			final File file = new File(studiesRoot , uuid + "/DICOM/" + metadata);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
@@ -179,7 +180,7 @@ public class StudiesController {
 		}
 	}
 
-	@RequestMapping(value = { "/studies/{uuid}/summary", "/studies/{uuid}/summary.gpb", "/studies/{uuid}/summary.html" })
+	@RequestMapping(value = { "/studies/{uuid}/DICOM/summary", "/studies/{uuid}/DICOM/summary.gpb", "/studies/{uuid}/DICOM/summary.html" })
 	public void studiesSummary(@PathVariable final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
@@ -195,7 +196,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/html");
 				summary = "/summary.html";
 			}
-			final File file = new File(studyRoot, uuid + summary);
+			final File file = new File(studiesRoot, uuid + "/DICOM/" + summary);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
