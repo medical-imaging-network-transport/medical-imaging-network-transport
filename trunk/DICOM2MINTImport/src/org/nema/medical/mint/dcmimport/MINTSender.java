@@ -47,7 +47,7 @@ public final class MINTSender implements MINTSend {
     @Override
     public void send(final MetaBinaryPair studyData) throws IOException {
         final HttpClient httpclient = new DefaultHttpClient();
-        final HttpPost httpPost = new HttpPost(serverURI);
+        final HttpPost httpPost = new HttpPost(serverURI + "/jobs/createstudy");
         final MultipartEntity entity = new MultipartEntity();
 
         final Study study = studyData.getMetadata();
@@ -61,7 +61,10 @@ public final class MINTSender implements MINTSend {
         }
 
         httpPost.setEntity(entity);
-        httpclient.execute(httpPost, new BasicResponseHandler());
+        final String result = httpclient.execute(httpPost, new BasicResponseHandler());
+        System.out.println("Uploaded study " + study.getStudyInstanceUID() + ".");
+        System.out.println("Server response:");
+        System.out.println(result);
     }
 
     final URI serverURI;
