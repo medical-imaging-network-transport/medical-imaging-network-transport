@@ -66,8 +66,8 @@ public class DCMImportMain {
         }
         catch(Exception e)
         {
-            System.out.println(e.toString());
-            System.out.println("Failed to create a file object for the input directory. Check that the directory specified exists.\n");
+            System.err.println(e.toString());
+            System.err.println("Failed to create a file object for the input directory. Check that the directory specified exists.\n");
             PrintUsage();
             return;
         }
@@ -83,8 +83,8 @@ public class DCMImportMain {
         //Now check that the server exists
         if( !CheckServerExists(serverURL) )
         {
-            System.out.println("Could not connect to the input MINTServer URL (" + serverURL + ")");
-            System.out.println("Check that the specified URL is correct and currently active.\n");
+            System.err.println("Could not connect to the input MINTServer URL (" + serverURL + ")");
+            System.err.println("Check that the specified URL is correct and currently active.\n");
             PrintUsage();
             return;
         }
@@ -102,9 +102,9 @@ public class DCMImportMain {
         }
         catch( Exception e )
         {
-            System.out.println("An exception occurred while processing the files in the input directory.");
-            System.out.println(e.toString());
-            System.out.println(e.getStackTrace().toString());
+            System.err.println("An exception occurred while processing the files in the input directory.");
+            System.err.println(e.toString());
+            e.printStackTrace();
         }
 
     }
