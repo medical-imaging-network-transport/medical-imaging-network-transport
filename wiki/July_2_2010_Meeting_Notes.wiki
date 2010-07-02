@@ -10,13 +10,12 @@
 
 = Actions =
 
-  * Define performance test environment [Jim Philbin]
-  * Setup Test Environment [Jim Philbin]
-  * Provide Test Data Sets [Jim Philbin]
-  * Provide anonymous FTP site to access data sets [Jim Philbin]
-  * Create MINT2DICOM Converter [Jack Vining]
-  * Iteration 1,2 & 3 Conformance Test [Tim Culp]
-  * MINT Server Implementation [Tim Dawson]
-  * ClearCanvas Implementation [Chris Hafey]
-  * DICOM2MINTImport [Tim Dawson]
-
+  * Define performance test environment (Jim Philbin)
+  * Setup Test Environment (Jim Philbin)
+  * Provide Test Data Sets (Jim Philbin)
+  * Provide anonymous FTP site to access data sets (Jim Philbin)
+  * Create MINT2DICOM Converter (Jack Vining)
+  * Iteration 1,2 & 3 Conformance Test (Tim Culp)
+  * MINT Server Implementation (Tim Dawson)
+  * ClearCanvas Implementation (Chris Hafey)
+  * DICOM2MINTImport (Tim Dawson)
