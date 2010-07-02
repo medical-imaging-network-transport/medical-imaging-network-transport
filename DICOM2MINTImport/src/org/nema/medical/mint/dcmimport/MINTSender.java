@@ -16,15 +16,24 @@
 
 package org.nema.medical.mint.dcmimport;
 
+import java.net.URL;
+
 import org.nema.medical.mint.dcm2mint.MetaBinaryPair;
 
 /**
  * @author Uli Bubenheimer
  */
-public interface MINTSend {
-    /**
-     * Sends mint data for one complete study off to a consumer.
-     * @param studyData
-     */
-    void send(MetaBinaryPair studyData);
+public final class MINTSender implements MINTSend {
+
+    public MINTSender(final URL serverURL) {
+        this.serverURL = serverURL;
+    }
+
+    @Override
+    public void send(final MetaBinaryPair studyData) {
+        // TODO Auto-generated method stub
+
+    }
+
+    final URL serverURL;
 }
