@@ -107,7 +107,7 @@ public final class Dcm2MetaBuilder {
    }
 
    public static String extractStudyInstanceUID(final DicomObject dcmObj) {
-       return dcmObj.getString(Tag.SeriesInstanceUID);
+       return dcmObj.getString(Tag.StudyInstanceUID);
    }
 
    /**
@@ -171,7 +171,7 @@ public final class Dcm2MetaBuilder {
              final TransferSyntax transferSyntax) {
          final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
 
-         final String dataStudyInstanceUID = dcmObj.getString(Tag.StudyInstanceUID);
+         final String dataStudyInstanceUID = extractStudyInstanceUID(dcmObj);
          if (dataStudyInstanceUID != null) {
              if (metaBinaryPair.getMetadata().getStudyInstanceUID() == null) {
                  metaBinaryPair.getMetadata().setStudyInstanceUID(dataStudyInstanceUID);
