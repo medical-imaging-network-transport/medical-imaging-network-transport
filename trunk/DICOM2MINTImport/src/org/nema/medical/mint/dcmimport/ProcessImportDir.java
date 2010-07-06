@@ -30,8 +30,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
+import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
+import org.dcm4che2.io.StopTagInputHandler;
 import org.nema.medical.mint.dcm2mint.BinaryFileData;
 import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
 import org.nema.medical.mint.dcm2mint.MetaBinaryPairImpl;
@@ -51,19 +53,22 @@ public final class ProcessImportDir {
         findPlainFilesRecursive(importDir, resultFiles);
         for (final File plainFile: resultFiles) {
             try {
+                final String studyUID;
                 final DicomInputStream dcmStream = new DicomInputStream(plainFile);
                 try {
-                    //TODO Somewhat wasteful to parse the entire file just to get to the study UID
+                    //Only read & parse DICOM file up to StudyInstanceUID tag
+                    dcmStream.setHandler(new StopTagInputHandler(Tag.StudyInstanceUID + 1));
                     final DicomObject dcmObj = dcmStream.readDicomObject();
-                    final String studyUID = Dcm2MetaBuilder.extractStudyInstanceUID(dcmObj);
-                    final Collection<File> dcmFileData = studyFileMap.get(studyUID);
-                    if (dcmFileData == null) {
-                        studyFileMap.put(studyUID, Collections.singleton(plainFile));
-                    } else {
-                        dcmFileData.add(plainFile);
-                    }
+                    studyUID = Dcm2MetaBuilder.extractStudyInstanceUID(dcmObj);
                 } finally {
                     dcmStream.close();
+                }
+
+                final Collection<File> dcmFileData = studyFileMap.get(studyUID);
+                if (dcmFileData == null) {
+                    studyFileMap.put(studyUID, Collections.singleton(plainFile));
+                } else {
+                    dcmFileData.add(plainFile);
                 }
             } catch (final IOException e) {
                 //Not a valid DICOM file?!
@@ -109,6 +114,7 @@ public final class ProcessImportDir {
             } catch (final IOException e) {
                 //Not a valid DICOM file?!
                 System.err.println("Problems sending study data for " + studyUID + ": " + e.getMessage());
+                e.printStackTrace();
                 continue;
             }
         }
