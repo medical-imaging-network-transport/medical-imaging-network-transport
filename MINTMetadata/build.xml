@@ -25,6 +25,8 @@
 			<classpath>
 				<pathelement path="build/ant-test-classes" />
 				<pathelement path="build/ant-classes" />
+				<fileset dir="ant-lib" includes="*.jar" />
+				<pathelement location="build/ant-classes" />
 			</classpath>
 			<compilerarg value="-Xlint:-path" />
 		</javac>
