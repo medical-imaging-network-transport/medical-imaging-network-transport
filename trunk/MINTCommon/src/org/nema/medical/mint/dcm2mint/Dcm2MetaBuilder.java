@@ -16,7 +16,6 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -237,7 +236,6 @@ public final class Dcm2MetaBuilder {
          if (vr == null) {
              throw new RuntimeException("Null VR");
          } else if (vr == VR.OW || vr == VR.OB || vr == VR.UN || vr == VR.UN_SIEMENS) {
-             //TODO define complete list of binary types
              //Binary
              storeBinary.store(dcmElem);
          } else if (vr == VR.SQ) {
@@ -344,62 +342,17 @@ public final class Dcm2MetaBuilder {
                  return; // Discard all private tags.
              }
 
-             Attribute attr = null;
-             NormalizationCounter normCounter = null;
-             final byte[] data = binData.getBytes();
-             if (seriesNormMap != null) {
-                 normCounter = seriesNormMap.get(binData.tag());
-                 if (normCounter != null) {
-                     final Attribute ncAttr = normCounter.attr;
-                     //TODO This is expensive if we're reading the item from disk; consider not comparing binary items
-                     final byte[] binaryItem = metaBinaryPair.getBinaryData().getBinaryItem(ncAttr.getBid());
-
-                     if (areEqual(ncAttr, binData, data, binaryItem)) {
-                         // The data is the same. Instead of creating a new Attribute just to throw it
-                         // away shortly, re-use the previously created attribute.
-                         attr = ncAttr;
-                         ++normCounter.count;
-                     }
-                 }
-             }
-
-             if (attr == null) {
-                 attr = newAttr(binData);
-                 attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
-
-                 metaBinaryPair.getBinaryData().add(data);
-
-                 if (seriesNormMap != null && normCounter == null) {
-                     // This is the first occurrence of this particular attribute
-                     normCounter = new NormalizationCounter();
-                     normCounter.attr = attr;
-                     seriesNormMap.put(binData.tag(), normCounter);
-                 }
-             }
-
+             final Attribute attr = newAttr(binData);
              assert attr != null;
+             attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
+             final byte[] data = binData.getBytes();
+             metaBinaryPair.getBinaryData().add(data);
              attrs.putAttribute(attr);
          }
      }
 
      private static boolean areNonValueFieldsEqual(final Attribute a, final DicomElement obj) {
          return a.getTag() == obj.tag() && obj.vr().toString().equals(a.getVr().toString());
-     }
-
-     private static boolean areEqual(
-         final Attribute a,
-         final DicomElement binData,
-         final byte[] binDataValue,
-         final byte[] binaryItem) {
-         if (areNonValueFieldsEqual(a, binData)) {
-             if (binDataValue == null) {
-                 return binaryItem == null;
-             }
-             return (binaryItem != null)
-                 && (Arrays.equals(binaryItem, binDataValue));
-         }
-
-         return false;
      }
 
      private static String getStringValue(final DicomElement elem, final SpecificCharacterSet charSet) {
