@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://medical.nema.org/xsd/mint"
+	xmlns:tns="http://medical.nema.org/xsd/mint" elementFormDefault="qualified">
+
+	<complexType name="StudyMetaType">
+		<sequence>
+			<element name="Attributes" type="tns:AttributesType"
+				maxOccurs="1" minOccurs="1" />
+			<element name="SeriesList" type="tns:SeriesListType"
+				maxOccurs="1" minOccurs="1" />
+		</sequence>
+		<attribute name="studyInstanceUID" type="string" use="required"></attribute>
+	</complexType>
+
+	<complexType name="AttributesType">
+		<sequence>
+			<element name="Attr" type="tns:AttrType" maxOccurs="unbounded"
+				minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="SeriesListType">
+		<sequence>
+			<element name="Series" type="tns:SeriesType" maxOccurs="unbounded"
+				minOccurs="0"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="AttrType">
+		<sequence>
+			<element name="Item" type="tns:ItemType" maxOccurs="unbounded"
+				minOccurs="0"></element>
+		</sequence>
+		<attribute name="tag" type="string" use="required"></attribute>
+		<attribute name="vr" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
+		<attribute name="val" type="string" use="optional"></attribute>
+		<attribute name="bid" type="unsignedInt" use="optional"></attribute>
+		<attribute name="exclude" type="string" use="optional"></attribute>
+	</complexType>
+
+	<complexType name="SeriesType">
+		<sequence>
+			<element name="Attributes" type="tns:AttributesType"
+				maxOccurs="unbounded" minOccurs="1"></element>
+			<element name="NormalizedInstanceAttributes" type="tns:NormalizedInstanceAttributesType"
+				maxOccurs="unbounded" minOccurs="1">
+			</element>
+			<element name="Instances" type="tns:InstancesType" maxOccurs="unbounded"
+				minOccurs="1"></element>
+		</sequence>
+		<attribute name="seriesInstanceUID" type="string" use="required"></attribute>
+		<attribute name="exclude" type="string" use="optional"></attribute>
+	</complexType>
+
+	<complexType name="ItemType">
+		<complexContent>
+			<extension base="tns:AttributesType">
+				<attribute name="id" type="unsignedInt" use="required"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="NormalizedInstanceAttributesType">
+		<complexContent>
+			<extension base="tns:AttributesType"></extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="InstancesType">
+		<sequence>
+			<element name="Instance" type="tns:InstanceType" maxOccurs="unbounded"
+				minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="InstanceType">
+		<sequence>
+			<element name="Attributes" type="tns:AttributesType"
+				maxOccurs="unbounded" minOccurs="0">
+			</element>
+		</sequence>
+		<attribute name="sopInstanceUID" type="string" use="required"></attribute>
+		<attribute name="transferSyntaxUID" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
+		<attribute name="exclude" type="string" use="optional"></attribute>
+	</complexType>
+
+	<element name="StudyMeta" type="tns:StudyMetaType"></element>
+</schema>

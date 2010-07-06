@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StudyMeta xmlns="http://medical.nema.org/mint" studyInstanceUID="1">
+  <Attributes>
+    <Attr tag="05f5e0ff" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1">
+      <Item>
+        <Attributes>
+          <Attr tag="00020003" vr="UI" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159"/>
+          <Attr tag="07fe0010" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="0"/>
+          <Attr tag="07fe0011" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1"/>
+        </Attributes>
+      </Item>
+    </Attr>
+  </Attributes>
+  <SeriesList>
+    <Series seriesInstanceUID="2.16.840.1.114255.393386359.389044243.31141.56">
+      <Attributes>
+        <Attr tag="05f5e0ff" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1">
+          <Item>
+            <Attributes>
+              <Attr tag="00020003" vr="UI" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159"/>
+              <Attr tag="07fe0010" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="0"/>
+              <Attr tag="07fe0011" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1"/>
+            </Attributes>
+          </Item>
+        </Attr>
+      </Attributes>
+      <NormalizedInstanceAttributes>
+        <Attr tag="05f5e0ff" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1">
+          <Item>
+            <Attributes>
+              <Attr tag="00020003" vr="UI" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159"/>
+              <Attr tag="07fe0010" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="0"/>
+              <Attr tag="07fe0011" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1"/>
+            </Attributes>
+          </Item>
+        </Attr>
+      </NormalizedInstanceAttributes>
+      <Instances>
+        <Instance sopInstanceUID="3.4.123.1023.12.2.1" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="07fe0010" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="0"/>
+            <Attr tag="07fe0011" vr="OW" val="1.3.12.2.1107.5.1.4.54587.30000010042317125468700002159" bid="1"/>
+          </Attributes>
+        </Instance>
+      </Instances>
+    </Series>
+  </SeriesList>
+</StudyMeta>

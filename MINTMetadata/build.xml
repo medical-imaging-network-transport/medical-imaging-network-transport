@@ -1,0 +1,98 @@
+<!DOCTYPE project>
+<project basedir="." default="jar" name="mint-metadata">
+	<property file="build.properties" />
+	<property name="build.dir" value="${basedir}/build" />
+
+	<target name="clean">
+		<mkdir dir="${build.dir}/ant-classes" />
+		<delete includeemptydirs="true">
+			<fileset dir="${build.dir}/ant-classes" includes="**/*" />
+		</delete>
+	</target>
+
+	<target name="build" description="Compile the Java files">
+		<path id="build.classpath">
+			<fileset dir="${basedir}/lib" includes="*.jar" />
+		</path>
+		<property name="build.classpath" refid="build.classpath" />
+
+		<mkdir dir="${build.dir}/ant-classes" />
+		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+			<compilerarg value="-Xlint:-path" />
+		</javac>
+		<mkdir dir="${build.dir}/ant-test-classes" />
+		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+			<classpath>
+				<pathelement path="build/ant-test-classes" />
+				<pathelement path="build/ant-classes" />
+			</classpath>
+			<compilerarg value="-Xlint:-path" />
+		</javac>
+	</target>
+
+	<target name="protoc" depends="build">
+		<exec executable="protoc" failonerror="true">
+			<arg value="--proto_path=config" />
+			<arg value="--java_out=src" />
+			<arg value="config/mint-metadata.proto" />
+		</exec>
+	</target>
+
+	<target name="test" depends="build">
+		<mkdir dir="${build.dir}/test-reports" />
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<fileset dir="lib" includes="*.jar" />
+				<pathelement path="build/ant-test-classes" />
+				<pathelement path="build/ant-classes" />
+			</classpath>
+
+			<formatter type="plain" />
+
+			<batchtest fork="no" todir="build/test-reports">
+				<fileset dir="build/ant-test-classes">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="jibx" depends="build">
+		<echo>My basedir is ${basedir}.</echo>
+		<mkdir dir="${build.dir}/classes" />
+		<delete>
+			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
+		</delete>
+		<bind verbose="true" load="true" binding="${basedir}/config/mint-binding.xml">
+			<classpath>
+				<pathelement path="${build.dir}/ant-classes" />
+				<pathelement location="lib/jibx-run.jar" />
+			</classpath>
+		</bind>
+		<delete>
+			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class" />
+		</delete>
+		<copy todir="${build.dir}/classes" overwrite="true">
+			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
+			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/metadata/*.class" />
+		</copy>
+
+	</target>
+
+	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
+		<jar destfile="${build.dir}/${ant.project.name}.jar">
+			<fileset dir="${build.dir}/ant-classes" />
+			<fileset dir="${basedir}/src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- task definitions -->
+	<taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
+		<classpath>
+			<fileset dir="lib" includes="*.jar" />
+			<fileset dir="ant-lib" includes="*.jar" />
+		</classpath>
+	</taskdef>
+</project>

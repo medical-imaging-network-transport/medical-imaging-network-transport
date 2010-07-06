@@ -1,0 +1,67 @@
+//------------------------------------------------------------------------------
+//
+//   Copyright 2010 MINT Working Group
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//------------------------------------------------------------------------------
+
+package mint.metadata;
+option java_package = "org.nema.medical.mint.metadata.gpb";
+option java_outer_classname = "MINT2GPB";
+option optimize_for = SPEED;
+
+//------------------------------------------------------------------------------
+message StudyData
+{
+	optional string study_instance_uid = 1;
+	repeated AttributeData attributes = 2;
+	repeated SeriesData series = 3;
+}
+
+//------------------------------------------------------------------------------
+message SeriesData
+{
+    optional string series_instance_uid = 1;
+	optional string exclude = 2;
+    repeated AttributeData attributes = 3;
+    repeated AttributeData normalized_instance_attributes = 4;
+    repeated InstanceData instances = 5;
+}
+
+//------------------------------------------------------------------------------
+message InstanceData
+{
+	optional string sop_instance_uid = 1;
+	optional string transfer_syntax_uid = 2;
+	optional string exclude = 3;
+	repeated AttributeData attributes = 4;
+}
+
+//------------------------------------------------------------------------------
+message ItemData
+{
+    repeated AttributeData attributes = 1;
+}
+
+//------------------------------------------------------------------------------
+message AttributeData
+{
+	optional uint32 tag = 1;
+	optional string vr = 2; // 2-character VR.
+
+    // Only one of the following three will be set.
+	optional string string_value = 3;
+	optional uint32 binary_item_id = 4;
+	optional string exclude = 5;
+	repeated ItemData items = 6; // If an item sequence.
+}
