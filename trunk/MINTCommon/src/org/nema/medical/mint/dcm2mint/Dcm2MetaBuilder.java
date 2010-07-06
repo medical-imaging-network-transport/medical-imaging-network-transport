@@ -337,11 +337,6 @@ public final class Dcm2MetaBuilder {
          public void store(final DicomElement binData) {
              assert binData != null;
 
-             final VR vr = binData.vr();
-             if (vr == null || vr == VR.UN || vr == VR.UN_SIEMENS) {
-                 return; // Discard all private tags.
-             }
-
              final Attribute attr = newAttr(binData);
              assert attr != null;
              attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
