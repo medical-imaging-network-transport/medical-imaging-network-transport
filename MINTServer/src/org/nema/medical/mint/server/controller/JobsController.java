@@ -36,10 +36,10 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.common.domain.JobInfo;
-import org.nema.medical.mint.common.domain.JobInfoDAO;
-import org.nema.medical.mint.common.domain.JobStatus;
-import org.nema.medical.mint.common.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.JobInfo;
+import org.nema.medical.mint.server.domain.JobInfoDAO;
+import org.nema.medical.mint.server.domain.JobStatus;
+import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.processor.StudyProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -87,7 +87,7 @@ public class JobsController {
 		String jobID = UUID.randomUUID().toString();
 
 		File jobFolder = new File(jobTemp, jobID);
-		jobFolder.mkdir();
+		jobFolder.mkdirs();
 
 		// the list of files uploaded
 		List<File> files = new ArrayList<File>();
@@ -141,7 +141,7 @@ public class JobsController {
 
 		String jobID = UUID.randomUUID().toString();
 		File jobFolder = new File(jobTemp, jobID);
-		jobFolder.mkdir();
+		jobFolder.mkdirs();
 
 		// the list of files uploaded
 		List<File> files = new ArrayList<File>();
