@@ -1,0 +1,44 @@
+<!DOCTYPE project>
+<project basedir="." default="jar" name="DICOM2MINTImport">
+    <property file="build.properties" />
+    <property name="build.dir" value="${basedir}/build" />
+
+    <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
+    <available file="${common.project.basedir}" type="dir" property="common.project.available" />
+    <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
+
+    <target name="clean">
+        <mkdir dir="${build.dir}/ant-classes" />
+        <delete includeemptydirs="true">
+            <fileset dir="${build.dir}/ant-classes" includes="**/*" />
+        </delete>
+    </target>
+
+    <target name="build" description="Compile the Java files">
+        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
+
+        <path id="build.classpath">
+            <fileset dir="${basedir}/lib" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+        </path>
+        <property name="build.classpath" refid="build.classpath" />
+
+        <mkdir dir="${build.dir}/ant-classes" />
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+            <compilerarg value="-Xlint:-path" />
+        </javac>
+    </target>
+
+    <target name="jar" depends="build" description="Make JAR of compiled classes">
+        <jar destfile="${build.dir}/${ant.project.name}.jar">
+            <fileset dir="${build.dir}/ant-classes" />
+            <fileset dir="${basedir}/src">
+                <exclude name="**/*.java" />
+            </fileset>
+            <manifest>
+              <attribute name="Main-Class" value="org.nema.medical.mint.dcmimport.DCMImportMain" />
+            </manifest>
+        </jar>
+    </target>
+</project>
