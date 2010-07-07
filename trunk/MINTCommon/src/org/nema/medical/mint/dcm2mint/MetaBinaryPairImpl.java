@@ -16,7 +16,7 @@
 
 package org.nema.medical.mint.dcm2mint;
 
-import org.nema.medical.mint.common.metadata.Study;
+import org.nema.medical.mint.metadata.Study;
 
 /**
 Type used to contain the result of the build.

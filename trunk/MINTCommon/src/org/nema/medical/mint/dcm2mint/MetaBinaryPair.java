@@ -15,7 +15,7 @@
  */
 package org.nema.medical.mint.dcm2mint;
 
-import org.nema.medical.mint.common.metadata.Study;
+import org.nema.medical.mint.metadata.Study;
 
 /**
  * @author Uli Bubenheimer

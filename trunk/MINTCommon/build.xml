@@ -3,6 +3,10 @@
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
 
+	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
+	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
+	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
+	
 	<target name="clean">
 		<mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
@@ -13,6 +17,8 @@
 	<target name="build" description="Compile the Java files">
 		<path id="build.classpath">
 			<fileset dir="${basedir}/lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
 		</path>
 		<property name="build.classpath" refid="build.classpath" />
 
@@ -22,7 +28,7 @@
 		</javac>
 	</target>
 
-	<target name="jibx" depends="build">
+	<!-- target name="jibx" depends="build">
 		<echo>My basedir is ${basedir}.</echo>
 		<mkdir dir="${build.dir}/classes" />
 		<delete>
@@ -42,17 +48,17 @@
 			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/common/metadata/*.class"/>
 		</copy>
 		
-	</target>
+	</target -->
 
 	<!-- JiBX binding compiler task definition -->
-	<taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
+	<!--taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
 		<classpath>
 			<fileset dir="lib" includes="*.jar" />
 			<fileset dir="ant-lib" includes="*.jar" />
 		</classpath>
-	</taskdef>
+	</taskdef-->
 
-	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
+	<target name="jar" depends="build" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}.jar">
 			<fileset dir="${build.dir}/ant-classes" />
 			<fileset dir="${basedir}/src">

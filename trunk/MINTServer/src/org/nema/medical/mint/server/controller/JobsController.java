@@ -41,6 +41,7 @@ import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.processor.StudyProcessor;
+import org.nema.medical.mint.server.processor.UpdateStudyProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -177,6 +178,20 @@ public class JobsController {
 			map.put("error_msg", "missing parameter studyUUID");
 			return "error";
 		}
+		
+		String studyUUID = params.get("studyUUID");
+		
+		JobInfo jobInfo = new JobInfo();
+		jobInfo.setId(jobID);
+		jobInfo.setStudyID(studyUUID);
+		jobInfo.setStatus(JobStatus.IN_PROGRESS);
+		jobInfo.setStatusDescription("0% complete");
+		map.addAttribute("jobinfo", jobInfo);
+		map.addAttribute("joburi", "updatestudy/" + jobInfo.getId());
+		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
+
+		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO);
+        timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";

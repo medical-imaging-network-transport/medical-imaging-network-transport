@@ -6,6 +6,9 @@
         <dependent-module archiveName="MINTCommon.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MINTCommon/MINTCommon">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="MINTMetadata.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MINTMetadata/MINTMetadata">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="MINTServer"/>
         <property name="java-output-path" value="/GoogleCodeMINTServer/build/classes"/>
     </wb-module>

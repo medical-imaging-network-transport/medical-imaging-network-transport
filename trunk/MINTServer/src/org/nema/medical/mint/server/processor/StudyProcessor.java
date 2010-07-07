@@ -1,13 +1,12 @@
 package org.nema.medical.mint.server.processor;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TimerTask;
 
-import org.nema.medical.mint.common.metadata.Study;
-import org.nema.medical.mint.common.metadata.StudyIO;
+import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.common.metadata.StudySummaryIO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;

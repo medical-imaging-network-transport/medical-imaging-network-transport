@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,7 +65,7 @@ public final class ProcessImportDir {
 
                 final Collection<File> dcmFileData = studyFileMap.get(studyUID);
                 if (dcmFileData == null) {
-                    studyFileMap.put(studyUID, Collections.singleton(plainFile));
+                    studyFileMap.put(studyUID, new ArrayList<File>());
                 } else {
                     dcmFileData.add(plainFile);
                 }

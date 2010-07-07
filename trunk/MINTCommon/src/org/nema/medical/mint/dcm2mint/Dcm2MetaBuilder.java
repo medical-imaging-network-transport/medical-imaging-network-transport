@@ -27,11 +27,11 @@ import org.dcm4che2.data.SpecificCharacterSet;
 import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.data.VR;
-import org.nema.medical.mint.common.metadata.Attribute;
-import org.nema.medical.mint.common.metadata.AttributeStore;
-import org.nema.medical.mint.common.metadata.Instance;
-import org.nema.medical.mint.common.metadata.Item;
-import org.nema.medical.mint.common.metadata.Series;
+import org.nema.medical.mint.metadata.Attribute;
+import org.nema.medical.mint.metadata.AttributeStore;
+import org.nema.medical.mint.metadata.Instance;
+import org.nema.medical.mint.metadata.Item;
+import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.util.Iter;
 
 /**
@@ -195,7 +195,8 @@ public final class Dcm2MetaBuilder {
          }
 
          final Instance instance = new Instance();
-         instance.setXfer(transferSyntax.uid());
+         instance.setTransferSyntaxUID(transferSyntax.uid());
+         instance.setSopInstanceUID(dcmObj.getString(Tag.SOPInstanceUID));
          series.putInstance(instance);
 
          // Now, iterate through all items in the object and store each appropriately.

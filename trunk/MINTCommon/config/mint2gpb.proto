@@ -23,48 +23,6 @@ option java_outer_classname = "MINT2GPB";
 option optimize_for = SPEED;
 
 //------------------------------------------------------------------------------
-message StudyData
-{
-	optional string study_instance_uid = 1;
-	repeated AttributeData attributes = 2;
-	repeated SeriesData series = 3;
-}
-
-//------------------------------------------------------------------------------
-message SeriesData
-{
-    optional string series_instance_uid = 1;
-    repeated AttributeData attributes = 2;
-    repeated AttributeData normalized_instance_attributes = 3;
-    repeated InstanceData instances = 4;
-}
-
-//------------------------------------------------------------------------------
-message InstanceData
-{
-	optional string transfer_syntax_uid = 1;
-	repeated AttributeData attributes = 2;
-}
-
-//------------------------------------------------------------------------------
-message ItemData
-{
-    repeated AttributeData attributes = 1;
-}
-
-//------------------------------------------------------------------------------
-message AttributeData
-{
-	optional uint32 tag = 1;
-	optional string vr = 2; // 2-character VR.
-
-    // Only one of the following three will be set.
-	optional string string_value = 3;
-	optional uint32 binary_item_id = 4;
-	repeated ItemData items = 5; // If an item sequence.
-}
-
-//------------------------------------------------------------------------------
 enum ECompressionMethod
 {
     kNone = 0;

@@ -3,6 +3,10 @@
     <property file="build.properties" />
     <property name="build.dir" value="${basedir}/build" />
 
+	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
+	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
+	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
+	
     <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
     <available file="${common.project.basedir}" type="dir" property="common.project.available" />
     <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
@@ -19,6 +23,8 @@
 
         <path id="build.classpath">
             <fileset dir="${basedir}/lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
             <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
             <fileset dir="${common.project.basedir}/build" includes="*.jar" />
         </path>
