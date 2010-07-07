@@ -20,9 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.nio.charset.Charset;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -31,8 +29,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.nema.medical.mint.common.metadata.Study;
-import org.nema.medical.mint.common.metadata.StudyIO;
+import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.dcm2mint.BinaryFileData;
 import org.nema.medical.mint.dcm2mint.MetaBinaryPair;
 import org.nema.medical.mint.util.Iter;
@@ -57,12 +55,12 @@ public final class MINTSender implements MINTSend {
         final ByteArrayOutputStream studyOutStream = new ByteArrayOutputStream();
         final String fileName = useXMLNotGPB ? "metadata.xml" : "metadata.gpb";
         if (useXMLNotGPB) {
-            StudyIO.writeToXML(study, new OutputStreamWriter(studyOutStream, utf8Charset));
+            StudyIO.writeToXML(study, studyOutStream);
         } else {
             StudyIO.writeToGPB(study, studyOutStream);
         }
         final ByteArrayInputStream studyInStream = new ByteArrayInputStream(studyOutStream.toByteArray());
-        entity.addPart(fileName, new InputStreamBody(studyInStream, fileName));
+        entity.addPart(fileName, new InputStreamBody(studyInStream, (useXMLNotGPB ? "text/xml" : "application/octet-stream"), fileName));
 
         for (final File binaryItemFile: Iter.iter(((BinaryFileData)(studyData.getBinaryData())).fileIterator())) {
             entity.addPart("binary", new FileBody(binaryItemFile));
@@ -77,6 +75,4 @@ public final class MINTSender implements MINTSend {
 
     private final URI serverURI;
     private final boolean useXMLNotGPB;
-
-    private static final Charset utf8Charset = Charset.forName("UTF-8");
 }
