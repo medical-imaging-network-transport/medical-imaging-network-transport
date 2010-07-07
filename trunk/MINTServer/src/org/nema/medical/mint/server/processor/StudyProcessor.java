@@ -6,13 +6,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TimerTask;
 
-import org.nema.medical.mint.common.domain.JobInfo;
-import org.nema.medical.mint.common.domain.JobInfoDAO;
-import org.nema.medical.mint.common.domain.JobStatus;
-import org.nema.medical.mint.common.domain.StudyDAO;
 import org.nema.medical.mint.common.metadata.Study;
 import org.nema.medical.mint.common.metadata.StudyIO;
 import org.nema.medical.mint.common.metadata.StudySummaryIO;
+import org.nema.medical.mint.server.domain.JobInfo;
+import org.nema.medical.mint.server.domain.JobInfoDAO;
+import org.nema.medical.mint.server.domain.JobStatus;
+import org.nema.medical.mint.server.domain.StudyDAO;
 
 public class StudyProcessor extends TimerTask {
 
@@ -89,13 +89,13 @@ public class StudyProcessor extends TimerTask {
 			metadata.delete();
 			metadata.getParentFile().delete();
 
-			org.nema.medical.mint.common.domain.Study studyData = new org.nema.medical.mint.common.domain.Study();
+			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
 			studyData.setID(studyUUID);
 			studyData.setStudyInstanceUID(study.getStudyInstanceUID());
 			studyData.setPatientName(study.getValueForAttribute(0x00100010));
 			studyData.setPatientID(study.getValueForAttribute(0x00100020));
 			studyData.setAccessionNumber(study.getValueForAttribute(0x00080050));
-			studyData.setStudyDateTime(org.nema.medical.mint.common.domain.Study
+			studyData.setStudyDateTime(org.nema.medical.mint.server.domain.Study
 					.now());
 			studyDAO.saveOrUpdateStudy(studyData);
 			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));		
