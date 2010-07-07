@@ -2,6 +2,8 @@
 <project basedir="." default="war" name="MINTServer">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="classes.dir" value="${build.dir}/ant-classes" />
 
 	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
@@ -25,28 +27,23 @@
 		</path>
 		<property name="build.classpath" refid="build.classpath" />
 
-		<mkdir dir="${build.dir}/bin" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/bin" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${basedir}/src" destdir="${classes.dir}" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
-	</target>
-
-	<target name="jar" depends="build" description="Make JAR of compiled classes">
-		<jar destfile="${build.dir}/${ant.project.name}.jar">
-			<fileset dir="${build.dir}/bin" />
-			<fileset dir="${basedir}/src">
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
-		</jar>
-		<fileset file="${build.dir}/${ant.project.name}.jar" id="jar.file" />
+		</copy>
 	</target>
 
-	<target name="war" depends="jar" description="Make WARs for deployment">
+	<target name="war" depends="build" description="Make WARs for deployment">
 		<war destfile="${build.dir}/${ant.project.name}.war" webxml="WebContent/WEB-INF/web.xml">
+			<classes dir="${classes.dir}"/>
 			<fileset dir="${basedir}/WebContent">
 				<exclude name="META-INF" />
 			</fileset>
-			<lib refid="jar.file" />
 			<lib dir="${common.project.basedir}/lib" includes="*.jar" />
 			<lib dir="${common.project.basedir}/build" includes="*.jar" />
 			<metainf dir="WebContent/META-INF" />
