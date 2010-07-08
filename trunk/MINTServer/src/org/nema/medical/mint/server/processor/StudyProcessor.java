@@ -2,9 +2,7 @@ package org.nema.medical.mint.server.processor;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
