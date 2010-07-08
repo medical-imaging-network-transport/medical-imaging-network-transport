@@ -23,40 +23,10 @@
 		<property name="build.classpath" refid="build.classpath" />
 
 		<mkdir dir="${build.dir}/ant-classes" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="off" listfiles="false" classpathref="build.classpath" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
 	</target>
-
-	<!-- target name="jibx" depends="build">
-		<echo>My basedir is ${basedir}.</echo>
-		<mkdir dir="${build.dir}/classes" />
-		<delete>
-			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class"/>
-		</delete>
-		<bind verbose="true" load="true" binding="${basedir}/config/mint-binding.xml">
-			<classpath>
-				<pathelement path="${build.dir}/ant-classes" />
-				<pathelement location="lib/jibx-run.jar" />
-			</classpath>
-		</bind>
-		<delete>
-			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class"/>
-		</delete>
-		<copy todir="${build.dir}/classes" overwrite="true">			
-			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class"/>
-			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/common/metadata/*.class"/>
-		</copy>
-		
-	</target -->
-
-	<!-- JiBX binding compiler task definition -->
-	<!--taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
-		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="ant-lib" includes="*.jar" />
-		</classpath>
-	</taskdef-->
 
 	<target name="jar" depends="build" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}.jar">

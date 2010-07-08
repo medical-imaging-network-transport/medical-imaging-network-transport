@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.common.metadata.StudySummaryIO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
@@ -15,6 +15,8 @@ import org.nema.medical.mint.server.domain.StudyDAO;
 
 public class StudyProcessor extends TimerTask {
 
+	static final Logger LOG = Logger.getLogger(StudyProcessor.class);
+	
 	final File jobFolder;
 	final File studyFolder;
 	private JobInfoDAO jobInfoDAO;
@@ -61,10 +63,10 @@ public class StudyProcessor extends TimerTask {
 				study = StudyIO.parseFromXML(metadataXML);
 				metadata = metadataXML;
 			} else if (metadataGPB.exists()) {
-				study = StudyIO.parseFromGPB(metadataXML);
+				study = StudyIO.parseFromGPB(metadataGPB);
 				metadata = metadataGPB;
 			} else if (metadataJSON.exists()) {
-				study = StudyIO.parseFromJSON(metadataXML);
+				study = StudyIO.parseFromJSON(metadataJSON);
 				metadata = metadataJSON;
 			} else {
 				throw new RuntimeException("unable to locate metadata file");
@@ -105,6 +107,7 @@ public class StudyProcessor extends TimerTask {
 		} catch (Exception e) {
 			jobInfo.setStatus(JobStatus.FAILED);
 			jobInfo.setStatusDescription(e.getMessage());
+			LOG.error("unable to process job " + jobID, e);
 		}
 
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
