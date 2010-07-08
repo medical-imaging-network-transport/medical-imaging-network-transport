@@ -83,12 +83,22 @@ public class DCMImportMain {
         //Finished validating inputs, call the actual processing code
         try {
             //Create an instance of the Directory Processing Class
-            final MINTSend mintSender = new MINTSender(new URI(serverURL), useXMLNotGPB);
+            final MINTSender mintSender = new MINTSender(new URI(serverURL), useXMLNotGPB);
             final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, mintSender);
 
             //Run the importing process against the specified directory
             //This will process and send the resulting MINT message to the MINTServer
             importProcessor.run();
+
+            //Wait for studies to finish processing on the server; time out after trying for about 30 seconds
+            for (int i = 0; i < 10; ++i) {
+                //Wait 3 seconds before hitting the server for updates
+                Thread.sleep(3000);
+
+                if (mintSender.handleResponses()) {
+                    break;
+                }
+            }
         } catch( Exception e ) {
             System.err.println("An exception occurred while processing the files in the input directory.");
             System.err.println(e.toString());
