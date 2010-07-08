@@ -118,16 +118,17 @@ public class DCMImportMain {
 
     }
 
-    private static boolean checkServerExists(String URLName) {
-        try
-        {
+    private static boolean checkServerExists(String urlName) {
+        urlName = urlName.trim();
+        if (!urlName.endsWith("/")) {
+            urlName += '/';
+        }
+        try {
             HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = (HttpURLConnection) new URL(URLName).openConnection();
+            HttpURLConnection con = (HttpURLConnection) new URL(urlName).openConnection();
             con.setRequestMethod("HEAD");
             return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println(e.toString());
             return false;
         }
