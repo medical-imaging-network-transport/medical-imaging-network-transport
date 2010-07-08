@@ -68,7 +68,7 @@ public class JobsController {
 
 	@RequestMapping(method = RequestMethod.GET, value = {
 			"/jobs/createstudy/{uuid}", "/jobs/updatestudy/{uuid}" })
-	public String getJobStatus(@PathVariable final String uuid,
+	public String getJobStatus(@PathVariable("uuid") final String uuid,
 			HttpServletResponse res, ModelMap map) throws IOException {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
