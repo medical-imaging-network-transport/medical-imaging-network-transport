@@ -20,13 +20,13 @@
 		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
+		
 		<mkdir dir="${build.dir}/ant-test-classes" />
 		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<classpath>
-				<pathelement path="build/ant-test-classes" />
-				<pathelement path="build/ant-classes" />
-				<fileset dir="ant-lib" includes="*.jar" />
-				<pathelement location="build/ant-classes" />
+				<pathelement path="${build.dir}/ant-test-classes" />
+				<pathelement path="${build.dir}/ant-classes" />
+				<pathelement location="ant-lib/junit-4.8.1.jar" />
 			</classpath>
 			<compilerarg value="-Xlint:-path" />
 		</javac>
@@ -40,19 +40,20 @@
 		</exec>
 	</target>
 
-	<target name="test" depends="build">
+	<target name="test" depends="jibx">
 		<mkdir dir="${build.dir}/test-reports" />
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath>
-				<fileset dir="lib" includes="*.jar" />
-				<pathelement path="build/ant-test-classes" />
-				<pathelement path="build/ant-classes" />
+				<fileset dir="${basedir}/lib" includes="*.jar" />
+				<pathelement path="${build.dir}/ant-classes" />
+				<pathelement path="${build.dir}/ant-test-classes" />
+				<pathelement location="ant-lib/junit-4.8.1.jar" />
 			</classpath>
 
 			<formatter type="plain" />
 
-			<batchtest fork="no" todir="build/test-reports">
-				<fileset dir="build/ant-test-classes">
+			<batchtest fork="no" todir="${build.dir}/test-reports">
+				<fileset dir="${build.dir}/ant-test-classes">
 					<include name="**/*Test.class" />
 				</fileset>
 			</batchtest>
