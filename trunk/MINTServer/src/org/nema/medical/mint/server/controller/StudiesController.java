@@ -85,7 +85,7 @@ public class StudiesController {
 	}
 
 	@RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
-	public void studiesBinaryItems(@PathVariable final String uuid, @PathVariable final String seq,
+	public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose
@@ -142,7 +142,7 @@ public class StudiesController {
 
 	@RequestMapping(value = { "/studies/{uuid}/DICOM/metadata", "/studies/{uuid}/metadata.gpb",
 			"/studies/{uuid}/metadata.xml" })
-	public void studiesMetadata(@PathVariable final String uuid, final HttpServletRequest httpServletRequest,
+	public void studiesMetadata(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
@@ -157,7 +157,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/xml");
 				metadata = "/metadata.xml";
 			}
-			final File file = new File(studiesRoot , uuid + "/DICOM/" + metadata);
+			final File file = new File(studiesRoot , uuid + "/DICOM" + metadata);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
@@ -179,7 +179,7 @@ public class StudiesController {
 	}
 
 	@RequestMapping(value = { "/studies/{uuid}/DICOM/summary", "/studies/{uuid}/DICOM/summary.gpb", "/studies/{uuid}/DICOM/summary.html" })
-	public void studiesSummary(@PathVariable final String uuid, final HttpServletRequest httpServletRequest,
+	public void studiesSummary(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
@@ -194,7 +194,7 @@ public class StudiesController {
 				httpServletResponse.setContentType("text/html");
 				summary = "/summary.html";
 			}
-			final File file = new File(studiesRoot, uuid + "/DICOM/" + summary);
+			final File file = new File(studiesRoot, uuid + "/DICOM" + summary);
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				final FileInputStream fileInputStream = new FileInputStream(file);
