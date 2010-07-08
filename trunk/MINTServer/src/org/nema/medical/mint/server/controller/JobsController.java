@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,8 +54,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class JobsController {
 
     private final Timer timer = new Timer("ProcessTimer",true);
-
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
+	private static final List<String> supportedMetadataExtensions = Arrays.asList(".gpb",".gpb.gz",".xml",".xml.gz",".json",".json.gz");
 
 	@Autowired
 	protected File jobTemp;
@@ -219,15 +220,32 @@ public class JobsController {
 				params.put(name, Streams.asString(in));
 			} else {
 				File file;
+
+				// special handling for first file - must be metadata!
 				if (files.isEmpty()) {
+					String filename = item.getName();
+					
+					LOG.info("loading metadata from " + filename);
+					for (String extension : supportedMetadataExtensions) {
+						if (filename.endsWith(extension)) {
+							filename = "metadata" + extension;
+							break;
+						}
+					}
+					
+					// last resort, use content type!
 					String contentType = item.getContentType();
 					if ("text/xml".equals(contentType)) {
-						file = new File(jobFolder, "metadata.xml");
+						filename = "metadata.xml";
 					} else if ("application/octet-stream".equals(contentType)) {
-						file = new File(jobFolder, "metadata.gpb");
+						filename = "metadata.gpb";
 					} else {
-						file = new File(jobFolder, "metadata.dat");
+						// dump out and write the content... will fail later
+						LOG.error("unable to determine metadata type for " + item.getName());
+						filename = "metadata.dat";
 					}
+
+					file = new File(jobFolder, filename);
 				} else {
 					file = new File(jobFolder, String.format("%d.dat", bid++));
 				}
