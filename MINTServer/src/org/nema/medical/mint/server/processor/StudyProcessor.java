@@ -2,7 +2,9 @@ package org.nema.medical.mint.server.processor;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
@@ -46,9 +48,7 @@ public class StudyProcessor extends TimerTask {
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
 		
-		try {
-			Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
-			
+		try {	
 			File dicomFolder = new File(studyFolder, "DICOM");
 			dicomFolder.mkdirs();
 
@@ -71,13 +71,16 @@ public class StudyProcessor extends TimerTask {
 			} else {
 				throw new RuntimeException("unable to locate metadata file");
 			}
-
+			metadata.delete();
+			
 			StudyIO.writeToGPB(study, new File(dicomFolder, "metadata.gpb"));
 			StudyIO.writeToXML(study, new File(dicomFolder, "metadata.xml"));
 	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));			
 
 	        File binaryRoot = new File(dicomFolder, "binaryitems");
 			binaryRoot.mkdirs();
+
+			Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
 			while (iterator.hasNext()) {
 				File tempfile = iterator.next();
 				File permfile = new File(binaryRoot, tempfile.getName());
@@ -87,8 +90,7 @@ public class StudyProcessor extends TimerTask {
 				// if the temp storage is on a different device
 				tempfile.renameTo(permfile);
 			}
-			metadata.delete();
-			metadata.getParentFile().delete();
+			jobFolder.delete();
 
 			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
 			studyData.setID(studyUUID);
