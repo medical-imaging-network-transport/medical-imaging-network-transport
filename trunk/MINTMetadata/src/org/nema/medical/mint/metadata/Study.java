@@ -159,5 +159,16 @@ public class Study implements AttributeStore
         StudyData data = builder.build();
         return data;
     }
+    
+	/**
+	 * This method should pull all data from the provided study into 'this'
+	 * study and overwrite any existing values in 'this' study.
+	 * 
+	 * @param study
+	 */
+    public void mergeStudy(Study study)
+    {
+    	//TODO Finish implementing this.
+    }
 
 }
