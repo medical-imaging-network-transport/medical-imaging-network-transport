@@ -79,7 +79,7 @@ public class Series implements AttributeStore
      * @param tag
      * @return the normalized instance attribute for the given tag
      */
-    public Attribute getNormalizedInstanceAttribute(final String tag) {
+    public Attribute getNormalizedInstanceAttribute(final int tag) {
         return normalizedInstanceAttributeMap.get(tag);
     }
 
@@ -95,7 +95,7 @@ public class Series implements AttributeStore
      * removes the NormalizedInstanceAttribute with the given tag from the Series
      * @param tag
      */
-    public void removeNormalizedInstanceAttribute(final String tag) {
+    public void removeNormalizedInstanceAttribute(final int tag) {
         normalizedInstanceAttributeMap.remove(tag);
     }
 
@@ -112,6 +112,48 @@ public class Series implements AttributeStore
      */
     public void putInstance(final Instance inst) {
         instanceList.add(inst);
+    }
+    
+    /**
+     * removes an Instance from the Series based on it's sop UID
+     * @param inst
+     */
+    public Instance removeInstance(final String sopInstanceUID, final String transferSyntax) {
+    	for(int x = 0; x < instanceList.size(); ++x)
+    	{
+    		Instance i = instanceList.get(x);
+			if (i != null
+					&& (i.getSopInstanceUID() == sopInstanceUID || 
+							(i.getSopInstanceUID() != null && i.getSopInstanceUID().equals(sopInstanceUID)))
+					&& (i.getTransferSyntaxUID() == transferSyntax || 
+							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
+    		{
+    			return instanceList.remove(x);
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    /**
+     * gets an Instance from the Series based on it's sop UID
+     * @param inst
+     */
+    public Instance getInstance(final String sopInstanceUID, final String transferSyntax) {
+    	for(int x = 0; x < instanceList.size(); ++x)
+    	{
+    		Instance i = instanceList.get(x);
+			if (i != null
+					&& (i.getSopInstanceUID() == sopInstanceUID || 
+							(i.getSopInstanceUID() != null && i.getSopInstanceUID().equals(sopInstanceUID)))
+					&& (i.getTransferSyntaxUID() == transferSyntax || 
+							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
+    		{
+    			return instanceList.get(x);
+    		}
+    	}
+    	
+    	return null;
     }
 
     /**
