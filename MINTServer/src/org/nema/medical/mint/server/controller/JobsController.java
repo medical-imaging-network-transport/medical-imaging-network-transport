@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,9 +55,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class JobsController {
 
-    private final Timer timer = new Timer("ProcessTimer",true);
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
 	private static final List<String> supportedMetadataExtensions = Arrays.asList(".gpb",".gpb.gz",".xml",".xml.gz",".json",".json.gz");
+
+    private Timer timer;
 
 	@Autowired
 	protected File jobTemp;
@@ -67,6 +70,17 @@ public class JobsController {
 	@Autowired
 	protected JobInfoDAO jobInfoDAO = null;
 
+	@PostConstruct
+	public void setupTimer() {
+		timer = new Timer("ProcessTimer",true); 
+	}
+	
+	@PreDestroy
+	public void stopTimer() {
+		timer.cancel();
+	}
+	
+	
 	@RequestMapping(method = RequestMethod.GET, value = {
 			"/jobs/createstudy/{uuid}", "/jobs/updatestudy/{uuid}" })
 	public String getJobStatus(@PathVariable("uuid") final String uuid,
