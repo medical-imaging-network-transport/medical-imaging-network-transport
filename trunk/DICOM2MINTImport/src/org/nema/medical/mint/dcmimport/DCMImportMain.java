@@ -17,14 +17,13 @@
 package org.nema.medical.mint.dcmimport;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Timer;
-
-import org.nema.medical.mint.dcmimport.daemon.CheckResponsesTask;
-import org.nema.medical.mint.dcmimport.daemon.DirTraverseTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Scott DeJarnette
@@ -107,21 +106,20 @@ public class DCMImportMain {
 
         //Finished validating inputs, call the actual processing code
         //Create an instance of the Directory Processing Class
-        final MINTSender mintSender = new MINTSender(serverURI, useXMLNotGPB);
-        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, mintSender);
+        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, serverURI, useXMLNotGPB);
 
         if (runOnceOnly) {
             try {
                 //Run the importing process against the specified directory
                 //This will process and send the resulting MINT message to the MINTServer
-                importProcessor.run();
+                importProcessor.processDir();
 
                 //Wait for studies to finish processing on the server; time out after trying for about 30 seconds
                 for (int i = 0; i < 10; ++i) {
                     //Wait 3 seconds before hitting the server for updates
                     Thread.sleep(3000);
 
-                    if (mintSender.handleResponses()) {
+                    if (importProcessor.handleResponses()) {
                         break;
                     }
                 }
@@ -130,18 +128,33 @@ public class DCMImportMain {
                 e.printStackTrace();
             }
         } else {
-            final Timer dirTraverseTimer = new Timer("DirTraverse", true);
-            final Timer checkResponsesTimer = new Timer("CheckResponses", true);
+            final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+            final Runnable checkResponsesTask = new Runnable() {
+                public void run() {
+                    try {
+                        importProcessor.handleResponses();
+                    } catch(final IOException e) {
+                        System.err.println("An exception occurred while checking for upload responses from the server:");
+                        e.printStackTrace();
+                    }
+                }
+            };
+            executor.scheduleWithFixedDelay(checkResponsesTask, 3, 3, TimeUnit.SECONDS);
 
-            checkResponsesTimer.schedule(new CheckResponsesTask(mintSender), 3000, 3000);
-            dirTraverseTimer.schedule(new DirTraverseTask(dirTraverseTimer, importProcessor), 0);
-
-            //TODO Add timer and code to delete processed directories
+            final Runnable dirTraverseTask = new Runnable() {
+                public void run() {
+                    importProcessor.processDir();
+                }
+            };
+            executor.scheduleWithFixedDelay(dirTraverseTask, 0, 3, TimeUnit.SECONDS);
 
             try {
-
-                Thread.sleep(Long.MAX_VALUE);
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             } catch (final InterruptedException e) {
+                System.err.println("Shutting down...");
+                if (!executor.isShutdown()) {
+                    executor.shutdown();
+                }
                 //Fall through and terminate - user may have pressed Ctrl-C
             }
         }
