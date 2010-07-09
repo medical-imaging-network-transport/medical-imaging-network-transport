@@ -168,7 +168,7 @@ public class Study implements AttributeStore
 	 */
     public void mergeStudy(Study study)
     {
-    	//Remove study level attributes?
+    	//Merge study level attributes
 		for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
 		{
 			Attribute attribute = i.next();
@@ -176,15 +176,16 @@ public class Study implements AttributeStore
 			this.putAttribute(attribute);
 		}
 		
-		//Remove series from study?
+		//Merge series from study
 		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
 		{
+			System.out.println("AHHH, there shouldn't be any series");
 			Series series = i.next();
 			Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
 			
 			if(thisSeries != null)
 			{
-				//Remove attributes from series?
+				//Merge attributes from series
 				for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
 				{
 					Attribute attribute = ii.next();
@@ -192,22 +193,23 @@ public class Study implements AttributeStore
 					thisSeries.putAttribute(attribute);
 				}
 				
-				//Remove normalized attributes from series?
+				//Merge normalized attributes from series
 				for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
 				{
 					Attribute attribute = ii.next();
 					
-					thisSeries.putAttribute(attribute);
+					thisSeries.putNormalizedInstanceAttribute(attribute);
 				}
 				
-				//Remove instances from series?
-				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+				//Merge instances from series
+				for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
 				{
 					Instance instance = ii.next();
 					Instance thisInstance = thisSeries.getInstance(instance.getSopInstanceUID(), instance.getTransferSyntaxUID());
 					
 					if(thisInstance != null)
 					{
+						//Merge attributes for instances
 						for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
 						{
 							Attribute attribute = iii.next();

@@ -207,7 +207,7 @@ public final class StudyUtil {
 		{
 			Attribute attribute = i.next();
 			
-			if(attribute.getExclude() != null)
+			if(isExclude(attribute.getExclude()))
 			{
 				//Non null exclude string means remove it
 				currentStudy.removeAttribute(attribute.getTag());
@@ -221,7 +221,7 @@ public final class StudyUtil {
 			Series excludeSeries = i.next();
 			Series currentSeries = currentStudy.getSeries(excludeSeries.getSeriesInstanceUID());
 			
-			if(excludeSeries.getExclude() != null)
+			if(isExclude(excludeSeries.getExclude()))
 			{
 				//Non null exclude string means exclude the series from the study
 				currentStudy.removeSeries(excludeSeries.getSeriesInstanceUID());
@@ -232,7 +232,7 @@ public final class StudyUtil {
 				{
 					Attribute attribute = ii.next();
 					
-					if(attribute.getExclude() != null)
+					if(isExclude(attribute.getExclude()))
 					{
 						//Non null exclude string means remove it
 						currentSeries.removeAttribute(attribute.getTag());
@@ -245,7 +245,7 @@ public final class StudyUtil {
 				{
 					Attribute attribute = ii.next();
 					
-					if(attribute.getExclude() != null)
+					if(isExclude(attribute.getExclude()))
 					{
 						//Non null exclude string means remove it
 						currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
@@ -259,7 +259,7 @@ public final class StudyUtil {
 					Instance excludeInstance = ii.next();
 					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSopInstanceUID(), excludeInstance.getTransferSyntaxUID());
 					
-					if(excludeInstance.getExclude() != null)
+					if(isExclude(excludeInstance.getExclude()))
 					{
 						currentSeries.removeInstance(excludeInstance.getSopInstanceUID(), excludeInstance.getTransferSyntaxUID());
 						ii.remove();
@@ -269,7 +269,7 @@ public final class StudyUtil {
 						{
 							Attribute attribute = iii.next();
 							
-							if(attribute.getExclude() != null)
+							if(isExclude(attribute.getExclude()))
 							{
 								//Non null exclude string means remove it
 								currentInstance.removeAttribute(attribute.getTag());
@@ -282,6 +282,11 @@ public final class StudyUtil {
 		}
 		
 		return true;
+	}
+	
+	public static boolean isExclude(String exculde)
+	{
+		return exculde != null;
 	}
 	
 	/**
@@ -394,14 +399,14 @@ public final class StudyUtil {
 		
 		if(a != null && attr != null)
 		{
-			//True if the Tags, VR, and values are all equal
-			equal = equal || (a.getTag() == attr.getTag());
+			//True if the Tags, VR, bid, and values are all equal
+			equal = equal && (a.getTag() == attr.getTag());
 			
-			equal = equal || (a.getVr() == attr.getVr());
-			equal = equal || (a.getVr() != null && a.getVr().equals(attr.getVr()));
+			equal = equal && ((a.getVr() == attr.getVr()) || (a.getVr() != null && a.getVr().equals(attr.getVr())));
 			
-			equal = equal || (a.getVal() == attr.getVal());
-			equal = equal || (a.getVal() != null && a.getVal().equals(attr.getVal()));
+			equal = equal && (a.getBid() == attr.getBid());
+			
+			equal = equal && ((a.getVal() == attr.getVal()) || (a.getVal() != null && a.getVal().equals(attr.getVal())));
 		}
 		
 		return equal;
@@ -409,16 +414,12 @@ public final class StudyUtil {
 
 	public static void writeStudy(Study study, File studyFolder) throws IOException 
 	{
-		File dicomFolder = new File(studyFolder, "DICOM");
-		
-		StudyIO.writeToGPB(study, new File(dicomFolder, "metadata.gpb"));
-		StudyIO.writeToXML(study, new File(dicomFolder, "metadata.xml"));
-//        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
+		StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb"));
+		StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml"));
+//        StudySummaryIO.writeSummaryToXHTML(study, new File(studyFolder, "summary.html"));
 	}
 
-	public static void moveBinaryItems(File jobFolder, File studyFolder) {
-		File binaryRoot = new File(studyFolder, "DICOM/binaryitems");
-
+	public static void moveBinaryItems(File jobFolder, File studyBinaryFolder) {
 		Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
 		while (iterator.hasNext()) {
 			File tempfile = iterator.next();
@@ -426,7 +427,7 @@ public final class StudyUtil {
 			//Don't move metadata because has no purpose in the destination
 			if(!tempfile.getName().startsWith("metadata"))
 			{
-				File permfile = new File(binaryRoot, tempfile.getName());
+				File permfile = new File(studyBinaryFolder, tempfile.getName());
 				// just moving the file since the reference implementation
 				// is using the same MINT_ROOT for temp and perm storage
 				// other implementations may want to copy/delete the file

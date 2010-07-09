@@ -45,17 +45,19 @@ public class UpdateStudyProcessor extends TimerTask {
 		String jobID = jobFolder.getName();
 		String studyUUID = studyFolder.getName();
 		
+		File dicomFolder = new File(studyFolder, "DICOM");
+		
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
-		File existingBinaryFolder = new File(studyFolder.getPath(), "binaryitems");
+		File existingBinaryFolder = new File(dicomFolder, "binaryitems");
 		
 		try
 		{
 			/*
 			 * Need to load current study studyinformation
 			 */
-			Study existingStudy = StudyUtil.loadStudy(studyFolder);
+			Study existingStudy = StudyUtil.loadStudy(dicomFolder);
 			
 			/*
 			 * Need to load new study information
@@ -68,7 +70,7 @@ public class UpdateStudyProcessor extends TimerTask {
 			 * the new study document.
 			 */
 			int maxExistingItemNumber = StudyUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
-			if(!StudyUtil.shiftItemIds(existingStudy, jobFolder, maxExistingItemNumber+1))
+			if(!StudyUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
 			{
 				//Shift Item Ids failed!
 				throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
@@ -109,10 +111,10 @@ public class UpdateStudyProcessor extends TimerTask {
 			 * Need to copy into the Study folder the new study document and
 			 * binary data files.
 			 */
-			StudyUtil.writeStudy(existingStudy, studyFolder);
-			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(studyFolder, "DICOM/summary.html"));
+			StudyUtil.writeStudy(existingStudy, dicomFolder);
+			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(dicomFolder, "summary.html"));
 			
-			StudyUtil.moveBinaryItems(jobFolder, studyFolder);
+			StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
 			
 			StudyUtil.deleteFolder(jobFolder);
 			
