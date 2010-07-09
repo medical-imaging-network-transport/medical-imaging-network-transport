@@ -168,7 +168,60 @@ public class Study implements AttributeStore
 	 */
     public void mergeStudy(Study study)
     {
-    	//TODO Finish implementing this.
+    	//Remove study level attributes?
+		for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
+		{
+			Attribute attribute = i.next();
+			
+			this.putAttribute(attribute);
+		}
+		
+		//Remove series from study?
+		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+		{
+			Series series = i.next();
+			Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
+			
+			if(thisSeries != null)
+			{
+				//Remove attributes from series?
+				for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
+				{
+					Attribute attribute = ii.next();
+					
+					thisSeries.putAttribute(attribute);
+				}
+				
+				//Remove normalized attributes from series?
+				for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
+				{
+					Attribute attribute = ii.next();
+					
+					thisSeries.putAttribute(attribute);
+				}
+				
+				//Remove instances from series?
+				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+				{
+					Instance instance = ii.next();
+					Instance thisInstance = thisSeries.getInstance(instance.getSopInstanceUID(), instance.getTransferSyntaxUID());
+					
+					if(thisInstance != null)
+					{
+						for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
+						{
+							Attribute attribute = iii.next();
+							
+							thisInstance.putAttribute(attribute);
+						}
+					}else{
+						thisSeries.putInstance(instance);
+					}
+				}
+			}else{
+				this.putSeries(series);
+			}
+		}
     }
 
 }
