@@ -2,7 +2,10 @@ package org.nema.medical.mint.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.Attribute;
@@ -10,6 +13,7 @@ import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.util.Iter;
 
 /**
  * 
@@ -320,6 +324,123 @@ public final class StudyUtil {
 	 */
 	public static boolean normalizeStudy(Study study)
 	{
+		List<Attribute> list = new LinkedList<Attribute>();
+		
+		//For each series
+		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+		{
+			Series s = i.next();
+			
+			list.clear();
+			
+			if(s.instanceCount() > 1)
+			{
+				//For each Instance in the series
+				
+				//Prime list by loading all attributes in from first instance
+				Iterator<Instance> ii = s.instanceIterator();
+				for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+				{
+					list.add(iii.next());
+				}
+				
+				//Loop over the rest of the attributes
+				while(ii.hasNext())
+				{
+					Instance inst = ii.next();
+					
+					//For each attribute in the instance
+					for(Iterator<Attribute> iii = list.iterator(); iii.hasNext();)
+					{
+						Attribute normalA = iii.next();
+						Attribute a = inst.getAttribute(normalA.getTag());
+						
+						if(!equalAttributes(a, normalA))
+							iii.remove();
+					}
+				}
+				
+				/*
+				 * All attributes left in the list were found in all instances
+				 * for this series.
+				 */
+				for(Attribute a : list)
+				{
+					// Move the attribute to the normalized section...
+					s.putNormalizedInstanceAttribute(a);
+	
+					for (final Instance instanceMeta : Iter.iter(s.instanceIterator()))
+					{
+						instanceMeta.removeAttribute(a.getTag());
+					}
+				}
+			}
+		}
+		
 		return true;
+	}
+	
+	public static boolean equalAttributes(Attribute a, Attribute attr) {
+		boolean equal = false;
+		
+		//True if both references point to the same object
+		equal = equal || a == attr;
+		
+		if(a != null && attr != null)
+		{
+			//True if the VR and values are all equal
+			equal = equal || (a.getVr() == attr.getVr());
+			equal = equal || (a.getVr() != null && a.getVr().equals(attr.getVr()));
+			equal = equal || (a.getVal() == attr.getVal());
+			equal = equal || (a.getVal() != null && a.getVal().equals(attr.getVal()));
+		}
+		
+		return equal;
+	}
+
+	public static void writeStudy(Study study, File studyFolder) throws IOException 
+	{
+		File dicomFolder = new File(studyFolder, "DICOM");
+		
+		StudyIO.writeToGPB(study, new File(dicomFolder, "metadata.gpb"));
+		StudyIO.writeToXML(study, new File(dicomFolder, "metadata.xml"));
+//        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
+	}
+
+	public static void moveBinaryItems(File jobFolder, File studyFolder) {
+		File binaryRoot = new File(studyFolder, "DICOM/binaryitems");
+
+		Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
+		while (iterator.hasNext()) {
+			File tempfile = iterator.next();
+			
+			//Don't move metadata because has no purpose in the destination
+			if(!tempfile.getName().startsWith("metadata"))
+			{
+				File permfile = new File(binaryRoot, tempfile.getName());
+				// just moving the file since the reference implementation
+				// is using the same MINT_ROOT for temp and perm storage
+				// other implementations may want to copy/delete the file
+				// if the temp storage is on a different device
+				tempfile.renameTo(permfile);
+			}
+		}
+		jobFolder.delete();
+	}
+
+	/**
+	 * Will delete all files in the jobs folder and then delete the jobs folder
+	 * itself.
+	 * 
+	 * @param jobFolder
+	 */
+	public static void deleteFolder(File jobFolder) 
+	{
+		for(File f : jobFolder.listFiles())
+		{
+			f.delete();
+		}
+		
+		jobFolder.delete();
 	}
 }

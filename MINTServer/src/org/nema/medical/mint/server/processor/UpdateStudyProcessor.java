@@ -109,6 +109,29 @@ public class UpdateStudyProcessor extends TimerTask {
 			 * Need to copy into the Study folder the new study document and
 			 * binary data files.
 			 */
+			StudyUtil.writeStudy(existingStudy, studyFolder);
+			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(studyFolder, "DICOM/summary.html"));
+			
+			StudyUtil.moveBinaryItems(jobFolder, studyFolder);
+			
+			StudyUtil.deleteFolder(jobFolder);
+			
+			/*
+			 * Update the Job DAO and Study DAO
+			 */
+			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
+			studyData.setID(studyUUID);
+			studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
+			studyData.setPatientName(existingStudy.getValueForAttribute(0x00100010));
+			studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
+			studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
+			studyData.setStudyDateTime(org.nema.medical.mint.server.domain.Study
+					.now());
+			studyDAO.saveOrUpdateStudy(studyData);
+			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));		
+
+			jobInfo.setStatus(JobStatus.SUCCESS);
+			jobInfo.setStatusDescription("complete");
 		}catch(Exception e){
 			jobInfo.setStatus(JobStatus.FAILED);
 			jobInfo.setStatusDescription(e.getMessage());
