@@ -380,6 +380,12 @@ public final class StudyUtil {
 		return true;
 	}
 	
+	/**
+	 * Returns true
+	 * @param a
+	 * @param attr
+	 * @return
+	 */
 	public static boolean equalAttributes(Attribute a, Attribute attr) {
 		boolean equal = false;
 		
@@ -388,9 +394,12 @@ public final class StudyUtil {
 		
 		if(a != null && attr != null)
 		{
-			//True if the VR and values are all equal
+			//True if the Tags, VR, and values are all equal
+			equal = equal || (a.getTag() == attr.getTag());
+			
 			equal = equal || (a.getVr() == attr.getVr());
 			equal = equal || (a.getVr() != null && a.getVr().equals(attr.getVr()));
+			
 			equal = equal || (a.getVal() == attr.getVal());
 			equal = equal || (a.getVal() != null && a.getVal().equals(attr.getVal()));
 		}
