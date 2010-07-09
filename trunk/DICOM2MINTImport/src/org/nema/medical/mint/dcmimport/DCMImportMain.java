@@ -19,7 +19,12 @@ package org.nema.medical.mint.dcmimport;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Timer;
+
+import org.nema.medical.mint.dcmimport.daemon.CheckResponsesTask;
+import org.nema.medical.mint.dcmimport.daemon.DirTraverseTask;
 
 /**
  * @author Scott DeJarnette
@@ -40,26 +45,38 @@ public class DCMImportMain {
         }
 
         //Too many or not enough arguments
-        if( args.length != 3 ) {
-            System.err.println("An invalid number of arguments was specified: xml|gpb, [DIRECTORY], and [URL] must be defined.\n");
+        if( args.length != 4 ) {
+            System.err.println("An invalid number of arguments was specified: once|daemon, xml|gpb, [DIRECTORY], and [URL] must be defined.\n");
+            printUsage();
+            return;
+        }
+
+        //Run once or as a daemon
+        final boolean runOnceOnly;
+        if (args[0].equalsIgnoreCase("once")) {
+            runOnceOnly = true;
+        } else if (args[0].equalsIgnoreCase("daemon")) {
+            runOnceOnly = false;
+        } else {
+            System.err.println("Invalid format option (" + args[0] + "): specify either 'once' or 'daemon'.");
             printUsage();
             return;
         }
 
         //Get the metadata output format
         final boolean useXMLNotGPB;
-        if (args[0].equalsIgnoreCase("xml")) {
+        if (args[1].equalsIgnoreCase("xml")) {
             useXMLNotGPB = true;
-        } else if (args[0].equalsIgnoreCase("gpb")) {
+        } else if (args[1].equalsIgnoreCase("gpb")) {
             useXMLNotGPB = false;
         } else {
-            System.err.println("Invalid format option (" + args[0] + "): specify either xml or gpb.");
+            System.err.println("Invalid format option (" + args[1] + "): specify either xml or gpb.");
             printUsage();
             return;
         }
 
         //Attempt to set the DIRECTORY input as a file
-        final File inputDir = new File(args[1]);
+        final File inputDir = new File(args[2]);
         if( !inputDir.exists()) {
             System.err.println("Failed to create a file object for the input directory. Check that the directory specified exists.\n");
             printUsage();
@@ -67,7 +84,7 @@ public class DCMImportMain {
         }
 
         //Get the Server URL and make sure it is a valid HTTP address
-        String serverURL = args[2];
+        String serverURL = args[3];
         if( !serverURL.startsWith("http://") ) {
             serverURL = "http://" + serverURL;
         }
@@ -80,29 +97,53 @@ public class DCMImportMain {
             return;
         }
 
-        //Finished validating inputs, call the actual processing code
+        final URI serverURI;
         try {
-            //Create an instance of the Directory Processing Class
-            final MINTSender mintSender = new MINTSender(new URI(serverURL), useXMLNotGPB);
-            final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, mintSender);
+            serverURI = new URI(serverURL);
+        } catch (final URISyntaxException e) {
+            System.err.println("Invalid server URL \"" + serverURL + "\": " + e.toString());
+            return;
+        }
 
-            //Run the importing process against the specified directory
-            //This will process and send the resulting MINT message to the MINTServer
-            importProcessor.run();
+        //Finished validating inputs, call the actual processing code
+        //Create an instance of the Directory Processing Class
+        final MINTSender mintSender = new MINTSender(serverURI, useXMLNotGPB);
+        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, mintSender);
 
-            //Wait for studies to finish processing on the server; time out after trying for about 30 seconds
-            for (int i = 0; i < 10; ++i) {
-                //Wait 3 seconds before hitting the server for updates
-                Thread.sleep(3000);
+        if (runOnceOnly) {
+            try {
+                //Run the importing process against the specified directory
+                //This will process and send the resulting MINT message to the MINTServer
+                importProcessor.run();
 
-                if (mintSender.handleResponses()) {
-                    break;
+                //Wait for studies to finish processing on the server; time out after trying for about 30 seconds
+                for (int i = 0; i < 10; ++i) {
+                    //Wait 3 seconds before hitting the server for updates
+                    Thread.sleep(3000);
+
+                    if (mintSender.handleResponses()) {
+                        break;
+                    }
                 }
+            } catch( Exception e ) {
+                System.err.println("An exception occurred while processing the files in the input directory.");
+                e.printStackTrace();
             }
-        } catch( Exception e ) {
-            System.err.println("An exception occurred while processing the files in the input directory.");
-            System.err.println(e.toString());
-            e.printStackTrace();
+        } else {
+            final Timer dirTraverseTimer = new Timer("DirTraverse", true);
+            final Timer checkResponsesTimer = new Timer("CheckResponses", true);
+
+            checkResponsesTimer.schedule(new CheckResponsesTask(mintSender), 3000, 3000);
+            dirTraverseTimer.schedule(new DirTraverseTask(dirTraverseTimer, importProcessor), 0);
+
+            //TODO Add timer and code to delete processed directories
+
+            try {
+
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (final InterruptedException e) {
+                //Fall through and terminate - user may have pressed Ctrl-C
+            }
         }
     }
 
@@ -115,7 +156,6 @@ public class DCMImportMain {
         System.err.println("    xml|gpb      specify either option to define the DICOM metadata output format");
         System.err.println("    [DIRECTORY]  the file path where DICOM files are located");
         System.err.println("    [URL]        the Base URL path of the MINTServer.");
-
     }
 
     private static boolean checkServerExists(String urlName) {
