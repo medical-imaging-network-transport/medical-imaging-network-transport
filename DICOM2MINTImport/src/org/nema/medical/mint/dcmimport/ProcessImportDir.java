@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
@@ -48,8 +50,11 @@ public final class ProcessImportDir {
     }
 
     public void run() {
-        final Collection<File> resultFiles = new ArrayList<File>();
+        final SortedSet<File> resultFiles = new TreeSet<File>();
         findPlainFilesRecursive(importDir, resultFiles);
+        resultFiles.removeAll(handledFiles);
+        handledFiles.addAll(resultFiles);
+        final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
         for (final File plainFile: resultFiles) {
             try {
                 final String studyUID;
@@ -74,9 +79,6 @@ public final class ProcessImportDir {
                 System.err.println("Skipping file: " + plainFile);
             }
         }
-
-        final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
-        final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
 
         for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
             final String studyUID = studyFiles.getKey();
@@ -121,7 +123,10 @@ public final class ProcessImportDir {
 
     private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles) {
         if (targetFile.isFile()) {
-            resultFiles.add(targetFile);
+            //Skip DICOM files which are not completely stored by dcmrcv yet.
+            if (!targetFile.getName().endsWith(".part")) {
+                resultFiles.add(targetFile);
+            }
         } else {
             assert targetFile.isDirectory();
             for (final File subFile: targetFile.listFiles()) {
@@ -130,8 +135,8 @@ public final class ProcessImportDir {
         }
     }
 
-    private Set<Integer> getTags(final String resource) {
-        final ClassLoader loader = this.getClass().getClassLoader();
+    private static Set<Integer> getTags(final String resource) {
+        final ClassLoader loader = ProcessImportDir.class.getClassLoader();
         final Properties properties = new Properties();
         try {
             InputStream stream = loader.getResourceAsStream(resource);
@@ -141,7 +146,7 @@ public final class ProcessImportDir {
                 stream.close();
             }
         } catch(final IOException ex) {
-            Logger.getLogger(this.getClass()).error("Unable to read tags file", ex);
+            Logger.getLogger(ProcessImportDir.class).error("Unable to read tags file", ex);
         }
         final Set<Integer> tagSet = new HashSet<Integer>();
         for (final Object tagStr: properties.keySet()) {
@@ -154,5 +159,8 @@ public final class ProcessImportDir {
 
     private final File importDir;
     private final MINTSend mintConsumer;
-    private final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
+    private final SortedSet<File> handledFiles = new TreeSet<File>();
+    private static final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
+    private static final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
+
 }
