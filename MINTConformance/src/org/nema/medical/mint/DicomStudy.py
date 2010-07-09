@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -----------------------------------------------------------------------------
-# File: DicomStudy.py
+# $Id$
+#
+# Copyright (C) 2010 MINT Working group. All rights reserved.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
