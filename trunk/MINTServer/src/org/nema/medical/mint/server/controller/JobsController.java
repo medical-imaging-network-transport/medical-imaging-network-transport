@@ -231,7 +231,7 @@ public class JobsController {
 			if (item.isFormField()) {
 				String value = Streams.asString(in);
 				LOG.debug("found form field " + name + " = " + value);
-				params.put(name, Streams.asString(in));
+				params.put(name, value);
 			} else {
 				File file;
 
