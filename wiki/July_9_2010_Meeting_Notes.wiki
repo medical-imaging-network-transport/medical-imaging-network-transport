@@ -1,0 +1,34 @@
+Notes¶
+    * JHU has a server on the DMZ, will have Jack install the software and upload de-id studies.  Will send out update to mint-user later
+    * Will load anonymized data sets into a public facing SVN server
+    * Tim Culp mentioned that it is desirable to have a MINT2DICOM tool to ease integration with systems that understand DICOM but not MINT 
+    * Harris and Vital both experienced problems with the google code svn repository - could not submit changes
+    * Tim Culp has made progress on the conformance test
+    * Tim Culp asked about adding a dependency on cygwin for windows to support the conformance test phase 1
+    * Vital has had troubles with Eclipse around builds 
+    * Rex has done some refactoring and is working on the update mechanism, also fixing random bugs
+    * Chris reported that the VItal team discussed some technical issues that need to be reviewed - will post to the mint-user group
+    * Demo of sending study into MINT 
+    * Jim has a meeting with NCI on July 27th, would like to demo and show some performance numbers - would like bulk loading
+    * Tim Culp asked if we had considered changing the BID value to a URL so you could just click it.  
+    * Jim suggested we add a helper class to the SDK that creates the URL for you
+    * Jim suggested that we add an option to the reference implementation to store the binary data in one file
+    * Chris suggested that we could store the binary data twice - once as a file to make it simple to understand and another as the bulk load binary items for efficiency testing
+    * Jim suggested that we schedule another working meeting in late July or August
+    * Harris is available in August
+    * Two day meeting at JHU - August 16 & 17
+
+New Actions
+
+
+Old Actions¶
+
+    * Define performance test environment (Jim Philbin)
+    * Setup Test Environment (Jim Philbin)
+    * Provide Test Data Sets (Jim Philbin)
+    * Provide anonymous FTP site to access data sets (Jim Philbin)
+    * Create MINT2DICOM Converter (Jack Vining)
+    * Iteration 1,2 & 3 Conformance Test (Tim Culp)
+    * MINT Server Implementation (Tim Dawson)
+    * Clear Canvas Implementation (Chris Hafey)
+    * DICOM2MINTImport (Tim Dawson) 
