@@ -148,7 +148,7 @@ public class Study implements AttributeStore
     StudyData toGPB() {
         StudyData.Builder builder = StudyData.newBuilder();
         if (this.studyInstanceUID != null) {
-        	builder.setStudyInstanceUid(this.studyInstanceUID);
+            builder.setStudyInstanceUid(this.studyInstanceUID);
         }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
@@ -159,71 +159,71 @@ public class Study implements AttributeStore
         StudyData data = builder.build();
         return data;
     }
-    
-	/**
-	 * This method should pull all data from the provided study into 'this'
-	 * study and overwrite any existing values in 'this' study.
-	 * 
-	 * @param study
-	 */
+
+    /**
+     * This method should pull all data from the provided study into 'this'
+     * study and overwrite any existing values in 'this' study.
+     *
+     * @param study
+     */
     public void mergeStudy(Study study)
     {
-    	//Merge study level attributes
-		for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
-		{
-			Attribute attribute = i.next();
-			
-			this.putAttribute(attribute);
-		}
-		
-		//Merge series from study
-		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
-		{
-			System.out.println("AHHH, there shouldn't be any series");
-			Series series = i.next();
-			Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
-			
-			if(thisSeries != null)
-			{
-				//Merge attributes from series
-				for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
-				{
-					Attribute attribute = ii.next();
-					
-					thisSeries.putAttribute(attribute);
-				}
-				
-				//Merge normalized attributes from series
-				for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
-				{
-					Attribute attribute = ii.next();
-					
-					thisSeries.putNormalizedInstanceAttribute(attribute);
-				}
-				
-				//Merge instances from series
-				for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
-				{
-					Instance instance = ii.next();
-					Instance thisInstance = thisSeries.getInstance(instance.getSopInstanceUID(), instance.getTransferSyntaxUID());
-					
-					if(thisInstance != null)
-					{
-						//Merge attributes for instances
-						for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
-						{
-							Attribute attribute = iii.next();
-							
-							thisInstance.putAttribute(attribute);
-						}
-					}else{
-						thisSeries.putInstance(instance);
-					}
-				}
-			}else{
-				this.putSeries(series);
-			}
-		}
+        //Merge study level attributes
+        for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
+        {
+            Attribute attribute = i.next();
+
+            this.putAttribute(attribute);
+        }
+
+        //Merge series from study
+        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+        {
+            System.out.println("AHHH, there shouldn't be any series");
+            Series series = i.next();
+            Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
+
+            if(thisSeries != null)
+            {
+                //Merge attributes from series
+                for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    thisSeries.putAttribute(attribute);
+                }
+
+                //Merge normalized attributes from series
+                for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    thisSeries.putNormalizedInstanceAttribute(attribute);
+                }
+
+                //Merge instances from series
+                for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
+                {
+                    Instance instance = ii.next();
+                    Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID(), instance.getTransferSyntaxUID());
+
+                    if(thisInstance != null)
+                    {
+                        //Merge attributes for instances
+                        for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
+                        {
+                            Attribute attribute = iii.next();
+
+                            thisInstance.putAttribute(attribute);
+                        }
+                    }else{
+                        thisSeries.putInstance(instance);
+                    }
+                }
+            }else{
+                this.putSeries(series);
+            }
+        }
     }
 
 }

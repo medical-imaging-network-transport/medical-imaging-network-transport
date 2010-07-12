@@ -189,7 +189,7 @@ public class StudyIOTest {
 		Instance instance = new Instance();
 		instance.putAttribute(itemAttr1);
 		instance.putAttribute(itemAttr2);
-		instance.setSopInstanceUID("3.4.123.1023.12.2.1");
+		instance.setSOPInstanceUID("3.4.123.1023.12.2.1");
 		instance.setTransferSyntaxUID("1.2.840.10008.1.2.1");
 		instances.add(instance);
 		instances.add(instance);
