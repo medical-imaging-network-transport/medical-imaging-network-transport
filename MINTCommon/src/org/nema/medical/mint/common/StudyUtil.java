@@ -257,11 +257,11 @@ public final class StudyUtil {
 				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
 				{
 					Instance excludeInstance = ii.next();
-					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSopInstanceUID(), excludeInstance.getTransferSyntaxUID());
+					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID(), excludeInstance.getTransferSyntaxUID());
 					
 					if(isExclude(excludeInstance.getExclude()))
 					{
-						currentSeries.removeInstance(excludeInstance.getSopInstanceUID(), excludeInstance.getTransferSyntaxUID());
+						currentSeries.removeInstance(excludeInstance.getSOPInstanceUID(), excludeInstance.getTransferSyntaxUID());
 						ii.remove();
 					}else{
 						//Remove attributes from instance?

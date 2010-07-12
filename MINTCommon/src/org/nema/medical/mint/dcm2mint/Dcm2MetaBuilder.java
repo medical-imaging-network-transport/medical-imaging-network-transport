@@ -196,7 +196,7 @@ public final class Dcm2MetaBuilder {
 
          final Instance instance = new Instance();
          instance.setTransferSyntaxUID(transferSyntax.uid());
-         instance.setSopInstanceUID(dcmObj.getString(Tag.SOPInstanceUID));
+         instance.setSOPInstanceUID(dcmObj.getString(Tag.SOPInstanceUID));
          series.putInstance(instance);
 
          // Now, iterate through all items in the object and store each appropriately.

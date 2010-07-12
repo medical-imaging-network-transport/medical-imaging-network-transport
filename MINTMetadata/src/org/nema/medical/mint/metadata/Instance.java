@@ -85,7 +85,7 @@ public class Instance implements AttributeStore
      * @return value
      */
 
-    public String getSopInstanceUID() {
+    public String getSOPInstanceUID() {
 		return sopInstanceUID;
 	}
 
@@ -94,7 +94,7 @@ public class Instance implements AttributeStore
      *
      * @param sopInstanceUID
      */
-	public void setSopInstanceUID(String sopInstanceUID) {
+	public void setSOPInstanceUID(String sopInstanceUID) {
 		this.sopInstanceUID = sopInstanceUID;
 	}
 
@@ -139,7 +139,7 @@ public class Instance implements AttributeStore
     //
     static Instance fromGPB(InstanceData data) {
         Instance instance = new Instance();
-        if (data.hasSopInstanceUid()) instance.setSopInstanceUID(data.getSopInstanceUid());
+        if (data.hasSopInstanceUid()) instance.setSOPInstanceUID(data.getSopInstanceUid());
         if (data.hasTransferSyntaxUid()) instance.setTransferSyntaxUID(data.getTransferSyntaxUid());
         if (data.hasExclude()) instance.setExclude(data.getExclude());
         for (AttributeData attrData : data.getAttributesList()) {

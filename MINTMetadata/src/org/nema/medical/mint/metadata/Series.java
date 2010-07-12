@@ -123,8 +123,8 @@ public class Series implements AttributeStore
     	{
     		Instance i = instanceList.get(x);
 			if (i != null
-					&& (i.getSopInstanceUID() == sopInstanceUID || 
-							(i.getSopInstanceUID() != null && i.getSopInstanceUID().equals(sopInstanceUID)))
+					&& (i.getSOPInstanceUID() == sopInstanceUID || 
+							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID)))
 					&& (i.getTransferSyntaxUID() == transferSyntax || 
 							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
     		{
@@ -144,8 +144,8 @@ public class Series implements AttributeStore
     	{
     		Instance i = instanceList.get(x);
 			if (i != null
-					&& (i.getSopInstanceUID() == sopInstanceUID || 
-							(i.getSopInstanceUID() != null && i.getSopInstanceUID().equals(sopInstanceUID)))
+					&& (i.getSOPInstanceUID() == sopInstanceUID || 
+							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID)))
 					&& (i.getTransferSyntaxUID() == transferSyntax || 
 							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
     		{
