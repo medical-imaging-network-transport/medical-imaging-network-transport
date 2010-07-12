@@ -58,12 +58,12 @@ public class UpdateStudyProcessor extends TimerTask {
 			 * Need to load current study studyinformation
 			 */
 			Study existingStudy = StudyUtil.loadStudy(dicomFolder);
-			
+
 			/*
 			 * Need to load new study information
 			 */
 			Study newStudy = StudyUtil.loadStudy(jobFolder);
-			
+
 			/*
 			 * Need to rename the new binary files so there are no collisions
 			 * with existing data files when merging. This also means updating

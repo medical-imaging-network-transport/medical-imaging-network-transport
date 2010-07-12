@@ -236,7 +236,7 @@ public final class StudyUtil {
 					{
 						//Non null exclude string means remove it
 						currentSeries.removeAttribute(attribute.getTag());
-						i.remove();
+						ii.remove();
 					}
 				}
 				
@@ -249,12 +249,12 @@ public final class StudyUtil {
 					{
 						//Non null exclude string means remove it
 						currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
-						i.remove();
+						ii.remove();
 					}
 				}
 				
 				//Remove instances from series?
-				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+				for(Iterator<Instance> ii = excludeSeries.instanceIterator(); ii.hasNext();)
 				{
 					Instance excludeInstance = ii.next();
 					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID(), excludeInstance.getTransferSyntaxUID());
@@ -273,7 +273,7 @@ public final class StudyUtil {
 							{
 								//Non null exclude string means remove it
 								currentInstance.removeAttribute(attribute.getTag());
-								i.remove();
+								iii.remove();
 							}
 						}
 					}
@@ -392,21 +392,34 @@ public final class StudyUtil {
 	 * @return
 	 */
 	public static boolean equalAttributes(Attribute a, Attribute attr) {
-		boolean equal = false;
+		boolean equal;
 		
 		//True if both references point to the same object
-		equal = equal || a == attr;
-		
-		if(a != null && attr != null)
+		if(a == attr)
 		{
-			//True if the Tags, VR, bid, and values are all equal
-			equal = equal && (a.getTag() == attr.getTag());
-			
-			equal = equal && ((a.getVr() == attr.getVr()) || (a.getVr() != null && a.getVr().equals(attr.getVr())));
-			
-			equal = equal && (a.getBid() == attr.getBid());
-			
-			equal = equal && ((a.getVal() == attr.getVal()) || (a.getVal() != null && a.getVal().equals(attr.getVal())));
+			//references are the same (may be null)
+			equal = true;
+		}else if(a != null && attr != null){
+			//references are not equal and neither reference is null
+			if(a.getTag() != attr.getTag()){
+				//Tags are not equal : false
+				equal = false;
+			}else if(!((a.getVr() == attr.getVr()) || (a.getVr() != null && a.getVr().equals(attr.getVr())))) {
+				//VR are not equal : false
+				equal = false;
+			}else if(!(a.getBid() == attr.getBid())) {
+				//Binary IDs not equal : false
+				equal = false;
+			}else if(!((a.getVal() == attr.getVal()) || (a.getVal() != null && a.getVal().equals(attr.getVal())))) {
+				//Value fields not equal : false
+				equal = false;
+			}else{
+				//Tags, VRs, Binary IDs, and Values were all equal : true
+				equal = true;
+			}
+		}else{
+			//a != attr and one of them is null
+			equal = false;
 		}
 		
 		return equal;
