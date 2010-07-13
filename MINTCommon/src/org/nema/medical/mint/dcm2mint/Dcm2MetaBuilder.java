@@ -145,17 +145,6 @@ public final class Dcm2MetaBuilder {
        }
    }
 
-     private static SpecificCharacterSet checkCharacterSet(final File dcmPath, final DicomObject dataset) {
-         final SpecificCharacterSet specificCharacterSet = dataset.getSpecificCharacterSet();
-         //Can't use DicomObject.getSpecificCharacterSet() due to maldesigned SpecificCharacterSet class
-         final String str = dataset.getString(Tag.SpecificCharacterSet);
-         // If no dataset is specified, it defaults to "ISO_IR 100" which is what we want.
-         if (str != null && !str.equals("ISO_IR 100")) {
-             throw new RuntimeException(dcmPath + " -- unsupported character set: " + str);
-         }
-         return specificCharacterSet;
-     }
-
      /**
      Accumulates the tags for the DICOM P10 instance specified by path into the overall study
      metadata.
@@ -167,8 +156,6 @@ public final class Dcm2MetaBuilder {
       */
      public void accumulateFile(final File dcmPath, final DicomObject dcmObj,
              final TransferSyntax transferSyntax) {
-         final SpecificCharacterSet charSet = checkCharacterSet(dcmPath, dcmObj);
-
          final String dataStudyInstanceUID = extractStudyInstanceUID(dcmObj);
          if (dataStudyInstanceUID != null) {
              if (metaBinaryPair.getMetadata().getStudyInstanceUID() == null) {
@@ -198,6 +185,8 @@ public final class Dcm2MetaBuilder {
          instance.setTransferSyntaxUID(transferSyntax.uid());
          instance.setSOPInstanceUID(dcmObj.getString(Tag.SOPInstanceUID));
          series.putInstance(instance);
+
+         final SpecificCharacterSet charSet = dcmObj.getSpecificCharacterSet();
 
          // Now, iterate through all items in the object and store each appropriately.
          // This dispatches the Attribute storage to one of the study level, series level
