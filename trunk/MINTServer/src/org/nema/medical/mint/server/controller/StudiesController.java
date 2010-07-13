@@ -83,6 +83,62 @@ public class StudiesController {
 		// this will render the studies list using studies.jsp
 		return "studies";
 	}
+	
+	@RequestMapping("/studies/{uuid}/changelog/{seq}")
+	public void studiesChangeLog(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
+			final HttpServletResponse httpServletResponse) throws IOException {
+		if (StringUtils.isBlank(uuid)) {
+			// Shouldn't happen...but could be +++, I suppose
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+			return;
+		}
+		final Long sequence;
+		try {
+			sequence = Long.valueOf(seq);
+		} catch (final NumberFormatException e) {
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
+			return;
+		}
+		if (sequence < 0) {
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
+			return;
+		}
+		if (sequence >= Integer.MAX_VALUE) {
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
+			return;
+		}
+
+		try {
+			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata.xml");
+			if (metadataFile.exists() && metadataFile.canRead()) {
+				final InputStream in = new FileInputStream(metadataFile);
+				final OutputStream out = httpServletResponse.getOutputStream();
+				try {
+					final long itemsize = metadataFile.length();
+					httpServletResponse.setContentLength((int)itemsize);
+					httpServletResponse.setContentType("text/xml");
+					final int bufsize = 16384;
+					byte[] buf = new byte[bufsize];
+					for (long i = 0; i < itemsize; i += bufsize) {
+						int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
+						in.read(buf,0,len);
+						out.write(buf,0,len);
+					}
+
+					httpServletResponse.getOutputStream().flush();
+				} finally {
+					in.close();
+				}
+			} else {
+				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
+			}
+		} catch (final IOException e) {
+			if (!httpServletResponse.isCommitted()) {
+				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						"Cannot provide study change log: File Read Failure");
+			}
+		}
+	}
 
 	@RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
 	public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,

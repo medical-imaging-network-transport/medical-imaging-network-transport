@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.JobInfo;
@@ -49,6 +50,8 @@ public class StudyProcessor extends TimerTask {
 		try {	
 			File dicomFolder = new File(studyFolder, "DICOM");
 			dicomFolder.mkdirs();
+			File changelogRoot = new File(studyFolder, "changelog");
+			changelogRoot.mkdirs();
 
 			File metadataGPB = new File(jobFolder,"metadata.gpb");
 			File metadataXML = new File(jobFolder,"metadata.xml");
@@ -73,7 +76,12 @@ public class StudyProcessor extends TimerTask {
 			
 			StudyIO.writeToGPB(study, new File(dicomFolder, "metadata.gpb"));
 			StudyIO.writeToXML(study, new File(dicomFolder, "metadata.xml"));
-	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));			
+	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
+	        
+	        //Write metadata to change log
+	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
+	        
+	        StudyUtil.writeStudy(study, changelogFolder);
 
 	        File binaryRoot = new File(dicomFolder, "binaryitems");
 			binaryRoot.mkdirs();
