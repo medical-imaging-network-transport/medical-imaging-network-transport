@@ -107,41 +107,49 @@ public final class ProcessImportDir {
             assert studyUID != null;
 
             final BinaryFileData binaryData = new BinaryFileData();
-            final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
-            metaBinaryPair.setBinaryData(binaryData);
-            //Constrain processing
-            metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
-            final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
-            final Iterator<File> instanceFileIter = studyFiles.getValue().iterator();
-            while (instanceFileIter.hasNext()) {
-                final File instanceFile = instanceFileIter.next();
-                final TransferSyntax transferSyntax;
-                final DicomObject dcmObj;
-                try {
-                    final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
+            try {
+                final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
+                metaBinaryPair.setBinaryData(binaryData);
+                //Constrain processing
+                metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
+                final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
+                final Iterator<File> instanceFileIter = studyFiles.getValue().iterator();
+                while (instanceFileIter.hasNext()) {
+                    final File instanceFile = instanceFileIter.next();
+                    final TransferSyntax transferSyntax;
+                    final DicomObject dcmObj;
                     try {
-                        transferSyntax = dcmStream.getTransferSyntax();
-                        dcmObj = dcmStream.readDicomObject();
-                    } finally {
-                        dcmStream.close();
+                        final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
+                        try {
+                            transferSyntax = dcmStream.getTransferSyntax();
+                            dcmObj = dcmStream.readDicomObject();
+                        } finally {
+                            dcmStream.close();
+                        }
+                    } catch (final IOException e) {
+                        //Not a valid DICOM file?!
+                        System.err.println("Skipping file: " + instanceFile);
+                        instanceFileIter.remove();
+                        continue;
                     }
+                    builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
+                }
+                builder.finish();
+
+                try {
+                    send(metaBinaryPair, studyFiles.getValue());
                 } catch (final IOException e) {
                     //Not a valid DICOM file?!
-                    System.err.println("Skipping file: " + instanceFile);
-                    instanceFileIter.remove();
+                    System.err.println("Problems sending study data for " + studyUID + ": " + e.getMessage());
+                    e.printStackTrace();
                     continue;
                 }
-                builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
-            }
-            builder.finish();
-
-            try {
-                send(metaBinaryPair, studyFiles.getValue());
-            } catch (final IOException e) {
-                //Not a valid DICOM file?!
-                System.err.println("Problems sending study data for " + studyUID + ": " + e.getMessage());
-                e.printStackTrace();
-                continue;
+            } finally {
+                //Delete all temporary files storing binary data from DICOM;
+                //do this ASAP as these files may be large and fill up the file system
+                for (final File binaryItemFile: Iter.iter(binaryData.fileIterator())) {
+                    binaryItemFile.delete();
+                }
             }
         }
     }

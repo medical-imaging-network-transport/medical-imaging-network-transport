@@ -36,10 +36,9 @@ public final class BinaryFileData implements BinaryData {
         //Stream to file
         assert item != null;
         try {
-            final File tmpFile = File.createTempFile("mint", ".bin");
             //The file should be deleted as soon as it is passed on to somewhere else;
-            //we have a deleteOnExit here just as a backup.
-            tmpFile.deleteOnExit();
+            //using SelfDeletingFile is just a backup,
+            final File tmpFile = new SelfDeletingFile(File.createTempFile("mint", ".bin"));
             final FileOutputStream outStream = new FileOutputStream(tmpFile);
             try {
                 outStream.write(item);
@@ -121,5 +120,21 @@ public final class BinaryFileData implements BinaryData {
             throw new RuntimeException(ex);
         }
         return dataBytes;
+    }
+
+    private static class SelfDeletingFile extends File {
+        private static final long serialVersionUID = 1L;
+
+        public SelfDeletingFile(final File origFile) {
+            super(origFile.getParentFile(), origFile.getName());
+            //Make sure to delete no later than when JVM goes away
+            deleteOnExit();
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            //Delete on finalization no matter what; if file does not exist, this will fail silently.
+            delete();
+        }
     }
 }
