@@ -32,7 +32,7 @@ public final class StudyUtil {
 	 * @param directory
 	 *            This should be a folder with a gpb, xml, or json metadata file
 	 *            in it.
-	 * @return
+	 * @return Study loaded
 	 * @throws IOException
 	 */
 	public static Study loadStudy(File directory) throws IOException
@@ -65,7 +65,7 @@ public final class StudyUtil {
 	 * need to be re thought if what binary item IDs are is redesigned.
 	 * 
 	 * @param directory
-	 * @return
+	 * @return highest number
 	 */
 	public static int getHighestNumberedBinaryItem(File directory)
 	{
@@ -106,7 +106,7 @@ public final class StudyUtil {
 	 * @param study
 	 * @param binaryDirectory
 	 * @param shiftAmount
-	 * @return
+	 * @return true if successful
 	 */
 	public static boolean shiftItemIds(Study study, File binaryDirectory, int shiftAmount)
 	{
@@ -198,7 +198,7 @@ public final class StudyUtil {
 	 * 
 	 * @param currentStudy
 	 * @param excludeStudy
-	 * @return
+	 * @return true 
 	 */
 	public static boolean applyExcludes(Study currentStudy, Study excludeStudy)
 	{
@@ -302,7 +302,7 @@ public final class StudyUtil {
 	 * catastrophically unexpected occurs.
 	 * 
 	 * @param study
-	 * @return
+	 * @return true
 	 */
 	public static boolean denormalizeStudy(Study study)
 	{
@@ -332,7 +332,7 @@ public final class StudyUtil {
 	 * Performs a normalization algorithm on the provided Study
 	 * 
 	 * @param study
-	 * @return
+	 * @return true
 	 */
 	public static boolean normalizeStudy(Study study)
 	{
@@ -396,7 +396,7 @@ public final class StudyUtil {
 	 * Returns true
 	 * @param a
 	 * @param attr
-	 * @return
+	 * @return true if equals
 	 */
 	public static boolean equalAttributes(Attribute a, Attribute attr) {
 		boolean equal;

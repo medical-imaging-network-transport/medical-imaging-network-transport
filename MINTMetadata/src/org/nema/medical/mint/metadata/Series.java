@@ -116,7 +116,7 @@ public class Series implements AttributeStore
     
     /**
      * removes an Instance from the Series based on it's sop UID
-     * @param inst
+     * @param sopInstanceUID
      */
     public Instance removeInstance(final String sopInstanceUID) {
     	for(int x = 0; x < instanceList.size(); ++x)
@@ -135,7 +135,7 @@ public class Series implements AttributeStore
     
     /**
      * gets an Instance from the Series based on it's sop UID
-     * @param inst
+     * @param sopInstanceUID
      */
     public Instance getInstance(final String sopInstanceUID) {
     	for(int x = 0; x < instanceList.size(); ++x)

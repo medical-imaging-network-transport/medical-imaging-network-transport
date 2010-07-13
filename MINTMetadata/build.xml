@@ -1,5 +1,5 @@
 <!DOCTYPE project>
-<project basedir="." default="jar" name="mint-metadata">
+<project basedir="." default="doc" name="mint-metadata">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
 
@@ -10,7 +10,7 @@
 		</delete>
 	</target>
 
-	<target name="build" description="Compile the Java files">
+	<target name="build" depends="clean" description="Compile the Java files">
 		<path id="build.classpath">
 			<fileset dir="${basedir}/lib" includes="*.jar" />
 		</path>
@@ -61,7 +61,6 @@
 	</target>
 
 	<target name="jibx" depends="build">
-		<echo>My basedir is ${basedir}.</echo>
 		<mkdir dir="${build.dir}/classes" />
 		<delete>
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
@@ -89,6 +88,17 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</jar>
+	</target>
+
+	<target name="doc" depends="jar" description="Make JavaDoc archives">
+		<mkdir dir="${build.dir}/doc" />
+		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+			<classpath refid="build.classpath" />
+			<doctitle>MINTMetadata</doctitle>
+		</javadoc>
+		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
 	</target>
 
 	<!-- task definitions -->

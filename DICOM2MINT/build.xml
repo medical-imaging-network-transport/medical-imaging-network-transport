@@ -1,16 +1,20 @@
 <!DOCTYPE project>
-<project basedir="." default="war" name="DICOM2Mint">
+<project basedir="." default="doc" name="DICOM2Mint">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
+
+	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
+	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
+	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
 
 	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
 	<fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
 
 	<target name="clean">
-		<mkdir dir="${build.dir}/classes" />
+		<mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
-			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset dir="${build.dir}/ant-classes" includes="**/*" />
 		</delete>
 	</target>
 
@@ -20,8 +24,10 @@
 		<path id="build.classpath">
 			<fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
 			<fileset dir="${basedir}/ant-lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
 			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/ant-build" includes="*.jar" />
+			<fileset dir="${common.project.basedir}/build" includes="*.jar" />
 		</path>
 		<property name="build.classpath" refid="build.classpath" />
 
@@ -51,5 +57,16 @@
 			<lib dir="${common.project.basedir}/build" includes="*.jar" />
 			<metainf dir="WebContent/META-INF" />
 		</war>
+	</target>
+
+	<target name="doc" depends="war" description="Make JavaDoc archives">
+		<mkdir dir="${build.dir}/doc" />
+		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+			<classpath refid="build.classpath" />
+			<doctitle>DICOM2MINT</doctitle>
+		</javadoc>
+		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
 	</target>
 </project>

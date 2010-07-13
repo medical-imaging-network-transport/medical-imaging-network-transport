@@ -1,5 +1,5 @@
 <!DOCTYPE project>
-<project basedir="." default="jar" name="DICOM2MINTImport">
+<project basedir="." default="doc" name="DICOM2MINTImport">
     <property file="build.properties" />
     <property name="build.dir" value="${basedir}/build" />
 
@@ -18,7 +18,7 @@
         </delete>
     </target>
 
-    <target name="build" description="Compile the Java files">
+    <target name="build" depends="clean" description="Compile the Java files">
         <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
         <path id="build.classpath">
@@ -47,4 +47,15 @@
             </manifest>
         </jar>
     </target>
+
+	<target name="doc" depends="jar" description="Make JavaDoc archives">
+		<mkdir dir="${build.dir}/doc" />
+		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+			<classpath refid="build.classpath" />
+			<doctitle>DICOM2MINTImport</doctitle>
+		</javadoc>
+		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+	</target>
 </project>

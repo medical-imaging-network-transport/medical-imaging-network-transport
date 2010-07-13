@@ -1,12 +1,12 @@
 <!DOCTYPE project>
-<project basedir="." default="jar" name="MINTCommon">
+<project basedir="." default="doc" name="MINTCommon">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
 
 	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
 	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
 	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
-	
+
 	<target name="clean">
 		<mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
@@ -14,7 +14,7 @@
 		</delete>
 	</target>
 
-	<target name="build" description="Compile the Java files">
+	<target name="build" depends="clean" description="Compile the Java files">
 		<path id="build.classpath">
 			<fileset dir="${basedir}/lib" includes="*.jar" />
 			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
@@ -65,5 +65,16 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</jar>
+	</target>
+
+	<target name="doc" depends="jar" description="Make JavaDoc archives">
+		<mkdir dir="${build.dir}/doc" />
+		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+			<classpath refid="build.classpath" />
+			<doctitle>MINTCommon</doctitle>
+		</javadoc>
+		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
 	</target>
 </project>
