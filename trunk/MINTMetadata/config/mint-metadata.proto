@@ -23,16 +23,24 @@ option optimize_for = SPEED;
 //------------------------------------------------------------------------------
 message StudyData
 {
-	optional string study_instance_uid = 1;
-	repeated AttributeData attributes = 2;
-	repeated SeriesData series = 3;
+    // identifier
+    optional string study_instance_uid = 1;
+    
+    // studies contain attributes and series
+    repeated AttributeData attributes = 2;
+    repeated SeriesData series = 3;
 }
 
 //------------------------------------------------------------------------------
 message SeriesData
 {
+    // identifier
     optional string series_instance_uid = 1;
-	optional string exclude = 2;
+
+    // used only in updates when removing attributes
+    optional string exclude = 2;  
+    
+    // series contain series-level and normalized attributes, and instances
     repeated AttributeData attributes = 3;
     repeated AttributeData normalized_instance_attributes = 4;
     repeated InstanceData instances = 5;
@@ -41,27 +49,38 @@ message SeriesData
 //------------------------------------------------------------------------------
 message InstanceData
 {
-	optional string sop_instance_uid = 1;
-	optional string transfer_syntax_uid = 2;
-	optional string exclude = 3;
-	repeated AttributeData attributes = 4;
-}
-
-//------------------------------------------------------------------------------
-message ItemData
-{
-    repeated AttributeData attributes = 1;
+    // identifier
+    optional string sop_instance_uid = 1;
+    
+    // used only in updates when removing attributes
+    optional string exclude = 2;
+    
+    // instances include the transfer syntax and attributes
+    optional string transfer_syntax_uid = 3;
+    repeated AttributeData attributes = 4;
 }
 
 //------------------------------------------------------------------------------
 message AttributeData
 {
-	optional uint32 tag = 1;
-	optional string vr = 2; // 2-character VR.
+    // identifier
+    optional uint32 tag = 1;
+    
+    // used only in updates when removing attributes
+    optional string exclude = 2;  
+    
+    // 2-character VR
+    optional string vr = 3;
+    
+    // attributes contain either a value, reference to a binary item, or items
+    optional string string_value = 4;    // if a "normal" attribute
+    optional uint32 binary_item_id = 5;  // if a binary item
+    repeated ItemData items = 6;         // if a "sequence" attribute
+}
 
-    // Only one of the following three will be set.
-	optional string string_value = 3;
-	optional uint32 binary_item_id = 4;
-	optional string exclude = 5;
-	repeated ItemData items = 6; // If an item sequence.
+//------------------------------------------------------------------------------
+message ItemData
+{
+    // items are used within sequence attributes and contain other attributes
+    repeated AttributeData attributes = 1;
 }

@@ -1088,19 +1088,19 @@ public final class MINT2GPB {
     public boolean hasSopInstanceUid() { return hasSopInstanceUid; }
     public java.lang.String getSopInstanceUid() { return sopInstanceUid_; }
     
-    // optional string transfer_syntax_uid = 2;
-    public static final int TRANSFER_SYNTAX_UID_FIELD_NUMBER = 2;
-    private boolean hasTransferSyntaxUid;
-    private java.lang.String transferSyntaxUid_ = "";
-    public boolean hasTransferSyntaxUid() { return hasTransferSyntaxUid; }
-    public java.lang.String getTransferSyntaxUid() { return transferSyntaxUid_; }
-    
-    // optional string exclude = 3;
-    public static final int EXCLUDE_FIELD_NUMBER = 3;
+    // optional string exclude = 2;
+    public static final int EXCLUDE_FIELD_NUMBER = 2;
     private boolean hasExclude;
     private java.lang.String exclude_ = "";
     public boolean hasExclude() { return hasExclude; }
     public java.lang.String getExclude() { return exclude_; }
+    
+    // optional string transfer_syntax_uid = 3;
+    public static final int TRANSFER_SYNTAX_UID_FIELD_NUMBER = 3;
+    private boolean hasTransferSyntaxUid;
+    private java.lang.String transferSyntaxUid_ = "";
+    public boolean hasTransferSyntaxUid() { return hasTransferSyntaxUid; }
+    public java.lang.String getTransferSyntaxUid() { return transferSyntaxUid_; }
     
     // repeated .mint.metadata.AttributeData attributes = 4;
     public static final int ATTRIBUTES_FIELD_NUMBER = 4;
@@ -1126,11 +1126,11 @@ public final class MINT2GPB {
       if (hasSopInstanceUid()) {
         output.writeString(1, getSopInstanceUid());
       }
-      if (hasTransferSyntaxUid()) {
-        output.writeString(2, getTransferSyntaxUid());
-      }
       if (hasExclude()) {
-        output.writeString(3, getExclude());
+        output.writeString(2, getExclude());
+      }
+      if (hasTransferSyntaxUid()) {
+        output.writeString(3, getTransferSyntaxUid());
       }
       for (org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData element : getAttributesList()) {
         output.writeMessage(4, element);
@@ -1148,13 +1148,13 @@ public final class MINT2GPB {
         size += com.google.protobuf.CodedOutputStream
           .computeStringSize(1, getSopInstanceUid());
       }
-      if (hasTransferSyntaxUid()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getTransferSyntaxUid());
-      }
       if (hasExclude()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(3, getExclude());
+          .computeStringSize(2, getExclude());
+      }
+      if (hasTransferSyntaxUid()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(3, getTransferSyntaxUid());
       }
       for (org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData element : getAttributesList()) {
         size += com.google.protobuf.CodedOutputStream
@@ -1325,11 +1325,11 @@ public final class MINT2GPB {
         if (other.hasSopInstanceUid()) {
           setSopInstanceUid(other.getSopInstanceUid());
         }
-        if (other.hasTransferSyntaxUid()) {
-          setTransferSyntaxUid(other.getTransferSyntaxUid());
-        }
         if (other.hasExclude()) {
           setExclude(other.getExclude());
+        }
+        if (other.hasTransferSyntaxUid()) {
+          setTransferSyntaxUid(other.getTransferSyntaxUid());
         }
         if (!other.attributes_.isEmpty()) {
           if (result.attributes_.isEmpty()) {
@@ -1367,11 +1367,11 @@ public final class MINT2GPB {
               break;
             }
             case 18: {
-              setTransferSyntaxUid(input.readString());
+              setExclude(input.readString());
               break;
             }
             case 26: {
-              setExclude(input.readString());
+              setTransferSyntaxUid(input.readString());
               break;
             }
             case 34: {
@@ -1406,28 +1406,7 @@ public final class MINT2GPB {
         return this;
       }
       
-      // optional string transfer_syntax_uid = 2;
-      public boolean hasTransferSyntaxUid() {
-        return result.hasTransferSyntaxUid();
-      }
-      public java.lang.String getTransferSyntaxUid() {
-        return result.getTransferSyntaxUid();
-      }
-      public Builder setTransferSyntaxUid(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasTransferSyntaxUid = true;
-        result.transferSyntaxUid_ = value;
-        return this;
-      }
-      public Builder clearTransferSyntaxUid() {
-        result.hasTransferSyntaxUid = false;
-        result.transferSyntaxUid_ = getDefaultInstance().getTransferSyntaxUid();
-        return this;
-      }
-      
-      // optional string exclude = 3;
+      // optional string exclude = 2;
       public boolean hasExclude() {
         return result.hasExclude();
       }
@@ -1445,6 +1424,27 @@ public final class MINT2GPB {
       public Builder clearExclude() {
         result.hasExclude = false;
         result.exclude_ = getDefaultInstance().getExclude();
+        return this;
+      }
+      
+      // optional string transfer_syntax_uid = 3;
+      public boolean hasTransferSyntaxUid() {
+        return result.hasTransferSyntaxUid();
+      }
+      public java.lang.String getTransferSyntaxUid() {
+        return result.getTransferSyntaxUid();
+      }
+      public Builder setTransferSyntaxUid(java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  result.hasTransferSyntaxUid = true;
+        result.transferSyntaxUid_ = value;
+        return this;
+      }
+      public Builder clearTransferSyntaxUid() {
+        result.hasTransferSyntaxUid = false;
+        result.transferSyntaxUid_ = getDefaultInstance().getTransferSyntaxUid();
         return this;
       }
       
@@ -1509,6 +1509,541 @@ public final class MINT2GPB {
     }
     
     // @@protoc_insertion_point(class_scope:mint.metadata.InstanceData)
+  }
+  
+  public static final class AttributeData extends
+      com.google.protobuf.GeneratedMessage {
+    // Use AttributeData.newBuilder() to construct.
+    private AttributeData() {
+      initFields();
+    }
+    private AttributeData(boolean noInit) {}
+    
+    private static final AttributeData defaultInstance;
+    public static AttributeData getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public AttributeData getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.nema.medical.mint.metadata.gpb.MINT2GPB.internal_static_mint_metadata_AttributeData_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.nema.medical.mint.metadata.gpb.MINT2GPB.internal_static_mint_metadata_AttributeData_fieldAccessorTable;
+    }
+    
+    // optional uint32 tag = 1;
+    public static final int TAG_FIELD_NUMBER = 1;
+    private boolean hasTag;
+    private int tag_ = 0;
+    public boolean hasTag() { return hasTag; }
+    public int getTag() { return tag_; }
+    
+    // optional string exclude = 2;
+    public static final int EXCLUDE_FIELD_NUMBER = 2;
+    private boolean hasExclude;
+    private java.lang.String exclude_ = "";
+    public boolean hasExclude() { return hasExclude; }
+    public java.lang.String getExclude() { return exclude_; }
+    
+    // optional string vr = 3;
+    public static final int VR_FIELD_NUMBER = 3;
+    private boolean hasVr;
+    private java.lang.String vr_ = "";
+    public boolean hasVr() { return hasVr; }
+    public java.lang.String getVr() { return vr_; }
+    
+    // optional string string_value = 4;
+    public static final int STRING_VALUE_FIELD_NUMBER = 4;
+    private boolean hasStringValue;
+    private java.lang.String stringValue_ = "";
+    public boolean hasStringValue() { return hasStringValue; }
+    public java.lang.String getStringValue() { return stringValue_; }
+    
+    // optional uint32 binary_item_id = 5;
+    public static final int BINARY_ITEM_ID_FIELD_NUMBER = 5;
+    private boolean hasBinaryItemId;
+    private int binaryItemId_ = 0;
+    public boolean hasBinaryItemId() { return hasBinaryItemId; }
+    public int getBinaryItemId() { return binaryItemId_; }
+    
+    // repeated .mint.metadata.ItemData items = 6;
+    public static final int ITEMS_FIELD_NUMBER = 6;
+    private java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> items_ =
+      java.util.Collections.emptyList();
+    public java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> getItemsList() {
+      return items_;
+    }
+    public int getItemsCount() { return items_.size(); }
+    public org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData getItems(int index) {
+      return items_.get(index);
+    }
+    
+    private void initFields() {
+    }
+    public final boolean isInitialized() {
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (hasTag()) {
+        output.writeUInt32(1, getTag());
+      }
+      if (hasExclude()) {
+        output.writeString(2, getExclude());
+      }
+      if (hasVr()) {
+        output.writeString(3, getVr());
+      }
+      if (hasStringValue()) {
+        output.writeString(4, getStringValue());
+      }
+      if (hasBinaryItemId()) {
+        output.writeUInt32(5, getBinaryItemId());
+      }
+      for (org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData element : getItemsList()) {
+        output.writeMessage(6, element);
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (hasTag()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, getTag());
+      }
+      if (hasExclude()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(2, getExclude());
+      }
+      if (hasVr()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(3, getVr());
+      }
+      if (hasStringValue()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeStringSize(4, getStringValue());
+      }
+      if (hasBinaryItemId()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(5, getBinaryItemId());
+      }
+      for (org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData element : getItemsList()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, element);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> {
+      private org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData result;
+      
+      // Construct using org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.newBuilder()
+      private Builder() {}
+      
+      private static Builder create() {
+        Builder builder = new Builder();
+        builder.result = new org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData();
+        return builder;
+      }
+      
+      protected org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData internalGetResult() {
+        return result;
+      }
+      
+      public Builder clear() {
+        if (result == null) {
+          throw new IllegalStateException(
+            "Cannot call clear() after build().");
+        }
+        result = new org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData();
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(result);
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDescriptor();
+      }
+      
+      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData getDefaultInstanceForType() {
+        return org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDefaultInstance();
+      }
+      
+      public boolean isInitialized() {
+        return result.isInitialized();
+      }
+      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData build() {
+        if (result != null && !isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return buildPartial();
+      }
+      
+      private org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        if (!isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return buildPartial();
+      }
+      
+      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData buildPartial() {
+        if (result == null) {
+          throw new IllegalStateException(
+            "build() has already been called on this Builder.");
+        }
+        if (result.items_ != java.util.Collections.EMPTY_LIST) {
+          result.items_ =
+            java.util.Collections.unmodifiableList(result.items_);
+        }
+        org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData returnMe = result;
+        result = null;
+        return returnMe;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData) {
+          return mergeFrom((org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData other) {
+        if (other == org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDefaultInstance()) return this;
+        if (other.hasTag()) {
+          setTag(other.getTag());
+        }
+        if (other.hasExclude()) {
+          setExclude(other.getExclude());
+        }
+        if (other.hasVr()) {
+          setVr(other.getVr());
+        }
+        if (other.hasStringValue()) {
+          setStringValue(other.getStringValue());
+        }
+        if (other.hasBinaryItemId()) {
+          setBinaryItemId(other.getBinaryItemId());
+        }
+        if (!other.items_.isEmpty()) {
+          if (result.items_.isEmpty()) {
+            result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
+          }
+          result.items_.addAll(other.items_);
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              setTag(input.readUInt32());
+              break;
+            }
+            case 18: {
+              setExclude(input.readString());
+              break;
+            }
+            case 26: {
+              setVr(input.readString());
+              break;
+            }
+            case 34: {
+              setStringValue(input.readString());
+              break;
+            }
+            case 40: {
+              setBinaryItemId(input.readUInt32());
+              break;
+            }
+            case 50: {
+              org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder subBuilder = org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addItems(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      
+      // optional uint32 tag = 1;
+      public boolean hasTag() {
+        return result.hasTag();
+      }
+      public int getTag() {
+        return result.getTag();
+      }
+      public Builder setTag(int value) {
+        result.hasTag = true;
+        result.tag_ = value;
+        return this;
+      }
+      public Builder clearTag() {
+        result.hasTag = false;
+        result.tag_ = 0;
+        return this;
+      }
+      
+      // optional string exclude = 2;
+      public boolean hasExclude() {
+        return result.hasExclude();
+      }
+      public java.lang.String getExclude() {
+        return result.getExclude();
+      }
+      public Builder setExclude(java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  result.hasExclude = true;
+        result.exclude_ = value;
+        return this;
+      }
+      public Builder clearExclude() {
+        result.hasExclude = false;
+        result.exclude_ = getDefaultInstance().getExclude();
+        return this;
+      }
+      
+      // optional string vr = 3;
+      public boolean hasVr() {
+        return result.hasVr();
+      }
+      public java.lang.String getVr() {
+        return result.getVr();
+      }
+      public Builder setVr(java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  result.hasVr = true;
+        result.vr_ = value;
+        return this;
+      }
+      public Builder clearVr() {
+        result.hasVr = false;
+        result.vr_ = getDefaultInstance().getVr();
+        return this;
+      }
+      
+      // optional string string_value = 4;
+      public boolean hasStringValue() {
+        return result.hasStringValue();
+      }
+      public java.lang.String getStringValue() {
+        return result.getStringValue();
+      }
+      public Builder setStringValue(java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  result.hasStringValue = true;
+        result.stringValue_ = value;
+        return this;
+      }
+      public Builder clearStringValue() {
+        result.hasStringValue = false;
+        result.stringValue_ = getDefaultInstance().getStringValue();
+        return this;
+      }
+      
+      // optional uint32 binary_item_id = 5;
+      public boolean hasBinaryItemId() {
+        return result.hasBinaryItemId();
+      }
+      public int getBinaryItemId() {
+        return result.getBinaryItemId();
+      }
+      public Builder setBinaryItemId(int value) {
+        result.hasBinaryItemId = true;
+        result.binaryItemId_ = value;
+        return this;
+      }
+      public Builder clearBinaryItemId() {
+        result.hasBinaryItemId = false;
+        result.binaryItemId_ = 0;
+        return this;
+      }
+      
+      // repeated .mint.metadata.ItemData items = 6;
+      public java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> getItemsList() {
+        return java.util.Collections.unmodifiableList(result.items_);
+      }
+      public int getItemsCount() {
+        return result.getItemsCount();
+      }
+      public org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData getItems(int index) {
+        return result.getItems(index);
+      }
+      public Builder setItems(int index, org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        result.items_.set(index, value);
+        return this;
+      }
+      public Builder setItems(int index, org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder builderForValue) {
+        result.items_.set(index, builderForValue.build());
+        return this;
+      }
+      public Builder addItems(org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        if (result.items_.isEmpty()) {
+          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
+        }
+        result.items_.add(value);
+        return this;
+      }
+      public Builder addItems(org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder builderForValue) {
+        if (result.items_.isEmpty()) {
+          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
+        }
+        result.items_.add(builderForValue.build());
+        return this;
+      }
+      public Builder addAllItems(
+          java.lang.Iterable<? extends org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> values) {
+        if (result.items_.isEmpty()) {
+          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
+        }
+        super.addAll(values, result.items_);
+        return this;
+      }
+      public Builder clearItems() {
+        result.items_ = java.util.Collections.emptyList();
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:mint.metadata.AttributeData)
+    }
+    
+    static {
+      defaultInstance = new AttributeData(true);
+      org.nema.medical.mint.metadata.gpb.MINT2GPB.internalForceInit();
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:mint.metadata.AttributeData)
   }
   
   public static final class ItemData extends
@@ -1842,541 +2377,6 @@ public final class MINT2GPB {
     // @@protoc_insertion_point(class_scope:mint.metadata.ItemData)
   }
   
-  public static final class AttributeData extends
-      com.google.protobuf.GeneratedMessage {
-    // Use AttributeData.newBuilder() to construct.
-    private AttributeData() {
-      initFields();
-    }
-    private AttributeData(boolean noInit) {}
-    
-    private static final AttributeData defaultInstance;
-    public static AttributeData getDefaultInstance() {
-      return defaultInstance;
-    }
-    
-    public AttributeData getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.nema.medical.mint.metadata.gpb.MINT2GPB.internal_static_mint_metadata_AttributeData_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.nema.medical.mint.metadata.gpb.MINT2GPB.internal_static_mint_metadata_AttributeData_fieldAccessorTable;
-    }
-    
-    // optional uint32 tag = 1;
-    public static final int TAG_FIELD_NUMBER = 1;
-    private boolean hasTag;
-    private int tag_ = 0;
-    public boolean hasTag() { return hasTag; }
-    public int getTag() { return tag_; }
-    
-    // optional string vr = 2;
-    public static final int VR_FIELD_NUMBER = 2;
-    private boolean hasVr;
-    private java.lang.String vr_ = "";
-    public boolean hasVr() { return hasVr; }
-    public java.lang.String getVr() { return vr_; }
-    
-    // optional string string_value = 3;
-    public static final int STRING_VALUE_FIELD_NUMBER = 3;
-    private boolean hasStringValue;
-    private java.lang.String stringValue_ = "";
-    public boolean hasStringValue() { return hasStringValue; }
-    public java.lang.String getStringValue() { return stringValue_; }
-    
-    // optional uint32 binary_item_id = 4;
-    public static final int BINARY_ITEM_ID_FIELD_NUMBER = 4;
-    private boolean hasBinaryItemId;
-    private int binaryItemId_ = 0;
-    public boolean hasBinaryItemId() { return hasBinaryItemId; }
-    public int getBinaryItemId() { return binaryItemId_; }
-    
-    // optional string exclude = 5;
-    public static final int EXCLUDE_FIELD_NUMBER = 5;
-    private boolean hasExclude;
-    private java.lang.String exclude_ = "";
-    public boolean hasExclude() { return hasExclude; }
-    public java.lang.String getExclude() { return exclude_; }
-    
-    // repeated .mint.metadata.ItemData items = 6;
-    public static final int ITEMS_FIELD_NUMBER = 6;
-    private java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> items_ =
-      java.util.Collections.emptyList();
-    public java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> getItemsList() {
-      return items_;
-    }
-    public int getItemsCount() { return items_.size(); }
-    public org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData getItems(int index) {
-      return items_.get(index);
-    }
-    
-    private void initFields() {
-    }
-    public final boolean isInitialized() {
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (hasTag()) {
-        output.writeUInt32(1, getTag());
-      }
-      if (hasVr()) {
-        output.writeString(2, getVr());
-      }
-      if (hasStringValue()) {
-        output.writeString(3, getStringValue());
-      }
-      if (hasBinaryItemId()) {
-        output.writeUInt32(4, getBinaryItemId());
-      }
-      if (hasExclude()) {
-        output.writeString(5, getExclude());
-      }
-      for (org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData element : getItemsList()) {
-        output.writeMessage(6, element);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (hasTag()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, getTag());
-      }
-      if (hasVr()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getVr());
-      }
-      if (hasStringValue()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(3, getStringValue());
-      }
-      if (hasBinaryItemId()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(4, getBinaryItemId());
-      }
-      if (hasExclude()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(5, getExclude());
-      }
-      for (org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData element : getItemsList()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, element);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> {
-      private org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData result;
-      
-      // Construct using org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.newBuilder()
-      private Builder() {}
-      
-      private static Builder create() {
-        Builder builder = new Builder();
-        builder.result = new org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData();
-        return builder;
-      }
-      
-      protected org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData internalGetResult() {
-        return result;
-      }
-      
-      public Builder clear() {
-        if (result == null) {
-          throw new IllegalStateException(
-            "Cannot call clear() after build().");
-        }
-        result = new org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData();
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(result);
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDescriptor();
-      }
-      
-      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData getDefaultInstanceForType() {
-        return org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDefaultInstance();
-      }
-      
-      public boolean isInitialized() {
-        return result.isInitialized();
-      }
-      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData build() {
-        if (result != null && !isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return buildPartial();
-      }
-      
-      private org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        if (!isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return buildPartial();
-      }
-      
-      public org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData buildPartial() {
-        if (result == null) {
-          throw new IllegalStateException(
-            "build() has already been called on this Builder.");
-        }
-        if (result.items_ != java.util.Collections.EMPTY_LIST) {
-          result.items_ =
-            java.util.Collections.unmodifiableList(result.items_);
-        }
-        org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData returnMe = result;
-        result = null;
-        return returnMe;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData) {
-          return mergeFrom((org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData other) {
-        if (other == org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.getDefaultInstance()) return this;
-        if (other.hasTag()) {
-          setTag(other.getTag());
-        }
-        if (other.hasVr()) {
-          setVr(other.getVr());
-        }
-        if (other.hasStringValue()) {
-          setStringValue(other.getStringValue());
-        }
-        if (other.hasBinaryItemId()) {
-          setBinaryItemId(other.getBinaryItemId());
-        }
-        if (other.hasExclude()) {
-          setExclude(other.getExclude());
-        }
-        if (!other.items_.isEmpty()) {
-          if (result.items_.isEmpty()) {
-            result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
-          }
-          result.items_.addAll(other.items_);
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              setTag(input.readUInt32());
-              break;
-            }
-            case 18: {
-              setVr(input.readString());
-              break;
-            }
-            case 26: {
-              setStringValue(input.readString());
-              break;
-            }
-            case 32: {
-              setBinaryItemId(input.readUInt32());
-              break;
-            }
-            case 42: {
-              setExclude(input.readString());
-              break;
-            }
-            case 50: {
-              org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder subBuilder = org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addItems(subBuilder.buildPartial());
-              break;
-            }
-          }
-        }
-      }
-      
-      
-      // optional uint32 tag = 1;
-      public boolean hasTag() {
-        return result.hasTag();
-      }
-      public int getTag() {
-        return result.getTag();
-      }
-      public Builder setTag(int value) {
-        result.hasTag = true;
-        result.tag_ = value;
-        return this;
-      }
-      public Builder clearTag() {
-        result.hasTag = false;
-        result.tag_ = 0;
-        return this;
-      }
-      
-      // optional string vr = 2;
-      public boolean hasVr() {
-        return result.hasVr();
-      }
-      public java.lang.String getVr() {
-        return result.getVr();
-      }
-      public Builder setVr(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasVr = true;
-        result.vr_ = value;
-        return this;
-      }
-      public Builder clearVr() {
-        result.hasVr = false;
-        result.vr_ = getDefaultInstance().getVr();
-        return this;
-      }
-      
-      // optional string string_value = 3;
-      public boolean hasStringValue() {
-        return result.hasStringValue();
-      }
-      public java.lang.String getStringValue() {
-        return result.getStringValue();
-      }
-      public Builder setStringValue(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasStringValue = true;
-        result.stringValue_ = value;
-        return this;
-      }
-      public Builder clearStringValue() {
-        result.hasStringValue = false;
-        result.stringValue_ = getDefaultInstance().getStringValue();
-        return this;
-      }
-      
-      // optional uint32 binary_item_id = 4;
-      public boolean hasBinaryItemId() {
-        return result.hasBinaryItemId();
-      }
-      public int getBinaryItemId() {
-        return result.getBinaryItemId();
-      }
-      public Builder setBinaryItemId(int value) {
-        result.hasBinaryItemId = true;
-        result.binaryItemId_ = value;
-        return this;
-      }
-      public Builder clearBinaryItemId() {
-        result.hasBinaryItemId = false;
-        result.binaryItemId_ = 0;
-        return this;
-      }
-      
-      // optional string exclude = 5;
-      public boolean hasExclude() {
-        return result.hasExclude();
-      }
-      public java.lang.String getExclude() {
-        return result.getExclude();
-      }
-      public Builder setExclude(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasExclude = true;
-        result.exclude_ = value;
-        return this;
-      }
-      public Builder clearExclude() {
-        result.hasExclude = false;
-        result.exclude_ = getDefaultInstance().getExclude();
-        return this;
-      }
-      
-      // repeated .mint.metadata.ItemData items = 6;
-      public java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> getItemsList() {
-        return java.util.Collections.unmodifiableList(result.items_);
-      }
-      public int getItemsCount() {
-        return result.getItemsCount();
-      }
-      public org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData getItems(int index) {
-        return result.getItems(index);
-      }
-      public Builder setItems(int index, org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        result.items_.set(index, value);
-        return this;
-      }
-      public Builder setItems(int index, org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder builderForValue) {
-        result.items_.set(index, builderForValue.build());
-        return this;
-      }
-      public Builder addItems(org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        if (result.items_.isEmpty()) {
-          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
-        }
-        result.items_.add(value);
-        return this;
-      }
-      public Builder addItems(org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder builderForValue) {
-        if (result.items_.isEmpty()) {
-          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
-        }
-        result.items_.add(builderForValue.build());
-        return this;
-      }
-      public Builder addAllItems(
-          java.lang.Iterable<? extends org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData> values) {
-        if (result.items_.isEmpty()) {
-          result.items_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData>();
-        }
-        super.addAll(values, result.items_);
-        return this;
-      }
-      public Builder clearItems() {
-        result.items_ = java.util.Collections.emptyList();
-        return this;
-      }
-      
-      // @@protoc_insertion_point(builder_scope:mint.metadata.AttributeData)
-    }
-    
-    static {
-      defaultInstance = new AttributeData(true);
-      org.nema.medical.mint.metadata.gpb.MINT2GPB.internalForceInit();
-      defaultInstance.initFields();
-    }
-    
-    // @@protoc_insertion_point(class_scope:mint.metadata.AttributeData)
-  }
-  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_mint_metadata_StudyData_descriptor;
   private static
@@ -2393,15 +2393,15 @@ public final class MINT2GPB {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_mint_metadata_InstanceData_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_mint_metadata_ItemData_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_mint_metadata_ItemData_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_mint_metadata_AttributeData_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_mint_metadata_AttributeData_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_mint_metadata_ItemData_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_mint_metadata_ItemData_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2422,14 +2422,14 @@ public final class MINT2GPB {
       "(\0132\034.mint.metadata.AttributeData\022.\n\tinst" +
       "ances\030\005 \003(\0132\033.mint.metadata.InstanceData",
       "\"\210\001\n\014InstanceData\022\030\n\020sop_instance_uid\030\001 " +
-      "\001(\t\022\033\n\023transfer_syntax_uid\030\002 \001(\t\022\017\n\007excl" +
-      "ude\030\003 \001(\t\0220\n\nattributes\030\004 \003(\0132\034.mint.met" +
-      "adata.AttributeData\"<\n\010ItemData\0220\n\nattri" +
-      "butes\030\001 \003(\0132\034.mint.metadata.AttributeDat" +
-      "a\"\217\001\n\rAttributeData\022\013\n\003tag\030\001 \001(\r\022\n\n\002vr\030\002" +
-      " \001(\t\022\024\n\014string_value\030\003 \001(\t\022\026\n\016binary_ite" +
-      "m_id\030\004 \001(\r\022\017\n\007exclude\030\005 \001(\t\022&\n\005items\030\006 \003" +
-      "(\0132\027.mint.metadata.ItemDataB0\n\"org.nema." +
+      "\001(\t\022\017\n\007exclude\030\002 \001(\t\022\033\n\023transfer_syntax_" +
+      "uid\030\003 \001(\t\0220\n\nattributes\030\004 \003(\0132\034.mint.met" +
+      "adata.AttributeData\"\217\001\n\rAttributeData\022\013\n" +
+      "\003tag\030\001 \001(\r\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022" +
+      "\024\n\014string_value\030\004 \001(\t\022\026\n\016binary_item_id\030" +
+      "\005 \001(\r\022&\n\005items\030\006 \003(\0132\027.mint.metadata.Ite" +
+      "mData\"<\n\010ItemData\0220\n\nattributes\030\001 \003(\0132\034." +
+      "mint.metadata.AttributeDataB0\n\"org.nema." +
       "medical.mint.metadata.gpbB\010MINT2GPBH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
@@ -2458,25 +2458,25 @@ public final class MINT2GPB {
           internal_static_mint_metadata_InstanceData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_InstanceData_descriptor,
-              new java.lang.String[] { "SopInstanceUid", "TransferSyntaxUid", "Exclude", "Attributes", },
+              new java.lang.String[] { "SopInstanceUid", "Exclude", "TransferSyntaxUid", "Attributes", },
               org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData.class,
               org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData.Builder.class);
-          internal_static_mint_metadata_ItemData_descriptor =
+          internal_static_mint_metadata_AttributeData_descriptor =
             getDescriptor().getMessageTypes().get(3);
+          internal_static_mint_metadata_AttributeData_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_mint_metadata_AttributeData_descriptor,
+              new java.lang.String[] { "Tag", "Exclude", "Vr", "StringValue", "BinaryItemId", "Items", },
+              org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.class,
+              org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.Builder.class);
+          internal_static_mint_metadata_ItemData_descriptor =
+            getDescriptor().getMessageTypes().get(4);
           internal_static_mint_metadata_ItemData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_ItemData_descriptor,
               new java.lang.String[] { "Attributes", },
               org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.class,
               org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData.Builder.class);
-          internal_static_mint_metadata_AttributeData_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_mint_metadata_AttributeData_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_mint_metadata_AttributeData_descriptor,
-              new java.lang.String[] { "Tag", "Vr", "StringValue", "BinaryItemId", "Exclude", "Items", },
-              org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.class,
-              org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.Builder.class);
           return null;
         }
       };
