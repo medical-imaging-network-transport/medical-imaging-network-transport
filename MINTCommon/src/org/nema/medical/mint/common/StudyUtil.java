@@ -473,4 +473,36 @@ public final class StudyUtil {
 		
 		jobFolder.delete();
 	}
+	
+	/**
+	 * This method will find the largest int named file in the changelog root
+	 * directory and will return a file to root/'the largest int + 1'. Calls
+	 * mkdirs on the file to return before returning it.
+	 * 
+	 * @param changelogRoot
+	 * @return
+	 */
+	public static File getNextChangelogDir(File changelogRoot)
+	{
+		int max = -1;
+		
+		for(String name : changelogRoot.list())
+		{
+			try
+			{
+				int tmp = Integer.parseInt(name);
+				
+				if(tmp > max)
+					max = tmp;
+				
+			}catch(NumberFormatException e){
+				LOG.warn("Encountered a changelog folder that was not an integer: " + name, e);
+			}
+		}
+		
+		File nextChange = new File(changelogRoot, Integer.toString(max+1));
+		nextChange.mkdirs();
+		
+		return nextChange;
+	}
 }

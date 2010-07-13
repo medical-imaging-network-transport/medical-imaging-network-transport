@@ -45,7 +45,9 @@ public class UpdateStudyProcessor extends TimerTask {
 		String jobID = jobFolder.getName();
 		String studyUUID = studyFolder.getName();
 		
+		//Not calling mkdirs on these because they better already exist
 		File dicomFolder = new File(studyFolder, "DICOM");
+		File changelogRoot = new File(studyFolder, "changelog");
 		
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -75,6 +77,13 @@ public class UpdateStudyProcessor extends TimerTask {
 				//Shift Item Ids failed!
 				throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
 			}
+			
+			/*
+			 * Write metadata update message to change log folder.
+			 */
+	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
+	        
+	        StudyUtil.writeStudy(newStudy, changelogFolder);
 			
 			/*
 			 * Need to move through the new study and look for things to exclude
