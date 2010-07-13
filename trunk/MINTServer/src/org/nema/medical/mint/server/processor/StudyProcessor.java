@@ -1,14 +1,11 @@
 package org.nema.medical.mint.server.processor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Study;
-import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
@@ -53,29 +50,11 @@ public class StudyProcessor extends TimerTask {
 			File changelogRoot = new File(studyFolder, "changelog");
 			changelogRoot.mkdirs();
 
-			File metadataGPB = new File(jobFolder,"metadata.gpb");
-			File metadataXML = new File(jobFolder,"metadata.xml");
-			File metadataJSON = new File(jobFolder,"metadata.json");
-			File metadata;
-
-			Study study = null;
-
-			if (metadataXML.exists()) {
-				study = StudyIO.parseFromXML(metadataXML);
-				metadata = metadataXML;
-			} else if (metadataGPB.exists()) {
-				study = StudyIO.parseFromGPB(metadataGPB);
-				metadata = metadataGPB;
-			} else if (metadataJSON.exists()) {
-				study = StudyIO.parseFromJSON(metadataJSON);
-				metadata = metadataJSON;
-			} else {
-				throw new RuntimeException("unable to locate metadata file");
-			}
-			metadata.delete();
+			//load study into memory
+			Study study = StudyUtil.loadStudy(jobFolder);
 			
-			StudyIO.writeToGPB(study, new File(dicomFolder, "metadata.gpb"));
-			StudyIO.writeToXML(study, new File(dicomFolder, "metadata.xml"));
+			//write study into dicom folder
+			StudyUtil.writeStudy(study, dicomFolder);
 	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
 	        
 	        //Write metadata to change log
@@ -83,21 +62,16 @@ public class StudyProcessor extends TimerTask {
 	        
 	        StudyUtil.writeStudy(study, changelogFolder);
 
+	        //Copy binary data into binaryitems folder
 	        File binaryRoot = new File(dicomFolder, "binaryitems");
 			binaryRoot.mkdirs();
 
-			Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
-			while (iterator.hasNext()) {
-				File tempfile = iterator.next();
-				File permfile = new File(binaryRoot, tempfile.getName());
-				// just moving the file since the reference implementation
-				// is using the same MINT_ROOT for temp and perm storage
-				// other implementations may want to copy/delete the file
-				// if the temp storage is on a different device
-				tempfile.renameTo(permfile);
-			}
-			jobFolder.delete();
+			StudyUtil.moveBinaryItems(jobFolder, binaryRoot);
+			
+			//delete job folder
+			StudyUtil.deleteFolder(jobFolder);
 
+			//update database
 			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
 			studyData.setID(studyUUID);
 			studyData.setStudyInstanceUID(study.getStudyInstanceUID());
