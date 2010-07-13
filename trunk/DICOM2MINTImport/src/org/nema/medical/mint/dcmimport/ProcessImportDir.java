@@ -283,7 +283,8 @@ public final class ProcessImportDir {
         Collections.synchronizedMap(new HashMap<String, Collection<File>>());
     private final URI postURI;
     private final boolean useXMLNotGPB;
-    private final Collection<String> studyUUIDs = new LinkedList<String>();
+    private final Collection<String> studyUUIDs =
+        Collections.synchronizedList(new LinkedList<String>());
 
     private static final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
     private static final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
