@@ -204,7 +204,7 @@ public class Study implements AttributeStore
 				for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
 				{
 					Instance instance = ii.next();
-					Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID(), instance.getTransferSyntaxUID());
+					Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
 					
 					if(thisInstance != null)
 					{
