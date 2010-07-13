@@ -257,13 +257,20 @@ public final class StudyUtil {
 				for(Iterator<Instance> ii = excludeSeries.instanceIterator(); ii.hasNext();)
 				{
 					Instance excludeInstance = ii.next();
-					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID(), excludeInstance.getTransferSyntaxUID());
+					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID());
 					
 					if(isExclude(excludeInstance.getExclude()))
 					{
-						currentSeries.removeInstance(excludeInstance.getSOPInstanceUID(), excludeInstance.getTransferSyntaxUID());
+						currentSeries.removeInstance(excludeInstance.getSOPInstanceUID());
 						ii.remove();
 					}else{
+						//Check if transfer syntax is existing, update current if it is provided
+						String transferSyntaxUID = excludeInstance.getTransferSyntaxUID();
+						if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
+						{
+							currentInstance.setTransferSyntaxUID(transferSyntaxUID);
+						}
+						
 						//Remove attributes from instance?
 						for(Iterator<Attribute> iii = excludeInstance.attributeIterator(); iii.hasNext();)
 						{

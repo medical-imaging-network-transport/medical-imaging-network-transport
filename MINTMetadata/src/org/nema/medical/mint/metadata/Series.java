@@ -118,15 +118,13 @@ public class Series implements AttributeStore
      * removes an Instance from the Series based on it's sop UID
      * @param inst
      */
-    public Instance removeInstance(final String sopInstanceUID, final String transferSyntax) {
+    public Instance removeInstance(final String sopInstanceUID) {
     	for(int x = 0; x < instanceList.size(); ++x)
     	{
     		Instance i = instanceList.get(x);
 			if (i != null
 					&& (i.getSOPInstanceUID() == sopInstanceUID || 
-							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID)))
-					&& (i.getTransferSyntaxUID() == transferSyntax || 
-							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
+							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
     		{
     			return instanceList.remove(x);
     		}
@@ -139,15 +137,13 @@ public class Series implements AttributeStore
      * gets an Instance from the Series based on it's sop UID
      * @param inst
      */
-    public Instance getInstance(final String sopInstanceUID, final String transferSyntax) {
+    public Instance getInstance(final String sopInstanceUID) {
     	for(int x = 0; x < instanceList.size(); ++x)
     	{
     		Instance i = instanceList.get(x);
 			if (i != null
 					&& (i.getSOPInstanceUID() == sopInstanceUID || 
-							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID)))
-					&& (i.getTransferSyntaxUID() == transferSyntax || 
-							(i.getTransferSyntaxUID() != null && i.getTransferSyntaxUID().equals(transferSyntax))))
+							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
     		{
     			return instanceList.get(x);
     		}
