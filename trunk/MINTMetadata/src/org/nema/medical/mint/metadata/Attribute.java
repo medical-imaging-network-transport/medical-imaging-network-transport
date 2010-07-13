@@ -49,7 +49,7 @@ public class Attribute
 
     /**
      * puts an Item into the Attribute
-     * @param attr
+     * @param item
      */
     public void addItem(final Item item) {
         items.add(item);
@@ -57,7 +57,7 @@ public class Attribute
 
     /**
      * removes the Item at the given index in the list
-     * @param tag
+     * @param index
      */
     public void removeItem(final int index) {
         items.remove(index);
@@ -80,7 +80,7 @@ public class Attribute
     /**
      * Get the 'tag' attribute value.
      *
-     * @return value
+     * @return tag
      */
     public int getTag() {
         return tag;
@@ -98,7 +98,7 @@ public class Attribute
     /**
      * Set the 'tag' attribute value ... as a hex string
      *
-     * @param tag
+     * @param hex
      */
     public void setTag(String hex) {
         this.tag = StudyIO.hex2int(hex);
@@ -107,7 +107,7 @@ public class Attribute
     /**
      * Get the 'vr' attribute value.
      *
-     * @return value
+     * @return vr
      */
     public String getVr() {
         return vr;
@@ -125,7 +125,7 @@ public class Attribute
     /**
      * Get the 'val' attribute value.
      *
-     * @return value
+     * @return val
      */
     public String getVal() {
         return val;
@@ -143,7 +143,7 @@ public class Attribute
     /**
      * Get the 'bid' attribute value.
      *
-     * @return value
+     * @return bid
      */
     public int getBid() {
         return bid;
@@ -163,7 +163,7 @@ public class Attribute
     /**
      * Get the 'exclude' attribute value.
      *
-     * @return value
+     * @return exclude
      */
     public String getExclude() {
 		return exclude;

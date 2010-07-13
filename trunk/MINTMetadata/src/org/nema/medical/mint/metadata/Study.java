@@ -89,7 +89,7 @@ public class Study implements AttributeStore
 
     /**
      * puts an Series into the Study - series are unique per uid
-     * @param attr
+     * @param series
      */
     public void putSeries(final Series series) {
         seriesMap.put(series.getSeriesInstanceUID(), series);

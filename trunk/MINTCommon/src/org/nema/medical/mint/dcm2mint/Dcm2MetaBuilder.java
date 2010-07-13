@@ -118,7 +118,7 @@ public final class Dcm2MetaBuilder {
    This should be called only after all P10 instances for the study have been processed with
    accumulateFile().
 
-   @return A MetaBinaryPair instance containing the normalized metadata for the study and all the
+  A MetaBinaryPair instance containing the normalized metadata for the study and all the
    binary data blobs for the study.
     */
    public void finish() {
