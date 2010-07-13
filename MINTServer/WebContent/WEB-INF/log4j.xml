@@ -23,7 +23,12 @@
 	</logger>
 
 	<logger name="org.hibernate" additivity="false">
-		<level value="debug" />
+		<level value="warn" />
+		<appender-ref ref="console" />
+	</logger>
+
+	<logger name="org.springframework" additivity="false">
+		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
 
