@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.nema.medical.mint.server.domain.Study;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.UpdateInfo;
+import org.nema.medical.mint.server.domain.UpdateInfoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,6 +45,9 @@ public class StudiesController {
 
 	@Autowired
 	protected File studiesRoot;
+	
+	@Autowired
+	protected UpdateInfoDAO updateDAO = null;
 
 	@Autowired
 	protected StudyDAO studyDAO = null;
@@ -60,7 +65,7 @@ public class StudiesController {
 		}
 		outputStream.flush();
 	}
-
+	
 	@ModelAttribute("Studies")
 	public List<Study> getStudies() {
 		return new LinkedList<Study>();
@@ -82,6 +87,29 @@ public class StudiesController {
 		
 		// this will render the studies list using studies.jsp
 		return "studies";
+	}
+	
+	@ModelAttribute("Updates")
+	public List<UpdateInfo> getUpdates() {
+		return new LinkedList<UpdateInfo>();
+	}
+	
+	@RequestMapping("/studies/{uuid}/changelog")
+	public String updates(@PathVariable("uuid") final String uuid,
+			@ModelAttribute("Updates") final List<UpdateInfo> updates)
+			throws IOException {
+
+		if (StringUtils.isNotBlank(uuid)) {
+			final List<UpdateInfo> updatesFound = updateDAO.findUpdateInfo(uuid);
+			if (updatesFound != null) {
+				updates.addAll(updatesFound);
+			}
+		} else {
+			updates.addAll(updateDAO.getMostRecentUpdates(50));
+		}
+		
+		// this will render the studies list using studies.jsp
+		return "updates";
 	}
 	
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")
