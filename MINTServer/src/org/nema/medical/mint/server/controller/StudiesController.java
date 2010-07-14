@@ -213,6 +213,7 @@ public class StudiesController {
 		//Send all binaryItems to the original requestor
 		if(binaryItems.size() == 1)
 		{
+			//Normal process to send an single item back
 			try {
 				final File binaryItemFile = binaryItems.get(0);
 				if (binaryItemFile.exists() && binaryItemFile.canRead()) {
@@ -244,8 +245,51 @@ public class StudiesController {
 				}
 			}
 		}else{
-			//TODO use multipart mime respose to send all binaryItems
-			
+			//TODO use multipart MIME response to send all binaryItems
+			try
+			{
+				final String boundary = "BinaryItem";
+				httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + boundary + "\"");
+				
+				final OutputStream out = httpServletResponse.getOutputStream();
+				
+				out.write(("--" + boundary + "\n").getBytes());
+				out.flush();
+				for(File binaryItem : binaryItems)
+				{
+					final int bufsize = 16384;
+					byte[] buf = new byte[bufsize];
+					
+					final InputStream in = new FileInputStream(binaryItem);
+					try 
+					{
+						out.write('\n');
+						
+						final long itemsize = binaryItem.length();
+						out.write("Content-type: application/octet-stream\n".getBytes());
+						out.write(("Content-length: " + itemsize).getBytes());
+						
+						for (long i = 0; i < itemsize; i += bufsize) {
+							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
+							in.read(buf,0,len);
+							out.write(buf,0,len);
+						}
+						
+						out.write(("\n--" + boundary).getBytes());
+	
+						out.flush();
+					} finally {
+						in.close();
+					}
+				}
+				out.write("--".getBytes());
+				out.flush();
+			} catch (final IOException e) {
+				if (!httpServletResponse.isCommitted()) {
+					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							"Cannot provide study binary items: File Read Failure");
+				}
+			}
 		}
 	}
 	
