@@ -2,6 +2,7 @@ package org.nema.medical.mint.server.processor;
 
 import java.io.File;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
@@ -10,6 +11,8 @@ import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.UpdateInfo;
+import org.nema.medical.mint.server.domain.UpdateInfoDAO;
 
 /**
  * 
@@ -24,6 +27,7 @@ public class UpdateStudyProcessor extends TimerTask {
 	
 	private JobInfoDAO jobInfoDAO;
 	private StudyDAO studyDAO;
+	private UpdateInfoDAO updateDAO;
 
 	/**
 	 * extracts files from the jobFolder, merges them in the studyFolder
@@ -33,11 +37,12 @@ public class UpdateStudyProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public UpdateStudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO) {
+	public UpdateStudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, UpdateInfoDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
+		this.updateDAO = updateDAO;
 	}
 
 	@Override
@@ -139,7 +144,14 @@ public class UpdateStudyProcessor extends TimerTask {
 			studyData.setStudyDateTime(org.nema.medical.mint.server.domain.Study
 					.now());
 			studyDAO.saveOrUpdateStudy(studyData);
-			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));		
+			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));
+			
+			UpdateInfo updateInfo = new UpdateInfo();
+			updateInfo.setId(UUID.randomUUID().toString());
+			updateInfo.setStudyID(studyUUID);
+			updateInfo.setUpdateDescription("Update of existing study.");
+			updateInfo.setUpdateIndex(Integer.parseInt(changelogFolder.getName()));
+			updateDAO.saveOrUpdateUpdateInfo(updateInfo);
 
 			jobInfo.setStatus(JobStatus.SUCCESS);
 			jobInfo.setStatusDescription("complete");

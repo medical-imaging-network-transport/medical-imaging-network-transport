@@ -43,6 +43,7 @@ import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.UpdateInfoDAO;
 import org.nema.medical.mint.server.processor.StudyProcessor;
 import org.nema.medical.mint.server.processor.UpdateStudyProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,8 @@ public class JobsController {
 	protected StudyDAO studyDAO = null;
 	@Autowired
 	protected JobInfoDAO jobInfoDAO = null;
+	@Autowired
+	protected UpdateInfoDAO updateDAO = null;
 
 	@PostConstruct
 	public void setupTimer() {
@@ -144,7 +147,7 @@ public class JobsController {
 		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		StudyProcessor processor = new StudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO);
+		StudyProcessor processor = new StudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO, updateDAO);
         timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
@@ -205,7 +208,7 @@ public class JobsController {
 		map.addAttribute("joburi", "updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO);
+		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO, updateDAO);
         timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp

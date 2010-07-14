@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.UpdateInfoDAO;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +64,7 @@ public class ServerConfig {
 	 * MINTServer specific
 	 */
 	protected StudyDAO studyDAO = null;
+	protected UpdateInfoDAO updateDAO = null;
 	protected JobInfoDAO jobInfoDAO = null;
 	protected File jobTemp = null;
 	protected File studiesRoot = null;
@@ -222,6 +224,16 @@ public class ServerConfig {
 			studyDAO.afterPropertiesSet();
 		}
 		return studyDAO;
+	}
+	
+	@Bean(name = "updateDAO", autowire = Autowire.BY_NAME)
+	public UpdateInfoDAO updateDAO() throws Exception {
+		if (updateDAO == null) {
+			updateDAO = new UpdateInfoDAO();
+			updateDAO.setSessionFactory(sessionFactory());
+			updateDAO.afterPropertiesSet();
+		}
+		return updateDAO;
 	}
 
 	@Bean(name = "jobInfoDAO", autowire = Autowire.BY_NAME)
