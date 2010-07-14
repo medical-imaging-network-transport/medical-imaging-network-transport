@@ -16,9 +16,9 @@
 			<li>
 			<ul>
 				<li class='StudyUID'>Study ID: ${update.studyID}</li>
-				<li class='UpdateIndex'>Update Index: ${update.updateIndex}</li>
-				<li class='UpdateDescription'>Update Description: ${update.updateDescription}</li>
-				<li class='UpdateTime'>Update Time: ${update.updateTime}</li>
+				<li class='UpdateIndex'>Update index: ${update.updateIndex}</li>
+				<li class='UpdateDescription'>Update description: ${update.updateDescription}</li>
+				<li class='UpdateTime'>Time the update was performed: ${update.updateTime}</li>
 				<li class='meta'><a
 					href='<%=request.getContextPath()%>/studies/${update.studyID}/changelog/${update.updateIndex}'>Meta
 				Data</a></li>
