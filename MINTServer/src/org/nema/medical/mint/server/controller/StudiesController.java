@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.nema.medical.mint.common.StudyUtil;
+import org.nema.medical.mint.metadata.Attribute;
+import org.nema.medical.mint.metadata.Instance;
+import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.server.domain.Study;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.domain.UpdateInfo;
@@ -176,52 +182,157 @@ public class StudiesController {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
 			return;
 		}
-		final Long sequence;
+		
+		final File studyRoot = new File(studiesRoot , uuid);
+		
+		final List<Long> itemList = parseItemList(seq, studyRoot, httpServletResponse);
+		
+		if(itemList == null)
+		{
+			//failed to parse seq, error message already added
+			return;
+		}
+		
+		//Make sure all the binary files requested are existing
+		final List<File> binaryItems = new ArrayList<File>();
+		final File binaryRoot = new File(studyRoot, "DICOM/binaryitems");
+		
+		for(long l : itemList)
+		{
+			File f = new File(binaryRoot, l + ".dat");
+			
+			if(!f.exists() || !f.canRead())
+			{
+				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item request: Not found : " + l);
+				return;
+			}
+			
+			binaryItems.add(f);
+		}
+		
+		//Send all binaryItems to the original requestor
+		if(binaryItems.size() == 1)
+		{
+			try {
+				final File binaryItemFile = binaryItems.get(0);
+				if (binaryItemFile.exists() && binaryItemFile.canRead()) {
+					final InputStream in = new FileInputStream(binaryItemFile);
+					final OutputStream out = httpServletResponse.getOutputStream();
+					try {
+						final long itemsize = binaryItemFile.length();
+						httpServletResponse.setContentLength((int)itemsize);
+						httpServletResponse.setContentType("application/octet-stream");
+						final int bufsize = 16384;
+						byte[] buf = new byte[bufsize];
+						for (long i = 0; i < itemsize; i += bufsize) {
+							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
+							in.read(buf,0,len);
+							out.write(buf,0,len);
+						}
+	
+						httpServletResponse.getOutputStream().flush();
+					} finally {
+						in.close();
+					}
+				} else {
+					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
+				}
+			} catch (final IOException e) {
+				if (!httpServletResponse.isCommitted()) {
+					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+							"Cannot provide study binary items: File Read Failure");
+				}
+			}
+		}else{
+			//TODO use multipart mime respose to send all binaryItems
+			
+		}
+	}
+	
+	private List<Long> parseItemList(String seq, File studyRoot, final HttpServletResponse httpServletResponse) throws IOException
+	{
+		final List<Long> itemList = new ArrayList<Long>();
+		
+		if(seq.equals("all"))
+		{
+			//need to return all items in current metadata
+			File dicomRoot = new File(studyRoot, "DICOM");
+			
+			org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(dicomRoot);
+			
+			//Go through each instance and collect the bids
+			for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+			{
+				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+				{
+					for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+					{
+						Attribute a = iii.next();
+						
+						int bid = a.getBid();
+						if(bid >= 0)
+						{
+							itemList.add((long)bid);
+						}
+					}
+				}
+			}
+		}else{
+			String[] elements = seq.split(",");
+			
+			for(String element : elements)
+			{
+				String[] range = element.split("-");
+				
+				if(range.length < 1 || range.length > 2)
+				{
+					//failed to parse element, error message not set yet
+					return null;
+				}
+				
+				long start = parseLong(range[0], httpServletResponse);
+				long end = start;
+				if(range.length == 2)
+				{
+					end = parseLong(range[1], httpServletResponse);
+				}
+				
+				if(start < 0 || end < 0)
+				{
+					//failed to parse element, error message already set
+					return null;
+				}
+				
+				//for each item in the range, add to itemList
+				for(;start <= end; ++start)
+				{
+					itemList.add(start);
+				}
+			}
+		}
+		
+		return itemList;
+	}
+	
+	private Long parseLong(String str, final HttpServletResponse httpServletResponse) throws IOException
+	{
+		final Long num;
 		try {
-			sequence = Long.valueOf(seq);
+			num = Long.valueOf(str);
 		} catch (final NumberFormatException e) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
-			return;
+			return -1l;
 		}
-		if (sequence < 0) {
+		if (num < 0) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
-			return;
+			return -1l;
 		}
-		if (sequence >= Integer.MAX_VALUE) {
+		if (num >= Integer.MAX_VALUE) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
-			return;
+			return -1l;
 		}
-
-		try {
-			final File binaryItemFile = new File(studiesRoot, uuid + "/DICOM/binaryitems/" + sequence + ".dat");
-			if (binaryItemFile.exists() && binaryItemFile.canRead()) {
-				final InputStream in = new FileInputStream(binaryItemFile);
-				final OutputStream out = httpServletResponse.getOutputStream();
-				try {
-					final long itemsize = binaryItemFile.length();
-					httpServletResponse.setContentLength((int)itemsize);
-					httpServletResponse.setContentType("application/octet-stream");
-					final int bufsize = 16384;
-					byte[] buf = new byte[bufsize];
-					for (long i = 0; i < itemsize; i += bufsize) {
-						int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
-						in.read(buf,0,len);
-						out.write(buf,0,len);
-					}
-
-					httpServletResponse.getOutputStream().flush();
-				} finally {
-					in.close();
-				}
-			} else {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
-			}
-		} catch (final IOException e) {
-			if (!httpServletResponse.isCommitted()) {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Cannot provide study binary items: File Read Failure");
-			}
-		}
+		
+		return num;
 	}
 
 	@RequestMapping(value = { "/studies/{uuid}/DICOM/metadata", "/studies/{uuid}/metadata.gpb",
