@@ -11,6 +11,10 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.nema.medical.mint.metadata.Study;
 
+/**
+ * @author Rex
+ *
+ */
 public class StudyMergeTest {
 	static final Logger LOG = Logger.getLogger(StudyMergeTest.class);
 
