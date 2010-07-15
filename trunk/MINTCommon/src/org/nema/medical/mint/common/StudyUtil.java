@@ -247,7 +247,10 @@ public final class StudyUtil {
 					if(isExclude(attribute.getExclude()))
 					{
 						//Non null exclude string means remove it
-						currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
+						if(currentSeries != null)
+						{
+							currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
+						}
 						ii.remove();
 					}
 				}
@@ -256,20 +259,17 @@ public final class StudyUtil {
 				for(Iterator<Instance> ii = excludeSeries.instanceIterator(); ii.hasNext();)
 				{
 					Instance excludeInstance = ii.next();
-					Instance currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID());
+					Instance currentInstance = null;
+					if(currentSeries != null)
+					{
+						currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID());
+					}
 					
 					if(isExclude(excludeInstance.getExclude()))
 					{
 						currentSeries.removeInstance(excludeInstance.getSOPInstanceUID());
 						ii.remove();
 					}else{
-						//Check if transfer syntax is existing, update current if it is provided
-						String transferSyntaxUID = excludeInstance.getTransferSyntaxUID();
-						if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
-						{
-							currentInstance.setTransferSyntaxUID(transferSyntaxUID);
-						}
-						
 						//Remove attributes from instance?
 						for(Iterator<Attribute> iii = excludeInstance.attributeIterator(); iii.hasNext();)
 						{
@@ -278,7 +278,10 @@ public final class StudyUtil {
 							if(isExclude(attribute.getExclude()))
 							{
 								//Non null exclude string means remove it
-								currentInstance.removeAttribute(attribute.getTag());
+								if(currentInstance != null)
+								{
+									currentInstance.removeAttribute(attribute.getTag());
+								}
 								iii.remove();
 							}
 						}
