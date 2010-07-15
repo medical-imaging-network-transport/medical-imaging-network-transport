@@ -208,6 +208,13 @@ public class Study implements AttributeStore
 					
 					if(thisInstance != null)
 					{
+						//Check if transfer syntax is existing, update current if it is provided
+						String transferSyntaxUID = instance.getTransferSyntaxUID();
+						if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
+						{
+							thisInstance.setTransferSyntaxUID(transferSyntaxUID);
+						}
+						
 						//Merge attributes for instances
 						for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
 						{
