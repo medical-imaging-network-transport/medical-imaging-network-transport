@@ -119,7 +119,10 @@ public class StudiesController {
 	}
 	
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")
-	public void studiesChangeLog(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
+	public void studiesChangeLog(
+			@RequestParam(value = "metadataType", required = false) String metadataType,
+			@PathVariable("uuid") final String uuid,
+			@PathVariable final String seq,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose
@@ -143,7 +146,11 @@ public class StudiesController {
 		}
 
 		try {
-			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata.xml");
+			//Defaults to xml metadata
+			if(StringUtils.isBlank(metadataType))
+				metadataType = ".xml";
+			
+			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata" + metadataType);
 			if (metadataFile.exists() && metadataFile.canRead()) {
 				final InputStream in = new FileInputStream(metadataFile);
 				final OutputStream out = httpServletResponse.getOutputStream();
