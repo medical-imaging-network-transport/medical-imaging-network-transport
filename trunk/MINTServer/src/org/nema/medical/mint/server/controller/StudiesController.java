@@ -267,7 +267,7 @@ public class StudiesController {
 						
 						final long itemsize = binaryItem.length();
 						out.write("Content-type: application/octet-stream\n".getBytes());
-						out.write(("Content-length: " + itemsize + "\n").getBytes());
+						out.write(("Content-length: " + itemsize + "\n\n").getBytes());
 						
 						for (long i = 0; i < itemsize; i += bufsize) {
 							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
