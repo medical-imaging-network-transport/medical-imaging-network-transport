@@ -253,7 +253,7 @@ public class StudiesController {
 				
 				final OutputStream out = httpServletResponse.getOutputStream();
 				
-				out.write(("--" + boundary + "\n").getBytes());
+				out.write(("--" + boundary).getBytes());
 				out.flush();
 				for(File binaryItem : binaryItems)
 				{
@@ -267,7 +267,7 @@ public class StudiesController {
 						
 						final long itemsize = binaryItem.length();
 						out.write("Content-type: application/octet-stream\n".getBytes());
-						out.write(("Content-length: " + itemsize).getBytes());
+						out.write(("Content-length: " + itemsize + "\n").getBytes());
 						
 						for (long i = 0; i < itemsize; i += bufsize) {
 							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
