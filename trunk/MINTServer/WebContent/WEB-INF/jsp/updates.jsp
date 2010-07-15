@@ -1,28 +1,36 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html version="-//W3C//DTD HTML 4.01 Transitional//EN" dir="ltr"
-	lang="en">
-<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>List of Updates</title>
+<title>ChangeLog</title>
+<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
+<style type="text/css">
+dl { margin: 0; padding: 0; }
+dt { margin: 0; padding: 0; font-weight: bold; }
+dd { margin: 0 0 1em 0; padding: 0; }
+</style>
 </head>
 <body>
-<h1>List of Updates</h1>
-<c:if test="${not empty Updates}">
+<h1>ChangeLog</h1>
+<c:if test="${not empty changes}">
 	<ul>
-		<c:forEach var="update" items="${Updates}" varStatus="updateStatus">
+		<c:forEach var="change" items="${changes}">
 			<li>
-			<ul>
-				<li class='StudyUID'>Study ID: ${update.studyID}</li>
-				<li class='UpdateIndex'>Update index: ${update.updateIndex}</li>
-				<li class='UpdateDescription'>Update description: ${update.updateDescription}</li>
-				<li class='UpdateTime'>Time the update was performed: ${update.updateTime}</li>
-				<li class='meta'><a
-					href='<%=request.getContextPath()%>/studies/${update.studyID}/changelog/${update.updateIndex}'>Meta
-				Data</a></li>
-			</ul>
+			<dl id='${change.studyID}'>
+				<dt>Study ID</dt>
+				<dd class='StudyID'>${change.studyID}</dd>
+				<dt>Change Number</dt>
+				<dd class='ChangeIndex'>${change.updateIndex}</dd>
+				<dt>Change Description</dt>
+				<dd class='ChangeDescription'>${change.updateDescription}</dd>
+				<dt>Change Time</dt>
+				<dd class='ChangeTime'>${change.updateTime}</dd>
+				<dt>Links</dt>
+				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/DICOM/metadata'>Study Metadata</a></dd>
+				<dd class='ChangeMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/changelog/${change.updateIndex}'>Change Metadata</a></dd>
+			</dl>
 			</li>
 		</c:forEach>
 	</ul>

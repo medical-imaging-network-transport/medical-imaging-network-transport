@@ -72,14 +72,14 @@ public class StudiesController {
 		outputStream.flush();
 	}
 	
-	@ModelAttribute("Studies")
+	@ModelAttribute("studies")
 	public List<Study> getStudies() {
 		return new LinkedList<Study>();
 	}
 
 	@RequestMapping("/studies")
 	public String studies(@RequestParam(value = "studyuid", required = false) final String studyUid,
-			@ModelAttribute("Studies") final List<Study> studies)
+			@ModelAttribute("studies") final List<Study> studies)
 			throws IOException {
 
 		if (StringUtils.isNotBlank(studyUid)) {
@@ -95,14 +95,14 @@ public class StudiesController {
 		return "studies";
 	}
 	
-	@ModelAttribute("Updates")
-	public List<UpdateInfo> getUpdates() {
+	@ModelAttribute("changes")
+	public List<UpdateInfo> getChanges() {
 		return new LinkedList<UpdateInfo>();
 	}
 	
 	@RequestMapping("/studies/{uuid}/changelog")
 	public String updates(@PathVariable("uuid") final String uuid,
-			@ModelAttribute("Updates") final List<UpdateInfo> updates)
+			@ModelAttribute("changes") final List<UpdateInfo> updates)
 			throws IOException {
 
 		if (StringUtils.isNotBlank(uuid)) {
