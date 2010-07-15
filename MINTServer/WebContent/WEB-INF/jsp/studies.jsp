@@ -1,30 +1,33 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="ISO-8859-1"%><%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html version="-//W3C//DTD HTML 4.01 Transitional//EN" dir="ltr"
-	lang="en">
-<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>List of all studies</title>
+<title>Studies</title>
+<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
+<style type="text/css">
+dl { margin: 0; padding: 0; }
+dt { margin: 0; padding: 0; font-weight: bold; }
+dd { margin: 0 0 1em 0; padding: 0; }
+</style>
 </head>
 <body>
-<h1>List of all studies</h1>
-<c:if test="${not empty Studies}">
-	<ul>
-		<c:forEach var="study" items="${Studies}" varStatus="studyStatus">
+<h1>Studies</h1>
+<c:if test="${not empty studies}">
+	<ol>
+		<c:forEach var="study" items="${studies}">
 			<li>
-			<ul>
-				<li class='UID'>${study.studyInstanceUID}</li>
-				<li class='meta'><a
-					href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/metadata'>Meta
-				Data</a></li>
-				<li class='summary'><a
-					href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/summary'>Study
-				Summary</a></li>
-			</ul>
+			<dl>
+				<dt>StudyID</dt>
+				<dd class='StudyID'>${study.studyInstanceUID}</dd>
+				<dt>Links</dt>
+				<dd class='StudySummary'><a href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/summary'>Summary</a></dd>
+				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/metadata'>Metadata</a></dd>
+				<dd class='StudyChangeLog'><a href='<%=request.getContextPath()%>/studies/${study.id}/changelog'>ChangeLog</a></dd>
+			</dl>
 			</li>
 		</c:forEach>
-	</ul>
+	</ol>
 </c:if>
 </body>
 </html>

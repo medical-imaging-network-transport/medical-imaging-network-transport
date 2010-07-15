@@ -289,5 +289,5 @@ public final class ProcessImportDir {
     private static final Set<Integer> studyLevelTags = getTags("StudyTags.txt");
     private static final Set<Integer> seriesLevelTags = getTags("SeriesTags.txt");
     private static final Pattern responseMatchPattern = Pattern.compile("URL=.*createstudy/([^\"]+)");
-    private static final Pattern statusMatchPattern = Pattern.compile("Status: ([^<]*)");
+    private static final Pattern statusMatchPattern = Pattern.compile("JobStatus'>([^<]*)</dd");
 }
