@@ -25,7 +25,7 @@ import java.util.List;
  */
 public final class BinaryMemoryData implements BinaryData {
     /** The study's binary data */
-    public final List<byte[]> binaryItems = new ArrayList<byte[]>();
+    private final List<byte[]> binaryItems = new ArrayList<byte[]>();
 
     @Override
     public void add(final byte[] item) {
