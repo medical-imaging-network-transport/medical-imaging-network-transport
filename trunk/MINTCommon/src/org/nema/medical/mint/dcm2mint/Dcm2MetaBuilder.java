@@ -341,7 +341,7 @@ public final class Dcm2MetaBuilder {
      }
 
      private static String getStringValue(final DicomElement elem, final SpecificCharacterSet charSet) {
-         return elem.getString(charSet, false);
+         return elem.getValueAsString(charSet, 0);
      }
 
      private static boolean areEqual(final Attribute a, final DicomElement elem, final String value) {
