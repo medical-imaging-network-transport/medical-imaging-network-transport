@@ -19,8 +19,8 @@ dd { margin: 0 0 1em 0; padding: 0; }
 		<c:forEach var="change" items="${changes}">
 			<li>
 			<dl id='${change.studyID}'>
-				<dt>Study ID</dt>
-				<dd class='StudyID'>${change.studyID}</dd>
+				<dt>MINT Study UUID</dt>
+				<dd class='StudyUUID'>${change.studyID}</dd>
 				<dt>Change Number</dt>
 				<dd class='ChangeIndex'>${change.index}</dd>
 				<dt>Change Description</dt>

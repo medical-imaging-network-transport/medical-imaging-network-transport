@@ -300,8 +300,7 @@ public class StudiesController {
 		return num;
 	}
 
-	@RequestMapping(value = { "/studies/{uuid}/DICOM/metadata", "/studies/{uuid}/metadata.gpb",
-			"/studies/{uuid}/metadata.xml" })
+	@RequestMapping("/studies/{uuid}/DICOM/metadata")
 	public void studiesMetadata(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
@@ -310,7 +309,7 @@ public class StudiesController {
 		}
 		try {
 			String metadata = null;
-			if (StringUtils.endsWith(httpServletRequest.getPathInfo(),".gpb")) {
+			if (StringUtils.endsWith(httpServletRequest.getRequestURI(),".gpb")) {
 				httpServletResponse.setContentType("application/octet-stream");
 				metadata = "/metadata.gpb";
 			} else {
