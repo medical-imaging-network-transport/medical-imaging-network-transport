@@ -1,5 +1,6 @@
 package org.nema.medical.mint.server.domain;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +13,19 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *
  */
 public class ChangeDAO extends HibernateDaoSupport {
+	
+	@SuppressWarnings("unchecked")
+	public List<Change> findChanges(final Date since) {
+		if (since != null) {
+			final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Change.class).add(
+					Restrictions.gt("changeDateTime", since));
+			final List<Change> list = getHibernateTemplate().findByCriteria(detachedCriteria);
+
+			return list;
+		}
+		return null;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Change> findChanges(final String studyID) {
 		if (StringUtils.isNotBlank(studyID)) {

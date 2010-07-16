@@ -20,8 +20,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,12 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.nema.medical.mint.common.StudyUtil;
-import org.nema.medical.mint.metadata.Attribute;
-import org.nema.medical.mint.metadata.Instance;
-import org.nema.medical.mint.metadata.Series;
-import org.nema.medical.mint.server.domain.Study;
-import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,30 +51,48 @@ public class ChangeLogController {
 	@Autowired
 	protected ChangeDAO changeDAO = null;
 
-	@Autowired
-	protected StudyDAO studyDAO = null;
-
-	private void bufferedRead(final InputStream inputStream, final OutputStream outputStream) throws IOException {
-		final byte[] bytes = new byte[8 * 1024];
-		while (true) {
-			synchronized (bytes) {
-				final int amountRead = inputStream.read(bytes);
-				if (amountRead == -1) {
-					break;
-				}
-				outputStream.write(bytes, 0, amountRead);
-			}
-		}
-		outputStream.flush();
-	}
-	
 	@ModelAttribute("changes")
 	public List<Change> getChanges() {
 		return new LinkedList<Change>();
 	}
 	
+	@RequestMapping("/changelog")
+	public String changelog(
+			@RequestParam(value = "since", required = false) String since,
+			@ModelAttribute("changes") final List<Change> changes,
+			final HttpServletRequest req,
+			final HttpServletResponse res) throws IOException {
+
+		if (since != null) {
+			
+			DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			Date date = null;
+			try {
+				date = format.parse(since);
+			} catch (ParseException e) {
+				try {
+					format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+					date = format.parse(since);
+				} catch (ParseException e2) {
+					res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+					return "error";
+				}
+			}
+			
+			final List<Change> changesFound = changeDAO.findChanges(date);
+			if (changesFound != null) {
+				changes.addAll(changesFound);
+			}
+		} else {
+			changes.addAll(changeDAO.getMostRecentChanges(50));
+		}
+		
+		// this will render the studies list using studies.jsp
+		return "changelog";
+	}
+	
 	@RequestMapping("/studies/{uuid}/changelog")
-	public String updates(@PathVariable("uuid") final String uuid,
+	public String studyChangelog(@PathVariable("uuid") final String uuid,
 			@ModelAttribute("changes") final List<Change> changes)
 			throws IOException {
 
@@ -97,44 +111,44 @@ public class ChangeLogController {
 	
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")
 	public void studiesChangeLog(
-			@RequestParam(value = "metadataType", required = false) String metadataType,
 			@PathVariable("uuid") final String uuid,
-			@PathVariable final String seq,
-			final HttpServletResponse httpServletResponse) throws IOException {
+			@PathVariable("seq") final String seq,
+			final HttpServletRequest req,
+			final HttpServletResponse res) throws IOException {
+		
+		String ext = "xml";
+		// todo use "/studies/{uuid}/changelog/{seq:.*}" to get extension and grab other types
+		
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
 			return;
 		}
 		final Long sequence;
 		try {
 			sequence = Long.valueOf(seq);
 		} catch (final NumberFormatException e) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
 			return;
 		}
 		if (sequence < 0) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
 			return;
 		}
 		if (sequence >= Integer.MAX_VALUE) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
 			return;
 		}
 
 		try {
-			//Defaults to xml metadata
-			if(StringUtils.isBlank(metadataType))
-				metadataType = ".xml";
-			
-			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata" + metadataType);
+			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata." + ext);
 			if (metadataFile.exists() && metadataFile.canRead()) {
 				final InputStream in = new FileInputStream(metadataFile);
-				final OutputStream out = httpServletResponse.getOutputStream();
+				final OutputStream out = res.getOutputStream();
 				try {
 					final long itemsize = metadataFile.length();
-					httpServletResponse.setContentLength((int)itemsize);
-					httpServletResponse.setContentType("text/xml");
+					res.setContentLength((int)itemsize);
+					res.setContentType("text/xml");
 					final int bufsize = 16384;
 					byte[] buf = new byte[bufsize];
 					for (long i = 0; i < itemsize; i += bufsize) {
@@ -143,16 +157,16 @@ public class ChangeLogController {
 						out.write(buf,0,len);
 					}
 
-					httpServletResponse.getOutputStream().flush();
+					res.getOutputStream().flush();
 				} finally {
 					in.close();
 				}
 			} else {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
 			}
 		} catch (final IOException e) {
-			if (!httpServletResponse.isCommitted()) {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+			if (!res.isCommitted()) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						"Cannot provide study change log: File Read Failure");
 			}
 		}
