@@ -30,6 +30,8 @@ from org.nema.medical.mint.XmlNode import XmlNode
 # MintAttribute
 # -----------------------------------------------------------------------------
 class MintAttribute():
+
+   binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
    
    def __init__(self, node):
        self.__tag = node.attributeWithName("tag")
@@ -41,6 +43,8 @@ class MintAttribute():
    def vr (self): return self.__vr;
    def val(self): return self.__val;
    def bid(self): return self.__bid;
+   
+   def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
    def toString(self):
        return self.__str__()

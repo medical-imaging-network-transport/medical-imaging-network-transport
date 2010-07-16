@@ -30,7 +30,9 @@ import os
 import sys
 import traceback
 
-from org.nema.medical.mint.MintStudy import MintStudy 
+from os.path import join
+
+from org.nema.medical.mint.MintStudy import MintStudy
 
 # -----------------------------------------------------------------------------
 # MintStudy
@@ -38,8 +40,17 @@ from org.nema.medical.mint.MintStudy import MintStudy
 class MintStudyCompare():
    
    def __init__(self, study1, study2):
-       self.__study1 = MintStudy(study1)
+       self.__study1 = MintStudy(study1)       
        self.__study2 = MintStudy(study2)
+
+       studydir1 = os.path.dirname(study1)
+       studydir2 = os.path.dirname(study2)
+       
+       self.__binary1 = os.path.join(studydir1, "binaryitems")
+       self.__binary2 = os.path.join(studydir2, "binaryitems")
+
+       self.__binaryitems = []
+       
        self.__count = 0
 
    def compare(self):
@@ -62,7 +73,8 @@ class MintStudyCompare():
               self.check("Study Attribute", attr1.toString(), "None")
            else:
               self.check("Study Attribute", attr1.toString(), attr2.toString())       
-       
+           self.__checkForBinary(attr1)
+              
        self.check("Number of series",
                   s1.numSeries(), 
                   s2.numSeries())
@@ -72,10 +84,12 @@ class MintStudyCompare():
            series1 = s1.series(n)
            series2 = s2.seriesByUID(series1.seriesInstanceUID())
            self.__compareSeries(series1, series2)
+           
+       self.__checkBinary()
 
        if self.__count != 0:
           print self.__count, "difference(s) found."
-          
+                 
    def check(self, msg, obj1, obj2):
        if obj1 != obj2:
           self.__count += 1
@@ -104,6 +118,7 @@ class MintStudyCompare():
               self.check(series+" Attribute", attr1.toString(), "None")       
            else:
               self.check(series+" Attribute", attr1.toString(), attr2.toString())       
+           self.__checkForBinary(attr1)
 
        numNormalizedInstanceAttributes = series1.numNormalizedInstanceAttributes()
        for n in range(0, numNormalizedInstanceAttributes):
@@ -113,6 +128,7 @@ class MintStudyCompare():
               self.check(series+" Normalized Instance Attribute", attr1.toString(), "None")       
            else:
               self.check(series+" Normalized Instance Attribute", attr1.toString(), attr2.toString())       
+           self.__checkForBinary(attr1)
 
            self.check("Number of "+series+" Instances",
                       series1.numInstances(), 
@@ -146,8 +162,87 @@ class MintStudyCompare():
            if attr2 == None:
               self.check(instance+" Attribute", attr1.toString(), "None")
            else:
-              self.check(instance+" Attribute", attr1.toString(), attr2.toString())       
+              self.check(instance+" Attribute", attr1.toString(), attr2.toString())
+           self.__checkForBinary(attr1)
 
+   def __checkForBinary(self, attr):
+       if attr.bid() != None and attr.isBinary() and attr.bid() not in self.__binaryitems:
+          self.__binaryitems.append(attr.bid())
+       
+   def __checkBinary(self):
+       bufsize = 1024
+       
+       # ---
+       # Loop through each binary item.
+       # ---
+       for binaryitem in self.__binaryitems:
+       
+           # ---
+           # Check for binary item in study 1.
+           # ---
+           dat1 = os.path.join(self.__binary1, binaryitem+".dat")
+           if not os.access(dat1, os.F_OK):
+              self.__count += 1
+              print "File not found", ":", dat1
+              pass
+           
+           # ---
+           # Check for binary item in study 2.
+           # ---
+           dat2 = os.path.join(self.__binary2, binaryitem+".dat")
+           if not os.access(dat2, os.F_OK):
+              self.__count += 1
+              print "File not found", ":", dat2
+              pass
+              
+           # ---
+           # Check for binary item sizes.
+           # ---
+           size1 = os.path.getsize(dat1)
+           size2 = os.path.getsize(dat2)
+           self.check(binaryitem+".dat size",
+                      size1,
+                      size2)
+
+           # ---
+           # Check for binary item byte for byte.
+           # ---
+           if size1 == size2:
+              bid1 = open(dat1, "rb")
+              bid2 = open(dat2, "rb")
+           
+              # ---
+              # Read in a block.
+              # ---
+              buf1 = bid1.read(bufsize)
+              while buf1 != "":
+                 buf2 = bid2.read(bufsize)
+                 n1 = len(buf1)
+                 n2 = len(buf2)
+                 assert n1 == n2 # These better be equal
+                 
+                 # ---
+                 # Loop through block.
+                 # ---
+                 diff = False
+                 for i in range(0, n1):
+                     if buf1[i] != buf2[i]:
+                        self.__count += 1
+                        print binaryitem+".dat byte "+str(i)+" differs."
+                        diff = True
+                        break
+                        
+                 # ---
+                 # Skip to end if difference was found.
+                 # ---
+                 if diff:
+                    buf1 = ""
+                 else:
+                    buf1 = bid1.read(1024)
+
+              bid1.close()
+              bid2.close()
+           
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
