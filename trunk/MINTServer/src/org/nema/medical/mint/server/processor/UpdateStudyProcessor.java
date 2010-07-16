@@ -11,8 +11,8 @@ import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.UpdateInfo;
-import org.nema.medical.mint.server.domain.UpdateInfoDAO;
+import org.nema.medical.mint.server.domain.Change;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 
 /**
  * 
@@ -27,7 +27,7 @@ public class UpdateStudyProcessor extends TimerTask {
 	
 	private JobInfoDAO jobInfoDAO;
 	private StudyDAO studyDAO;
-	private UpdateInfoDAO updateDAO;
+	private ChangeDAO updateDAO;
 
 	/**
 	 * extracts files from the jobFolder, merges them in the studyFolder
@@ -37,7 +37,7 @@ public class UpdateStudyProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public UpdateStudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, UpdateInfoDAO updateDAO) {
+	public UpdateStudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.jobInfoDAO = jobInfoDAO;
@@ -146,12 +146,12 @@ public class UpdateStudyProcessor extends TimerTask {
 			studyDAO.saveOrUpdateStudy(studyData);
 			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));
 			
-			UpdateInfo updateInfo = new UpdateInfo();
+			Change updateInfo = new Change();
 			updateInfo.setId(UUID.randomUUID().toString());
 			updateInfo.setStudyID(studyUUID);
-			updateInfo.setUpdateDescription("Update of existing study.");
-			updateInfo.setUpdateIndex(Integer.parseInt(changelogFolder.getName()));
-			updateDAO.saveOrUpdateUpdateInfo(updateInfo);
+			updateInfo.setDescription("Update of existing study.");
+			updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
+			updateDAO.saveChange(updateInfo);
 
 			jobInfo.setStatus(JobStatus.SUCCESS);
 			jobInfo.setStatusDescription("complete");

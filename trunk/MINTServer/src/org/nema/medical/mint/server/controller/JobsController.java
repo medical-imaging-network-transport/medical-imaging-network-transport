@@ -43,7 +43,7 @@ import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.UpdateInfoDAO;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.processor.StudyProcessor;
 import org.nema.medical.mint.server.processor.UpdateStudyProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ public class JobsController {
 	@Autowired
 	protected JobInfoDAO jobInfoDAO = null;
 	@Autowired
-	protected UpdateInfoDAO updateDAO = null;
+	protected ChangeDAO updateDAO = null;
 
 	@PostConstruct
 	public void setupTimer() {

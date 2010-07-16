@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.UpdateInfoDAO;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,25 +50,21 @@ public class ServerConfig {
 	 */
 	private static final Logger LOG = Logger.getLogger(ServerConfig.class);
 	
-	protected File mintHome = null;
-
 	protected static HibernateTransactionManager hibernateTransactionManager = null;
-
 	protected static SessionFactory sessionFactory = null;
-
 	protected Context envContext = null;
-
 	protected Properties properties = null;
 	
 	/*
 	 * MINTServer specific
 	 */
 	protected StudyDAO studyDAO = null;
-	protected UpdateInfoDAO updateDAO = null;
+	protected ChangeDAO updateDAO = null;
 	protected JobInfoDAO jobInfoDAO = null;
 	protected File jobTemp = null;
 	protected File studiesRoot = null;
-	
+	protected File mintHome = null;
+
 	@Bean(name = "mintHome", autowire = Autowire.BY_NAME)
 	public File mintHome() throws Exception {
 		String path = System.getenv("MINT_HOME");
@@ -227,9 +223,9 @@ public class ServerConfig {
 	}
 	
 	@Bean(name = "updateDAO", autowire = Autowire.BY_NAME)
-	public UpdateInfoDAO updateDAO() throws Exception {
+	public ChangeDAO updateDAO() throws Exception {
 		if (updateDAO == null) {
-			updateDAO = new UpdateInfoDAO();
+			updateDAO = new ChangeDAO();
 			updateDAO.setSessionFactory(sessionFactory());
 			updateDAO.afterPropertiesSet();
 		}

@@ -22,14 +22,14 @@ dd { margin: 0 0 1em 0; padding: 0; }
 				<dt>Study ID</dt>
 				<dd class='StudyID'>${change.studyID}</dd>
 				<dt>Change Number</dt>
-				<dd class='ChangeIndex'>${change.updateIndex}</dd>
+				<dd class='ChangeIndex'>${change.index}</dd>
 				<dt>Change Description</dt>
-				<dd class='ChangeDescription'>${change.updateDescription}</dd>
+				<dd class='ChangeDescription'>${change.description}</dd>
 				<dt>Change Time</dt>
-				<dd class='ChangeTime'>${change.updateTime}</dd>
+				<dd class='ChangeTime'>${change.dateTime}</dd>
 				<dt>Links</dt>
 				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/DICOM/metadata'>Study Metadata</a></dd>
-				<dd class='ChangeMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/changelog/${change.updateIndex}'>Change Metadata</a></dd>
+				<dd class='ChangeMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/changelog/${change.index}'>Change Metadata</a></dd>
 			</dl>
 			</li>
 		</c:forEach>
