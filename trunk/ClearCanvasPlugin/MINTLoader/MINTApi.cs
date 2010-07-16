@@ -57,7 +57,7 @@ namespace MINTLoader
             var keys = new List<StudyKey>();
             foreach (XmlNode child in doc.ChildNodes)
             {
-                var studyUidNodes = child.SelectNodes("//ns:li/ns:ul", nsMan);
+                var studyUidNodes = child.SelectNodes("//ns:li/ns:dl", nsMan);
                 if (studyUidNodes == null)
                 {
                     continue;
@@ -65,7 +65,7 @@ namespace MINTLoader
 
                 foreach (XmlNode node in studyUidNodes)
                 {
-                    var uidNode = node.SelectSingleNode("ns:li[@class='UID']", nsMan);
+                    var uidNode = node.SelectSingleNode("ns:dd[@class='StudyID']", nsMan);
                     if (uidNode == null)
                     {
                         continue;
@@ -75,13 +75,13 @@ namespace MINTLoader
                     {
                         continue;
                     }
-                    string metaUri = GetHref(node, "meta", nsMan);
+                    string metaUri = GetHref(node, "StudyMetadata", nsMan);
                     if (string.IsNullOrEmpty(metaUri))
                     {
                         continue;
                     }
 
-                    string summaryUri = GetHref(node, "summary", nsMan);
+                    string summaryUri = GetHref(node, "StudySummary", nsMan);
                     if (string.IsNullOrEmpty(metaUri))
                     {
                         continue;
@@ -251,7 +251,7 @@ namespace MINTLoader
 
         private static string GetHref(XmlNode topNode, string tagType, XmlNamespaceManager nsMan)
         {
-            var liNode = topNode.SelectSingleNode(string.Format("ns:li[@class='{0}']", tagType), nsMan);
+            var liNode = topNode.SelectSingleNode(string.Format("ns:dd[@class='{0}']", tagType), nsMan);
             if (liNode == null)
             {
                 return null;
