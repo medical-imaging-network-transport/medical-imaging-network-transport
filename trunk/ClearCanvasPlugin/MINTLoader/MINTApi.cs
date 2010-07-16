@@ -65,7 +65,8 @@ namespace MINTLoader
 
                 foreach (XmlNode node in studyUidNodes)
                 {
-                    var uidNode = node.SelectSingleNode("ns:dd[@class='StudyID']", nsMan);
+                    // The DICOM study instance UID, not the MINT UUID.
+                    var uidNode = node.SelectSingleNode("ns:dd[@class='StudyUID']", nsMan);
                     if (uidNode == null)
                     {
                         continue;
