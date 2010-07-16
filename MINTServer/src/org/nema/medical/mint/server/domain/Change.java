@@ -14,27 +14,27 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "mint_updateinfo")
-public class UpdateInfo {
+@Table(name = "mint_change")
+public class Change {
 	public static Timestamp now() {
 		return new Timestamp(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTimeInMillis());
 	}
 	
 	@Id
-	@Column(name="updateId")
+	@Column(name="changeId")
 	private String id;
 	
 	@Column
 	private String studyID;
 	
 	@Column(nullable=false)
-	private int updateIndex;
+	private int changeIndex;
 	
 	@Column
-	private String updateDescription;
+	private String changeDescription;
 	
 	@Column
-	private Timestamp updateTime = now();
+	private Timestamp changeDateTime = now();
 
 	public String getId() {
 		return id;
@@ -52,28 +52,28 @@ public class UpdateInfo {
 		this.studyID = studyID;
 	}
 
-	public int getUpdateIndex() {
-		return updateIndex;
+	public int getIndex() {
+		return changeIndex;
 	}
 
-	public void setUpdateIndex(int updateIndex) {
-		this.updateIndex = updateIndex;
+	public void setIndex(int updateIndex) {
+		this.changeIndex = updateIndex;
 	}
 
-	public String getUpdateDescription() {
-		return updateDescription;
+	public String getDescription() {
+		return changeDescription;
 	}
 
-	public void setUpdateDescription(String updateDescription) {
-		this.updateDescription = updateDescription;
+	public void setDescription(String changeDescription) {
+		this.changeDescription = changeDescription;
 	}
 
-	public Timestamp getUpdateTime() {
-		return updateTime;
+	public Timestamp getDateTime() {
+		return changeDateTime;
 	}
 
-	public void setUpdateTime(Timestamp updateTime) {
-		this.updateTime = updateTime;
+	public void setDateTime(Timestamp dateTime) {
+		this.changeDateTime = dateTime;
 	}
 	
 	
