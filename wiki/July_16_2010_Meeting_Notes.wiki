@@ -1,0 +1,40 @@
+Notes
+  * Chris Hafey Demoed ClearCanvas talking to Reference Implementation. 
+  * Tim Dawson Demoed StudyUpdate, ChangeLog, BulkBinaryLoading
+  * Jack Vining Minor progress on MINT2DICOM
+  * Jack Vining reports o progress on JHU DMZ Server setup
+  * Tim Culp did an update late last night with iteration 1 conformance test that runs in a Unix/Cygwin environment
+  * Tim Culp implemented iteration 2 for metadata and binary data (95% complete)
+  * Tim Culp is targeting to wrap up iteration 3 by end of next week or the week after
+  * Tim Culp raised an issue about how the conformance test should handle study updates
+  * Tim Culp asked if we are using any SVN macros to get filename, history.  No we are not currently.  MINT conformance files use this
+  * Tim Culp is not available to meet August 9-12, would prefer later in the week if possible.
+  * Tim Dawson email on use of Atom.  What atom typically returns is a static count of items (e.g. 100) - it does not support querying ranges.  There is an XQuery extension, but recommend not using it due to performance, technology creep, etc.  Proposing that we make a restful interface to handle this specific use case.
+  * Tim Dawson proposed that we not normalize binary items and sequence items.  The upside here is that it is less complex.  
+  * Rex raised the issue that the metadata for a study update could refer to binary items that were not uploaded.  Also - binary items could be uploaded that are not referenced in the metadata.  Need to add validation logic
+  * Tim Culp raised the issue that the old Metadata XML used to emit attributes with value = "" for some VRs - the newer version has no value emitted.  
+  * Tim Dawson raised the issue of how to handle study updates for proprietary vs dicom.  
+
+Issues
+  * How to handle DICOM attributes with empty values - do we omit the value xml attribute or require it = ""?
+
+Decisions
+  * Use RESTful interface for changelog instead of Atom:  mintserver/changelog.  Will have some content as the study level changelog.
+  * Do not normalize binary items or sequence items.
+  * When doing a study update, pass the TYPE as a POST parameter so the study update knows which type the update applies to (DICOM vs proprietary)
+
+New Actions
+  * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson)
+  * 
+
+Old Actions
+
+    * Define performance test environment (Jim Philbin)
+    * Setup Test Environment (Jim Philbin)
+    * Provide Test Data Sets (Jim Philbin)
+    * Provide anonymous FTP site to access data sets (Jim Philbin)
+    * Create MINT2DICOM Converter (Jack Vining)
+    * Iteration 1,2 & 3 Conformance Test (Tim Culp)
+    * MINT Server Implementation (Tim Dawson)
+    * Clear Canvas Implementation (Chris Hafey)
+    * DICOM2MINTImport (Tim Dawson) 
