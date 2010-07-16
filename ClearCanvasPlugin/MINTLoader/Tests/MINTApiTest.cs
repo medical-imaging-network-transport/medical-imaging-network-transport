@@ -53,26 +53,32 @@ namespace MINTUnitTest
                   <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'> 
                     <meta http-equiv='Content-Type' content='text/html;charset=utf-8' /> 
                     <head> 
-                        <title>List of all studies</title> 
+                        <title>Studies</title> 
                     </head> 
                     <body> 
-                        <h1>List of all studies</h1> 
-                        <ul>
+                        <h1>Studies</h1> 
+                        <ol>
                             <li> 
-                                <ul> 
-                                    <li class='UID'>study0</li> 
-                                    <li class='meta'><a href='meta0'>Meta Data</a></li> 
-                                    <li class='summary'><a href='summary0'>Study Summary</a></li> 
-                                </ul> 
+                                <dl> 
+                                    <dt>StudyID</dt>
+                                    <dd class='StudyID'>study0</dd> 
+                                    <dt>Links</dt>
+                                    <dd class='StudySummary'><a href='summary0'>Summary</a></dd>
+                                    <dd class='StudyMetadata'><a href='meta0'>Metadata</a></dd>
+                                    <dd class='StudyChangeLog'><a href='meta0'>ChangeLog</a></dd>
+                                </dl> 
                             </li> 
                             <li> 
-                                <ul> 
-                                    <li class='UID'>study1</li> 
-                                    <li class='meta'><a href='meta1'>Meta Data</a></li> 
-                                    <li class='summary'><a href='summary1'>Study Summary</a></li> 
-                                </ul> 
+                                <dl> 
+                                    <dt>StudyID</dt>
+                                    <dd class='StudyID'>study1</dd> 
+                                    <dt>Links</dt>
+                                    <dd class='StudySummary'><a href='summary1'>Summary</a></dd>
+                                    <dd class='StudyMetadata'><a href='meta1'>Metadata</a></dd>
+                                    <dd class='StudyChangeLog'><a href='meta1'>ChangeLog</a></dd>
+                                </dl> 
                             </li> 
-                        </ul> 
+                        </ol> 
                     </body> 
                 </html> ";
 
