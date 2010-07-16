@@ -234,7 +234,7 @@ public final class ProcessImportDir {
         final Matcher matcher = responseMatchPattern.matcher(result);
         final boolean matched = matcher.find();
         if (!matched) {
-            throw new IOException("Invalid server response" + result);
+            throw new IOException("Invalid server response:\n" + result);
         }
         final String studyUUID = matcher.group(1);
         studyUUIDs.add(studyUUID);
