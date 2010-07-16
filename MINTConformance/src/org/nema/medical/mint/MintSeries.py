@@ -73,7 +73,7 @@ class MintSeries():
        tag = self.__normalizedTags[n]
        return self.__normalizedInstanceAttributes[tag]
 
-   def normalizedAttributeByTag(self, tag):
+   def normalizedInstanceAttributeByTag(self, tag):
        """
        Returns a MintAttribute if tag is found, otherwise None.
        """

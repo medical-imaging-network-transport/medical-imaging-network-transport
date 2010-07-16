@@ -33,6 +33,7 @@ from org.nema.medical.mint.XmlNode       import XmlNode
 class MintInstance():
    
    def __init__(self, root):    
+       self.__xfer = ""
        self.__attributes = {}
        self.__tags = []
        self.__read(root)
