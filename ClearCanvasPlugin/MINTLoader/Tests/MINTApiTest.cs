@@ -60,22 +60,26 @@ namespace MINTUnitTest
                         <ol>
                             <li> 
                                 <dl> 
-                                    <dt>StudyID</dt>
-                                    <dd class='StudyID'>study0</dd> 
+                                    <dt>MINT Study Instance UUID</dt>
+                                    <dd class='StudyUUID'>study0</dd> 
+                                    <dt>DICOM Study Instance ID</dt>
+                                    <dd class='StudyUID'>DICOM study UID 0</dd> 
                                     <dt>Links</dt>
                                     <dd class='StudySummary'><a href='summary0'>Summary</a></dd>
                                     <dd class='StudyMetadata'><a href='meta0'>Metadata</a></dd>
-                                    <dd class='StudyChangeLog'><a href='meta0'>ChangeLog</a></dd>
+                                    <dd class='StudyChangeLog'><a href='changelog0'>ChangeLog</a></dd>
                                 </dl> 
                             </li> 
                             <li> 
                                 <dl> 
-                                    <dt>StudyID</dt>
-                                    <dd class='StudyID'>study1</dd> 
+                                    <dt>MINT Study Instance UUID</dt>
+                                    <dd class='StudyUUID'>study1</dd> 
+                                    <dt>DICOM Study Instance ID</dt>
+                                    <dd class='StudyUID'>DICOM study UID 1</dd> 
                                     <dt>Links</dt>
                                     <dd class='StudySummary'><a href='summary1'>Summary</a></dd>
                                     <dd class='StudyMetadata'><a href='meta1'>Metadata</a></dd>
-                                    <dd class='StudyChangeLog'><a href='meta1'>ChangeLog</a></dd>
+                                    <dd class='StudyChangeLog'><a href='changelog1'>ChangeLog</a></dd>
                                 </dl> 
                             </li> 
                         </ol> 
@@ -89,11 +93,11 @@ namespace MINTUnitTest
             Assert.AreEqual(2, actual.Count);
             Assert.AreEqual("funnyService/meta0", actual[0].MetadataUri);
             Assert.AreEqual("funnyService/summary0", actual[0].SummaryUri);
-            Assert.AreEqual("study0", actual[0].StudyUid);
+            Assert.AreEqual("DICOM study UID 0", actual[0].StudyUid);
 
             Assert.AreEqual("funnyService/meta1", actual[1].MetadataUri);
             Assert.AreEqual("funnyService/summary1", actual[1].SummaryUri);
-            Assert.AreEqual("study1", actual[1].StudyUid);
+            Assert.AreEqual("DICOM study UID 1", actual[1].StudyUid);
         }
 
         static string studySummaryXml =
