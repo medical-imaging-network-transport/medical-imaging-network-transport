@@ -36,10 +36,6 @@ class MintAttribute():
        self.__vr  = node.attributeWithName("vr")
        self.__val = node.attributeWithName("val")
        self.__bid = node.attributeWithName("bid")
-       
-       assert (self.__val != None or self.__bid != None)
-       assert not (self.__val == None and self.__bid == None)
-       assert not (self.__val != None and self.__bid != None)
                 
    def tag(self): return self.__tag;
    def vr (self): return self.__vr;
