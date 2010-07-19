@@ -44,7 +44,8 @@ public class StudyBinaryItemsController {
     protected File studiesRoot;
 
     @RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
-    public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
+    public void studiesBinaryItems(@PathVariable("uuid") final String uuid, 
+                                   @PathVariable("seq") final String seq,
                                    final HttpServletResponse httpServletResponse) throws IOException {
         if (StringUtils.isBlank(uuid)) {
             // Shouldn't happen...but could be +++, I suppose
