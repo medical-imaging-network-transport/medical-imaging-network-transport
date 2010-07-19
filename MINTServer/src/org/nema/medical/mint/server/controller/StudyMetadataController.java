@@ -16,10 +16,7 @@
 package org.nema.medical.mint.server.controller;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,51 +39,34 @@ public class StudyMetadataController {
 
 	@RequestMapping("/studies/{uuid}/DICOM/metadata")
 	public void studiesMetadata(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
-			final HttpServletResponse httpServletResponse) throws IOException {
+			final HttpServletResponse response) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
 			return;
 		}
 		try {
 			String metadata = null;
 			if (StringUtils.endsWith(httpServletRequest.getRequestURI(),".gpb")) {
-				httpServletResponse.setContentType("application/octet-stream");
+				response.setContentType("application/octet-stream");
 				metadata = "/metadata.gpb";
 			} else {
-				httpServletResponse.setContentType("text/xml");
+				response.setContentType("text/xml");
 				metadata = "/metadata.xml";
 			}
 			final File file = new File(studiesRoot , uuid + "/DICOM" + metadata);
 			if (file.exists() && file.canRead()) {
-				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
-				final FileInputStream fileInputStream = new FileInputStream(file);
-				try {
-					final OutputStream outputStream = httpServletResponse.getOutputStream();
-					bufferedPipe(fileInputStream, outputStream);
-				} finally {
-					fileInputStream.close();
-				}
+				response.setContentLength(Long.valueOf(file.length()).intValue());
+				Utils.streamFile(file, response.getOutputStream());
 			} else {
-				httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+				return;
 			}
 		} catch (final IOException e) {
-			if (!httpServletResponse.isCommitted()) {
-				httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			if (!response.isCommitted()) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Unable to provide study metadata. See server logs.");
+				return;
 			}
 		}
 	}
-
-	private void bufferedPipe(final InputStream inputStream, final OutputStream outputStream) throws IOException {
-		final byte[] bytes = new byte[8 * 1024];
-		while (true) {
-			final int amountRead = inputStream.read(bytes);
-			if (amountRead == -1) {
-				break;
-			}
-			outputStream.write(bytes, 0, amountRead);
-		}
-		outputStream.flush();
-	}
-	
 }

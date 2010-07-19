@@ -16,12 +16,9 @@
 package org.nema.medical.mint.server.controller;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +63,7 @@ public class ChangeLogController {
 			
 			Date date = null;
 			try {
-				date = parseDate(since);
+				date = Utils.parseDate(since);
 			} catch (ParseException e) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date range: " + since);
 				return "error";
@@ -137,26 +134,12 @@ public class ChangeLogController {
 		}
 
 		try {
-			final File metadataFile = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata." + ext);
-			if (metadataFile.exists() && metadataFile.canRead()) {
-				final InputStream in = new FileInputStream(metadataFile);
+			final File file = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata." + ext);
+			if (file.exists() && file.canRead()) {
 				final OutputStream out = res.getOutputStream();
-				try {
-					final long itemsize = metadataFile.length();
-					res.setContentLength((int)itemsize);
-					res.setContentType("text/xml");
-					final int bufsize = 16384;
-					byte[] buf = new byte[bufsize];
-					for (long i = 0; i < itemsize; i += bufsize) {
-						int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
-						in.read(buf,0,len);
-						out.write(buf,0,len);
-					}
-
-					res.getOutputStream().flush();
-				} finally {
-					in.close();
-				}
+				res.setContentLength((int)file.length());
+				res.setContentType("text/xml");
+				Utils.streamFile(file, out);
 			} else {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
 			}
@@ -166,23 +149,5 @@ public class ChangeLogController {
 						"Cannot provide study change log: File Read Failure");
 			}
 		}
-	}
-
-	private Date parseDate(String dateStr) throws ParseException {
-		Date date = null;
-		ParseException ex = null;
-		for (String format : new String[]{"yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd","yyyyMMdd'T'HHmmss","yyyyMMdd"}) {
-			try {
-				date = new SimpleDateFormat(format).parse(dateStr);
-				break;
-			} catch (ParseException e) {
-				// try next format, but throw the last error
-				ex = e;
-			}
-		}
-		if (date == null) {
-			throw ex;
-		}
-		return date;
 	}
 }
