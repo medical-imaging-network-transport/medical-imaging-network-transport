@@ -3,9 +3,11 @@ package org.nema.medical.mint.common;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.Attribute;
@@ -56,12 +58,14 @@ public final class StudyUtil {
 	}
 	
 	/**
-	 * This method will looks for .dat files and will try to perform a 
-	 * parseInt on the front of the files.  The largest int parsed will be 
-	 * returned.  -1 will be returned when not .dat files are encountered.
+	 * This method will looks for BINARY_FILE_EXTENSION files and will try to
+	 * perform a parseInt on the front of the files. The largest int parsed will
+	 * be returned. -1 will be returned when not BINARY_FILE_EXTENSION files are
+	 * encountered.
 	 * 
-	 * This method assumes that the .dat files start with an integer and will
-	 * need to be re thought if what binary item IDs are is redesigned.
+	 * This method assumes that the BINARY_FILE_EXTENSION files start with an
+	 * integer and will need to be re thought if what binary item IDs are is
+	 * redesigned.
 	 * 
 	 * @param directory
 	 * @return highest number
@@ -143,14 +147,22 @@ public final class StudyUtil {
 			
 			if(name.endsWith(BINARY_FILE_EXTENSION))
 			{
-				int bid = Integer.parseInt(name.substring(0,name.indexOf('.')));
-				
-				bid += shiftAmount;
-				
-				String newName = bid + "." + BINARY_FILE_EXTENSION;
-				
-				//It is a binary file, shift it!
-				f.renameTo(new File(directory, newName));
+				if(!name.startsWith("metadata"))
+				{
+					try
+					{
+						int bid = Integer.parseInt(name.substring(0,name.indexOf('.')));
+						
+						bid += shiftAmount;
+						
+						String newName = bid + "." + BINARY_FILE_EXTENSION;
+						
+						//It is a binary file, shift it!
+						f.renameTo(new File(directory, newName));
+					}catch(NumberFormatException e){
+						LOG.warn("Detected binary item file whose name was not an integer as was expected.", e);
+					}
+				}
 			}else{
 				//Not a binary file
 			}
@@ -510,5 +522,58 @@ public final class StudyUtil {
 		nextChange.mkdirs();
 		
 		return nextChange;
+	}
+	
+	/**
+	 * This method will determine if there the bid references from the study to
+	 * binary items are all existing and that there are no excess binary items.
+	 * The expect usage of this method is during study create and study update
+	 * to ensure the passed in metadata and binary items are in agreement (i.e.,
+	 * no unreferenced binary items and no bids in the metadata that point to
+	 * nothing).
+	 * 
+	 * @param study
+	 * @param binaryFolder
+	 * @return Returns true if no violations were detected.
+	 */
+	public static boolean validateBinaryItemsReferences(Study study, File binaryFolder)
+	{
+		Set<Integer> studyBids = new HashSet<Integer>(), binaryItemIds = new HashSet<Integer>();
+		
+		//Collect id from file names
+		for(String file : binaryFolder.list())
+		{
+			if(!file.startsWith("metadata"))
+			{
+				try
+				{
+					int bid = Integer.parseInt(file.substring(0,file.indexOf('.')));
+					
+					binaryItemIds.add(bid);
+				}catch(NumberFormatException e){
+					LOG.warn("Detected binary item file whose name was not an integer as was expected.", e);
+				}
+			}
+		}
+		
+		//Collect id from attributes
+		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+		{
+			for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+			{
+				for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+				{
+					Attribute a = iii.next();
+					
+					int bid = a.getBid();
+					if(bid >= 0)
+					{
+						studyBids.add(bid);
+					}
+				}
+			}
+		}
+		
+		return studyBids.containsAll(binaryItemIds) && binaryItemIds.containsAll(studyBids);
 	}
 }

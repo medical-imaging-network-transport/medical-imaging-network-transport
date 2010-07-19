@@ -58,6 +58,11 @@ public class StudyProcessor extends TimerTask {
 			//load study into memory
 			Study study = StudyUtil.loadStudy(jobFolder);
 			
+			if(!StudyUtil.validateBinaryItemsReferences(study, jobFolder))
+			{
+				throw new RuntimeException("Validation of the new study failed");
+			}
+			
 			//write study into dicom folder
 			StudyUtil.writeStudy(study, dicomFolder);
 	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
