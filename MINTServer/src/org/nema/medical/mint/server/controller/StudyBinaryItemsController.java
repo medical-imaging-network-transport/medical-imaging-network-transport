@@ -42,127 +42,114 @@ public class StudyBinaryItemsController {
 	@Autowired
 	protected File studiesRoot;
 	
-	@RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
-	public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
-			final HttpServletResponse httpServletResponse) throws IOException {
-		if (StringUtils.isBlank(uuid)) {
-			// Shouldn't happen...but could be +++, I suppose
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-			return;
-		}
-		
-		final File studyRoot = new File(studiesRoot , uuid);
-		
-		final List<Long> itemList = parseItemList(seq, studyRoot, httpServletResponse);
-		
-		if(itemList == null)
-		{
-			//failed to parse seq, error message already added
-			return;
-		}
-		
-		//Make sure all the binary files requested are existing
-		final List<File> binaryItems = new ArrayList<File>();
-		final File binaryRoot = new File(studyRoot, "DICOM/binaryitems");
-		
-		for(long l : itemList)
-		{
-			File f = new File(binaryRoot, l + ".dat");
-			
-			if(!f.exists() || !f.canRead())
-			{
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item request: Not found : " + l);
-				return;
-			}
-			
-			binaryItems.add(f);
-		}
-		
-		//Send all binaryItems to the original requestor
-		if(binaryItems.size() == 1)
-		{
-			//Normal process to send an single item back
-			try {
-				final File binaryItemFile = binaryItems.get(0);
-				if (binaryItemFile.exists() && binaryItemFile.canRead()) {
-					final InputStream in = new FileInputStream(binaryItemFile);
-					final OutputStream out = httpServletResponse.getOutputStream();
-					try {
-						final long itemsize = binaryItemFile.length();
-						httpServletResponse.setContentLength((int)itemsize);
-						httpServletResponse.setContentType("application/octet-stream");
-						final int bufsize = 16384;
-						byte[] buf = new byte[bufsize];
-						for (long i = 0; i < itemsize; i += bufsize) {
-							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
-							len = in.read(buf,0,len);
-							out.write(buf,0,len);
-						}
+    @RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
+    public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
+                                   final HttpServletResponse httpServletResponse) throws IOException {
+        if (StringUtils.isBlank(uuid)) {
+            // Shouldn't happen...but could be +++, I suppose
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+            return;
+        }
+
+        final File studyRoot = new File(studiesRoot, uuid);
+        if (!studyRoot.exists()) {
+            httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Study Not Found");
+            return;
+        }
+
+        final List<Integer> itemList = parseItemList(seq, studyRoot, httpServletResponse);
+        if (itemList == null) {
+            //failed to parse seq, error message already added
+            return;
+        }
+
+        //Make sure all the binary files requested are existing
+        final List<File> binaryItems = new ArrayList<File>();
+        final File binaryRoot = new File(studyRoot, "DICOM/binaryitems");
+
+        for (long l : itemList) {
+            File f = new File(binaryRoot, l + ".dat");
+
+            if (!f.exists() || !f.canRead()) {
+                httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid binary item requested: '" + l + "' Not found ");
+                return;
+            }
+
+            binaryItems.add(f);
+        }
+
+        final OutputStream out = httpServletResponse.getOutputStream();
+
+        //Send all binaryItems to the original requestor
+        if (binaryItems.size() == 1) {
+            //Normal process to send an single item back
+            try {
+                final File binaryItemFile = binaryItems.get(0);
+                final long itemsize = binaryItemFile.length();
+                httpServletResponse.setContentLength((int) itemsize);
+                httpServletResponse.setContentType("application/octet-stream");
+
+                final InputStream in = new FileInputStream(binaryItemFile);
+                try {
+                    bufferedPipe(in, out);
+                } finally {
+                    in.close();
+                }
+            } catch (final IOException e) {
+                if (!httpServletResponse.isCommitted()) {
+                    httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            "Unable to provide study binary items. See server log for details.");
+                    return;
+                }
+            }
+        } else {
+            try {
+                final String boundary = "BinaryItem";
+                httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + boundary + "\"");
+
+                out.write(("--" + boundary).getBytes());
+                out.flush();
+                for (File binaryItem : binaryItems) {
+                    final long itemsize = binaryItem.length();
+                    out.write("\nContent-type: application/octet-stream\n".getBytes());
+                    out.write(("Content-length: " + itemsize + "\n\n").getBytes());
+
+                    final InputStream in = new FileInputStream(binaryItem);
+                    try {
+                        bufferedPipe(in, out);
+                    } finally {
+                        in.close();
+                    }
+
+                    out.write(("\n--" + boundary).getBytes());
+                    out.flush();
+                }
+                out.write("--".getBytes());
+                out.flush();
+            } catch (final IOException e) {
+                if (!httpServletResponse.isCommitted()) {
+                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Cannot provide study binary items: File Read Failure");
+                }
+            }
+        }
+    }
 	
-						httpServletResponse.getOutputStream().flush();
-					} finally {
-						in.close();
-					}
-				} else {
-					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
-				}
-			} catch (final IOException e) {
-				if (!httpServletResponse.isCommitted()) {
-					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							"Cannot provide study binary items: File Read Failure");
-				}
+	private void bufferedPipe(final InputStream inputStream, final OutputStream outputStream) throws IOException {
+		final byte[] bytes = new byte[8 * 1024];
+		while (true) {
+			final int amountRead = inputStream.read(bytes);
+			if (amountRead == -1) {
+				break;
 			}
-		}else{
-			try
-			{
-				final String boundary = "BinaryItem";
-				httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + boundary + "\"");
-				
-				final OutputStream out = httpServletResponse.getOutputStream();
-				
-				out.write(("--" + boundary).getBytes());
-				out.flush();
-				for(File binaryItem : binaryItems)
-				{
-					final int bufsize = 16384;
-					byte[] buf = new byte[bufsize];
-					
-					final InputStream in = new FileInputStream(binaryItem);
-					try 
-					{
-						out.write('\n');
-						
-						final long itemsize = binaryItem.length();
-						out.write("Content-type: application/octet-stream\n".getBytes());
-						out.write(("Content-length: " + itemsize + "\n\n").getBytes());
-						
-						for (long i = 0; i < itemsize; i += bufsize) {
-							int len = (int) ((i + bufsize > itemsize) ? (int)itemsize - i : bufsize);
-							len = in.read(buf,0,len);
-							out.write(buf,0,len);
-						}
-						
-						out.write(("\n--" + boundary).getBytes());
-	
-						out.flush();
-					} finally {
-						in.close();
-					}
-				}
-				out.write("--".getBytes());
-				out.flush();
-			} catch (final IOException e) {
-				if (!httpServletResponse.isCommitted()) {
-					httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-							"Cannot provide study binary items: File Read Failure");
-				}
-			}
+			outputStream.write(bytes, 0, amountRead);
 		}
+		outputStream.flush();
 	}
-	
-	private List<Long> parseItemList(String seq, File studyRoot, final HttpServletResponse httpServletResponse) throws IOException
+
+	private List<Integer> parseItemList(String seq, File studyRoot, final HttpServletResponse httpServletResponse) throws IOException
 	{
-		final List<Long> itemList = new ArrayList<Long>();
+		final List<Integer> itemList = new ArrayList<Integer>();
 		
 		if(seq.equals("all"))
 		{
@@ -183,7 +170,7 @@ public class StudyBinaryItemsController {
 						int bid = a.getBid();
 						if(bid >= 0)
 						{
-							itemList.add((long)bid);
+							itemList.add(bid);
 						}
 					}
 				}
@@ -201,11 +188,11 @@ public class StudyBinaryItemsController {
 					return null;
 				}
 				
-				long start = parseLong(range[0], httpServletResponse);
-				long end = start;
+				int start = parseInt(range[0], httpServletResponse);
+				int end = start;
 				if(range.length == 2)
 				{
-					end = parseLong(range[1], httpServletResponse);
+					end = parseInt(range[1], httpServletResponse);
 				}
 				
 				if(start < 0 || end < 0)
@@ -225,22 +212,22 @@ public class StudyBinaryItemsController {
 		return itemList;
 	}
 	
-	private Long parseLong(String str, final HttpServletResponse httpServletResponse) throws IOException
+	private int parseInt(String str, final HttpServletResponse httpServletResponse) throws IOException
 	{
-		final Long num;
+		final Integer num;
 		try {
-			num = Long.valueOf(str);
+			num = Integer.valueOf(str);
 		} catch (final NumberFormatException e) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
-			return -1l;
+			return -1;
 		}
 		if (num < 0) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
-			return -1l;
+			return -1;
 		}
 		if (num >= Integer.MAX_VALUE) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
-			return -1l;
+			return -1;
 		}
 		
 		return num;
