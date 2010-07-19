@@ -27,6 +27,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
@@ -39,198 +40,154 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class StudyBinaryItemsController {
 
-	@Autowired
-	protected File studiesRoot;
-	
+    @Autowired
+    protected File studiesRoot;
+
     @RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
     public void studiesBinaryItems(@PathVariable("uuid") final String uuid, @PathVariable final String seq,
                                    final HttpServletResponse httpServletResponse) throws IOException {
         if (StringUtils.isBlank(uuid)) {
             // Shouldn't happen...but could be +++, I suppose
-            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request: Missing binary item id");
             return;
         }
 
         final File studyRoot = new File(studiesRoot, uuid);
         if (!studyRoot.exists()) {
-            httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Study Not Found");
+            httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Requested Study Not Found");
             return;
         }
 
-        final List<Integer> itemList = parseItemList(seq, studyRoot, httpServletResponse);
-        if (itemList == null) {
-            //failed to parse seq, error message already added
+        final List<Integer> itemList;
+        try {
+        	itemList = parseItemList(seq, studyRoot);
+        } catch (final NumberFormatException e) {
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item requested: NaN");
             return;
         }
 
-        //Make sure all the binary files requested are existing
-        final List<File> binaryItems = new ArrayList<File>();
-        final File binaryRoot = new File(studyRoot, "DICOM/binaryitems");
+        if (itemList == null || itemList.isEmpty()) {
+            httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive binary items. See server log for details.");
+            LOG.error("Unable to locate binary items: " + seq);
+            return;
+        }
 
-        for (long l : itemList) {
-            File f = new File(binaryRoot, l + ".dat");
-
-            if (!f.exists() || !f.canRead()) {
-                httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid binary item requested: '" + l + "' Not found ");
+        List<File> binaryItems = new ArrayList<File>(itemList.size());
+        for (int i : itemList) {
+            final File file = new File(studyRoot + "/DICOM/binaryitems/" + i + ".dat");
+            if (!file.exists() || !file.canRead()) {
+                httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
+                LOG.error("BinaryItemsFile " + file + " does not exist");
                 return;
             }
-
-            binaryItems.add(f);
+            binaryItems.add(file);
         }
 
         final OutputStream out = httpServletResponse.getOutputStream();
 
-        //Send all binaryItems to the original requestor
-        if (binaryItems.size() == 1) {
-            //Normal process to send an single item back
-            try {
-                final File binaryItemFile = binaryItems.get(0);
-                final long itemsize = binaryItemFile.length();
-                httpServletResponse.setContentLength((int) itemsize);
-                httpServletResponse.setContentType("application/octet-stream");
+        // write the appropriate header
+        final boolean multipart = binaryItems.size() > 0;
+        if (multipart) {
+            httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
+            out.write(("--" + MP_BOUNDARY).getBytes());
+            out.flush();
+        } else {
+            httpServletResponse.setContentType("application/octet-stream");
+            httpServletResponse.setContentLength((int) binaryItems.get(0).length());
+        }
 
-                final InputStream in = new FileInputStream(binaryItemFile);
-                try {
-                    bufferedPipe(in, out);
-                } finally {
-                    in.close();
+        for (File binaryItem : binaryItems) {
+            if (multipart) {
+                final long itemsize = binaryItem.length();
+                out.write("\nContent-type: application/octet-stream\n".getBytes());
+                out.write(("Content-length: " + itemsize + "\n\n").getBytes());
+            }
+
+            streamBinaryItem(binaryItem,out);
+            
+            if (multipart) {
+                out.write(("\n--" + MP_BOUNDARY).getBytes());
+                out.flush();
+            }
+        }
+        if (multipart) {
+            out.write("--".getBytes());
+            out.flush();
+        }
+    }
+
+    private void streamBinaryItem(final File file, final OutputStream outputStream) throws IOException {
+        final InputStream in = new FileInputStream(file);
+        final byte[] bytes = new byte[16 * 1024];
+        try {
+            while (true) {
+                final int amountRead = in.read(bytes);
+                if (amountRead == -1) {
+                    break;
                 }
-            } catch (final IOException e) {
-                if (!httpServletResponse.isCommitted()) {
-                    httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                            "Unable to provide study binary items. See server log for details.");
-                    return;
+                outputStream.write(bytes, 0, amountRead);
+            }
+            outputStream.flush();
+        } finally {
+            in.close();
+        }
+    }
+
+    private List<Integer> parseItemList(String seq, File studyRoot) throws NumberFormatException, IOException {
+        final List<Integer> itemList = new ArrayList<Integer>();
+
+        if (seq.equals("all")) {
+            //need to return all items in current metadata
+            File dicomRoot = new File(studyRoot, "DICOM");
+
+            org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(dicomRoot);
+
+            // iterate through each instance and collect the bids
+            for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
+                for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
+                    for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
+                        Attribute a = iii.next();
+
+                        int bid = a.getBid();
+                        if (bid >= 0) {
+                            itemList.add(bid);
+                        }
+                    }
                 }
             }
         } else {
-            try {
-                final String boundary = "BinaryItem";
-                httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + boundary + "\"");
+            String[] elements = seq.split(",");
 
-                out.write(("--" + boundary).getBytes());
-                out.flush();
-                for (File binaryItem : binaryItems) {
-                    final long itemsize = binaryItem.length();
-                    out.write("\nContent-type: application/octet-stream\n".getBytes());
-                    out.write(("Content-length: " + itemsize + "\n\n").getBytes());
+            for (String element : elements) {
+                String[] range = element.split("-");
 
-                    final InputStream in = new FileInputStream(binaryItem);
-                    try {
-                        bufferedPipe(in, out);
-                    } finally {
-                        in.close();
-                    }
-
-                    out.write(("\n--" + boundary).getBytes());
-                    out.flush();
+                if (range.length < 1 || range.length > 2) {
+                    //failed to parse element, error message not set yet
+                    return null;
                 }
-                out.write("--".getBytes());
-                out.flush();
-            } catch (final IOException e) {
-                if (!httpServletResponse.isCommitted()) {
-                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            "Cannot provide study binary items: File Read Failure");
+
+                int start = Integer.valueOf(range[0]);
+                int end = start;
+                if (range.length == 2) {
+                    end = Integer.valueOf(range[1]);
+                }
+
+                if (start < 0 || end < 0) {
+                    //failed to parse element, error message already set
+                    return null;
+                }
+
+                //for each item in the range, add to itemList
+                for (; start <= end; ++start) {
+                    itemList.add(start);
                 }
             }
         }
-    }
-	
-	private void bufferedPipe(final InputStream inputStream, final OutputStream outputStream) throws IOException {
-		final byte[] bytes = new byte[8 * 1024];
-		while (true) {
-			final int amountRead = inputStream.read(bytes);
-			if (amountRead == -1) {
-				break;
-			}
-			outputStream.write(bytes, 0, amountRead);
-		}
-		outputStream.flush();
-	}
 
-	private List<Integer> parseItemList(String seq, File studyRoot, final HttpServletResponse httpServletResponse) throws IOException
-	{
-		final List<Integer> itemList = new ArrayList<Integer>();
-		
-		if(seq.equals("all"))
-		{
-			//need to return all items in current metadata
-			File dicomRoot = new File(studyRoot, "DICOM");
-			
-			org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(dicomRoot);
-			
-			//Go through each instance and collect the bids
-			for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
-			{
-				for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
-				{
-					for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
-					{
-						Attribute a = iii.next();
-						
-						int bid = a.getBid();
-						if(bid >= 0)
-						{
-							itemList.add(bid);
-						}
-					}
-				}
-			}
-		}else{
-			String[] elements = seq.split(",");
-			
-			for(String element : elements)
-			{
-				String[] range = element.split("-");
-				
-				if(range.length < 1 || range.length > 2)
-				{
-					//failed to parse element, error message not set yet
-					return null;
-				}
-				
-				int start = parseInt(range[0], httpServletResponse);
-				int end = start;
-				if(range.length == 2)
-				{
-					end = parseInt(range[1], httpServletResponse);
-				}
-				
-				if(start < 0 || end < 0)
-				{
-					//failed to parse element, error message already set
-					return null;
-				}
-				
-				//for each item in the range, add to itemList
-				for(;start <= end; ++start)
-				{
-					itemList.add(start);
-				}
-			}
-		}
-		
-		return itemList;
-	}
-	
-	private int parseInt(String str, final HttpServletResponse httpServletResponse) throws IOException
-	{
-		final Integer num;
-		try {
-			num = Integer.valueOf(str);
-		} catch (final NumberFormatException e) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
-			return -1;
-		}
-		if (num < 0) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
-			return -1;
-		}
-		if (num >= Integer.MAX_VALUE) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Too large");
-			return -1;
-		}
-		
-		return num;
-	}
+        return itemList;
+    }
+
+    private static final Logger LOG = Logger.getLogger(StudyBinaryItemsController.class);
+    private static final String MP_BOUNDARY = "BinaryItemBoundary-7afb50349c2148c3a5d6a324891a481c";
 
 }
