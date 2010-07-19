@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,20 +64,17 @@ public class ChangeLogController {
 
 		if (since != null) {
 			
-			DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			Date date = null;
 			try {
-				date = format.parse(since);
+				date = parseDate(since);
 			} catch (ParseException e) {
-				try {
-					format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
-					date = format.parse(since);
-				} catch (ParseException e2) {
-					res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-					return "error";
-				}
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date range: " + since);
+				return "error";
 			}
-			
+			if (date.getTime() > System.currentTimeMillis()) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
+				return "error";
+			}
 			final List<Change> changesFound = changeDAO.findChanges(date);
 			if (changesFound != null) {
 				changes.addAll(changesFound);
@@ -172,4 +168,21 @@ public class ChangeLogController {
 		}
 	}
 
+	private Date parseDate(String dateStr) throws ParseException {
+		Date date = null;
+		ParseException ex = null;
+		for (String format : new String[]{"yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd","yyyyMMdd'T'HHmmss","yyyyMMdd"}) {
+			try {
+				date = new SimpleDateFormat(format).parse(dateStr);
+				break;
+			} catch (ParseException e) {
+				// try next format, but throw the last error
+				ex = e;
+			}
+		}
+		if (date == null) {
+			throw ex;
+		}
+		return date;
+	}
 }
