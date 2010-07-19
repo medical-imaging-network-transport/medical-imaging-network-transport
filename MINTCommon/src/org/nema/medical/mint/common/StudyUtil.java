@@ -568,7 +568,11 @@ public final class StudyUtil {
 					int bid = a.getBid();
 					if(bid >= 0)
 					{
-						studyBids.add(bid);
+						if(!studyBids.add(bid))
+						{
+							//If the set already contained the bid
+							return false;
+						}
 					}
 				}
 			}
