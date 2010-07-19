@@ -16,11 +16,6 @@ PYTHONPATH=$MC_HOME/MINTConformance/src
 $MC_HOME/$MC_SRC/MintStudyCompare.sh $MC_HOME/$MC_MINT/metadata.xml $MC_HOME/$MC_MINT/metadata.xml
 
 # ---
-# Parse a DICOM file.
-# ---
-python $MC_HOME/$MC_SRC/DicomSeries.py $MC_HOME/$MC_DICOM/1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037.dcm
-
-# ---
 # Parse a DICOM Study.
 # ---
 python $MC_HOME/$MC_SRC/DicomStudy.py $MC_HOME/$MC_DICOM$
@@ -28,14 +23,14 @@ python $MC_HOME/$MC_SRC/DicomStudy.py $MC_HOME/$MC_DICOM$
 # ---
 # Parse a MINT Study.
 # ---
-python $MC_HOME/$MC_SRC/MintStudy.py $MC_HOME/$MC_MINT/Meta.xml
+python $MC_HOME/$MC_SRC/MintStudy.py $MC_HOME/$MC_MINT/metadata.xml
 
 # ---
 # Compare identical MINT Studies.
 # ---
-python $MC_HOME/$MC_SRC/MintStudyCompare.py $MC_HOME/$MC_MINT/Meta.xml $MC_HOME/$MC_MINT/Meta.xml
+python $MC_HOME/$MC_SRC/MintStudyCompare.py $MC_HOME/$MC_MINT/metadata.xml $MC_HOME/$MC_MINT/metadata.xml
 
 # ---
 # Compare different MINT Studies.
 # ---
-python $MC_HOME/$MC_SRC/MintStudyCompare.py $MC_HOME/$MC_MINT/Meta.xml $MC_HOME/$MC_MINT/metadata.xml
+python $MC_HOME/$MC_SRC/MintStudyCompare.py $MC_HOME/$MC_MINT/metadata.xml $MC_HOME/$MC_MINT/Meta.xml

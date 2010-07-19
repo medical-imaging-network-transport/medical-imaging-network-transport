@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StudyMeta xmlns="http://medical.nema.org/mint" studyInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873">
+  <Attributes>
+    <Attr tag="00100030" vr="DA"/>
+    <Attr tag="00080090" vr="PN"/>
+    <Attr tag="00100020" vr="LO" val="JM8-ECG-TEST"/>
+    <Attr tag="00100010" vr="PN" val="20 phase"/>
+    <Attr tag="00101010" vr="AS" val="073Y"/>
+    <Attr tag="00100040" vr="CS" val="F"/>
+    <Attr tag="00104000" vr="LT" val="1-5B"/>
+    <Attr tag="00200010" vr="SH" val="1126"/>
+    <Attr tag="00080030" vr="TM" val="144114.000"/>
+    <Attr tag="00080020" vr="DA" val="20020711"/>
+    <Attr tag="0020000d" vr="UI" val="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873"/>
+    <Attr tag="00080050" vr="SH" val="1126"/>
+  </Attributes>
+  <SeriesList>
+    <Series seriesInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997331.21983">
+      <Attributes>
+        <Attr tag="00200011" vr="IS" val="52"/>
+        <Attr tag="0020000e" vr="UI" val="1.2.392.200036.9116.2.2.2.1762893313.1029997331.21983"/>
+        <Attr tag="00400244" vr="DA" val="20020711"/>
+        <Attr tag="00400245" vr="TM" val="142633.000"/>
+        <Attr tag="00185100" vr="CS" val="HFS"/>
+        <Attr tag="00400253" vr="SH" val="1028"/>
+        <Attr tag="00080060" vr="CS" val="CT"/>
+      </Attributes>
+      <NormalizedInstanceAttributes>
+        <Attr tag="00080080" vr="LO" val="FUJITA_HEALTH_UNIV."/>
+        <Attr tag="00080008" vr="CS" val="ORIGINAL"/>
+        <Attr tag="00180090" vr="DS" val="320.00"/>
+        <Attr tag="00200020" vr="CS" val="L"/>
+        <Attr tag="00181120" vr="DS" val="+0.0"/>
+        <Attr tag="00180010" vr="LO" val="Omunipaque"/>
+        <Attr tag="00181210" vr="SH" val="FC11"/>
+        <Attr tag="00200037" vr="DS" val="1.000000"/>
+        <Attr tag="00200032" vr="DS" val="-101.875000"/>
+        <Attr tag="00181020" vr="LO" val="V1.10JR400"/>
+        <Attr tag="00181130" vr="DS" val="+115.00"/>
+        <Attr tag="00280030" vr="DS" val="0.468"/>
+        <Attr tag="00080016" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+        <Attr tag="00080023" vr="DA" val="20020711"/>
+        <Attr tag="00181100" vr="DS" val="240.00"/>
+        <Attr tag="00080022" vr="DA" val="20020711"/>
+        <Attr tag="00280006" vr="US" val="0"/>
+        <Attr tag="00280004" vr="CS" val="MONOCHROME2"/>
+        <Attr tag="00280002" vr="US" val="1"/>
+        <Attr tag="00081090" vr="LO" val="Aquilion"/>
+        <Attr tag="00200012" vr="IS" val="1"/>
+        <Attr tag="00080032" vr="TM" val="145107.550"/>
+        <Attr tag="00081010" vr="SH" val="ID_STATION"/>
+        <Attr tag="00180022" vr="CS" val="HELICAL_CT"/>
+        <Attr tag="00181000" vr="LO" val="SERIALNO"/>
+        <Attr tag="00280101" vr="US" val="16"/>
+        <Attr tag="00280100" vr="US" val="16"/>
+        <Attr tag="00280010" vr="US" val="512"/>
+        <Attr tag="00280103" vr="US" val="1"/>
+        <Attr tag="00280011" vr="US" val="512"/>
+        <Attr tag="00280102" vr="US" val="15"/>
+        <Attr tag="00201040" vr="LO"/>
+        <Attr tag="00400004" vr="DA" val="20020711"/>
+        <Attr tag="00400005" vr="TM" val="145633.000"/>
+        <Attr tag="00082111" vr="ST" val="3:1 JPEGLOSSLESSPROC14"/>
+        <Attr tag="00400002" vr="DA" val="20020711"/>
+        <Attr tag="00400003" vr="TM" val="142633.000"/>
+        <Attr tag="00180050" vr="DS" val="1.0"/>
+        <Attr tag="00281053" vr="DS" val="1"/>
+        <Attr tag="00281052" vr="DS" val="0"/>
+        <Attr tag="00281051" vr="DS" val="350"/>
+        <Attr tag="00281050" vr="DS" val="30"/>
+        <Attr tag="00281055" vr="LO"/>
+        <Attr tag="00081040" vr="LO" val="ID_DEPARTMENT"/>
+        <Attr tag="00181140" vr="CS" val="CW"/>
+        <Attr tag="00282110" vr="CS" val="00"/>
+        <Attr tag="00200052" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026365194.126649"/>
+        <Attr tag="00181150" vr="IS" val="400"/>
+        <Attr tag="00180060" vr="DS" val="135"/>
+        <Attr tag="00181151" vr="IS" val="350"/>
+        <Attr tag="00080070" vr="LO" val="TOSHIBA"/>
+        <Attr tag="00181152" vr="IS" val="111"/>
+      </NormalizedInstanceAttributes>
+      <Instances>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398695.348267" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398695.348267"/>
+            <Attr tag="00201041" vr="DS" val="-115.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="1"/>
+            <Attr tag="00200013" vr="IS" val="26"/>
+            <Attr tag="00080033" vr="TM" val="145113.670"/>
+          </Attributes>
+        </Instance>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398699.181490" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398699.181490"/>
+            <Attr tag="00201041" vr="DS" val="-114.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="2"/>
+            <Attr tag="00200013" vr="IS" val="27"/>
+            <Attr tag="00080033" vr="TM" val="145113.870"/>
+          </Attributes>
+        </Instance>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398695.348267" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398695.348267"/>
+            <Attr tag="00201041" vr="DS" val="-115.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="5"/>
+            <Attr tag="00200013" vr="IS" val="26"/>
+            <Attr tag="00080033" vr="TM" val="145113.670"/>
+          </Attributes>
+        </Instance>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398699.181490" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398699.181490"/>
+            <Attr tag="00201041" vr="DS" val="-114.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="6"/>
+            <Attr tag="00200013" vr="IS" val="27"/>
+            <Attr tag="00080033" vr="TM" val="145113.870"/>
+          </Attributes>
+        </Instance>
+      </Instances>
+    </Series>
+    <Series seriesInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350">
+      <Attributes>
+        <Attr tag="00200011" vr="IS" val="51"/>
+        <Attr tag="0020000e" vr="UI" val="1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350"/>
+        <Attr tag="00400244" vr="DA" val="20020711"/>
+        <Attr tag="00400245" vr="TM" val="142633.000"/>
+        <Attr tag="00185100" vr="CS" val="HFS"/>
+        <Attr tag="00400253" vr="SH" val="1028"/>
+        <Attr tag="00080060" vr="CS" val="CT"/>
+      </Attributes>
+      <NormalizedInstanceAttributes>
+        <Attr tag="00080080" vr="LO" val="FUJITA_HEALTH_UNIV."/>
+        <Attr tag="00080008" vr="CS" val="ORIGINAL"/>
+        <Attr tag="00180090" vr="DS" val="320.00"/>
+        <Attr tag="00200020" vr="CS" val="L"/>
+        <Attr tag="00181120" vr="DS" val="+0.0"/>
+        <Attr tag="00180010" vr="LO" val="Omunipaque"/>
+        <Attr tag="00181210" vr="SH" val="FC11"/>
+        <Attr tag="00200037" vr="DS" val="1.000000"/>
+        <Attr tag="00200032" vr="DS" val="-101.875000"/>
+        <Attr tag="00181020" vr="LO" val="V1.10JR400"/>
+        <Attr tag="00181130" vr="DS" val="+115.00"/>
+        <Attr tag="00280030" vr="DS" val="0.468"/>
+        <Attr tag="00080016" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+        <Attr tag="00080023" vr="DA" val="20020711"/>
+        <Attr tag="00181100" vr="DS" val="240.00"/>
+        <Attr tag="00080022" vr="DA" val="20020711"/>
+        <Attr tag="00280006" vr="US" val="0"/>
+        <Attr tag="00280004" vr="CS" val="MONOCHROME2"/>
+        <Attr tag="00280002" vr="US" val="1"/>
+        <Attr tag="00081090" vr="LO" val="Aquilion"/>
+        <Attr tag="00200012" vr="IS" val="1"/>
+        <Attr tag="00080032" vr="TM" val="145107.550"/>
+        <Attr tag="00081010" vr="SH" val="ID_STATION"/>
+        <Attr tag="00180022" vr="CS" val="HELICAL_CT"/>
+        <Attr tag="00181000" vr="LO" val="SERIALNO"/>
+        <Attr tag="00280101" vr="US" val="16"/>
+        <Attr tag="00280100" vr="US" val="16"/>
+        <Attr tag="00280010" vr="US" val="512"/>
+        <Attr tag="00280103" vr="US" val="1"/>
+        <Attr tag="00280011" vr="US" val="512"/>
+        <Attr tag="00280102" vr="US" val="15"/>
+        <Attr tag="00201040" vr="LO"/>
+        <Attr tag="00400004" vr="DA" val="20020711"/>
+        <Attr tag="00400005" vr="TM" val="145633.000"/>
+        <Attr tag="00082111" vr="ST" val="3:1 JPEGLOSSLESSPROC14"/>
+        <Attr tag="00400002" vr="DA" val="20020711"/>
+        <Attr tag="00400003" vr="TM" val="142633.000"/>
+        <Attr tag="00180050" vr="DS" val="1.0"/>
+        <Attr tag="00281053" vr="DS" val="1"/>
+        <Attr tag="00281052" vr="DS" val="0"/>
+        <Attr tag="00281051" vr="DS" val="350"/>
+        <Attr tag="00281050" vr="DS" val="30"/>
+        <Attr tag="00281055" vr="LO"/>
+        <Attr tag="00081040" vr="LO" val="ID_DEPARTMENT"/>
+        <Attr tag="00181140" vr="CS" val="CW"/>
+        <Attr tag="00282110" vr="CS" val="00"/>
+        <Attr tag="00200052" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026365194.126649"/>
+        <Attr tag="00181150" vr="IS" val="400"/>
+        <Attr tag="00180060" vr="DS" val="135"/>
+        <Attr tag="00181151" vr="IS" val="350"/>
+        <Attr tag="00080070" vr="LO" val="TOSHIBA"/>
+        <Attr tag="00181152" vr="IS" val="111"/>
+      </NormalizedInstanceAttributes>
+      <Instances>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398165.298629" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398165.298629"/>
+            <Attr tag="00201041" vr="DS" val="-114.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="0"/>
+            <Attr tag="00200013" vr="IS" val="27"/>
+            <Attr tag="00080033" vr="TM" val="145113.870"/>
+          </Attributes>
+        </Instance>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037"/>
+            <Attr tag="00201041" vr="DS" val="-115.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="3"/>
+            <Attr tag="00200013" vr="IS" val="26"/>
+            <Attr tag="00080033" vr="TM" val="145113.670"/>
+          </Attributes>
+        </Instance>
+        <Instance sopInstanceUID="1.2.392.200036.9116.2.2.2.1762660474.1026398165.298629" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080018" vr="UI" val="1.2.392.200036.9116.2.2.2.1762660474.1026398165.298629"/>
+            <Attr tag="00201041" vr="DS" val="-114.40"/>
+            <Attr tag="7fe00010" vr="OW" bid="4"/>
+            <Attr tag="00200013" vr="IS" val="27"/>
+            <Attr tag="00080033" vr="TM" val="145113.870"/>
+          </Attributes>
+        </Instance>
+      </Instances>
+    </Series>
+  </SeriesList>
+</StudyMeta>

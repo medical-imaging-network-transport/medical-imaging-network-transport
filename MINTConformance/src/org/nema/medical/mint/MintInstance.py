@@ -26,20 +26,24 @@
 
 from org.nema.medical.mint.MintAttribute import MintAttribute
 from org.nema.medical.mint.XmlNode       import XmlNode
-\
+
 # -----------------------------------------------------------------------------
 # MintInstance
 # -----------------------------------------------------------------------------
 class MintInstance():
    
    def __init__(self, root):    
-       self.__xfer = ""
+       self.__sopInstanceUID = ""
+       self.__transferSyntaxUID = ""
        self.__attributes = {}
        self.__tags = []
        self.__read(root)
        
-   def xfer(self): 
-       return self.__xfer;
+   def sopInstanceUID(self): 
+       return self.__sopInstanceUID;
+       
+   def transferSyntaxUID(self): 
+       return self.__transferSyntaxUID;
        
    def numAttributes(self):
        return len(self.__tags)
@@ -64,22 +68,24 @@ class MintInstance():
        return self.__str__()
 
    def __read(self, root):
-       self.__xfer = root.attributeWithName("xfer")
+       self.__sopInstanceUID = root.attributeWithName("sopInstanceUID")
+       self.__transferSyntaxUID = root.attributeWithName("transferSyntaxUID")
 
        # ---
        # Read Attributes
        # ---
        node = root.childWithName("Attributes")
-       nodes = node.childrenWithName("Attr")
-       for node in nodes:
-           attb = MintAttribute(node)
-           self.__attributes[attb.tag()] = attb
-       self.__tags = self.__attributes.keys()
-       self.__tags.sort()
+       if node != None:
+          nodes = node.childrenWithName("Attr")
+          for node in nodes:
+              attb = MintAttribute(node)
+              self.__attributes[attb.tag()] = attb
+          self.__tags = self.__attributes.keys()
+          self.__tags.sort()
        
    def __str__(self):
-       s  = "    - Instance xfer=" + self.xfer() + '\n'
-       
+       s  = "    - SOP Instance UID="+self.sopInstanceUID()+'\n'       
+       s += "     - Transfer Syntax UID="+self.transferSyntaxUID()+"\n"       
        s += "     - Attributes\n"       
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
