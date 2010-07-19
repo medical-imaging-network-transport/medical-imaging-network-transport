@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,9 +36,6 @@ public class StudySummaryController {
 	@Autowired
 	protected File studiesRoot;
 	
-	@Autowired
-	protected StudyDAO studyDAO = null;
-
 	@RequestMapping("/studies/{uuid}/DICOM/summary")
 	public void studiesSummary(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse httpServletResponse) throws IOException {
@@ -55,7 +51,7 @@ public class StudySummaryController {
 				final FileInputStream fileInputStream = new FileInputStream(file);
 				try {
 					final OutputStream outputStream = httpServletResponse.getOutputStream();
-					bufferedRead(fileInputStream, outputStream);
+					bufferedPipe(fileInputStream, outputStream);
 				} finally {
 					fileInputStream.close();
 				}
@@ -65,12 +61,12 @@ public class StudySummaryController {
 		} catch (final IOException e) {
 			if (!httpServletResponse.isCommitted()) {
 				httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-						"Cannot provide study metadata: File Read Failure");
+						"Unable to provide study summary. See server logs.");
 			}
 		}
 	}
 
-	private void bufferedRead(final InputStream inputStream, final OutputStream outputStream) throws IOException {
+	private void bufferedPipe(final InputStream inputStream, final OutputStream outputStream) throws IOException {
 		final byte[] bytes = new byte[8 * 1024];
 		while (true) {
 			final int amountRead = inputStream.read(bytes);

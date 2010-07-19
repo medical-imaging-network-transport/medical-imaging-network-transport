@@ -62,22 +62,22 @@ public class StudyMetadataController {
 				final FileInputStream fileInputStream = new FileInputStream(file);
 				try {
 					final OutputStream outputStream = httpServletResponse.getOutputStream();
-					bufferedRead(fileInputStream, outputStream);
+					bufferedPipe(fileInputStream, outputStream);
 				} finally {
 					fileInputStream.close();
 				}
 			} else {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
+				httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
 			}
 		} catch (final IOException e) {
 			if (!httpServletResponse.isCommitted()) {
-				httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Cannot provide study metadata: File Read Failure");
+				httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+						"Unable to provide study metadata. See server logs.");
 			}
 		}
 	}
 
-	private void bufferedRead(final InputStream inputStream, final OutputStream outputStream) throws IOException {
+	private void bufferedPipe(final InputStream inputStream, final OutputStream outputStream) throws IOException {
 		final byte[] bytes = new byte[8 * 1024];
 		while (true) {
 			final int amountRead = inputStream.read(bytes);
