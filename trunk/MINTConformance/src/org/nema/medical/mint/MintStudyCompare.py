@@ -40,7 +40,15 @@ from org.nema.medical.mint.MintStudy import MintStudy
 class MintStudyCompare():
    
    def __init__(self, study1, study2):
-       self.__study1 = MintStudy(study1)       
+       if not os.path.isfile(study1):
+          print "File not found -", study1
+          sys.exit(1)
+
+       if not os.path.isfile(study2):
+          print "File not found -", study2
+          sys.exit(1)
+                
+       self.__study1 = MintStudy(study1)
        self.__study2 = MintStudy(study2)
 
        studydir1 = os.path.dirname(study1)
@@ -57,6 +65,10 @@ class MintStudyCompare():
        s1 = self.__study1
        s2 = self.__study2
        
+       self.check("Study xmlns",
+                  s1.xmlns(), 
+                  s2.xmlns())
+                      
        self.check("Study Instance UID",
                   s1.studyInstanceUID(), 
                   s2.studyInstanceUID())
@@ -130,31 +142,35 @@ class MintStudyCompare():
               self.check(series+" Normalized Instance Attribute", attr1.toString(), attr2.toString())       
            self.__checkForBinary(attr1)
 
-           self.check("Number of "+series+" Instances",
-                      series1.numInstances(), 
-                      series2.numInstances())
+       self.check("Number of "+series+" Instances",
+                  series1.numInstances(), 
+                  series2.numInstances())
 
-           numInstances = series1.numInstances()
-           for n in range(0, numInstances):
-               instance1 = series1.instance(n)
-               instance2 = None
-               if series2.numInstances() >= n+1:
-                  instance2 = series2.instance(n)
-               self.__compareInstances(series, n, instance1, instance2)
+       numInstances = series1.numInstances()
+       for n in range(0, numInstances):
+           instance1 = series1.instance(n)
+           instance2 = None
+           if series2.numInstances() >= n+1:
+              instance2 = series2.instance(n)
+           self.__compareInstances(instance1, instance2)
 
-   def __compareInstances(self, series, n, instance1, instance2):
-       instance = series+" Instance "+str(n)
-       
+   def __compareInstances(self, instance1, instance2):
+       instance = "Instance "+instance1.sopInstanceUID()
+              
        if instance2 == None:
-          self.check(instance+" Tranfer",
-                     instance1.xfer(), 
-                     "")
+          self.check(instance+" SOP Instance UID",
+                     instance1.sopInstanceUID(), 
+                     "None")
           return
        
-       self.check(instance+" Tranfer",
-                  instance1.xfer(), 
-                  instance2.xfer())
-   
+       self.check(instance+" SOP Instance UID",
+                  instance1.sopInstanceUID(), 
+                  instance2.sopInstanceUID())
+                  
+       self.check(instance+" Transfer Syntax UID",
+                  instance1.transferSyntaxUID(), 
+                  instance2.transferSyntaxUID()) 
+                  
        numAttributes = instance1.numAttributes()
        for n in range(0, numAttributes):
            attr1 = instance1.attribute(n)
@@ -214,6 +230,7 @@ class MintStudyCompare():
               # ---
               # Read in a block.
               # ---
+              block = 0
               buf1 = bid1.read(bufsize)
               while buf1 != "":
                  buf2 = bid2.read(bufsize)
@@ -228,7 +245,7 @@ class MintStudyCompare():
                  for i in range(0, n1):
                      if buf1[i] != buf2[i]:
                         self.__count += 1
-                        print binaryitem+".dat byte "+str(i)+" differs."
+                        print binaryitem+".dat byte "+str(block*bufsize+i)+" differs."
                         diff = True
                         break
                         
@@ -239,6 +256,7 @@ class MintStudyCompare():
                     buf1 = ""
                  else:
                     buf1 = bid1.read(1024)
+                    block += 1
 
               bid1.close()
               bid2.close()

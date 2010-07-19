@@ -48,13 +48,20 @@ class MintStudy(): #XmlDocument):
        """
        #XmlDocument.__init__(self, MintStudy.ROOT_TAG_NAME)
        #self.readFromFile(metadataName)
+
        self.__xml = XmlDocument(MintStudy.ROOT_TAG_NAME)
+       self.__xmlns = ""
+       self.__studyInstanceUID = ""
        self.__attributes = {}
        self.__tags = []
        self.__series = {}
        self.__seriesInstanceUIDs = []
+
        self.__readFromFile(metadataName)
 
+   def xmlns(self): 
+       return self.__xmlns;
+       
    def studyInstanceUID(self): 
        return self.__studyInstanceUID;
        
@@ -96,35 +103,39 @@ class MintStudy(): #XmlDocument):
        else:
           return None
 
-   def __readFromFile(self, metadataName):      
+   def __readFromFile(self, metadataName):
        self.__xml.readFromFile(metadataName)
       
+       self.__xmlns = self.__xml.attributeWithName("xmlns")
        self.__studyInstanceUID = self.__xml.attributeWithName("studyInstanceUID")
      
        # ---
        # Read Attributes
        # ---
        node = self.__xml.childWithName("Attributes")
-       nodes = node.childrenWithName("Attr")
-       for node in nodes:
-           attb = MintAttribute(node)
-           self.__attributes[attb.tag()] = attb
-       self.__tags = self.__attributes.keys()
-       self.__tags.sort()
+       if node != None:
+          nodes = node.childrenWithName("Attr")
+          for node in nodes:
+              attb = MintAttribute(node)
+              self.__attributes[attb.tag()] = attb
+          self.__tags = self.__attributes.keys()
+          self.__tags.sort()
    
        # ---
        # Read Series
        # ---
        node = self.__xml.childWithName("SeriesList")
-       nodes = node.childrenWithName("Series")
-       for node in nodes:
-           series = MintSeries(node)
-           self.__series[series.seriesInstanceUID()] = series
-       self.__seriesInstanceUIDs = self.__series.keys()
-       self.__seriesInstanceUIDs.sort()
+       if node != None:
+          nodes = node.childrenWithName("Series")
+          for node in nodes:
+              series = MintSeries(node)
+              self.__series[series.seriesInstanceUID()] = series
+          self.__seriesInstanceUIDs = self.__series.keys()
+          self.__seriesInstanceUIDs.sort()
        
    def __str__(self):
        s =  "- Study Instance UID="+self.__studyInstanceUID+'\n'
+       s += " - xmlns="+self.xmlns()+"\n"
        s += " - Attributes\n"
        
        numAttributes = self.numAttributes()

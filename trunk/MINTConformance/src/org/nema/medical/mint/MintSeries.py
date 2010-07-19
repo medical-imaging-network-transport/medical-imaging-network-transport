@@ -101,31 +101,34 @@ class MintSeries():
        # Read Attributes
        # ---
        node = root.childWithName("Attributes")
-       nodes = node.childrenWithName("Attr")
-       for node in nodes:
-           attb = MintAttribute(node)
-           self.__attributes[attb.tag()] = attb
-       self.__tags = self.__attributes.keys()
-       self.__tags.sort()
+       if node != None:
+          nodes = node.childrenWithName("Attr")
+          for node in nodes:
+              attb = MintAttribute(node)
+              self.__attributes[attb.tag()] = attb
+          self.__tags = self.__attributes.keys()
+          self.__tags.sort()
 
        # ---
        # Read Normalized Instance Attributes
        # ---
        node = root.childWithName("NormalizedInstanceAttributes")
-       nodes = node.childrenWithName("Attr")
-       for node in nodes:
-           attb = MintAttribute(node)
-           self.__normalizedInstanceAttributes[attb.tag()] = attb
-       self.__normalizedTags = self.__normalizedInstanceAttributes.keys()
-       self.__normalizedTags.sort()
+       if node != None:
+          nodes = node.childrenWithName("Attr")
+          for node in nodes:
+              attb = MintAttribute(node)
+              self.__normalizedInstanceAttributes[attb.tag()] = attb
+          self.__normalizedTags = self.__normalizedInstanceAttributes.keys()
+          self.__normalizedTags.sort()
                
        # ---
        # Read Instances
        # ---
        node = root.childWithName("Instances")
-       nodes = node.childrenWithName("Instance")
-       for node in nodes:
-           self.__instances.append(MintInstance(node)) 
+       if node != None:
+          nodes = node.childrenWithName("Instance")
+          for node in nodes:
+              self.__instances.append(MintInstance(node)) 
 
    def __str__(self):
        s  = "  - Series Instance UID=" + self.__seriesInstanceUID + '\n'
@@ -147,4 +150,3 @@ class MintSeries():
            s += instance.toString()
 
        return s
-
