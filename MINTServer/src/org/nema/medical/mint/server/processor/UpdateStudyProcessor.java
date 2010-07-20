@@ -71,7 +71,7 @@ public class UpdateStudyProcessor extends TimerTask {
 			 */
 			Study newStudy = StudyUtil.loadStudy(jobFolder);
 			
-			if(!StudyUtil.validateBinaryItemsReferences(newStudy, jobFolder))
+			if(!StudyUtil.validateStudy(newStudy, jobFolder))
 			{
 				throw new RuntimeException("Validation of the jobs study failed");
 			}

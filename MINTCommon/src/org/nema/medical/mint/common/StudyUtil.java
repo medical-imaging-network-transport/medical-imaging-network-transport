@@ -525,6 +525,26 @@ public final class StudyUtil {
 	}
 	
 	/**
+	 * This method will return true if the given study has passed all
+	 * implemented validation checks. This is validation for studies that are
+	 * being 'created' or 'updated' it is not expected that this validation with
+	 * pass on studies already written to disk.
+	 * 
+	 * @param study
+	 * @param binaryFolder
+	 * @return
+	 */
+	public static boolean validateStudy(Study study, File binaryFolder)
+	{
+		boolean result = true;
+		
+		result = result && validateBinaryItemsReferences(study, binaryFolder);
+		//add other validation here and && it with result
+		
+		return result;
+	}
+	
+	/**
 	 * This method will determine if there the bid references from the study to
 	 * binary items are all existing and that there are no excess binary items.
 	 * The expect usage of this method is during study create and study update
