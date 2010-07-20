@@ -58,7 +58,7 @@ public class StudyProcessor extends TimerTask {
 			//load study into memory
 			Study study = StudyUtil.loadStudy(jobFolder);
 			
-			if(!StudyUtil.validateBinaryItemsReferences(study, jobFolder))
+			if(!StudyUtil.validateStudy(study, jobFolder))
 			{
 				throw new RuntimeException("Validation of the new study failed");
 			}
