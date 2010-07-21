@@ -88,9 +88,9 @@ public class StudyProcessor extends TimerTask {
 			studyData.setPatientName(study.getValueForAttribute(0x00100010));
 			studyData.setPatientID(study.getValueForAttribute(0x00100020));
 			studyData.setAccessionNumber(study.getValueForAttribute(0x00080050));
-			studyData.setStudyDateTime(org.nema.medical.mint.server.domain.Study
+			studyData.setDateTime(org.nema.medical.mint.server.domain.Study
 					.now());
-			studyDAO.saveOrUpdateStudy(studyData);
+			studyDAO.insertStudy(studyData);
 			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));
 			
 			Change updateInfo = new Change();

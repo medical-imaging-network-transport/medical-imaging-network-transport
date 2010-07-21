@@ -33,8 +33,8 @@ public class Change {
 	@Column
 	private String changeDescription;
 	
-	@Column
-	private Timestamp changeDateTime = now();
+	@Column(name="changeDateTime")
+	private Timestamp dateTime = now();
 
 	public String getId() {
 		return id;
@@ -69,11 +69,11 @@ public class Change {
 	}
 
 	public Timestamp getDateTime() {
-		return changeDateTime;
+		return dateTime;
 	}
 
 	public void setDateTime(Timestamp dateTime) {
-		this.changeDateTime = dateTime;
+		this.dateTime = dateTime;
 	}
 	
 	

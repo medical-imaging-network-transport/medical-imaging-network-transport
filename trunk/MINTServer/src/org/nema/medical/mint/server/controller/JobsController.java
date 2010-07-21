@@ -81,12 +81,11 @@ public class JobsController {
 	@PreDestroy
 	public void stopTimer() {
 		timer.cancel();
-	}
-	
+	}	
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
-	public String getCreateStatus(HttpServletRequest req, HttpServletResponse res,
-			@PathVariable("uuid") final String uuid, ModelMap map) throws IOException {
+	public String getCreateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+			@PathVariable("uuid") final String uuid) throws IOException {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
@@ -94,12 +93,11 @@ public class JobsController {
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
-
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
-	public String getUpdateStatus(HttpServletRequest req, HttpServletResponse res,
-			@PathVariable("uuid") final String uuid, ModelMap map) throws IOException {
+	public String getUpdateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+			@PathVariable("uuid") final String uuid) throws IOException {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
@@ -107,7 +105,6 @@ public class JobsController {
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
-
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")

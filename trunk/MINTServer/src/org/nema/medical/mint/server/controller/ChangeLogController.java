@@ -39,11 +39,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ChangeLogController {
 
-	public static final String NEWLINE = System.getProperty("line.separator");
-
 	@Autowired
 	protected File studiesRoot;
-	
+
 	@Autowired
 	protected ChangeDAO changeDAO = null;
 
@@ -51,67 +49,77 @@ public class ChangeLogController {
 	public List<Change> getChanges() {
 		return new LinkedList<Change>();
 	}
-	
+
 	@RequestMapping("/changelog")
 	public String changelog(
-			@RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
 			@ModelAttribute("changes") final List<Change> changes,
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 
+        // todo read pageSize from a config file
+        if (pageSize == null) pageSize = 50;
+        if (pageNum == null) pageNum = 1;
+        int firstIndex = (pageNum-1)*pageSize;
+        
 		if (since != null) {
-			
+
 			Date date = null;
 			try {
 				date = Utils.parseDate(since);
 			} catch (ParseException e) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date range: " + since);
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
 				return "error";
 			}
 			if (date.getTime() > System.currentTimeMillis()) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
 				return "error";
 			}
-			final List<Change> changesFound = changeDAO.findChanges(date);
+			final List<Change> changesFound = changeDAO.findChanges(date, firstIndex, pageSize);
 			if (changesFound != null) {
 				changes.addAll(changesFound);
 			}
 		} else {
-			changes.addAll(changeDAO.getMostRecentChanges(50));
+			changes.addAll(changeDAO.findChanges(firstIndex, pageSize));
 		}
-		
-		// this will render the studies list using studies.jsp
-		return "changelog";
-	}
-	
-	@RequestMapping("/studies/{uuid}/changelog")
-	public String studyChangelog(@PathVariable("uuid") final String uuid,
-			@ModelAttribute("changes") final List<Change> changes)
-			throws IOException {
 
-		if (StringUtils.isNotBlank(uuid)) {
-			final List<Change> changesFound = changeDAO.findChanges(uuid);
-			if (changesFound != null) {
-				changes.addAll(changesFound);
-			}
-		} else {
-			changes.addAll(changeDAO.getMostRecentChanges(50));
-		}
-		
 		// this will render the studies list using studies.jsp
 		return "changelog";
 	}
-	
+
+	@RequestMapping("/studies/{uuid}/changelog")
+    public String studyChangelog(final HttpServletResponse res,
+                                 @PathVariable("uuid") final String uuid,
+                                 @ModelAttribute("changes") final List<Change> changes)
+            throws IOException {
+
+        if (StringUtils.isBlank(uuid)) {
+            // Shouldn't happen...but could be +++, I suppose
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+            return "error";
+        }
+
+        final List<Change> changesFound = changeDAO.findChanges(uuid);
+        if (changesFound != null) {
+            changes.addAll(changesFound);
+        }
+
+		// this will render the studies list using studies.jsp
+		return "changelog";
+	}
+
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")
 	public void studiesChangeLog(
 			@PathVariable("uuid") final String uuid,
 			@PathVariable("seq") final String seq,
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
-		
+
 		String ext = "xml";
 		// todo use "/studies/{uuid}/changelog/{seq:.*}" to get extension and grab other types
-		
+
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
