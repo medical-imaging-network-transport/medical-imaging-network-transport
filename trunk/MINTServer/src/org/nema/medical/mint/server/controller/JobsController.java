@@ -158,12 +158,9 @@ public class JobsController {
 		
 		if(StringUtils.isBlank(type))
 		{
-			/*
-			 * TODO shouldn't assume a type, should force user to provide one,
-			 * this is here to keep everything from breaking because not
-			 * everyone is prepared for this to occur.
-			 */
-			type = "DICOM";
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "misser parameter 'type'");
+			return "error";
 		}
 						
 		JobInfo jobInfo = new JobInfo();
@@ -236,12 +233,9 @@ public class JobsController {
 		
 		if(StringUtils.isBlank(type))
 		{
-			/*
-			 * TODO shouldn't assume a type, should force user to provide one,
-			 * this is here to keep everything from breaking because not
-			 * everyone is prepared for this to occur.
-			 */
-			type = "DICOM";
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "misser parameter 'type'");
+			return "error";
 		}
 		
 		JobInfo jobInfo = new JobInfo();
