@@ -25,6 +25,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
 @Entity
 @Table(name = "mint_study")
 /*
@@ -43,6 +45,11 @@ public class Study implements Serializable {
 		return new Timestamp(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTimeInMillis());
 	}
 
+	// this is a UUID, generated externally for new instances by Java's UUID class
+	@Id @Column(name = "studyID")
+    @GenericGenerator(name = "generator", strategy = "assigned")
+	private String id;
+
 	// Accession Number (0008,0050) T2
 	// A RIS generated number that identifies the order for the Study.
 	// INDEXED
@@ -51,35 +58,6 @@ public class Study implements Serializable {
 	// user. This value may be an empty string
 	@Column
 	private String accessionNumber;
-
-	// this is a UUID, generated externally for new instances by Java's UUID class
-	@Id @Column(name = "studyID")
-	private String id;
-
-	// Patient ID (0010,0020) T2
-	// Primary hospital identification number or code for the patient.
-	// INDEXED
-	// While this value is typically provided, it is not necessarily unique or
-	// 100% reliable:
-	// - It can be an empty string
-	// - It can be the wrong value (someone typed it in wrong)
-	// - There can be other patient's with the same ID
-	// - A given patient can have multiple patient IDs
-	// The patient ID is a string that is frequently used to find studies on a
-	// system. It is also frequently displayed to the user.
-	// Users often try to find what they are looking for with the minimum amount
-	// of typing. Here are some
-	// possible search use cases
-	// - What studies exist for patient whose patient ID that begins with
-	// "A1256"
-	// - What studies exist for patient whose patient ID exactly matches
-	// "A1256245"
-	// - What studies exist for patient whose patient ID begins with the numeric
-	// characters "1256"
-	// - What studies exist for patient whose patient ID contains he numeric
-	// characters "1256256"
-	@Column
-	private String patientID;
 
 	// Patient's name (0010,0010) T2
 	// Patient's full name.
@@ -106,22 +84,51 @@ public class Study implements Serializable {
 	// - What studies exist for patient whose last name exactly matches "HAFEY".
 	// - What studies exist for patient whose last name exactly matches "HAFEY"
 	// and first name begins with "C".
-	// - What studies exist for patient whos last name begins with "HAF" and
+	// - What studies exist for patient whose last name begins with "HAF" and
 	// first name begins with "C"
 	@Column
 	private String patientName;
 
+	// Patient ID (0010,0020) T2
+	// Primary hospital identification number or code for the patient.
+	// INDEXED
+	// While this value is typically provided, it is not necessarily unique or
+	// 100% reliable:
+	// - It can be an empty string
+	// - It can be the wrong value (someone typed it in wrong)
+	// - There can be other patient's with the same ID
+	// - A given patient can have multiple patient IDs
+	// The patient ID is a string that is frequently used to find studies on a
+	// system. It is also frequently displayed to the user.
+	// Users often try to find what they are looking for with the minimum amount
+	// of typing. Here are some
+	// possible search use cases
+	// - What studies exist for patient whose patient ID that begins with
+	// "A1256"
+	// - What studies exist for patient whose patient ID exactly matches
+	// "A1256245"
+	// - What studies exist for patient whose patient ID begins with the numeric
+	// characters "1256"
+	// - What studies exist for patient whose patient ID contains he numeric
+	// characters "1256256"
+	@Column
+	private String patientID;
+
+	// Issuer of Patient ID (0010,0021) T2
+	@Column
+	private String issuerOfPatientID;
+
 	// The conjoined studyDate and studyTime from DICOM. If a parse error
 	// occurs, this is set to null.
 	// INDEXED
-	@Column
-	private Timestamp studyDateTime;
+	@Column(name="studyDateTime")
+	private Timestamp dateTime;
 
 	// DICOM StudyInstanceUID (0020,0010) T1
 	// Unique identifier for the Study.
 	// NOT NULL
 	// This is the "primary key" for DICOM systems use to identify studies.
-	// Since this the Study is the least granular entity in DICOM, the Study UID
+	// Since the Study is the least granular entity in DICOM, the Study UID
 	// is required
 	@Column
 	private String studyInstanceUID;
@@ -152,16 +159,20 @@ public class Study implements Serializable {
 		return id;
 	}
 
-	public String getPatientID() {
-		return patientID;
-	}
-
 	public String getPatientName() {
 		return patientName;
 	}
 
-	public Timestamp getStudyDateTime() {
-		return studyDateTime;
+	public String getPatientID() {
+		return patientID;
+	}
+
+	public String getIssuerOfPatientID() {
+		return issuerOfPatientID;
+	}
+
+	public Timestamp getDateTime() {
+		return dateTime;
 	}
 
 	public String getStudyInstanceUID() {
@@ -185,16 +196,20 @@ public class Study implements Serializable {
 		this.id = id;
 	}
 
-	public void setPatientID(final String patientID) {
-		this.patientID = patientID;
-	}
-
 	public void setPatientName(final String patientName) {
 		this.patientName = patientName;
 	}
 
-	public void setStudyDateTime(final Timestamp studyDateTime) {
-		this.studyDateTime = studyDateTime;
+	public void setPatientID(final String patientID) {
+		this.patientID = patientID;
+	}
+
+	public void setIssuerOfPatientID(String issuerOfPatientID) {
+		this.issuerOfPatientID = issuerOfPatientID;
+	}
+
+	public void setDateTime(final Timestamp dateTime) {
+		this.dateTime = dateTime;
 	}
 
 	public void setStudyInstanceUID(final String studyInstanceUID) {

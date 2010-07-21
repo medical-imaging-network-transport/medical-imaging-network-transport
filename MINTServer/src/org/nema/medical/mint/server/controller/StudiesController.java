@@ -17,17 +17,23 @@ package org.nema.medical.mint.server.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.nema.medical.mint.server.domain.Study;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.StudyDAO.SearchKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class StudiesController {
@@ -38,27 +44,49 @@ public class StudiesController {
 	@Autowired
 	protected StudyDAO studyDAO = null;
 
-	@ModelAttribute("studies")
-	public List<Study> getStudies() {
-		return new LinkedList<Study>();
-	}
+    @RequestMapping("/studies")
+    public String studies(HttpServletRequest req, final HttpServletResponse res, ModelMap map)
+            throws IOException {
+        List<Study> studies = new LinkedList<Study>();
+        map.addAttribute("studies", studies);
 
-	@RequestMapping("/studies")
-	public String studies(@RequestParam(value = "studyuid", required = false) final String studyUid,
-			@ModelAttribute("studies") final List<Study> studies)
-			throws IOException {
+        Map<StudyDAO.SearchKey, Object> searchParams = new HashMap<StudyDAO.SearchKey, Object>();
+        for (StudyDAO.SearchKey key : SearchKey.values()) {
+            String value = req.getParameter(key.name());
+            if (value != null) {
+                switch (key.type) {
+                    case Date:
+                        Date date;
+                        try {
+                            date = Utils.parseDate(value);
+                        } catch (ParseException e) {
+                            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + value);
+                            return "error";
+                        }
+                        if (date.getTime() > System.currentTimeMillis()) {
+                            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
+                            return "error";
+                        }
+                        searchParams.put(key,date);
+                        break;
+                    case Number:
+                        Integer integer;
+                        try {
+                            integer = Integer.parseInt(value);
+                        } catch (NumberFormatException e) {
+                            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameter: " + key.name() + "," + value);
+                            return "error";
+                        }
+                        searchParams.put(key,integer);
+                        break;
+                    case String:
+                    default:
+                        searchParams.put(key,value);
+                }
+            }
+        }
 
-		if (StringUtils.isNotBlank(studyUid)) {
-			final Study study = studyDAO.findStudy(studyUid);
-			if (study != null) {
-				studies.add(study);
-			}
-		} else {
-			studies.addAll(studyDAO.getMostRecentStudies(50, 5 * 24 * 60 * 60));
-		}
-		
-		// this will render the studies list using studies.jsp
-		return "studies";
-	}
-	
+        studies.addAll(studyDAO.findStudies(searchParams));
+        return "studies";
+    }
 }

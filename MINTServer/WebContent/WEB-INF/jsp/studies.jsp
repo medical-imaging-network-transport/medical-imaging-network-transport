@@ -25,6 +25,8 @@ dd { margin: 0 0 1em 0; padding: 0; }
 				<dd class='StudyUID'>${study.studyInstanceUID}</dd>
 				<dt>DICOM AccessionNumber</dt>
 				<dd class='StudyAccessionNumber'>${study.accessionNumber}</dd>
+				<dt>DICOM StudyDate</dt>
+				<dd class='StudyDate'>${study.dateTime}</dd>
 				<dt>Links</dt>
 				<dd class='StudySummary'><a href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/summary'>Summary</a></dd>
 				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${study.id}/DICOM/metadata'>Metadata</a></dd>
