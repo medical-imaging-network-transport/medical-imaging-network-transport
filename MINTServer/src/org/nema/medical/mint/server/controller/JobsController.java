@@ -38,6 +38,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
@@ -108,9 +109,9 @@ public class JobsController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
-	public String createStudy(HttpServletRequest req, HttpServletResponse res,
+	public String createStudy(HttpServletRequest req, HttpServletResponse res, 
 			ModelMap map) throws IOException {
-
+		
 		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
 
@@ -146,6 +147,24 @@ public class JobsController {
 					"at least one file (containing metadata) is required.");
 			return "error";
 		}
+		
+		if (!params.containsKey("type")) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "misser parameter 'type'");
+			return "error";
+		}
+		
+		String type = params.get("type");
+		
+		if(StringUtils.isBlank(type))
+		{
+			/*
+			 * TODO shouldn't assume a type, should force user to provide one,
+			 * this is here to keep everything from breaking because not
+			 * everyone is prepared for this to occur.
+			 */
+			type = "DICOM";
+		}
 						
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -156,7 +175,7 @@ public class JobsController {
 		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		StudyProcessor processor = new StudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO, updateDAO);
+		StudyProcessor processor = new StudyProcessor(jobFolder, new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO, updateDAO);
         timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
@@ -166,7 +185,7 @@ public class JobsController {
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
 	public String updateStudy(HttpServletRequest req, HttpServletResponse res,
 			ModelMap map) throws IOException {
-
+		
 		String jobID = UUID.randomUUID().toString();
 		File jobFolder = new File(jobTemp, jobID);
 		jobFolder.mkdirs();
@@ -206,7 +225,24 @@ public class JobsController {
 			return "error";
 		}
 		
+		if (!params.containsKey("type")) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "misser parameter 'type'");
+			return "error";
+		}
+		
 		String studyUUID = params.get("studyUUID");
+		String type = params.get("type");
+		
+		if(StringUtils.isBlank(type))
+		{
+			/*
+			 * TODO shouldn't assume a type, should force user to provide one,
+			 * this is here to keep everything from breaking because not
+			 * everyone is prepared for this to occur.
+			 */
+			type = "DICOM";
+		}
 		
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -217,7 +253,7 @@ public class JobsController {
 		map.addAttribute("joburi", "updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), jobInfoDAO, studyDAO, updateDAO);
+		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO, updateDAO);
         timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp

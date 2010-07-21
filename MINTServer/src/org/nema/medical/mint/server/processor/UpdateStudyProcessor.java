@@ -22,9 +22,10 @@ import org.nema.medical.mint.server.domain.ChangeDAO;
 public class UpdateStudyProcessor extends TimerTask {
 	static final Logger LOG = Logger.getLogger(UpdateStudyProcessor.class);
 
-	protected final File jobFolder;
-	protected final File studyFolder;
+	private final File jobFolder;
+	private final File studyFolder;
 	
+	private String type;
 	private JobInfoDAO jobInfoDAO;
 	private StudyDAO studyDAO;
 	private ChangeDAO updateDAO;
@@ -37,9 +38,10 @@ public class UpdateStudyProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public UpdateStudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public UpdateStudyProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
+		this.type = type;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -51,20 +53,20 @@ public class UpdateStudyProcessor extends TimerTask {
 		String studyUUID = studyFolder.getName();
 		
 		//Not calling mkdirs on these because they better already exist
-		File dicomFolder = new File(studyFolder, "DICOM");
+		File typeFolder = new File(studyFolder, type);
 		File changelogRoot = new File(studyFolder, "changelog");
 		
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
-		File existingBinaryFolder = new File(dicomFolder, "binaryitems");
+		File existingBinaryFolder = new File(typeFolder, "binaryitems");
 		
 		try
 		{
 			/*
 			 * Need to load current study studyinformation
 			 */
-			Study existingStudy = StudyUtil.loadStudy(dicomFolder);
+			Study existingStudy = StudyUtil.loadStudy(typeFolder);
 
 			/*
 			 * Need to load new study information
@@ -130,8 +132,8 @@ public class UpdateStudyProcessor extends TimerTask {
 			 * Need to copy into the Study folder the new study document and
 			 * binary data files.
 			 */
-			StudyUtil.writeStudy(existingStudy, dicomFolder);
-			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(dicomFolder, "summary.html"));
+			StudyUtil.writeStudy(existingStudy, typeFolder);
+			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(typeFolder, "summary.html"));
 			
 			StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
 			

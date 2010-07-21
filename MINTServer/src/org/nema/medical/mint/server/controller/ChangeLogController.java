@@ -118,7 +118,7 @@ public class ChangeLogController {
 			final HttpServletResponse res) throws IOException {
 
 		String ext = "xml";
-		// todo use "/studies/{uuid}/changelog/{seq:.*}" to get extension and grab other types
+		// TODO use "/studies/{uuid}/changelog/{seq:.*}" to get extension and grab other types
 
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose

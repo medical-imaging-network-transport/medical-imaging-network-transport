@@ -18,23 +18,35 @@ public class StudyProcessor extends TimerTask {
 
 	static final Logger LOG = Logger.getLogger(StudyProcessor.class);
 	
-	final File jobFolder;
-	final File studyFolder;
+	private final File jobFolder;
+	private final File studyFolder;
+	
+	private String type;
 	private JobInfoDAO jobInfoDAO;
 	private StudyDAO studyDAO;
 	private ChangeDAO updateDAO;
 
 	/**
-	 * extracts files from the jobFolder, places them in the studyFolder
-	 * updates the database
-	 * @param jobFolder the folder containing the uploaded files - must contain metadata.xml or metadata.gpb
-	 * @param studyFolder the target folder where the study will be created (will contain a DICOM subdir)
-	 * @param jobInfoDAO needed to update the database
-	 * @param studyDAO needed to update the database
+	 * extracts files from the jobFolder, places them in the studyFolder updates
+	 * the database
+	 * 
+	 * @param jobFolder
+	 *            the folder containing the uploaded files - must contain
+	 *            metadata.xml or metadata.gpb
+	 * @param studyFolder
+	 *            the target folder where the study will be created (will
+	 *            contain a {type} subdir)
+	 * @param type
+	 *            the type of study being created
+	 * @param jobInfoDAO
+	 *            needed to update the database
+	 * @param studyDAO
+	 *            needed to update the database
 	 */
-	public StudyProcessor(File jobFolder, File studyFolder, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
+		this.type = type;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -50,8 +62,8 @@ public class StudyProcessor extends TimerTask {
 		jobInfo.setStudyID(studyUUID);
 		
 		try {	
-			File dicomFolder = new File(studyFolder, "DICOM");
-			dicomFolder.mkdirs();
+			File typeFolder = new File(studyFolder, type);
+			typeFolder.mkdirs();
 			File changelogRoot = new File(studyFolder, "changelog");
 			changelogRoot.mkdirs();
 
@@ -63,9 +75,9 @@ public class StudyProcessor extends TimerTask {
 				throw new RuntimeException("Validation of the new study failed");
 			}
 			
-			//write study into dicom folder
-			StudyUtil.writeStudy(study, dicomFolder);
-	        StudySummaryIO.writeSummaryToXHTML(study, new File(dicomFolder, "summary.html"));
+			//write study into type folder
+			StudyUtil.writeStudy(study, typeFolder);
+	        StudySummaryIO.writeSummaryToXHTML(study, new File(typeFolder, "summary.html"));
 	        
 	        //Write metadata to change log
 	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
@@ -73,7 +85,7 @@ public class StudyProcessor extends TimerTask {
 	        StudyUtil.writeStudy(study, changelogFolder);
 
 	        //Copy binary data into binaryitems folder
-	        File binaryRoot = new File(dicomFolder, "binaryitems");
+	        File binaryRoot = new File(typeFolder, "binaryitems");
 			binaryRoot.mkdirs();
 
 			StudyUtil.moveBinaryItems(jobFolder, binaryRoot);

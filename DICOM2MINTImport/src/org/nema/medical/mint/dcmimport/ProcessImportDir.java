@@ -44,6 +44,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
@@ -221,12 +222,18 @@ public final class ProcessImportDir {
         final Study study = studyData.getMetadata();
         final ByteArrayOutputStream studyOutStream = new ByteArrayOutputStream();
         final String fileName = useXMLNotGPB ? "metadata.xml" : "metadata.gpb";
+        
         if (useXMLNotGPB) {
             StudyIO.writeToXML(study, studyOutStream);
         } else {
             StudyIO.writeToGPB(study, studyOutStream);
         }
+        
         final ByteArrayInputStream studyInStream = new ByteArrayInputStream(studyOutStream.toByteArray());
+        
+        //Need to specify the 'type' of the data being sent
+        entity.addPart("type", new StringBody("DICOM"));
+        
         //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
         entity.addPart(fileName, new InputStreamBody(studyInStream, (useXMLNotGPB ? "text/xml" : "application/octet-stream"), fileName));
 
@@ -243,6 +250,7 @@ public final class ProcessImportDir {
         }
 
         httpPost.setEntity(entity);
+        
         final String result = httpClient.execute(httpPost, new BasicResponseHandler());
         final Matcher matcher = RESPONSE_MATCH_PATTERN.matcher(result);
         final boolean matched = matcher.find();
