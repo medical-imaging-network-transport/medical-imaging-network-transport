@@ -37,8 +37,8 @@ public class StudyMetadataController {
 	@Autowired
 	protected StudyDAO studyDAO = null;
 
-	@RequestMapping("/studies/{uuid}/DICOM/metadata")
-	public void studiesMetadata(@PathVariable("uuid") final String uuid, final HttpServletRequest httpServletRequest,
+	@RequestMapping("/studies/{uuid}/{type}/metadata")
+	public void studiesMetadata(@PathVariable("uuid") final String uuid, @PathVariable("type") final String type, final HttpServletRequest httpServletRequest,
 			final HttpServletResponse response) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
@@ -53,7 +53,7 @@ public class StudyMetadataController {
 				response.setContentType("text/xml");
 				metadata = "/metadata.xml";
 			}
-			final File file = new File(studiesRoot , uuid + "/DICOM" + metadata);
+			final File file = new File(studiesRoot , uuid + "/" + type + metadata);
 			if (file.exists() && file.canRead()) {
 				response.setContentLength(Long.valueOf(file.length()).intValue());
 				Utils.streamFile(file, response.getOutputStream());

@@ -32,8 +32,9 @@ public class StudySummaryController {
 	@Autowired
 	protected File studiesRoot;
 	
-	@RequestMapping("/studies/{uuid}/DICOM/summary")
+	@RequestMapping("/studies/{uuid}/{type}/summary")
 	public void studiesSummary(@PathVariable("uuid") final String uuid,
+			@PathVariable("type") final String type, 
 			final HttpServletResponse httpServletResponse) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing Study UUID");
@@ -41,7 +42,7 @@ public class StudySummaryController {
 		}
 		try {
 			httpServletResponse.setContentType("text/html");
-			final File file = new File(studiesRoot, uuid + "/DICOM/summary.html");
+			final File file = new File(studiesRoot, uuid + "/" + type + "/summary.html");
 			if (file.exists() && file.canRead()) {
 				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
 				Utils.streamFile(file, httpServletResponse.getOutputStream());

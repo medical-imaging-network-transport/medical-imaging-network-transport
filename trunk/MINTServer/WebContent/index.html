@@ -8,6 +8,7 @@
 
 <h2>Create Study</h2>
 <form method='POST' enctype='multipart/form-data' action='jobs/createstudy'> 
+Type: <input type=text name=type value="DICOM"><br> 
 File to upload: <input type=file name=metadata><br> 
 File to upload: <input type=file name=binary001><br> 
 File to upload: <input type=file name=binary002><br> 
@@ -18,7 +19,8 @@ File to upload: <input type=file name=binary003><br>
  
 <h2>Update Study</h2>
 <form method='POST' enctype='multipart/form-data' action='jobs/updatestudy'> 
-Study UUID: <input type=text name=studyUUID><br> 
+Study UUID: <input type=text name=studyUUID><br>
+Type: <input type=text name=type value="DICOM"><br> 
 File to upload: <input type=file name=metadata><br> 
 File to upload: <input type=file name=binary001><br> 
 File to upload: <input type=file name=binary002><br> 

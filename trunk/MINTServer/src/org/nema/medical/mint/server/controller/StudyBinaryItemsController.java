@@ -43,8 +43,9 @@ public class StudyBinaryItemsController {
     @Autowired
     protected File studiesRoot;
 
-    @RequestMapping("/studies/{uuid}/DICOM/binaryitems/{seq}")
+    @RequestMapping("/studies/{uuid}/{type}/binaryitems/{seq}")
     public void studiesBinaryItems(@PathVariable("uuid") final String uuid, 
+    							   @PathVariable("type") final String type, 
                                    @PathVariable("seq") final String seq,
                                    final HttpServletResponse httpServletResponse) throws IOException {
         if (StringUtils.isBlank(uuid)) {
@@ -61,7 +62,7 @@ public class StudyBinaryItemsController {
 
         final List<Integer> itemList;
         try {
-        	itemList = parseItemList(seq, studyRoot);
+        	itemList = parseItemList(seq, type, studyRoot);
         } catch (final NumberFormatException e) {
             httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item requested: NaN");
             return;
@@ -75,7 +76,7 @@ public class StudyBinaryItemsController {
 
         List<File> binaryItems = new ArrayList<File>(itemList.size());
         for (int i : itemList) {
-            final File file = new File(studyRoot + "/DICOM/binaryitems/" + i + ".dat");
+            final File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
             if (!file.exists() || !file.canRead()) {
                 httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
                 LOG.error("BinaryItemsFile " + file + " does not exist");
@@ -134,14 +135,14 @@ public class StudyBinaryItemsController {
         }
     }
 
-    private List<Integer> parseItemList(String seq, File studyRoot) throws NumberFormatException, IOException {
+    private List<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
         final List<Integer> itemList = new ArrayList<Integer>();
 
         if (seq.equals("all")) {
             //need to return all items in current metadata
-            File dicomRoot = new File(studyRoot, "DICOM");
+            File typeRoot = new File(studyRoot, type);
 
-            org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(dicomRoot);
+            org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(typeRoot);
 
             // iterate through each instance and collect the bids
             for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
