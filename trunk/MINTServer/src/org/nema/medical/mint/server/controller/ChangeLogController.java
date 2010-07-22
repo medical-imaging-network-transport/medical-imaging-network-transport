@@ -59,7 +59,7 @@ public class ChangeLogController {
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 
-        // todo read pageSize from a config file
+        // TODO read pageSize from a config file
         if (pageSize == null) pageSize = 50;
         if (pageNum == null) pageNum = 1;
         int firstIndex = (pageNum-1)*pageSize;
