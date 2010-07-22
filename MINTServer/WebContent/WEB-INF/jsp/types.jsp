@@ -19,10 +19,10 @@ dd { margin: 0 0 1em 0; padding: 0; }
 		<c:forEach var="type" items="${types}">
 			<li>
 			<dl id='${type}'>
-				<dt>TypeName</dt>
+				<dt>Type Name</dt>
 				<dd class='TypeName'>${type}</dd>
-				<dt>Links</dt>
-				<dd class='TypeFile'><a href='<%=request.getContextPath()%>/types/${type}'>Type Definition File</a></dd>
+				<dt>Link</dt>
+				<dd class='TypeDef'><a href='<%=request.getContextPath()%>/types/${type}'>Type Definition</a></dd>
 			</dl>
 			</li>
 		</c:forEach>

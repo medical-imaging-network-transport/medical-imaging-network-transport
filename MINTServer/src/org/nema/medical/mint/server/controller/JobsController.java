@@ -84,29 +84,10 @@ public class JobsController {
 		timer.cancel();
 	}	
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
-	public String getCreateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
-			@PathVariable("uuid") final String uuid) throws IOException {
-
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
-
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
-	public String getUpdateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
-			@PathVariable("uuid") final String uuid) throws IOException {
-
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
-
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
-	}
+    @RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy")
+    public String createStudy() {
+        return "studycreate";
+    }
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
 	public String createStudy(HttpServletRequest req, HttpServletResponse res, 
@@ -179,6 +160,23 @@ public class JobsController {
 		return "jobinfo";
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
+	public String getCreateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+			@PathVariable("uuid") final String uuid) throws IOException {
+
+		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
+		map.addAttribute("job", jobInfo);
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
+
+		// this will render the job info using jobinfo.jsp
+		return "jobinfo";
+	}
+
+    @RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
+    public String updateStudy() {
+        return "studyupdate";
+    }
+
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
 	public String updateStudy(HttpServletRequest req, HttpServletResponse res,
 			ModelMap map) throws IOException {
@@ -249,6 +247,18 @@ public class JobsController {
 
 		UpdateStudyProcessor processor = new UpdateStudyProcessor(jobFolder, new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO, updateDAO);
         timer.schedule(processor, 0); // process immediately in the background
+
+		// this will render the job info using jobinfo.jsp
+		return "jobinfo";
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
+	public String getUpdateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+			@PathVariable("uuid") final String uuid) throws IOException {
+
+		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
+		map.addAttribute("job", jobInfo);
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";

@@ -42,7 +42,7 @@ public final class StudyUtil {
 		File metadataXML = new File(directory,"metadata.xml");
 		File metadataJSON = new File(directory,"metadata.json");
 
-		Study study = null;
+		Study study;
 
 		if (metadataXML.exists()) {
 			study = StudyIO.parseFromXML(metadataXML);

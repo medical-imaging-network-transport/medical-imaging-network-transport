@@ -2,40 +2,18 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Study Create/Update</title>
+<title>MINT</title>
 </head>
 <body>
 
-<h2>Create Study</h2>
-<form method='POST' enctype='multipart/form-data' action='jobs/createstudy'> 
-Type: <select name=type>
-<!-- TODO dynamically populate this list from the set of types the server knows about -->
-<option value="DICOM">DICOM</option>
-</select><br> 
-File to upload: <input type=file name=metadata><br> 
-File to upload: <input type=file name=binary001><br> 
-File to upload: <input type=file name=binary002><br> 
-File to upload: <input type=file name=binary003><br> 
-<br> 
-<input type=submit value=Submit>
-</form> 
- 
-<h2>Update Study</h2>
-<form method='POST' enctype='multipart/form-data' action='jobs/updatestudy'> 
-Study UUID: <input type=text name=studyUUID><br>
-Type: <select name=type>
-<!-- TODO dynamically populate this list from the set of types the server knows about -->
-<option value="DICOM">DICOM</option>
-</select><br> 
-File to upload: <input type=file name=metadata><br> 
-File to upload: <input type=file name=binary001><br> 
-File to upload: <input type=file name=binary002><br> 
-File to upload: <input type=file name=binary003><br> 
-<br> 
-<input type=submit value=Submit>
-</form> 
- 
- 
+<h2>Welcome to MINT</h2>
+
+Options
+<ul>
+<li>View <a href="studies">Studies</a></li>
+<li>Study <a href="jobs/createstudy">Create</a></li>
+<li>Study <a href="jobs/updatestudy">Update</a></li>
+</ul>
  
 </body>
 </html>
