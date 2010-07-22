@@ -17,46 +17,46 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class DictionaryController {
+public class TypeController {
 	
 	@Autowired
 	protected File mintHome;
 	
-	@ModelAttribute("dictionaries")
-	public List<String> getDictionaries() {
+	@ModelAttribute("types")
+	public List<String> getTypes() {
 		return new LinkedList<String>();
 	}
 	
-	private static final String DICTIONARY_FOLDER_NAME = "datadictionary";
+	private static final String TYPE_FOLDER_NAME = "types";
 
-	@RequestMapping("/dictionary")
-	public String dictionary(@ModelAttribute("dictionaries") final List<String> dictionaries,
-							 final HttpServletRequest req,
-							 final HttpServletResponse res)
+	@RequestMapping("/types")
+	public String types(@ModelAttribute("types") final List<String> types,
+						final HttpServletRequest req,
+						final HttpServletResponse res)
 	{
-		File dictionaryRoot = new File(mintHome, DICTIONARY_FOLDER_NAME);
+		File typeRoot = new File(mintHome, TYPE_FOLDER_NAME);
 		
-		if(dictionaryRoot.exists())
+		if(typeRoot.exists())
 		{
-			for(String s : dictionaryRoot.list())
+			for(String s : typeRoot.list())
 			{
 				if(s.endsWith(".xml"))
 				{
-					dictionaries.add(s.substring(0, s.lastIndexOf(".xml")));
+					types.add(s.substring(0, s.lastIndexOf(".xml")));
 				}
 			}
 		}else{
-			//No dictionaries preset
+			//No types preset
 		}
 		
-		return "dictionary";
+		return "type";
 	}
 	
-	@RequestMapping("/dictionary/{type}")
-	public String dictionaryEntry(@PathVariable("type") String type,
-								  final HttpServletRequest req,
-								  final HttpServletResponse res,
-								  ModelMap map)
+	@RequestMapping("/types/{type}")
+	public String typeEntry(@PathVariable("type") String type,
+							final HttpServletRequest req,
+							final HttpServletResponse res,
+							ModelMap map)
 	{
 		if(StringUtils.isBlank(type))
 		{
@@ -65,25 +65,27 @@ public class DictionaryController {
 			return "error";
 		}
 		
-		File dictionaryRoot = new File(mintHome, DICTIONARY_FOLDER_NAME);
+		File typeRoot = new File(mintHome, TYPE_FOLDER_NAME);
 		
+		//If no file extension, add .xml
+		//TODO make sure this works as expected
 		if(!type.contains("."))
 		{
 			type += ".xml";
 		}
 		
-		File dictionaryFile = new File(dictionaryRoot, type);
+		File typeFile = new File(typeRoot, type);
 		
-		if(dictionaryFile.exists() && dictionaryFile.canRead())
+		if(typeFile.exists() && typeFile.canRead())
 		{
 			try {
 				res.setContentType("text/xml");
-				res.setContentLength(Long.valueOf(dictionaryFile.length()).intValue());
-				Utils.streamFile(dictionaryFile, res.getOutputStream());
+				res.setContentLength(Long.valueOf(typeFile.length()).intValue());
+				Utils.streamFile(typeFile, res.getOutputStream());
 			} catch (final IOException e) {
 				if (!res.isCommitted()) {
 					res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					map.put("error_msg", "failed to stream dictionary document");
+					map.put("error_msg", "Failed to stream type definition document");
 					return "error";
 				}
 			}
