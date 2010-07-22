@@ -49,7 +49,7 @@ public class TypeController {
 			//No types preset
 		}
 		
-		return "type";
+		return "types";
 	}
 	
 	@RequestMapping("/types/{type}")
