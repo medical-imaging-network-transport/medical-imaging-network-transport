@@ -1,0 +1,111 @@
+<!-- THIS FILE IS SUPPOSED TO REPRESENT THE DICOM STANDARD -->
+<metadata type="DICOM" version="1.0">
+	<attributes> <!-- this part is optional, probably very long if we have it at all -->
+		<attribute tag='7fe00010' vr='OW' desc="Binary data tag." />
+	</attributes>
+	<summary-attributes>
+		<attribute tag='00080020' class="StudyDate" desc="Study Date" />
+		<attribute tag='00080030' class="StudyTime" desc="Study Time" />
+		<attribute tag='00080050' class="AccessionNumber" desc="Accession Number" />
+		<attribute tag='00100010' class="PatientName" desc="Patient's Name" />
+		<attribute tag='00100020' class="PatientID" desc="Patient ID" />
+		<attribute tag='00100040' class="PatientSex" desc="Patient's Sex" />
+		<attribute tag='00101010' class="PatientAge" desc="Patient's Age" />
+		<attribute tag='00104000' class="PatientComments" desc="Patient Comments" />
+		<attribute tag='0020000d' class="StudyInstanceUID" desc="Study Instance UID" />
+		<attribute tag='00200010' class="StudyID" desc="Study ID" />
+	</summary-attributes>
+	<study-attributes>
+		<attribute tag='00080020' desc="Study Date" />
+		<attribute tag='00080030' desc="Study Time" />
+		<attribute tag='00080050' desc="Accession Number" />
+		<attribute tag='00080051' desc="Issuer Of Accession Number Sequence" />
+		<attribute tag='00080090' desc="Referring Physician Name" />
+		<attribute tag='00080096' desc="Referring Physician Identification Sequence" />
+		<attribute tag='00081030' desc="Study Description" />
+		<attribute tag='00081032' desc="Procedure Code Sequence" />
+		<attribute tag='00081048' desc="Physicians Of Record" />
+		<attribute tag='00081049' desc="Physicians Of Record Identification Sequence" />
+		<attribute tag='00081060' desc="Name Of Physicians Reading Study" />
+		<attribute tag='00081062' desc="Physicians Reading Study Identification Sequence" />
+		<attribute tag='00081080' desc="Admitting Diagnoses Description" />
+		<attribute tag='00081084' desc="Admitting Diagnoses Code Sequence" />
+		<attribute tag='00081110' desc="Referenced Study Sequence" />
+		<attribute tag='00081120' desc="Referenced Patient Sequence" />
+		<attribute tag='00100010' desc="Patient Name" />
+		<attribute tag='00100020' desc="Patient ID" />
+		<attribute tag='00100030' desc="Patient Birth Date" />
+		<attribute tag='00100032' desc="Patient Birth Time" />
+		<attribute tag='00100040' desc="Patient Sex" />
+		<attribute tag='00101000' desc="Other Patient ID" />
+		<attribute tag='00101001' desc="Other Patient Names" />
+		<attribute tag='00101002' desc="Other Patient IDs Sequence" />
+		<attribute tag='00101010' desc="Patient Age" />
+		<attribute tag='00101020' desc="Patient Size" />
+		<attribute tag='00101030' desc="Patient Weight" />
+		<attribute tag='00102160' desc="Ethnic Group" />
+		<attribute tag='00102180' desc="Occupation" />
+		<attribute tag='001021B0' desc="Additional Patient History" />
+		<attribute tag='00102201' desc="Patient Species Description" />
+		<attribute tag='00102202' desc="Patient Species Code Sequence" />
+		<attribute tag='00102203' desc="Patient Sex Neutered" />
+		<attribute tag='00102292' desc="Patient Breed Description" />
+		<attribute tag='00102293' desc="Patient Breed Code Sequence" />
+		<attribute tag='00102294' desc="Breed Registration Sequence" />
+		<attribute tag='00102297' desc="Responsible Person" />
+		<attribute tag='00102298' desc="Responsible Person Role" />
+		<attribute tag='00102299' desc="Responsible Organization" />
+		<attribute tag='00104000' desc="Patient Comments" />
+		<attribute tag='00120010' desc="Clinical Trial Sponsor Name" />
+		<attribute tag='00120020' desc="Clinical Trial Protocol ID" />
+		<attribute tag='00120021' desc="Clinical Trial Protocol Name" />
+		<attribute tag='00120030' desc="Clinical Trial Site ID" />
+		<attribute tag='00120031' desc="Clinical Trial Site Name" />
+		<attribute tag='00120040' desc="Clinical Trial Subject ID" />
+		<attribute tag='00120042' desc="Clinical Trial Subject Reading ID" />
+		<attribute tag='00120050' desc="Clinical Trial Time Point ID" />
+		<attribute tag='00120051' desc="Clinical Trial Time Point Description" />
+		<attribute tag='00120062' desc="Patient Identity Removed" />
+		<attribute tag='00120063' desc="Deidentification Method" />
+		<attribute tag='00120064' desc="Deidentification Method Code Sequence" />
+		<attribute tag='00120081' desc="Clinical Trial Protocol Ethics Committee Name" />
+		<attribute tag='00120082' desc="Clinical Trial Protocol Ethics Committee Approval Number" />
+		<attribute tag='00120083' desc="Consent For Clinical Trial Use Sequence" />
+		<attribute tag='0020000D' desc="Study Instance UID" />
+		<attribute tag='00200010' desc="Study ID" />
+		<attribute tag='00321034' desc="Requesting Service Code Sequence" />
+		<attribute tag='00380010' desc="Admission ID" />
+		<attribute tag='00380014' desc="Issuer Of Admission ID Sequence" />
+		<attribute tag='00380060' desc="Service Episode ID" />
+		<attribute tag='00380062' desc="Service Episode Description" />
+		<attribute tag='00380064' desc="Issuer Of Service Episode ID Sequence" />
+		<attribute tag='00401012' desc="Reason For Performed Procedure Code Sequence" />
+	</study-attributes>
+	<series-attributes>
+		<attribute tag='00080021' desc="Series Date" />
+		<attribute tag='00080031' desc="Series Time" />
+		<attribute tag='00080060' desc="Modality" />
+		<attribute tag='0008103E' desc="Series Description" />
+		<attribute tag='00081050' desc="Performing Physician's Name" />
+		<attribute tag='00081052' desc="Performing Physician Identification Sequence" />
+		<attribute tag='00081070' desc="Operator's Name" />
+		<attribute tag='00081072' desc="Operator Identification Sequence" />
+		<attribute tag='00081111' desc="Referenced Performed Procedure Step Sequence" />
+		<attribute tag='00081250' desc="Related Series Sequence" />
+		<attribute tag='00180015' desc="Body Part Examined" />
+		<attribute tag='00181030' desc="Protocol Name" />
+		<attribute tag='00185100' desc="Patient Position" />
+		<attribute tag='0020000E' desc="Series Instance UID" />
+		<attribute tag='00200011' desc="Series Number" />
+		<attribute tag='00200060' desc="Laterality" />
+		<attribute tag='00280108' desc="Smallest Pixel Value in Series" />
+		<attribute tag='00280109' desc="Largest Pixel Value in Series" />
+		<attribute tag='00400244' desc="Performed Procedure Step Start Date" />
+		<attribute tag='00400245' desc="Performed Procedure Step Start Time" />
+		<attribute tag='00400253' desc="Performed Procedure Step ID" />
+		<attribute tag='00400254' desc="Performed Procedure Step Description" />
+		<attribute tag='00400260' desc="Performed Procedure Step Code Sequence" />
+		<attribute tag='00400275' desc="Request Attribute Sequence" />
+		<attribute tag='00400280' desc="Comments on the Performed Procedure Step" />
+	</series-attributes>
+</metadata>
