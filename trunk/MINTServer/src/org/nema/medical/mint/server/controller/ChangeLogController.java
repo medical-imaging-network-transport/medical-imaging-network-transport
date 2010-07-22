@@ -117,21 +117,58 @@ public class ChangeLogController {
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 
-		String ext = "xml";
-		// TODO use "/studies/{uuid}/changelog/{seq:.*}" to get extension and grab other types
-
+		String ext = null;
+		
+		/*
+		 * The path variable 'seq' when '0.gpb' is on the end of the URL seems
+		 * to be only '0' for some reason. I'm not sure what the weirdness is
+		 * with '.' in the URL. The following call should return the expected
+		 * sequence (i.e., '0.gpb').
+		 */
+		String tmp = req.getAttribute("org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping").toString();
+		if(StringUtils.isBlank(tmp))
+		{
+			tmp = seq;
+		}
+		
 		if (StringUtils.isBlank(uuid)) {
 			// Shouldn't happen...but could be +++, I suppose
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
 			return;
 		}
-		final Long sequence;
-		try {
-			sequence = Long.valueOf(seq);
-		} catch (final NumberFormatException e) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
+		
+		if(StringUtils.isBlank(tmp))
+		{
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Empty");
 			return;
 		}
+		
+		Long sequence;
+		
+		int extPoint = tmp.indexOf('.');
+		if(extPoint > -1)
+		{
+			try {
+				sequence = Long.valueOf(tmp.substring(0, extPoint));
+				ext = tmp.substring(extPoint+1);
+			} catch (final NumberFormatException e) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
+				return;
+			}
+		}else{
+			try {
+				sequence = Long.valueOf(tmp);
+			} catch (final NumberFormatException e) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: NaN");
+				return;
+			}
+		}
+		
+		if(StringUtils.isBlank(ext))
+		{
+			ext = "xml";
+		}
+		
 		if (sequence < 0) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
 			return;

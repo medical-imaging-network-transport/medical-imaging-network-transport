@@ -4,7 +4,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>Dictionaries</title>
+<title>Types</title>
 <meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
 <style type="text/css">
 dl { margin: 0; padding: 0; }
@@ -13,16 +13,16 @@ dd { margin: 0 0 1em 0; padding: 0; }
 </style>
 </head>
 <body>
-<h1>Dictionaries Supported by Server</h1>
-<c:if test="${not empty dictionaries}">
+<h1>Types Supported by Server</h1>
+<c:if test="${not empty types}">
 	<ul>
-		<c:forEach var="dictionary" items="${dictionaries}">
+		<c:forEach var="type" items="${types}">
 			<li>
-			<dl id='${dictionary}'>
-				<dt>Dictionary Name</dt>
-				<dd class='DictionaryName'>${dictionary}</dd>
+			<dl id='${type}'>
+				<dt>TypeName</dt>
+				<dd class='TypeName'>${type}</dd>
 				<dt>Links</dt>
-				<dd class='DictionaryFile'><a href='<%=request.getContextPath()%>/dictionary/${dictionary}'>Dictionary File</a></dd>
+				<dd class='TypeFile'><a href='<%=request.getContextPath()%>/types/${type}'>Type Definition File</a></dd>
 			</dl>
 			</li>
 		</c:forEach>
