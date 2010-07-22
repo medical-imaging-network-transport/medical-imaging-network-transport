@@ -16,7 +16,9 @@
 package org.nema.medical.mint.server;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -39,6 +41,7 @@ import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
@@ -64,6 +67,7 @@ public class ServerConfig {
 	protected File jobTemp = null;
 	protected File studiesRoot = null;
 	protected File mintHome = null;
+	protected File typesRoot = null;
 
 	@Bean(name = "mintHome", autowire = Autowire.BY_NAME)
 	public File mintHome() throws Exception {
@@ -210,6 +214,32 @@ public class ServerConfig {
 	public File studiesRoot() throws Exception {
 		studiesRoot = new File(mintHome(), "studies");
 		return studiesRoot;
+	}
+	
+	@Bean(name = "typesRoot", autowire = Autowire.BY_NAME)
+	public File typesRoot() throws Exception {
+		typesRoot = new File(mintHome(), "types");
+		
+		if(!typesRoot.exists())
+		{
+			typesRoot.mkdirs();
+		}
+		
+		File dicomFile = new File(typesRoot, "DICOM.xml");
+		
+		if(!dicomFile.exists())
+		{
+			InputStream internalDicomFile = getDicomTypeDefStream();
+			
+			FileCopyUtils.copy(internalDicomFile, new FileOutputStream(dicomFile));
+		}
+		
+		return typesRoot;
+	}
+	
+	private InputStream getDicomTypeDefStream()
+	{
+		return ServerConfig.class.getClassLoader().getResourceAsStream("DICOM.xml");
 	}
 
 	@Bean(name = "studyDAO", autowire = Autowire.BY_NAME)

@@ -20,33 +20,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TypeController {
 	
 	@Autowired
-	protected File mintHome;
+	protected File typesRoot;
 	
 	@ModelAttribute("types")
 	public List<String> getTypes() {
 		return new LinkedList<String>();
 	}
-	
-	private static final String TYPE_FOLDER_NAME = "types";
 
 	@RequestMapping("/types")
 	public String types(@ModelAttribute("types") final List<String> types,
 						final HttpServletRequest req,
 						final HttpServletResponse res)
 	{
-		File typeRoot = new File(mintHome, TYPE_FOLDER_NAME);
-		
-		if(typeRoot.exists())
+		for(String s : typesRoot.list())
 		{
-			for(String s : typeRoot.list())
+			if(s.endsWith(".xml"))
 			{
-				if(s.endsWith(".xml"))
-				{
-					types.add(s.substring(0, s.lastIndexOf(".xml")));
-				}
+				types.add(s.substring(0, s.lastIndexOf(".xml")));
 			}
-		}else{
-			//No types preset
 		}
 		
 		return "types";
@@ -65,8 +56,6 @@ public class TypeController {
 			return "error";
 		}
 		
-		File typeRoot = new File(mintHome, TYPE_FOLDER_NAME);
-		
 		//If no file extension, add .xml
 		//TODO make sure this works as expected
 		if(!type.contains("."))
@@ -74,7 +63,7 @@ public class TypeController {
 			type += ".xml";
 		}
 		
-		File typeFile = new File(typeRoot, type);
+		File typeFile = new File(typesRoot, type);
 		
 		if(typeFile.exists() && typeFile.canRead())
 		{
