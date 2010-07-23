@@ -117,9 +117,6 @@ public final class Dcm2MetaBuilder {
 
    This should be called only after all P10 instances for the study have been processed with
    accumulateFile().
-
-  A MetaBinaryPair instance containing the normalized metadata for the study and all the
-   binary data blobs for the study.
     */
    public void finish() {
        for (final Entry<String, Map<Integer, NormalizationCounter>> seriesTagsEntry: tagNormalizerTable.entrySet()) {
@@ -151,7 +148,7 @@ public final class Dcm2MetaBuilder {
 
      @param dcmPath The path to the DICOM P10 instance. All instances accumulated for a given
      StudyMeta must be part of the same study or an exception will be thrown.
-     @throws vtal::InvalidArgument The instance referred to by the path either doesn't have a study
+     @throws RuntimeException The instance referred to by the path either doesn't have a study
      instance UID or its study instance UID is not the same as previously accumulated instances.
       */
      public void accumulateFile(final File dcmPath, final DicomObject dcmObj,
@@ -191,16 +188,17 @@ public final class Dcm2MetaBuilder {
          // Now, iterate through all items in the object and store each appropriately.
          // This dispatches the Attribute storage to one of the study level, series level
          // or instance-level Attributes sets.
+         final int[] emptyTagPath = new int[0];
          for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
              final int tag = dcmElement.tag();
              if (studyLevelTags.contains(tag)) {
                  if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, metaBinaryPair.getMetadata(), null);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, metaBinaryPair.getMetadata(), null, emptyTagPath);
                  }
              }
              else if (seriesLevelTags.contains(tag)) {
                  if (series.getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, series, null);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, series, null, emptyTagPath);
                  }
              }
              else {
@@ -208,7 +206,7 @@ public final class Dcm2MetaBuilder {
                  final Map<Integer, NormalizationCounter> seriesNormMap =
                      tagNormalizerTable.get(series.getSeriesInstanceUID());
                  assert seriesNormMap != null;
-                 handleDICOMElement(dcmPath, charSet, dcmElement, instance, seriesNormMap);
+                 handleDICOMElement(dcmPath, charSet, dcmElement, instance, seriesNormMap, emptyTagPath);
              }
          }
      }
@@ -218,50 +216,36 @@ public final class Dcm2MetaBuilder {
              final SpecificCharacterSet charSet,
              final DicomElement dcmElem,
              final AttributeStore attrs,
-             final Map<Integer, NormalizationCounter> seriesNormMap) {
-         final IStore storePlain = new StorePlain(dcmPath, charSet, attrs, seriesNormMap);
-         final IStore storeSequence = new StoreSequence(dcmPath, charSet, attrs);
-         final IStore storeBinary = new StoreBinary(dcmPath, charSet, attrs, seriesNormMap);
+             final Map<Integer, NormalizationCounter> seriesNormMap,
+             final int[] tagPath) {
+         final Store store = new Store(dcmPath, charSet, attrs, seriesNormMap, tagPath, dcmElem);
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
          } else if (vr == VR.OW || vr == VR.OB || vr == VR.UN || vr == VR.UN_SIEMENS) {
              //Binary
-             storeBinary.store(dcmElem);
+             store.storeBinary();
          } else if (vr == VR.SQ) {
-             storeSequence.store(dcmElem);
+             store.storeSequence();
          } else {
              //Non-binary, non-sequence
-             storePlain.store(dcmElem);
+             store.storePlain();
          }
      }
 
-     private interface IStore {
-         void store(final DicomElement dcmItem);
-     }
-
-     private abstract class StoreBase implements IStore {
-         public StoreBase(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
-                 final Map<Integer, NormalizationCounter> seriesNormMap) {
+     private final class Store {
+         public Store(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
+                 final Map<Integer, NormalizationCounter> seriesNormMap, final int[] tagPath,
+                 final DicomElement elem) {
              this.dcmPath = dcmPath;
              this.charSet = charSet;
              this.attrs = attrs;
              this.seriesNormMap = seriesNormMap;
+             this.tagPath = tagPath;
+             this.elem = elem;
          }
 
-         protected final File dcmPath;
-         protected final SpecificCharacterSet charSet;
-         protected final AttributeStore attrs;
-         protected final Map<Integer, NormalizationCounter> seriesNormMap;
-     }
-
-     private final class StorePlain extends StoreBase {
-         public StorePlain(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
-                 final Map<Integer, NormalizationCounter> seriesNormMap) {
-             super(dcmPath, charSet, attrs, seriesNormMap);
-         }
-
-         public void store(final DicomElement elem) {
+         public void storePlain() {
              assert elem != null;
              Attribute attr = null;
              NormalizationCounter normCounter = null;
@@ -296,44 +280,41 @@ public final class Dcm2MetaBuilder {
              assert attr != null;
              attrs.putAttribute(attr);
          }
-     }
 
-     private final class StoreSequence extends StoreBase {
-         public StoreSequence(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs) {
-             super(dcmPath, charSet, attrs, null);
-         }
-
-         public void store(final DicomElement itemSeq) {
-             final Attribute attr = newAttr(itemSeq);
+         public void storeSequence() {
+             final Attribute attr = newAttr(elem);
              attrs.putAttribute(attr);
-             for (int i = 0; i < itemSeq.countItems(); ++i) {
-                 final DicomObject dcmObj = itemSeq.getDicomObject(i);
+             final int[] newTagPath = new int[tagPath.length + 2];
+             System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
+             newTagPath[tagPath.length] = elem.tag();
+             for (int i = 0; i < elem.countItems(); ++i) {
+                 newTagPath[tagPath.length + 1] = i;
+                 final DicomObject dcmObj = elem.getDicomObject(i);
                  final Item newItem = new Item();
                  attr.addItem(newItem);
                  for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
                      // Don't use tag normalization in sequence items...
-                     handleDICOMElement(dcmPath, charSet, dcmElement, newItem, null);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, newItem, null, newTagPath);
                  }
              }
          }
-     }
 
-     private final class StoreBinary extends StoreBase {
-         public StoreBinary(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
-                 final Map<Integer, NormalizationCounter> seriesNormMap) {
-             super(dcmPath, charSet, attrs, seriesNormMap);
-         }
+         public void storeBinary() {
+             assert elem != null;
 
-         public void store(final DicomElement binData) {
-             assert binData != null;
-
-             final Attribute attr = newAttr(binData);
+             final Attribute attr = newAttr(elem);
              assert attr != null;
              attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
-             final byte[] data = binData.getBytes();
-             metaBinaryPair.getBinaryData().add(data);
+             metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
              attrs.putAttribute(attr);
          }
+
+         private final File dcmPath;
+         private final SpecificCharacterSet charSet;
+         private final AttributeStore attrs;
+         private final Map<Integer, NormalizationCounter> seriesNormMap;
+         private final int[] tagPath;
+         private final DicomElement elem;
      }
 
      private static boolean areNonValueFieldsEqual(final Attribute a, final DicomElement obj) {

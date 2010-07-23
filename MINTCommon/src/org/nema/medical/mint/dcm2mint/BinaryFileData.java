@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dcm4che2.data.DicomElement;
+
 /**
  * @author Uli Bubenheimer
  */
@@ -32,13 +34,15 @@ public final class BinaryFileData implements BinaryData {
     public final List<File> binaryItems = new ArrayList<File>();
 
     @Override
-    public void add(final byte[] item) {
+    public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
         //Stream to file
+        final byte[] item = dcmElem.getBytes();
         assert item != null;
         try {
+            final File tmpFile = File.createTempFile("mint", ".bin");
             //The file should be deleted as soon as it is passed on to somewhere else;
-            //using SelfDeletingFile is just a backup,
-            final File tmpFile = new SelfDeletingFile(File.createTempFile("mint", ".bin"));
+            //we have a deleteOnExit here just as a backup.
+            tmpFile.deleteOnExit();
             final FileOutputStream outStream = new FileOutputStream(tmpFile);
             try {
                 outStream.write(item);
@@ -120,21 +124,5 @@ public final class BinaryFileData implements BinaryData {
             throw new RuntimeException(ex);
         }
         return dataBytes;
-    }
-
-    private static class SelfDeletingFile extends File {
-        private static final long serialVersionUID = 1L;
-
-        public SelfDeletingFile(final File origFile) {
-            super(origFile.getParentFile(), origFile.getName());
-            //Make sure to delete no later than when JVM goes away
-            deleteOnExit();
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            //Delete on finalization no matter what; if file does not exist, this will fail silently.
-            delete();
-        }
     }
 }

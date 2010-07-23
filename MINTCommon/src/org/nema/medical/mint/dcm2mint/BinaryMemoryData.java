@@ -16,9 +16,12 @@
 
 package org.nema.medical.mint.dcm2mint;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.dcm4che2.data.DicomElement;
 
 /**
  * @author Uli Bubenheimer
@@ -28,8 +31,12 @@ public final class BinaryMemoryData implements BinaryData {
     private final List<byte[]> binaryItems = new ArrayList<byte[]>();
 
     @Override
-    public void add(final byte[] item) {
-        binaryItems.add(item);
+    public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
+        add(dcmElem.getBytes());
+    }
+
+    void add(final byte[] binaryData) {
+        binaryItems.add(binaryData);
     }
 
     @Override
