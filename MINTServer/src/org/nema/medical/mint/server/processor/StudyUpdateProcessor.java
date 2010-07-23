@@ -19,8 +19,8 @@ import org.nema.medical.mint.server.domain.ChangeDAO;
  * @author rrobin20
  *
  */
-public class UpdateStudyProcessor extends TimerTask {
-	static final Logger LOG = Logger.getLogger(UpdateStudyProcessor.class);
+public class StudyUpdateProcessor extends TimerTask {
+	static final Logger LOG = Logger.getLogger(StudyUpdateProcessor.class);
 
 	private final File jobFolder;
 	private final File studyFolder;
@@ -38,7 +38,7 @@ public class UpdateStudyProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public UpdateStudyProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;

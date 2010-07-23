@@ -14,9 +14,9 @@ import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 
-public class StudyProcessor extends TimerTask {
+public class StudyCreateProcessor extends TimerTask {
 
-	static final Logger LOG = Logger.getLogger(StudyProcessor.class);
+	static final Logger LOG = Logger.getLogger(StudyCreateProcessor.class);
 	
 	private final File jobFolder;
 	private final File studyFolder;
@@ -43,7 +43,7 @@ public class StudyProcessor extends TimerTask {
 	 * @param studyDAO
 	 *            needed to update the database
 	 */
-	public StudyProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyCreateProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;
@@ -69,26 +69,34 @@ public class StudyProcessor extends TimerTask {
 
 			//load study into memory
 			Study study = StudyUtil.loadStudy(jobFolder);
+			LOG.info("job " + jobID + " loaded");
 			
 			if(!StudyUtil.validateStudy(study, jobFolder))
 			{
 				throw new RuntimeException("Validation of the new study failed");
 			}
+			LOG.info("job " + jobID + " validated");
 			
 			//write study into type folder
 			StudyUtil.writeStudy(study, typeFolder);
+			LOG.info("study metadata for " + jobID + " written");
 	        StudySummaryIO.writeSummaryToXHTML(study, new File(typeFolder, "summary.html"));
+			LOG.info("study summary for " + jobID + " written");
 	        
 	        //Write metadata to change log
 	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
 	        
+	        // todo copy the previous file, unmarshalling again is too time consuming
 	        StudyUtil.writeStudy(study, changelogFolder);
+			LOG.info("study changelog for " + jobID + " written");
 
 	        //Copy binary data into binaryitems folder
 	        File binaryRoot = new File(typeFolder, "binaryitems");
 			binaryRoot.mkdirs();
 
+			LOG.info("moving binary items for " + jobID + " ");
 			StudyUtil.moveBinaryItems(jobFolder, binaryRoot);
+			LOG.info("moving binary items for " + jobID + " complete");
 			
 			//delete job folder
 			StudyUtil.deleteFolder(jobFolder);
@@ -114,6 +122,7 @@ public class StudyProcessor extends TimerTask {
 
 			jobInfo.setStatus(JobStatus.SUCCESS);
 			jobInfo.setStatusDescription("complete");
+			LOG.info("job " + jobID + " complete");
 
 		} catch (Exception e) {
 			jobInfo.setStatus(JobStatus.FAILED);
