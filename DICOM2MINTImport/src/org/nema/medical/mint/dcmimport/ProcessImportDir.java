@@ -54,8 +54,10 @@ import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
 import org.nema.medical.mint.dcm2mint.BinaryData;
+import org.nema.medical.mint.dcm2mint.BinaryDcmData;
 import org.nema.medical.mint.dcm2mint.BinaryFileData;
 import org.nema.medical.mint.dcm2mint.BinaryMemoryData;
+import org.nema.medical.mint.dcm2mint.BinaryStorageType;
 import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
 import org.nema.medical.mint.dcm2mint.MetaBinaryPair;
 import org.nema.medical.mint.dcm2mint.MetaBinaryPairImpl;
@@ -109,7 +111,19 @@ public final class ProcessImportDir {
             final String studyUID = studyFiles.getKey();
             assert studyUID != null;
 
-            final BinaryData binaryData = USE_BINARYFILEDATA ? new BinaryFileData() : new BinaryMemoryData();
+            final BinaryData binaryData;
+            switch (BINARY_STORAGE_TYPE) {
+            case dicomFile:
+                binaryData = new BinaryDcmData();
+                break;
+            case memory:
+                binaryData = new BinaryMemoryData();
+                break;
+            case tempFile:
+                binaryData = new BinaryFileData();
+            default:
+                throw new AssertionError("Unsupported binary storage type");
+            }
             try {
                 final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
                 metaBinaryPair.setBinaryData(binaryData);
@@ -148,7 +162,7 @@ public final class ProcessImportDir {
                     continue;
                 }
             } finally {
-                if (USE_BINARYFILEDATA) {
+                if (BINARY_STORAGE_TYPE == BinaryStorageType.tempFile) {
                     //Delete all temporary files storing binary data from DICOM;
                     //do this ASAP as these files may be large and fill up the file system
                     for (final File binaryItemFile: Iter.iter(((BinaryFileData)binaryData).fileIterator())) {
@@ -207,9 +221,8 @@ public final class ProcessImportDir {
         final Collection<File> studyFiles = undeletedStudyFiles.remove(studyUUID);
         if (delete) {
             for (final File undeletedStudyFile: studyFiles) {
-                //TODO commented out for testing only
-                //undeletedStudyFile.delete();
-                //handledFiles.remove(undeletedStudyFile);
+                undeletedStudyFile.delete();
+                handledFiles.remove(undeletedStudyFile);
             }
         }
     }
@@ -222,35 +235,39 @@ public final class ProcessImportDir {
         final Study study = studyData.getMetadata();
         final ByteArrayOutputStream studyOutStream = new ByteArrayOutputStream();
         final String fileName = useXMLNotGPB ? "metadata.xml" : "metadata.gpb";
-        
+
         if (useXMLNotGPB) {
             StudyIO.writeToXML(study, studyOutStream);
         } else {
             StudyIO.writeToGPB(study, studyOutStream);
         }
-        
+
         final ByteArrayInputStream studyInStream = new ByteArrayInputStream(studyOutStream.toByteArray());
-        
+
         //Need to specify the 'type' of the data being sent
         entity.addPart("type", new StringBody("DICOM"));
-        
+
         //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
         entity.addPart(fileName, new InputStreamBody(studyInStream, (useXMLNotGPB ? "text/xml" : "application/octet-stream"), fileName));
 
-        if (studyData.getBinaryData() instanceof BinaryFileData) {
-            for (final File binaryItemFile: Iter.iter(((BinaryFileData)(studyData.getBinaryData())).fileIterator())) {
+        final BinaryData binaryData = studyData.getBinaryData();
+        if (binaryData instanceof BinaryDcmData) {
+            for (final InputStream binaryStream: Iter.iter(((BinaryDcmData) binaryData).streamIterator())) {
+                entity.addPart("binary", new InputStreamBody(binaryStream, "binary"));
+            }
+        } else if (binaryData instanceof BinaryFileData) {
+            for (final File binaryItemFile: Iter.iter(((BinaryFileData)(binaryData)).fileIterator())) {
                 entity.addPart("binary", new FileBody(binaryItemFile));
             }
         } else {
-            assert studyData.getBinaryData() instanceof BinaryMemoryData;
-            for (final byte[] binaryItemData: studyData.getBinaryData()) {
+            for (final byte[] binaryItemData: binaryData) {
                 final ByteArrayInputStream byteStream = new ByteArrayInputStream(binaryItemData);
                 entity.addPart("binary", new InputStreamBody(byteStream, "binary"));
             }
         }
 
         httpPost.setEntity(entity);
-        
+
         final String result = httpClient.execute(httpPost, new BasicResponseHandler());
         final Matcher matcher = RESPONSE_MATCH_PATTERN.matcher(result);
         final boolean matched = matcher.find();
@@ -311,5 +328,5 @@ public final class ProcessImportDir {
     private static final Set<Integer> SERIES_LEVEL_TAGS = getTags("SeriesTags.txt");
     private static final Pattern RESPONSE_MATCH_PATTERN = Pattern.compile("URL=.*createstudy/([^\"]+)");
     private static final Pattern STATUS_MATCH_PATTERN = Pattern.compile("JobStatus'>([^<]*)</dd");
-    private static final boolean USE_BINARYFILEDATA = false;
+    private static final BinaryStorageType BINARY_STORAGE_TYPE = BinaryStorageType.dicomFile;
 }

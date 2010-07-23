@@ -114,8 +114,8 @@ public class DCMImportMain {
                 //This will process and send the resulting MINT message to the MINTServer
                 importProcessor.processDir();
 
-                //Wait for studies to finish processing on the server; time out after trying for about 30 seconds
-                for (int i = 0; i < 10; ++i) {
+                //Wait for studies to finish processing on the server
+                for (;;) {
                     //Wait 3 seconds before hitting the server for updates
                     Thread.sleep(3000);
 
