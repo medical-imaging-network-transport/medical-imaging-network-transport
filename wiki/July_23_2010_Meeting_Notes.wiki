@@ -1,0 +1,78 @@
+Agenda
+  * Progress this week
+  * Bulk Binary Loading Mechanism
+  * August Meeting @ JHU
+  * RSNA Demo
+
+
+
+Notes
+  * Progress this week
+    * JHU DMZ Server
+      * Is up and running, but having trouble getting the MINT server to run on it
+    * MINT Implementation
+      * Added study search
+      * Added change log at study and global level, removed atom feed
+      * Started work on data dictionary
+      * Most of the implementation will be done soon
+    * MINT2DICOM Issues
+      * Jack had to write code to build DCM4CHE objects from the MINT objects
+      * Jack suggested that MINT build DCM4CHE objects directly instead of intermediate objects
+      * Jack check in code, ask for help if can't get access
+    * Conformance Testing
+      * Tim Culp completed Iteration 2 of conformance test checked in
+      * Tim Culp working on Iteration 3, hoping to complete next week
+  * New JHU team member joining MINT effort - Gorkem Sevinc, Jack Vining leaving next week.
+  * Bulk Binary Loading
+    * Concern about URL length - IE has a limit of 2k?
+    * Idea - POST collection of BIDs, server returns the ones requested
+    * Idea - Add a BID Collection to the server somehow so you can get that collection in one shot
+    * Tim asked for feedback on the bulk mechanism return them in the order of the metadata
+      * Chris raised a concern about race condition
+      * Rick mentioned that it would be advantageous to let the server return the BIDs in the order it wanted
+  * Multiple Update Concurrency
+    * Locking and serializing updates
+    * Do simplest/safest approach now, revisit at JHU meeting
+      * Add study version number, updates include that version number - if not correct, fail update
+  * Data Dictionary Version
+    * How to handle updates? Deal with at JHU meeting
+    * Tim Dawson has an example XML for the data dictionary.  Currently in SVN
+  * August meeting @ JHU
+    * August 16 & 17
+    * Send Jim email about hotel information
+  * RSNA Demo
+    * Ideas
+      * Demo in vendors booths
+        * Question about RSNA's network performance
+        * Concern about cost to connect to RSNA's network ($1500)
+      * Put a VM of each MINT server/viewer up in the DMZ so people can access it
+      * Generic Poster for MINT User Group in the educational area
+        * Logos for each vendor supporting MINT
+        * Server with VM's for demoing
+        * Code walk through for reference implementation
+      * Setup meetings with key DICOM individuals to discuss MINT
+      * Got MINT Campaign?  Vendors could give out actual mints wrapped with MINT logo/URL
+       
+Decisions
+  * Do more design work on Bulk Binary Loading at August JHU working meeting
+  * Do more design work on data dictionary versioning at JHU working meeting
+  * Do more design work on multiple update concurrent at JHU Working meeting
+  * Decided to omit attribute if the value was empty
+
+New Actions
+  * Tim Dawson to help Jack get MINT server running on DMZ machine
+  * Chris Hafey to look at doing bulk load in vital av server
+  * Jim to send out JHU august working meeting information to mailing list
+  * Jim to talk to invite other vendors to come to August JHU meeting
+  * Chris to ask vital RSNA folks about RSNA network performance/cost
+  * Jack to run dvtk on original DICOM files vs regenerated files
+
+Old Actions
+    * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson)
+    * Define performance test environment (Jim Philbin)
+    * Setup Test Environment (Jim Philbin)
+    * Provide Test Data Sets (Jim Philbin)
+    * Provide anonymous FTP site to access data sets (Jim Philbin)
+    * Create MINT2DICOM Converter (Jack Vining)
+    * Iteration 1,2 & 3 Conformance Test (Tim Culp)
+    * MINT Server Implementation - Phase 2 (Tim Dawson)
