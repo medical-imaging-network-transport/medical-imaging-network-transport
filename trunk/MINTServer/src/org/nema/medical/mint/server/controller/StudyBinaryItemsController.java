@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
@@ -43,20 +44,22 @@ public class StudyBinaryItemsController {
     @Autowired
     protected File studiesRoot;
 
-    @RequestMapping("/studies/{uuid}/{type}/binaryitems/{seq}")
-    public void studiesBinaryItems(@PathVariable("uuid") final String uuid, 
-    							   @PathVariable("type") final String type, 
-                                   @PathVariable("seq") final String seq,
-                                   final HttpServletResponse httpServletResponse) throws IOException {
-        if (StringUtils.isBlank(uuid)) {
+	@RequestMapping("/studies/{uuid}/{type}/binaryitems/{seq}")
+    public void studiesBinaryItems(final HttpServletResponse res, HttpServletRequest req,
+                                   @PathVariable("uuid") final String uuid,
+                                   @PathVariable("type") final String type,
+                                   @PathVariable("seq") final String seq
+    ) throws IOException {
+
+		if (StringUtils.isBlank(uuid)) {
             // Shouldn't happen...but could be +++, I suppose
-            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request: Missing binary item id");
+        	res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request: Missing binary item id");
             return;
         }
 
         final File studyRoot = new File(studiesRoot, uuid);
         if (!studyRoot.exists()) {
-            httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Requested Study Not Found");
+        	res.sendError(HttpServletResponse.SC_NOT_FOUND, "Requested Study Not Found");
             return;
         }
 
@@ -64,12 +67,12 @@ public class StudyBinaryItemsController {
         try {
         	itemList = parseItemList(seq, type, studyRoot);
         } catch (final NumberFormatException e) {
-            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item requested: NaN");
+        	res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid binary item requested: NaN");
             return;
         }
 
         if (itemList == null || itemList.isEmpty()) {
-            httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive binary items. See server log for details.");
+        	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive binary items. See server log for details.");
             LOG.error("Unable to locate binary items: " + seq);
             return;
         }
@@ -78,24 +81,24 @@ public class StudyBinaryItemsController {
         for (int i : itemList) {
             final File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
             if (!file.exists() || !file.canRead()) {
-                httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
+            	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
                 LOG.error("BinaryItemsFile " + file + " does not exist");
                 return;
             }
             binaryItems.add(file);
         }
 
-        final OutputStream out = httpServletResponse.getOutputStream();
+        final OutputStream out = res.getOutputStream();
 
         // write the appropriate header
-        final boolean multipart = binaryItems.size() > 0;
+        final boolean multipart = binaryItems.size() > 1;
         if (multipart) {
-            httpServletResponse.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
+        	res.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
             out.write(("--" + MP_BOUNDARY).getBytes());
             out.flush();
         } else {
-            httpServletResponse.setContentType("application/octet-stream");
-            httpServletResponse.setContentLength((int) binaryItems.get(0).length());
+        	res.setContentType("application/octet-stream");
+        	res.setContentLength((int) binaryItems.get(0).length());
         }
 
         for (File binaryItem : binaryItems) {
