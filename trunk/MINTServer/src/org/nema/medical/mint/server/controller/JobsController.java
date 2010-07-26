@@ -149,7 +149,7 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		map.addAttribute("jobinfo", jobInfo);
+		map.addAttribute("job", jobInfo);
 		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
@@ -244,7 +244,7 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		map.addAttribute("jobinfo", jobInfo);
+		map.addAttribute("job", jobInfo);
 		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 

@@ -15,7 +15,6 @@ dd { margin: 0 0 1em 0; padding: 0; }
 </style>
 </head>
 <body>
-<c:if test="${not empty job}">
 	<h1>Job Information</h1>
 	<dl>
 		<dt>JobID</dt>
@@ -32,6 +31,5 @@ dd { margin: 0 0 1em 0; padding: 0; }
 		<dt>Job Updated</dt>
 		<dd class='JobUpdated'>${job.updateTime}</dd>
 	</dl>
-</c:if>
 </body>
 </html>
