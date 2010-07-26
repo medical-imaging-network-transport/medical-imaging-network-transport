@@ -151,7 +151,12 @@ public final class StudyUtil {
                 {
                     try
                     {
-                        int bid = Integer.parseInt(name.substring(0,name.indexOf('.')));
+                        int bid;
+                        int extStart = name.indexOf('.');
+                        if(extStart > 0)
+                        	bid = Integer.parseInt(name.substring(0,extStart));
+                        else
+                        	bid = Integer.parseInt(name);
 
                         bid += shiftAmount;
 
