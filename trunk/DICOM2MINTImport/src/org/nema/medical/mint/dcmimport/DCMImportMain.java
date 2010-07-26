@@ -17,7 +17,6 @@
 package org.nema.medical.mint.dcmimport;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Scott DeJarnette
+ * @author Uli Bubenheimer
  */
 public class DCMImportMain {
 
@@ -127,10 +127,10 @@ public class DCMImportMain {
 
                 //Wait for studies to finish processing on the server
                 for (;;) {
-                    //Wait 3 seconds before hitting the server for updates
-                    Thread.sleep(3000);
+                    //Wait 1 second before hitting the server for updates
+                    Thread.sleep(1000);
 
-                    if (importProcessor.handleResponses()) {
+                    if (importProcessor.handleSends() && importProcessor.handleResponses()) {
                         break;
                     }
                 }
@@ -143,14 +143,15 @@ public class DCMImportMain {
             final Runnable checkResponsesTask = new Runnable() {
                 public void run() {
                     try {
+                        importProcessor.handleSends();
                         importProcessor.handleResponses();
-                    } catch(final IOException e) {
-                        System.err.println("An exception occurred while checking for upload responses from the server:");
+                    } catch(final Exception e) {
+                        System.err.println("An exception occurred while uploading to the server:");
                         e.printStackTrace();
                     }
                 }
             };
-            executor.scheduleWithFixedDelay(checkResponsesTask, 3, 3, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(checkResponsesTask, 1, 1, TimeUnit.SECONDS);
 
             final Runnable dirTraverseTask = new Runnable() {
                 public void run() {
