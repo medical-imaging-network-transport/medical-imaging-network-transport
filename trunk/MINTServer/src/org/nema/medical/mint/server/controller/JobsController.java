@@ -150,7 +150,7 @@ public class JobsController {
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("jobinfo", jobInfo);
-		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
@@ -245,7 +245,7 @@ public class JobsController {
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("jobinfo", jobInfo);
-		map.addAttribute("joburi", "updatestudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
@@ -264,8 +264,7 @@ public class JobsController {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/"
-				+ jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
