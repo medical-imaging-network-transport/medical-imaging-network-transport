@@ -58,9 +58,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class JobsController {
 
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
-	private static final List<String> supportedMetadataExtensions = Arrays.asList(".gpb",".gpb.gz",".xml",".xml.gz",".json",".json.gz");
+	private static final List<String> supportedMetadataExtensions = Arrays
+			.asList(".gpb", ".gpb.gz", ".xml", ".xml.gz", ".json", ".json.gz");
 
-    private Timer timer;
+	private Timer timer;
 
 	@Autowired
 	protected File jobTemp;
@@ -76,23 +77,23 @@ public class JobsController {
 
 	@PostConstruct
 	public void setupTimer() {
-		timer = new Timer("ProcessTimer",true); 
+		timer = new Timer("ProcessTimer", true);
 	}
-	
+
 	@PreDestroy
 	public void stopTimer() {
 		timer.cancel();
-	}	
-	
-    @RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy")
-    public String createStudy() {
-        return "studycreate";
-    }
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy")
+	public String createStudy() {
+		return "studycreate";
+	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
-	public String createStudy(HttpServletRequest req, HttpServletResponse res, 
+	public String createStudy(HttpServletRequest req, HttpServletResponse res,
 			ModelMap map) throws IOException {
-		
+
 		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
 
@@ -128,22 +129,21 @@ public class JobsController {
 					"at least one file (containing metadata) is required.");
 			return "error";
 		}
-		
+
 		if (!params.containsKey("type")) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "misser parameter 'type'");
 			return "error";
 		}
-		
+
 		String type = params.get("type");
-		
-		if(StringUtils.isBlank(type))
-		{
+
+		if (StringUtils.isBlank(type)) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "misser parameter 'type'");
 			return "error";
 		}
-						
+
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
@@ -153,34 +153,38 @@ public class JobsController {
 		map.addAttribute("joburi", "createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder, new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO, updateDAO);
-        timer.schedule(processor, 0); // process immediately in the background
+		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
+				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
+				updateDAO);
+		timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
-	public String getCreateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+	public String getCreateStatus(HttpServletRequest req,
+			HttpServletResponse res, ModelMap map,
 			@PathVariable("uuid") final String uuid) throws IOException {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/"
+				+ jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
 	}
 
-    @RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
-    public String updateStudy() {
-        return "studyupdate";
-    }
+	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
+	public String updateStudy() {
+		return "studyupdate";
+	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
 	public String updateStudy(HttpServletRequest req, HttpServletResponse res,
 			ModelMap map) throws IOException {
-		
+
 		String jobID = UUID.randomUUID().toString();
 		File jobFolder = new File(jobTemp, jobID);
 		jobFolder.mkdirs();
@@ -219,23 +223,22 @@ public class JobsController {
 			map.put("error_msg", "missing parameter studyUUID");
 			return "error";
 		}
-		
+
 		if (!params.containsKey("type")) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "misser parameter 'type'");
 			return "error";
 		}
-		
+
 		String studyUUID = params.get("studyUUID");
 		String type = params.get("type");
-		
-		if(StringUtils.isBlank(type))
-		{
+
+		if (StringUtils.isBlank(type)) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "misser parameter 'type'");
 			return "error";
 		}
-		
+
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
@@ -245,20 +248,24 @@ public class JobsController {
 		map.addAttribute("joburi", "updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder, new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO, updateDAO);
-        timer.schedule(processor, 0); // process immediately in the background
+		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
+				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
+				updateDAO);
+		timer.schedule(processor, 0); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
-	public String getUpdateStatus(HttpServletRequest req, HttpServletResponse res, ModelMap map,
+	public String getUpdateStatus(HttpServletRequest req,
+			HttpServletResponse res, ModelMap map,
 			@PathVariable("uuid") final String uuid) throws IOException {
 
 		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/"
+				+ jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
@@ -269,7 +276,11 @@ public class JobsController {
 			HttpServletResponse response, File jobFolder, List<File> files,
 			Map<String, String> params) throws IOException, FileUploadException {
 
+		byte buf[] = new byte[32 * 1024];
 		int bid = 0;
+
+		int fileCount = 0;
+		LOG.info("creating local files");
 
 		// Parse the request
 		ServletFileUpload upload = new ServletFileUpload();
@@ -290,7 +301,7 @@ public class JobsController {
 				// special handling for first file - must be metadata!
 				if (files.isEmpty()) {
 					String filename = item.getName();
-					
+
 					LOG.info("loading metadata from " + filename);
 					for (String extension : supportedMetadataExtensions) {
 						if (filename.endsWith(extension)) {
@@ -298,7 +309,7 @@ public class JobsController {
 							break;
 						}
 					}
-					
+
 					// last resort, use content type!
 					String contentType = item.getContentType();
 					if ("text/xml".equals(contentType)) {
@@ -307,7 +318,8 @@ public class JobsController {
 						filename = "metadata.gpb";
 					} else {
 						// dump out and write the content... will fail later
-						LOG.error("unable to determine metadata type for " + item.getName());
+						LOG.error("unable to determine metadata type for "
+								+ item.getName());
 						filename = "metadata.dat";
 					}
 
@@ -319,16 +331,15 @@ public class JobsController {
 				FileOutputStream out = null;
 				try {
 					while (true) {
-						byte buf[] = new byte[8 * 1024];
 						int len = in.read(buf);
 						if (len < 0)
 							break;
 						if (out == null) {
 							// defer create so we don't create empty files
 							out = new FileOutputStream(file);
-							LOG.info("creating... " + file);
 						}
 						out.write(buf, 0, len);
+						fileCount++;
 					}
 				} finally {
 					if (out != null) {
@@ -338,5 +349,6 @@ public class JobsController {
 				}
 			}
 		}
+		LOG.info("created " + fileCount + " files.");
 	}
 }
