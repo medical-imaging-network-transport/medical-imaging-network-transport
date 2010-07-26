@@ -67,7 +67,8 @@ public final class BinaryDcmData implements BinaryData {
                 return -1;
             }
 
-            return binaryItem[pos++];
+            //Convert to char first, so that negative byte values do not become negative int values
+            return (char) binaryItem[pos++];
         }
 
         private Reference<byte[]> binaryItemRef = new WeakReference<byte[]>(null);
