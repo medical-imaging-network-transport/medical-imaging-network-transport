@@ -32,7 +32,7 @@ public class StudyDAO extends HibernateDaoSupport {
     }
     public enum SearchKey {
         // study search fields
-        studyInstanceUID("id"), accessionNumber("accessionNumber"),
+        studyInstanceUID("studyInstanceUID"), accessionNumber("accessionNumber"),
         // patient search fields
         patientID("patientID"), issuerOfPatientID("issuerOfPatientID"),
         // date & pagination
