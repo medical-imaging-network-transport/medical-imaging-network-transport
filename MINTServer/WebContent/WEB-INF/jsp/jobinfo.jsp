@@ -4,10 +4,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <c:if test="${not job.complete}">
-<meta http-equiv="refresh" content="3;URL=${joburi}">
+<meta http-equiv="refresh" content="3;URL=${joburi}"/>
 </c:if>
 <title>JobInfo</title>
-<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />
+<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
 <style type="text/css">
 dl { margin: 0; padding: 0; }
 dt { margin: 0; padding: 0; font-weight: bold; }

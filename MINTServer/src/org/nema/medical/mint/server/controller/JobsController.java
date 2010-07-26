@@ -329,22 +329,19 @@ public class JobsController {
 				}
 
 				FileOutputStream out = null;
+				out = new FileOutputStream(file);
 				try {
 					while (true) {
 						int len = in.read(buf);
 						if (len < 0)
 							break;
-						if (out == null) {
-							// defer create so we don't create empty files
-							out = new FileOutputStream(file);
-						}
 						out.write(buf, 0, len);
-						fileCount++;
 					}
 				} finally {
 					if (out != null) {
 						out.close();
 						files.add(file);
+						fileCount++;
 					}
 				}
 			}
