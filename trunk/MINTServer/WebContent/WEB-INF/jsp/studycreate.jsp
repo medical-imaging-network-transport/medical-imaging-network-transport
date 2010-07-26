@@ -8,7 +8,7 @@
 
 <h2>Create Study</h2>
 
-<form method='POST' enctype='multipart/form-data' action='jobs/createstudy'>
+<form method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/createstudy'>
 Type: <select name=type>
 <!-- TODO dynamically populate this list from the set of types the server knows about -->
 <option value="DICOM">DICOM</option>
