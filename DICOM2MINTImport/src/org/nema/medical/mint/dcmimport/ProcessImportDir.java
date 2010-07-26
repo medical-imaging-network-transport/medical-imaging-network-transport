@@ -34,8 +34,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -60,6 +66,9 @@ import org.nema.medical.mint.dcm2mint.MetaBinaryPairImpl;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.util.Iter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Uli Bubenheimer
@@ -68,7 +77,9 @@ public final class ProcessImportDir {
 
     public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB, final boolean deletePhysicalInstanceFiles) {
         this.importDir = importDir;
-        this.postURI = URI.create(serverURI + "/jobs/createstudy");
+        this.createURI = URI.create(serverURI + "/jobs/createstudy");
+        this.queryURI = URI.create(serverURI + "/studies");
+        this.updateURI = URI.create(serverURI + "/jobs/updatestudy");
         this.useXMLNotGPB = useXMLNotGPB;
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
     }
@@ -136,14 +147,59 @@ public final class ProcessImportDir {
             }
             builder.finish();
 
-            try {
-                send(metaBinaryPair, studyFiles.getValue());
-            } catch (final IOException e) {
-                //Not a valid DICOM file?!
-                System.err.println("Problems sending study data for " + studyUID + ": " + e.getMessage());
-                e.printStackTrace();
-                continue;
-            }
+            addToSendQueue(metaBinaryPair, studyFiles.getValue());
+        }
+    }
+
+    private void addToSendQueue(final MetaBinaryPair studyData, final Collection<File> studyFiles) {
+        final MetaBinaryFiles mbf = new MetaBinaryFiles();
+        mbf.metaBinaryPair = studyData;
+        mbf.studyInstanceFiles = studyFiles;
+        studySendQueue.add(mbf);
+    }
+
+    /**
+     * @throws IOException
+     */
+    public boolean handleSends() throws Exception {
+        final Iterator<MetaBinaryFiles> studySendIter = studySendQueue.iterator();
+        while (studySendIter.hasNext()) {
+            final MetaBinaryFiles sendData = studySendIter.next();
+            studySendIter.remove();
+
+            //Determine whether study exists and we need to perform an update
+            final Study metadata = sendData.metaBinaryPair.getMetadata();
+            final String studyUUID = doesStudyExist(metadata.getStudyInstanceUID(), metadata.getAttribute(Tag.PatientID).getVal());
+
+            send(sendData.metaBinaryPair, sendData.studyInstanceFiles, studyUUID);
+        }
+
+        return studySendQueue.isEmpty();
+    }
+
+    private String doesStudyExist(final String studyInstanceUID, final String patientID) throws Exception {
+        final HttpGet httpGet = new HttpGet(queryURI + "?studyInstanceUID=" + studyInstanceUID
+                + "&patientID=" + (patientID == null ? "" : patientID));
+        final String response = httpClient.execute(httpGet, new BasicResponseHandler());
+        final NodeList nodeList;
+        try {
+            final Document responseDoc = documentBuilder.parse(
+                    new ByteArrayInputStream(response.getBytes()));
+            nodeList = (NodeList) xPath.evaluate("/html/body/ol/li/dl/dd[@class='StudyUUID']", responseDoc, XPathConstants.NODESET);
+        } catch(final Exception ex) {
+            System.err.println("Querying for studyUID " + studyInstanceUID + ": unknown server response:");
+            System.err.println(response);
+            throw ex;
+        }
+        final int uuidCount = nodeList.getLength();
+        switch (uuidCount) {
+        case 0:
+            return null;
+        case 1:
+            final Node node = nodeList.item(0);
+            return node.getTextContent().trim();
+        default:
+            throw new Exception("Multiple matches for study UID " + studyInstanceUID);
         }
     }
 
@@ -152,37 +208,39 @@ public final class ProcessImportDir {
      * @throws IOException
      */
     public boolean handleResponses() throws IOException {
-        final HttpClient httpClient = new DefaultHttpClient();
         final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        final Iterator<Entry<String, Collection<File>>> studyIter = studyUUIDInfo.entrySet().iterator();
+        final Iterator<Entry<String, Collection<File>>> studyIter = jobIDInfo.entrySet().iterator();
         while (studyIter.hasNext()) {
             final Entry<String, Collection<File>> studyEntry = studyIter.next();
-            final String studyUUID = studyEntry.getKey();
-            final HttpGet httpGet = new HttpGet(postURI + "/" + studyUUID);
-            final String result = httpClient.execute(httpGet, responseHandler);
-            final Matcher matcher = STATUS_MATCH_PATTERN.matcher(result);
-            final boolean matched = matcher.find();
-            if (!matched) {
-                System.err.println(studyUUID + ": unknown server response:");
-                System.err.println(result);
+            final String jobID = studyEntry.getKey();
+            final HttpGet httpGet = new HttpGet(createURI + "/" + jobID);
+            final String response = httpClient.execute(httpGet, responseHandler);
+            final String statusStr;
+            try {
+                final Document responseDoc = documentBuilder.parse(
+                        new ByteArrayInputStream(response.getBytes()));
+                statusStr = xPath.evaluate("/html/body/dl/dd[@class='JobStatus']/text()", responseDoc);
+            } catch(final Exception ex) {
+                System.err.println("Querying job " + jobID + ": unknown server response:");
+                System.err.println(response);
                 studyIter.remove();
                 continue;
             }
-            final String match = matcher.group(1).trim();
+
             final Collection<File> studyFiles = studyEntry.getValue();
-            if (match.equals("IN_PROGRESS")) {
+            if (statusStr.equals("IN_PROGRESS")) {
                 continue;
-            } else if (match.equals("FAILED")) {
-                System.err.println(studyUUID + ": Server upload failed:");
-                System.err.println(result);
+            } else if (statusStr.equals("FAILED")) {
+                System.err.println("Querying job " + jobID + ": Server upload failed:");
+                System.err.println(response);
                 //Do not delete the study's files in case of failure
                 removeStudyFiles(studyFiles, false);
-            } else if (match.equals("SUCCESS")) {
-                System.err.println(studyUUID + ": Server upload succeeded");
+            } else if (statusStr.equals("SUCCESS")) {
+                System.err.println("Querying job " + jobID + ": Server upload succeeded");
                 removeStudyFiles(studyFiles, true);
             } else {
-                System.err.println(studyUUID + ": unknown server response:");
-                System.err.println(result);
+                System.err.println("Querying job " + jobID + ": unknown server response:");
+                System.err.println(response);
                 //Do not delete the study's files in case of failure
                 removeStudyFiles(studyFiles, false);
             }
@@ -190,7 +248,7 @@ public final class ProcessImportDir {
             studyIter.remove();
         }
 
-        return studyUUIDInfo.isEmpty();
+        return jobIDInfo.isEmpty();
     }
 
     private void removeStudyFiles(final Collection<File> studyFiles, final boolean delete) {
@@ -202,9 +260,8 @@ public final class ProcessImportDir {
         }
     }
 
-    private void send(final MetaBinaryPair studyData, final Collection<File> studyFiles) throws IOException {
-        final HttpClient httpClient = new DefaultHttpClient();
-        final HttpPost httpPost = new HttpPost(postURI);
+    private void send(final MetaBinaryPair studyData, final Collection<File> studyFiles, final String existingStudyUUID) throws Exception {
+        final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
         final Study study = studyData.getMetadata();
@@ -221,6 +278,9 @@ public final class ProcessImportDir {
 
         //Need to specify the 'type' of the data being sent
         entity.addPart("type", new StringBody("DICOM"));
+        if (existingStudyUUID != null) {
+            entity.addPart("studyUUID", new StringBody(existingStudyUUID));
+        }
 
         //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
         entity.addPart(fileName, new InputStreamBody(studyInStream, (useXMLNotGPB ? "text/xml" : "application/octet-stream"), fileName));
@@ -234,14 +294,12 @@ public final class ProcessImportDir {
 
         httpPost.setEntity(entity);
 
-        final String result = httpClient.execute(httpPost, new BasicResponseHandler());
-        final Matcher matcher = RESPONSE_MATCH_PATTERN.matcher(result);
-        final boolean matched = matcher.find();
-        if (!matched) {
-            throw new IOException("Invalid server response:\n" + result);
-        }
-        final String studyUUID = matcher.group(1);
-        studyUUIDInfo.put(studyUUID, studyFiles);
+        final String response = httpClient.execute(httpPost, new BasicResponseHandler());
+        final String jobID;
+        final Document responseDoc = documentBuilder.parse(
+                new ByteArrayInputStream(response.getBytes()));
+        jobID = xPath.evaluate("/html/body/dl/dd[@class='JobID']/text()", responseDoc).trim();
+        jobIDInfo.put(jobID, studyFiles);
     }
 
     private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles) {
@@ -280,16 +338,38 @@ public final class ProcessImportDir {
         return tagSet;
     }
 
+    private static class MetaBinaryFiles {
+        public MetaBinaryPair metaBinaryPair;
+        public Collection<File> studyInstanceFiles;
+    }
+
+    private final HttpClient httpClient = new DefaultHttpClient();
     private final File importDir;
     private final SortedSet<File> handledFiles = new TreeSet<File>();
-    private final URI postURI;
+    private final URI createURI;
+    private final URI queryURI;
+    private final URI updateURI;
     private final boolean useXMLNotGPB;
-    private final Map<String, Collection<File>> studyUUIDInfo =
+    private final Collection<MetaBinaryFiles> studySendQueue =
+        new ConcurrentLinkedQueue<MetaBinaryFiles>();
+    private final Map<String, Collection<File>> jobIDInfo =
         Collections.synchronizedMap(new HashMap<String, Collection<File>>());
     private final boolean deletePhysicalInstanceFiles;
 
     private static final Set<Integer> STUDY_LEVEL_TAGS = getTags("StudyTags.txt");
     private static final Set<Integer> SERIES_LEVEL_TAGS = getTags("SeriesTags.txt");
-    private static final Pattern RESPONSE_MATCH_PATTERN = Pattern.compile("URL=.*createstudy/([^\"]+)");
-    private static final Pattern STATUS_MATCH_PATTERN = Pattern.compile("JobStatus'>([^<]*)</dd");
+    private static final XPath xPath = XPathFactory.newInstance().newXPath();
+    private static final DocumentBuilder documentBuilder;
+    static {
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setCoalescing(true);
+        documentBuilderFactory.setNamespaceAware(false);
+        documentBuilderFactory.setValidating(false);
+        try {
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (final ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
