@@ -8,7 +8,7 @@
 
 <h2>Update Study</h2>
 
-<form method='POST' enctype='multipart/form-data' action='jobs/updatestudy'>
+<form method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/updatestudy'>
 Study UUID: <input type=text name=studyUUID><br>
 Type: <select name=type>
 <!-- TODO dynamically populate this list from the set of types the server knows about -->
