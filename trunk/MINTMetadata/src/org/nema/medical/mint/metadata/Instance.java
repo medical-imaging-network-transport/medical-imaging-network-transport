@@ -16,9 +16,9 @@
 
 package org.nema.medical.mint.metadata;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData;
@@ -37,7 +37,7 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData;
  */
 public class Instance implements AttributeStore
 {
-    private final Map<Integer,Attribute> attributeMap = new HashMap<Integer,Attribute>();
+    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private String sopInstanceUID;
     private String transferSyntaxUID;
     private String exclude;
@@ -78,27 +78,27 @@ public class Instance implements AttributeStore
     public Iterator<Attribute> attributeIterator() {
         return attributeMap.values().iterator();
     }
-    
-	/**
+
+    /**
      * Get the 'sopInstanceUID' attribute value.
      *
      * @return value
      */
 
     public String getSOPInstanceUID() {
-		return sopInstanceUID;
-	}
+        return sopInstanceUID;
+    }
 
     /**
      * Set the 'sopInstanceUID' attribute value.
      *
      * @param sopInstanceUID
      */
-	public void setSOPInstanceUID(String sopInstanceUID) {
-		this.sopInstanceUID = sopInstanceUID;
-	}
+    public void setSOPInstanceUID(String sopInstanceUID) {
+        this.sopInstanceUID = sopInstanceUID;
+    }
 
-	/**
+    /**
      * Get the 'transferSyntaxUID' attribute value.
      *
      * @return value
@@ -122,17 +122,17 @@ public class Instance implements AttributeStore
      * @return value
      */
     public String getExclude() {
-		return exclude;
-	}
+        return exclude;
+    }
 
     /**
      * Set the 'exclude' attribute value.
      *
      * @param exclude
      */
-	public void setExclude(String exclude) {
-		this.exclude = exclude;
-	}
+    public void setExclude(String exclude) {
+        this.exclude = exclude;
+    }
 
     //
     // Google Protocol Buffer support - package protection intentional
@@ -151,13 +151,13 @@ public class Instance implements AttributeStore
     InstanceData toGPB() {
         InstanceData.Builder builder = InstanceData.newBuilder();
         if (this.sopInstanceUID != null) {
-        	builder.setSopInstanceUid(this.sopInstanceUID);
+            builder.setSopInstanceUid(this.sopInstanceUID);
         }
         if (this.transferSyntaxUID != null) {
-        	builder.setTransferSyntaxUid(this.transferSyntaxUID);
+            builder.setTransferSyntaxUid(this.transferSyntaxUID);
         }
         if (this.exclude != null) {
-        	builder.setExclude(this.exclude);
+            builder.setExclude(this.exclude);
         }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());

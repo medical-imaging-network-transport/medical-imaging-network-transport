@@ -16,11 +16,11 @@
 
 package org.nema.medical.mint.metadata;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
@@ -41,8 +41,8 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData;
  */
 public class Study implements AttributeStore
 {
-    private final Map<Integer,Attribute> attributeMap = new HashMap<Integer,Attribute>();
-    private final Map<String,Series> seriesMap = new HashMap<String,Series>();
+    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
+    private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
     private String studyInstanceUID;
 
     /**
@@ -150,7 +150,7 @@ public class Study implements AttributeStore
     StudyData toGPB() {
         StudyData.Builder builder = StudyData.newBuilder();
         if (this.studyInstanceUID != null) {
-        	builder.setStudyInstanceUid(this.studyInstanceUID);
+            builder.setStudyInstanceUid(this.studyInstanceUID);
         }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
@@ -161,145 +161,145 @@ public class Study implements AttributeStore
         StudyData data = builder.build();
         return data;
     }
-    
-	/**
-	 * This method should pull all data from the provided study into 'this'
-	 * study and overwrite any existing values in 'this' study.
-	 * 
-	 * @param study
-	 */
+
+    /**
+     * This method should pull all data from the provided study into 'this'
+     * study and overwrite any existing values in 'this' study.
+     *
+     * @param study
+     */
     public void mergeStudy(Study study)
     {
-    	//Merge study level attributes
-		for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
-		{
-			Attribute attribute = i.next();
-			
-			Queue<Attribute> sequence = new LinkedList<Attribute>();
+        //Merge study level attributes
+        for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
+        {
+            Attribute attribute = i.next();
+
+            Queue<Attribute> sequence = new LinkedList<Attribute>();
             sequence.add(attribute);
-            
+
             while(!sequence.isEmpty())
             {
-            	Attribute curr = sequence.remove();
-            	
-            	this.putAttribute(curr);
-            	
+                Attribute curr = sequence.remove();
+
+                this.putAttribute(curr);
+
                 //Add children to queue
-            	for(Iterator<Item> ii = curr.itemIterator(); ii.hasNext();)
-            	{
-            		for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
-            		{
-            			sequence.add(iii.next());
-            		}
-            	}
+                for(Iterator<Item> ii = curr.itemIterator(); ii.hasNext();)
+                {
+                    for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+                    {
+                        sequence.add(iii.next());
+                    }
+                }
             }
-		}
-		
-		//Merge series from study
-		for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
-		{
-			Series series = i.next();
-			Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
-			
-			if(thisSeries != null)
-			{
-				//Merge attributes from series
-				for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
-				{
-					Attribute attribute = ii.next();
-					
-					Queue<Attribute> sequence = new LinkedList<Attribute>();
-		            sequence.add(attribute);
-		            
-		            while(!sequence.isEmpty())
-		            {
-		            	Attribute curr = sequence.remove();
-		            	
-		            	thisSeries.putAttribute(curr);
-		            	
-		                //Add children to queue
-		            	for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
-		            	{
-		            		for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
-		            		{
-		            			sequence.add(iiii.next());
-		            		}
-		            	}
-		            }
-				}
-				
-				//Merge normalized attributes from series
-				for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
-				{
-					Attribute attribute = ii.next();
-					
-					Queue<Attribute> sequence = new LinkedList<Attribute>();
-		            sequence.add(attribute);
-		            
-		            while(!sequence.isEmpty())
-		            {
-		            	Attribute curr = sequence.remove();
-		            	
-		            	thisSeries.putNormalizedInstanceAttribute(curr);
-		            	
-		                //Add children to queue
-		            	for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
-		            	{
-		            		for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
-		            		{
-		            			sequence.add(iiii.next());
-		            		}
-		            	}
-		            }
-				}
-				
-				//Merge instances from series
-				for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
-				{
-					Instance instance = ii.next();
-					Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
-					
-					if(thisInstance != null)
-					{
-						//Check if transfer syntax is existing, update current if it is provided
-						String transferSyntaxUID = instance.getTransferSyntaxUID();
-						if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
-						{
-							thisInstance.setTransferSyntaxUID(transferSyntaxUID);
-						}
-						
-						//Merge attributes for instances
-						for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
-						{
-							Attribute attribute = iii.next();
-							
-							Queue<Attribute> sequence = new LinkedList<Attribute>();
-				            sequence.add(attribute);
-				            
-				            while(!sequence.isEmpty())
-				            {
-				            	Attribute curr = sequence.remove();
-				            	
-				            	thisInstance.putAttribute(curr);
-				            	
-				                //Add children to queue
-				            	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
-				            	{
-				            		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
-				            		{
-				            			sequence.add(iiiii.next());
-				            		}
-				            	}
-				            }
-						}
-					}else{
-						thisSeries.putInstance(instance);
-					}
-				}
-			}else{
-				this.putSeries(series);
-			}
-		}
+        }
+
+        //Merge series from study
+        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+        {
+            Series series = i.next();
+            Series thisSeries = this.getSeries(series.getSeriesInstanceUID());
+
+            if(thisSeries != null)
+            {
+                //Merge attributes from series
+                for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    Queue<Attribute> sequence = new LinkedList<Attribute>();
+                    sequence.add(attribute);
+
+                    while(!sequence.isEmpty())
+                    {
+                        Attribute curr = sequence.remove();
+
+                        thisSeries.putAttribute(curr);
+
+                        //Add children to queue
+                        for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
+                        {
+                            for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
+                            {
+                                sequence.add(iiii.next());
+                            }
+                        }
+                    }
+                }
+
+                //Merge normalized attributes from series
+                for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    Queue<Attribute> sequence = new LinkedList<Attribute>();
+                    sequence.add(attribute);
+
+                    while(!sequence.isEmpty())
+                    {
+                        Attribute curr = sequence.remove();
+
+                        thisSeries.putNormalizedInstanceAttribute(curr);
+
+                        //Add children to queue
+                        for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
+                        {
+                            for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
+                            {
+                                sequence.add(iiii.next());
+                            }
+                        }
+                    }
+                }
+
+                //Merge instances from series
+                for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
+                {
+                    Instance instance = ii.next();
+                    Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
+
+                    if(thisInstance != null)
+                    {
+                        //Check if transfer syntax is existing, update current if it is provided
+                        String transferSyntaxUID = instance.getTransferSyntaxUID();
+                        if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
+                        {
+                            thisInstance.setTransferSyntaxUID(transferSyntaxUID);
+                        }
+
+                        //Merge attributes for instances
+                        for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
+                        {
+                            Attribute attribute = iii.next();
+
+                            Queue<Attribute> sequence = new LinkedList<Attribute>();
+                            sequence.add(attribute);
+
+                            while(!sequence.isEmpty())
+                            {
+                                Attribute curr = sequence.remove();
+
+                                thisInstance.putAttribute(curr);
+
+                                //Add children to queue
+                                for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                                {
+                                    for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                                    {
+                                        sequence.add(iiiii.next());
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        thisSeries.putInstance(instance);
+                    }
+                }
+            }else{
+                this.putSeries(series);
+            }
+        }
     }
 
 }
