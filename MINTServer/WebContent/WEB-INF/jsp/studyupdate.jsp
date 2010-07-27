@@ -12,6 +12,7 @@
 <form method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/updatestudy'>
 Study UUID: <input type=text name=studyUUID><br>
 Type: <select name=type>
+<!-- TODO dynamically populate this list from the set of types the server knows about -->
 <option value="DICOM">DICOM</option>
 </select><br>
 Metadata to upload: <input type=file name=metadata><br>
