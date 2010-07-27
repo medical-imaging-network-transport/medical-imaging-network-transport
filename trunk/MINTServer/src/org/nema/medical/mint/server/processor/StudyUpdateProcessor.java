@@ -3,6 +3,10 @@ package org.nema.medical.mint.server.processor;
 import java.io.File;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
@@ -16,11 +20,13 @@ import org.nema.medical.mint.server.domain.ChangeDAO;
 
 /**
  * 
- * @author rrobin20
+ * @author Rex
  *
  */
 public class StudyUpdateProcessor extends TimerTask {
 	static final Logger LOG = Logger.getLogger(StudyUpdateProcessor.class);
+	
+	protected static final ConcurrentMap<String, Lock> studyIdLocks = new ConcurrentHashMap<String, Lock>();
 
 	private final File jobFolder;
 	private final File studyFolder;
@@ -49,123 +55,147 @@ public class StudyUpdateProcessor extends TimerTask {
 
 	@Override
 	public void run() {
+		LOG.info("Execution started.");
+		
 		String jobID = jobFolder.getName();
 		String studyUUID = studyFolder.getName();
-		
-		//Not calling mkdirs on these because they better already exist
-		File typeFolder = new File(studyFolder, type);
-		File changelogRoot = new File(studyFolder, "changelog");
 		
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
-		File existingBinaryFolder = new File(typeFolder, "binaryitems");
 		
-		try
+		Lock lock = new ReentrantLock(), oldLock;
+		
+		oldLock = studyIdLocks.putIfAbsent(studyUUID, lock);
+		if(oldLock != null)
 		{
-			/*
-			 * Need to load current study studyinformation
-			 */
-			Study existingStudy = StudyUtil.loadStudy(typeFolder);
-
-			/*
-			 * Need to load new study information
-			 */
-			Study newStudy = StudyUtil.loadStudy(jobFolder);
-			
-			if(!StudyUtil.validateStudy(newStudy, jobFolder))
+			LOG.info("Lock was an existing lock.");
+			lock = oldLock;
+		}
+		
+		if(lock.tryLock())
+		{
+			LOG.info("Got lock, and starting process");
+			try
 			{
-				throw new RuntimeException("Validation of the jobs study failed");
+				Thread.sleep(10000);
+				
+				//Not calling mkdirs on these because they better already exist
+				File typeFolder = new File(studyFolder, type);
+				File changelogRoot = new File(studyFolder, "changelog");
+				
+				File existingBinaryFolder = new File(typeFolder, "binaryitems");
+				
+				/*
+				 * Need to load current study studyinformation
+				 */
+				Study existingStudy = StudyUtil.loadStudy(typeFolder);
+	
+				/*
+				 * Need to load new study information
+				 */
+				Study newStudy = StudyUtil.loadStudy(jobFolder);
+				
+				if(!StudyUtil.validateStudy(newStudy, jobFolder))
+				{
+					throw new RuntimeException("Validation of the jobs study failed");
+				}
+	
+				/*
+				 * Need to rename the new binary files so there are no collisions
+				 * with existing data files when merging. This also means updating
+				 * the new study document.
+				 */
+				int maxExistingItemNumber = StudyUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
+				if(!StudyUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
+				{
+					//Shift Item Ids failed!
+					throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
+				}
+				
+				/*
+				 * Write metadata update message to change log folder.
+				 */
+		        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
+		        
+		        StudyUtil.writeStudy(newStudy, changelogFolder);
+				
+				/*
+				 * Need to move through the new study and look for things to exclude
+				 * and exclude them from the existing study.
+				 */
+				if(!StudyUtil.applyExcludes(existingStudy, newStudy))
+				{
+					//Applying Excludes failed!
+					throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
+				}
+				
+				/*
+				 * Need to merge the study documents and renormalize the result.
+				 * This means first denormalize, then merge, then normalize the
+				 * result
+				 */
+				if(!StudyUtil.denormalizeStudy(existingStudy))
+				{
+					throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
+				}
+				if(!StudyUtil.denormalizeStudy(newStudy))
+				{
+					throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
+				}
+				
+				existingStudy.mergeStudy(newStudy);
+				
+				if(!StudyUtil.normalizeStudy(existingStudy))
+				{
+					throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
+				}
+				
+				/*
+				 * Need to copy into the Study folder the new study document and
+				 * binary data files.
+				 */
+				StudyUtil.writeStudy(existingStudy, typeFolder);
+				StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(typeFolder, "summary.html"));
+				
+				StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
+				
+				StudyUtil.deleteFolder(jobFolder);
+				
+				/*
+				 * Update the Job DAO and Study DAO
+				 */
+				org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
+				studyData.setID(studyUUID);
+				studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
+				studyData.setPatientName(existingStudy.getValueForAttribute(0x00100010));
+				studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
+				studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
+				studyData.setDateTime(org.nema.medical.mint.server.domain.Study
+						.now());
+				studyDAO.updateStudy(studyData);
+				// studyData.setDateTime(study.getValueForAttribute(0x00080020));
+				
+				Change updateInfo = new Change();
+				updateInfo.setId(UUID.randomUUID().toString());
+				updateInfo.setStudyID(studyUUID);
+				updateInfo.setDescription("Update of existing study.");
+				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
+				updateDAO.saveChange(updateInfo);
+	
+				jobInfo.setStatus(JobStatus.SUCCESS);
+				jobInfo.setStatusDescription("complete");
+			}catch(Exception e){
+				jobInfo.setStatus(JobStatus.FAILED);
+				jobInfo.setStatusDescription(e.getMessage());
+				LOG.error("unable to process job " + jobID, e);
+			}finally{
+				LOG.info("Releasing lock and stopping.");
+				lock.unlock();
 			}
-
-			/*
-			 * Need to rename the new binary files so there are no collisions
-			 * with existing data files when merging. This also means updating
-			 * the new study document.
-			 */
-			int maxExistingItemNumber = StudyUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
-			if(!StudyUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
-			{
-				//Shift Item Ids failed!
-				throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
-			}
-			
-			/*
-			 * Write metadata update message to change log folder.
-			 */
-	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
-	        
-	        StudyUtil.writeStudy(newStudy, changelogFolder);
-			
-			/*
-			 * Need to move through the new study and look for things to exclude
-			 * and exclude them from the existing study.
-			 */
-			if(!StudyUtil.applyExcludes(existingStudy, newStudy))
-			{
-				//Applying Excludes failed!
-				throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
-			}
-			
-			/*
-			 * Need to merge the study documents and renormalize the result.
-			 * This means first denormalize, then merge, then normalize the
-			 * result
-			 */
-			if(!StudyUtil.denormalizeStudy(existingStudy))
-			{
-				throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
-			}
-			if(!StudyUtil.denormalizeStudy(newStudy))
-			{
-				throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
-			}
-			
-			existingStudy.mergeStudy(newStudy);
-			
-			if(!StudyUtil.normalizeStudy(existingStudy))
-			{
-				throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
-			}
-			
-			/*
-			 * Need to copy into the Study folder the new study document and
-			 * binary data files.
-			 */
-			StudyUtil.writeStudy(existingStudy, typeFolder);
-			StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(typeFolder, "summary.html"));
-			
-			StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
-			
-			StudyUtil.deleteFolder(jobFolder);
-			
-			/*
-			 * Update the Job DAO and Study DAO
-			 */
-			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
-			studyData.setID(studyUUID);
-			studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
-			studyData.setPatientName(existingStudy.getValueForAttribute(0x00100010));
-			studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
-			studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
-			studyData.setDateTime(org.nema.medical.mint.server.domain.Study
-					.now());
-			studyDAO.updateStudy(studyData);
-			// studyData.setDateTime(study.getValueForAttribute(0x00080020));
-			
-			Change updateInfo = new Change();
-			updateInfo.setId(UUID.randomUUID().toString());
-			updateInfo.setStudyID(studyUUID);
-			updateInfo.setDescription("Update of existing study.");
-			updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
-			updateDAO.saveChange(updateInfo);
-
-			jobInfo.setStatus(JobStatus.SUCCESS);
-			jobInfo.setStatusDescription("complete");
-		}catch(Exception e){
+		}else{
 			jobInfo.setStatus(JobStatus.FAILED);
-			jobInfo.setStatusDescription(e.getMessage());
-			LOG.error("unable to process job " + jobID, e);
+			jobInfo.setStatusDescription("unable to process job " + jobID + ", another update is current being processed on the same study.");
 		}
 		
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);

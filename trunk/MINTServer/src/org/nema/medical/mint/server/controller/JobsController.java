@@ -25,8 +25,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -61,7 +62,7 @@ public class JobsController {
 	private static final List<String> supportedMetadataExtensions = Arrays
 			.asList(".gpb", ".gpb.gz", ".xml", ".xml.gz", ".json", ".json.gz");
 
-	private Timer timer;
+	private ExecutorService executor;
 
 	@Autowired
 	protected File jobTemp;
@@ -76,13 +77,13 @@ public class JobsController {
 	protected ChangeDAO updateDAO = null;
 
 	@PostConstruct
-	public void setupTimer() {
-		timer = new Timer("ProcessTimer", true);
+	public void setupExecutor() {
+		executor = Executors.newCachedThreadPool();
 	}
 
 	@PreDestroy
-	public void stopTimer() {
-		timer.cancel();
+	public void stopExecutor() {
+		executor.shutdown();
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy")
@@ -156,7 +157,7 @@ public class JobsController {
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
 				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
 				updateDAO);
-		timer.schedule(processor, 0); // process immediately in the background
+		executor.execute(processor); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
@@ -251,7 +252,7 @@ public class JobsController {
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
 				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
 				updateDAO);
-		timer.schedule(processor, 0); // process immediately in the background
+		executor.execute(processor); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
