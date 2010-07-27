@@ -7,11 +7,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
+import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
@@ -178,7 +180,7 @@ public final class StudyUtil {
 
     /**
      * Will return true always unless something catastrophically unexpected
-     * occurs.
+     * occurs.  Assumes that all bids will be within the instances.
      *
      * @param study
      * @param shiftAmount
@@ -194,11 +196,29 @@ public final class StudyUtil {
                 {
                     Attribute a = iii.next();
 
-                    int bid = a.getBid();
-                    if(bid >= 0)
+                    Queue<Attribute> sequence = new LinkedList<Attribute>();
+                    sequence.add(a);
+                    
+                    while(!sequence.isEmpty())
                     {
-                        bid += shiftAmount;
-                        a.setBid(bid);
+                    	Attribute curr = sequence.remove();
+                    	
+                    	//Check if bid exists
+                    	int bid = curr.getBid();
+                        if(bid >= 0)
+                        {
+                            bid += shiftAmount;
+                            curr.setBid(bid);
+                        }
+                    	
+                        //Add children to queue
+                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                    	{
+                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                    		{
+                    			sequence.add(iiiii.next());
+                    		}
+                    	}
                     }
                 }
             }
@@ -310,6 +330,12 @@ public final class StudyUtil {
         return true;
     }
 
+	/**
+	 * Determines if the provided string is a valid "exclude" string.
+	 * 
+	 * @param exculde
+	 * @return
+	 */
     public static boolean isExclude(String exculde)
     {
         return exculde != null;
@@ -590,14 +616,31 @@ public final class StudyUtil {
                 {
                     Attribute a = iii.next();
 
-                    int bid = a.getBid();
-                    if(bid >= 0)
+                    Queue<Attribute> sequence = new LinkedList<Attribute>();
+                    sequence.add(a);
+                    
+                    while(!sequence.isEmpty())
                     {
-                        if(!studyBids.add(bid))
+                    	Attribute curr = sequence.remove();
+                    	
+                    	int bid = curr.getBid();
+                        if(bid >= 0)
                         {
-                            //If the set already contained the bid
-                            return false;
+                            if(!studyBids.add(bid))
+                            {
+                                //If the set already contained the bid, should be unique reference
+                                return false;
+                            }
                         }
+                    	
+                        //Add children to queue
+                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                    	{
+                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                    		{
+                    			sequence.add(iiiii.next());
+                    		}
+                    	}
                     }
                 }
             }
