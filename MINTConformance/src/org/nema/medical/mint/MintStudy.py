@@ -38,7 +38,7 @@ from org.nema.medical.mint.XmlNode       import XmlNode
 # -----------------------------------------------------------------------------
 # MintStudy
 # -----------------------------------------------------------------------------
-class MintStudy(): #XmlDocument):
+class MintStudy():
    
    ROOT_TAG_NAME = "StudyMeta"
    
@@ -46,9 +46,6 @@ class MintStudy(): #XmlDocument):
        """
        Parses a MINT Study XML document.
        """
-       #XmlDocument.__init__(self, MintStudy.ROOT_TAG_NAME)
-       #self.readFromFile(metadataName)
-
        self.__xml = XmlDocument(MintStudy.ROOT_TAG_NAME)
        self.__xmlns = ""
        self.__studyInstanceUID = ""
@@ -102,7 +99,36 @@ class MintStudy(): #XmlDocument):
           return self.__series[uid]
        else:
           return None
+          
+   def numInstances(self):
+       numInstances = 0
+       numSeries = self.numSeries()
+       for n in range(0, numSeries):
+           series = self.series(n)
+           numInstances += series.numInstances()           
+       return numInstances
 
+   def instanceByUID(self, uid):
+       """
+       Returns a MintInstance if UID is found, otherwise None.
+       """
+       instance = None
+       numSeries = self.numSeries()
+       for n in range(0, numSeries):
+           series = self.series(n)
+           instance = series.instanceByUID(uid)
+           if instance != None:
+              return instance
+       return instance
+          
+   def find(self, tag, seriesInstanceUID="", sopInstanceUID=""):
+       attr = self.attributeByTag(tag)
+       if attr == None:
+          series = self.seriesByUID(seriesInstanceUID)
+          if series != None:
+             attr = series.find(tag, sopInstanceUID)
+       return attr
+       
    def __readFromFile(self, metadataName):
        self.__xml.readFromFile(metadataName)
       

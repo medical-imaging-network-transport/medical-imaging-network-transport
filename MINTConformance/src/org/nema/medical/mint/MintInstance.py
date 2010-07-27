@@ -63,7 +63,10 @@ class MintInstance():
           return self.__attributes[tag]
        else:
           return None
-
+       
+   def find(self, tag):
+       return self.attributeByTag(tag)
+       
    def toString(self):
        return self.__str__()
 

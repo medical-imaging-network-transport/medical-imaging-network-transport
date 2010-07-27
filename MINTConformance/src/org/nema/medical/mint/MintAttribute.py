@@ -38,6 +38,9 @@ class MintAttribute():
        self.__vr  = node.attributeWithName("vr")
        self.__val = node.attributeWithName("val")
        self.__bid = node.attributeWithName("bid")
+       
+       if self.__val == None:
+          self.__val = ""
                 
    def tag(self): return self.__tag;
    def vr (self): return self.__vr;
@@ -51,9 +54,8 @@ class MintAttribute():
        
    def __str__(self):
        s = "tag="+self.__tag+" vr="+self.__vr
-       if self.__val != None:
-          s += " val="+self.__val
-       elif self.__bid != None:
+       s += " val="+self.__val
+       if self.__bid != None:
           s += " bid="+self.__bid
        return s
        

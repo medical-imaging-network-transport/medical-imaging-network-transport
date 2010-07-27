@@ -32,7 +32,7 @@ import string
 import sys
 import traceback
 
-from org.nema.medical.mint.DicomSeries import DicomSeries
+from org.nema.medical.mint.DicomInstance import DicomInstance
 
 # -----------------------------------------------------------------------------
 # DicomStudy
@@ -40,27 +40,33 @@ from org.nema.medical.mint.DicomSeries import DicomSeries
 class DicomStudy():
    def __init__(self, dcmDir):
        self.__dcmDir = dcmDir
-       self.__series = []
+       self.__instances = []
        self.__read()
+
+   def studyInstanceUID(self):
+       if self.numInstances() > 0:
+          return self.instances(0).studyInstanceUID()
+       else:
+          return ""
        
-   def numSeries(self):
-       return len(self.__series)
+   def numInstances(self):
+       return len(self.__instances)
        
-   def series(self, n):
-       return self.__series[n]
+   def instances(self, n):
+       return self.__instances[n]
        
    def _print(self):
-       numSeries = self.numSeries()
-       for n in range(0, numSeries):
-           series = self.series(n)
-           series._print()
+       numInstances = self.numInstances()
+       for n in range(0, numInstances):
+           instances = self.instances(n)
+           instances._print()
        
    def __read(self):
        pattern = os.path.join(self.__dcmDir, "*.dcm")
        dcmNames = glob.glob(pattern)
        for dcmName in dcmNames:
-           series = DicomSeries(dcmName)
-           self.__series.append(series)
+           instances = DicomInstance(dcmName)
+           self.__instances.append(instances)
        
 # -----------------------------------------------------------------------------
 # main
@@ -89,4 +95,3 @@ def main():
        
 if __name__ == "__main__":
    main()
-

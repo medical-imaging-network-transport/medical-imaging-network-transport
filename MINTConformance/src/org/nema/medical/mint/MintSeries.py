@@ -38,7 +38,8 @@ class MintSeries():
        self.__tags = []
        self.__normalizedInstanceAttributes = {}
        self.__normalizedTags = []
-       self.__instances = []
+       self.__instances = {}
+       self.__sopInstanceUIDs = []
        self.__read(root)
        
    def seriesInstanceUID(self): 
@@ -83,14 +84,34 @@ class MintSeries():
           return None
 
    def numInstances(self):
-       return len(self.__instances)
-          
+       return len(self.__sopInstanceUIDs)
+
    def instance(self, n):
        """
        Returns a MintInstance at index n.
        """
-       return self.__instances[n]
+       sopInstanceUID = self.__sopInstanceUIDs[n]
+       return self.__instances[sopInstanceUID]
 
+   def instanceByUID(self, uid):
+       """
+       Returns a MintInstance if UID is found, otherwise None.
+       """
+       if self.__instances.has_key(uid):
+          return self.__instances[uid]
+       else:
+          return None
+
+   def find(self, tag, sopInstanceUID):
+       attr = self.attributeByTag(tag)
+       if attr == None:
+          attr = self.normalizedInstanceAttributeByTag(tag)
+          if attr == None:
+             instance = self.instanceByUID(sopInstanceUID)
+             if instance != None:
+                attr = instance.find(tag)           
+       return attr
+       
    def toString(self):
        return self.__str__()
        
@@ -128,7 +149,10 @@ class MintSeries():
        if node != None:
           nodes = node.childrenWithName("Instance")
           for node in nodes:
-              self.__instances.append(MintInstance(node)) 
+              instance = MintInstance(node)
+              self.__instances[instance.sopInstanceUID()] = instance 
+       self.__sopInstanceUIDs = self.__instances.keys()
+       self.__sopInstanceUIDs.sort()
 
    def __str__(self):
        s  = "  - Series Instance UID=" + self.__seriesInstanceUID + '\n'
