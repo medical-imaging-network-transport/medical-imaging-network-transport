@@ -18,7 +18,9 @@ package org.nema.medical.mint.metadata;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
@@ -173,7 +175,24 @@ public class Study implements AttributeStore
 		{
 			Attribute attribute = i.next();
 			
-			this.putAttribute(attribute);
+			Queue<Attribute> sequence = new LinkedList<Attribute>();
+            sequence.add(attribute);
+            
+            while(!sequence.isEmpty())
+            {
+            	Attribute curr = sequence.remove();
+            	
+            	this.putAttribute(curr);
+            	
+                //Add children to queue
+            	for(Iterator<Item> ii = curr.itemIterator(); ii.hasNext();)
+            	{
+            		for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+            		{
+            			sequence.add(iii.next());
+            		}
+            	}
+            }
 		}
 		
 		//Merge series from study
@@ -189,7 +208,24 @@ public class Study implements AttributeStore
 				{
 					Attribute attribute = ii.next();
 					
-					thisSeries.putAttribute(attribute);
+					Queue<Attribute> sequence = new LinkedList<Attribute>();
+		            sequence.add(attribute);
+		            
+		            while(!sequence.isEmpty())
+		            {
+		            	Attribute curr = sequence.remove();
+		            	
+		            	thisSeries.putAttribute(curr);
+		            	
+		                //Add children to queue
+		            	for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
+		            	{
+		            		for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
+		            		{
+		            			sequence.add(iiii.next());
+		            		}
+		            	}
+		            }
 				}
 				
 				//Merge normalized attributes from series
@@ -197,7 +233,24 @@ public class Study implements AttributeStore
 				{
 					Attribute attribute = ii.next();
 					
-					thisSeries.putNormalizedInstanceAttribute(attribute);
+					Queue<Attribute> sequence = new LinkedList<Attribute>();
+		            sequence.add(attribute);
+		            
+		            while(!sequence.isEmpty())
+		            {
+		            	Attribute curr = sequence.remove();
+		            	
+		            	thisSeries.putNormalizedInstanceAttribute(curr);
+		            	
+		                //Add children to queue
+		            	for(Iterator<Item> iii = curr.itemIterator(); iii.hasNext();)
+		            	{
+		            		for(Iterator<Attribute> iiii = iii.next().attributeIterator(); iiii.hasNext();)
+		            		{
+		            			sequence.add(iiii.next());
+		            		}
+		            	}
+		            }
 				}
 				
 				//Merge instances from series
@@ -220,7 +273,24 @@ public class Study implements AttributeStore
 						{
 							Attribute attribute = iii.next();
 							
-							thisInstance.putAttribute(attribute);
+							Queue<Attribute> sequence = new LinkedList<Attribute>();
+				            sequence.add(attribute);
+				            
+				            while(!sequence.isEmpty())
+				            {
+				            	Attribute curr = sequence.remove();
+				            	
+				            	thisInstance.putAttribute(curr);
+				            	
+				                //Add children to queue
+				            	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+				            	{
+				            		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+				            		{
+				            			sequence.add(iiiii.next());
+				            		}
+				            	}
+				            }
 						}
 					}else{
 						thisSeries.putInstance(instance);
