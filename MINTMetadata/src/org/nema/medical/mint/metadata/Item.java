@@ -15,9 +15,9 @@
  */
 package org.nema.medical.mint.metadata;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
@@ -35,7 +35,7 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
  * </pre>
  */
 public class Item implements AttributeStore {
-    private final Map<Integer, Attribute> attributeMap = new HashMap<Integer, Attribute>();
+    private final Map<Integer, Attribute> attributeMap = new TreeMap<Integer, Attribute>();
 
     /**
      * @param tag

@@ -16,7 +16,11 @@
 
 package org.nema.medical.mint.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData;
@@ -38,8 +42,8 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
  */
 public class Series implements AttributeStore
 {
-    private final Map<Integer,Attribute> attributeMap = new HashMap<Integer,Attribute>();
-    private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new HashMap<Integer,Attribute>();
+    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
+    private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new TreeMap<Integer,Attribute>();
     private final List<Instance> instanceList = new ArrayList<Instance>();
     private String seriesInstanceUID;
     private String exclude;
@@ -113,43 +117,43 @@ public class Series implements AttributeStore
     public void putInstance(final Instance inst) {
         instanceList.add(inst);
     }
-    
+
     /**
      * removes an Instance from the Series based on it's sop UID
      * @param sopInstanceUID
      */
     public Instance removeInstance(final String sopInstanceUID) {
-    	for(int x = 0; x < instanceList.size(); ++x)
-    	{
-    		Instance i = instanceList.get(x);
-			if (i != null
-					&& (i.getSOPInstanceUID() == sopInstanceUID || 
-							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
-    		{
-    			return instanceList.remove(x);
-    		}
-    	}
-    	
-    	return null;
+        for(int x = 0; x < instanceList.size(); ++x)
+        {
+            Instance i = instanceList.get(x);
+            if (i != null
+                    && (i.getSOPInstanceUID() == sopInstanceUID ||
+                            (i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
+            {
+                return instanceList.remove(x);
+            }
+        }
+
+        return null;
     }
-    
+
     /**
      * gets an Instance from the Series based on it's sop UID
      * @param sopInstanceUID
      */
     public Instance getInstance(final String sopInstanceUID) {
-    	for(int x = 0; x < instanceList.size(); ++x)
-    	{
-    		Instance i = instanceList.get(x);
-			if (i != null
-					&& (i.getSOPInstanceUID() == sopInstanceUID || 
-							(i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
-    		{
-    			return instanceList.get(x);
-    		}
-    	}
-    	
-    	return null;
+        for(int x = 0; x < instanceList.size(); ++x)
+        {
+            Instance i = instanceList.get(x);
+            if (i != null
+                    && (i.getSOPInstanceUID() == sopInstanceUID ||
+                            (i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
+            {
+                return instanceList.get(x);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -190,19 +194,19 @@ public class Series implements AttributeStore
      * @return value
      */
     public String getExclude() {
-		return exclude;
-	}
+        return exclude;
+    }
 
     /**
      * Set the 'exclude' attribute value.
      *
      * @param exclude
      */
-	public void setExclude(String exclude) {
-		this.exclude = exclude;
-	}
+    public void setExclude(String exclude) {
+        this.exclude = exclude;
+    }
 
-	//
+    //
     // Google Protocol Buffer support - package protection intentional
     //
     static Series fromGPB(SeriesData data) {
@@ -224,10 +228,10 @@ public class Series implements AttributeStore
     SeriesData toGPB() {
         SeriesData.Builder builder = SeriesData.newBuilder();
         if (this.seriesInstanceUID != null ) {
-        	builder.setSeriesInstanceUid(this.seriesInstanceUID);
+            builder.setSeriesInstanceUid(this.seriesInstanceUID);
         }
         if (this.exclude != null) {
-        	builder.setExclude(this.exclude);
+            builder.setExclude(this.exclude);
         }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
