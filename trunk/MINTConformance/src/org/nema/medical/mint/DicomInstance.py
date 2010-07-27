@@ -36,6 +36,10 @@ from struct import unpack
 HEADER_GROUP     = "0002"
 PIXEL_DATA_GROUP = "7fe0"
 
+STUDY_INSTANCE_UID_TAG  = "0020000d"
+SERIES_INSTANCE_UID_TAG = "0020000e" 
+SOP_INSTANCE_UID_TAG    = "00080018" 
+   
 reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
 binaryVRs   = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
 
@@ -45,7 +49,9 @@ headerTags = {
    "00020002" : "Media Storage SOP Class UID",
    "00020003" : "Media Storage SOP Instance UID",
    "00020010" : "Transfer Syntax UID",
-   "00020012" : "Implementation Class UID"
+   "00020012" : "Implementation Class UID",
+   "00020013" : "Implementation Version Name",
+   "00020016" : "Source Application Entity Title" 
 }
 
 studyTags = {
@@ -78,7 +84,7 @@ studyTags = {
    "00101030" : "Patient Weight",
    "00102160" : "Ethnic Group",
    "00102180" : "Occupation",
-   "001021B0" : "Additional Patient History",
+   "001021b0" : "Additional Patient History",
    "00102201" : "Patient Species Description",
    "00102202" : "Patient Species Code Sequence",
    "00102203" : "Patient Sex Neutered",
@@ -104,7 +110,7 @@ studyTags = {
    "00120081" : "Clinical Trial Protocol Ethics Committee Name",
    "00120082" : "Clinical Trial Protocol Ethics Committee Approval Number",
    "00120083" : "Consent For Clinical Trial Use Sequence",
-   "0020000D" : "Study Instance UID",
+   "0020000d" : "Study Instance UID",
    "00200010" : "Study ID",
    "00321034" : "Requesting Service Code Sequence",
    "00380010" : "Admission ID",
@@ -116,10 +122,11 @@ studyTags = {
 }
 
 seriesTags = {
+   "00080018" : "Image SOP Instance UID",
    "00080021" : "Series Date",
    "00080031" : "Series Time",
    "00080060" : "Modality",
-   "0008103E" : "Series Description",
+   "0008103e" : "Series Description",
    "00081050" : "Performing Physician's Name",
    "00081052" : "Performing Physician Identification Sequence",
    "00081070" : "Operator's Name",
@@ -129,7 +136,7 @@ seriesTags = {
    "00180015" : "Body Part Examined",
    "00181030" : "Protocol Name",
    "00185100" : "Patient Position",
-   "0020000E" : "Series Instance UID",
+   "0020000e" : "Series Instance UID",
    "00200011" : "Series Number",
    "00200060" : "Laterality",
    "00280108" : "Smallest Pixel Value in Series",
@@ -144,14 +151,23 @@ seriesTags = {
 }
 
 # -----------------------------------------------------------------------------
-# DicomSeries
+# DicomInstance
 # -----------------------------------------------------------------------------
-class DicomSeries():
+class DicomInstance():
    def __init__(self, dcmName):
        self.__dcmName = dcmName
        self.__attbs = {}
        self.__tags = []
-       self.__open()
+       self.__open()   
+       
+   def studyInstanceUID(self):
+       return self.value(STUDY_INSTANCE_UID_TAG)
+       
+   def seriesInstanceUID(self):
+       return self.value(SERIES_INSTANCE_UID_TAG)
+
+   def sopInstanceUID(self):
+       return self.value(SOP_INSTANCE_UID_TAG)
        
    def numTags(self):
        return len(self.__tags)
@@ -159,9 +175,15 @@ class DicomSeries():
    def tag(self, n):
        return self.__tags[n]
        
+   def isHeader(self, tag):
+       return self.group(tag) == HEADER_GROUP
+       
    def isPrivate(self, tag):
        g = self.group(tag)
        return int(g) % 2 != 0
+       
+   def isImplicit(self, tag):
+       return self.vr(tag) == "  "
        
    def tagName(self, tag):
        if headerTags.has_key(tag):
@@ -256,9 +278,12 @@ class DicomSeries():
                 val = unpack('<L', val)
              val=val[0]
           else:
-          # Trim extra characters
              val = val[0:vl]
-          
+             if len(val) > 0 and not val[-1].isalnum():
+                val = val.rstrip(val[-1]) # strip non alphanumerics
+             val = val.rstrip() # strip whitespace
+             vl = len(val) # reset length
+                 
           # ---
           # Store this element and get next one.
           # ---
@@ -280,6 +305,7 @@ class DicomSeries():
        g = unpack('<h', group)
        e = unpack('<h', element)
        s = self.__bin2str(g) + self.__bin2str(e)
+       s = s.lower()
        return s
    
    def __attb(self, tag, index):
@@ -305,8 +331,8 @@ def main():
        # Read dicom.
        # ---
        dcmName = sys.argv[1];
-       series = DicomSeries(dcmName)
-       series._print()
+       instance = DicomInstance(dcmName)
+       instance._print()
                         
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
