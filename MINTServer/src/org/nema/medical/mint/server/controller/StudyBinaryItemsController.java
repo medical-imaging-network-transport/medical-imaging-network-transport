@@ -104,8 +104,10 @@ public class StudyBinaryItemsController {
         for (File binaryItem : binaryItems) {
             if (multipart) {
                 final long itemsize = binaryItem.length();
-                out.write("\nContent-type: application/octet-stream\n".getBytes());
-                out.write(("Content-length: " + itemsize + "\n\n").getBytes());
+                String index = binaryItem.getName().split("\\.")[0];
+                out.write("\nContent-Type: application/octet-stream\n".getBytes());
+                out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
+                out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
             }
 
             streamBinaryItem(binaryItem,out);
