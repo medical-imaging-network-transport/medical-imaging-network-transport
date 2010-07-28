@@ -222,7 +222,7 @@ public final class Dcm2MetaBuilder {
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
-         } else if (vr == VR.OW || vr == VR.OB || vr == VR.UN || vr == VR.UN_SIEMENS) {
+         } else if (vr == VR.OW || vr == VR.OB || vr == VR.OF || vr == VR.UN || vr == VR.UN_SIEMENS) {
              //Binary
              store.storeBinary();
          } else if (vr == VR.SQ) {
