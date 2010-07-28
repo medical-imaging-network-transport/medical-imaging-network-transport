@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
+import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -140,6 +143,19 @@ public class StudyBinaryItemsController {
         }
     }
 
+	/**
+	 * This method will scan through the study in the provided root directory
+	 * and will create a list of bid's encountered in order. This order is
+	 * expected to be the order in which the binary IDs exist in the study
+	 * metadata document.
+	 * 
+	 * @param seq
+	 * @param type
+	 * @param studyRoot
+	 * @return
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
     private List<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
         final List<Integer> itemList = new ArrayList<Integer>();
 
@@ -155,9 +171,27 @@ public class StudyBinaryItemsController {
                     for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
                         Attribute a = iii.next();
 
-                        int bid = a.getBid();
-                        if (bid >= 0) {
-                            itemList.add(bid);
+                        Queue<Attribute> sequence = new LinkedList<Attribute>();
+                        sequence.add(a);
+                        
+                        while(!sequence.isEmpty())
+                        {
+                        	Attribute curr = sequence.remove();
+                        	
+                        	//Check if bid exists
+                        	int bid = curr.getBid();
+                            if (bid >= 0) {
+                                itemList.add(bid);
+                            }
+                        	
+                            //Add children to queue
+                        	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                        	{
+                        		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                        		{
+                        			sequence.add(iiiii.next());
+                        		}
+                        	}
                         }
                     }
                 }
