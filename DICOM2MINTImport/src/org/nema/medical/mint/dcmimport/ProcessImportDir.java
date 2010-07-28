@@ -75,13 +75,15 @@ import org.w3c.dom.NodeList;
  */
 public final class ProcessImportDir {
 
-    public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB, final boolean deletePhysicalInstanceFiles) {
+    public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB,
+            final boolean deletePhysicalInstanceFiles, final boolean forceCreate) {
         this.importDir = importDir;
         this.createURI = URI.create(serverURI + "/jobs/createstudy");
         this.queryURI = URI.create(serverURI + "/studies");
         this.updateURI = URI.create(serverURI + "/jobs/updatestudy");
         this.useXMLNotGPB = useXMLNotGPB;
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
+        this.forceCreate = forceCreate;
     }
 
     public void processDir() {
@@ -167,9 +169,14 @@ public final class ProcessImportDir {
             final MetaBinaryFiles sendData = studySendIter.next();
             studySendIter.remove();
 
-            //Determine whether study exists and we need to perform an update
-            final Study metadata = sendData.metaBinaryPair.getMetadata();
-            final String studyUUID = doesStudyExist(metadata.getStudyInstanceUID(), metadata.getAttribute(Tag.PatientID).getVal());
+            final String studyUUID;
+            if (forceCreate) {
+                studyUUID = null;
+            } else {
+                //Determine whether study exists and we need to perform an update
+                final Study metadata = sendData.metaBinaryPair.getMetadata();
+                studyUUID = doesStudyExist(metadata.getStudyInstanceUID(), metadata.getAttribute(Tag.PatientID).getVal());
+            }
 
             send(sendData.metaBinaryPair, sendData.studyInstanceFiles, studyUUID);
         }
@@ -292,6 +299,21 @@ public final class ProcessImportDir {
             entity.addPart("binary", new InputStreamBody(binaryStream, "binary"));
         }
 
+        //Debugging only
+//        int i = 0;
+//        for (final InputStream binaryStream: Iter.iter(((BinaryDcmData) binaryData).streamIterator())) {
+//            final OutputStream testout = new BufferedOutputStream(new FileOutputStream("E:/testdata/" + i), 10000);
+//            for(;;) {
+//                final int val = binaryStream.read();
+//                if (val == -1) {
+//                    break;
+//                }
+//                testout.write(val);
+//            }
+//            testout.close();
+//            ++i;
+//        }
+
         httpPost.setEntity(entity);
 
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
@@ -355,6 +377,7 @@ public final class ProcessImportDir {
     private final Map<String, Collection<File>> jobIDInfo =
         Collections.synchronizedMap(new HashMap<String, Collection<File>>());
     private final boolean deletePhysicalInstanceFiles;
+    private final boolean forceCreate;
 
     private static final Set<Integer> STUDY_LEVEL_TAGS = getTags("StudyTags.txt");
     private static final Set<Integer> SERIES_LEVEL_TAGS = getTags("SeriesTags.txt");
