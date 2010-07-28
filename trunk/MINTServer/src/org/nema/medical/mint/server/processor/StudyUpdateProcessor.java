@@ -55,7 +55,7 @@ public class StudyUpdateProcessor extends TimerTask {
 
 	@Override
 	public void run() {
-		LOG.info("Execution started.");
+		LOG.debug("Execution started.");
 		
 		String jobID = jobFolder.getName();
 		String studyUUID = studyFolder.getName();
@@ -69,17 +69,15 @@ public class StudyUpdateProcessor extends TimerTask {
 		oldLock = studyIdLocks.putIfAbsent(studyUUID, lock);
 		if(oldLock != null)
 		{
-			LOG.info("Lock was an existing lock.");
+			LOG.debug("Lock was an existing lock.");
 			lock = oldLock;
 		}
 		
 		if(lock.tryLock())
 		{
-			LOG.info("Got lock, and starting process");
+			LOG.debug("Got lock, and starting process");
 			try
 			{
-				Thread.sleep(10000);
-				
 				//Not calling mkdirs on these because they better already exist
 				File typeFolder = new File(studyFolder, type);
 				File changelogRoot = new File(studyFolder, "changelog");
@@ -190,7 +188,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				jobInfo.setStatusDescription(e.getMessage());
 				LOG.error("unable to process job " + jobID, e);
 			}finally{
-				LOG.info("Releasing lock and stopping.");
+				LOG.debug("Releasing lock and stopping.");
 				lock.unlock();
 			}
 		}else{
