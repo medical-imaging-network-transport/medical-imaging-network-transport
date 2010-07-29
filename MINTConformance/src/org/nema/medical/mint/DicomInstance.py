@@ -33,13 +33,11 @@ import traceback
 
 from struct import unpack
 
-HEADER_GROUP     = "0002"
-PIXEL_DATA_GROUP = "7fe0"
-
 STUDY_INSTANCE_UID_TAG  = "0020000d"
 SERIES_INSTANCE_UID_TAG = "0020000e" 
 SOP_INSTANCE_UID_TAG    = "00080018" 
-   
+PIXEL_DATA_TAG          = "7fe00010"
+
 reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
 binaryVRs   = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
 
@@ -147,7 +145,8 @@ seriesTags = {
    "00400254" : "Performed Procedure Step Description",
    "00400260" : "Performed Procedure Step Code Sequence",
    "00400275" : "Request Attribute Sequence",
-   "00400280" : "Comments on the Performed Procedure Step"
+   "00400280" : "Comments on the Performed Procedure Step",
+   "7fe00010" : "Pixel Data"
 }
 
 # -----------------------------------------------------------------------------
@@ -175,15 +174,17 @@ class DicomInstance():
    def tag(self, n):
        return self.__tags[n]
        
-   def isHeader(self, tag):
-       return self.group(tag) == HEADER_GROUP
+   def isPrivateHeader(self, tag):
+       return self.group(tag) == "0002"
        
-   def isPrivate(self, tag):
-       g = self.group(tag)
-       return int(g) % 2 != 0
+   def isPrivateData(self, tag):
+       return self.isPrivateHeader(tag) or int(self.group(tag),16) % 2 != 0
        
    def isImplicit(self, tag):
        return self.vr(tag) == "  "
+       
+   def isBinary(self, tag):
+       return self.vr(tag) in binaryVRs or tag == PIXEL_DATA_TAG
        
    def tagName(self, tag):
        if headerTags.has_key(tag):
@@ -208,19 +209,19 @@ class DicomInstance():
        return self.__attb(tag, 1)
        
    def value(self, tag):
-       if self.group(tag) == PIXEL_DATA_GROUP:
-          return "<pixeldata>"
-       elif self.isPrivate(tag):
-          return "<private>"
-       else:
-          return self.__attb(tag, 2)
+       return self.__attb(tag, 2)
        
    def _print(self):
        s = self
        numTags = s.numTags()
        for n in range(0, numTags):
            tag = s.tag(n)
-           print tag, s.tagName(tag), s.vr(tag), s.length(tag), s.value(tag)
+           val = s.value(tag)
+           if tag == PIXEL_DATA_TAG:
+              val = "<Pixel Data>"
+           elif self.isPrivateData(tag):
+              val = "<Private>"
+           print tag, s.tagName(tag), s.vr(tag), s.length(tag), val
            
    def __open(self):
        dcm = open(self.__dcmName, "rb")
@@ -247,7 +248,7 @@ class DicomInstance():
           # If this is a header tag then the VR is explicit
           # ---
           vr="  "    
-          if self.group(tag) == HEADER_GROUP:
+          if self.isPrivateHeader(tag):
              vr=dcm.read(2)
           
           # ---
@@ -271,12 +272,9 @@ class DicomInstance():
           # Read the val
           # ---
           val=dcm.read(vl)
-          if vr in binaryVRs:
-             if vl == 2:
-                val = unpack('<h', val)
-             else:
-                val = unpack('<L', val)
-             val=val[0]
+          if self.isBinary(tag):
+             val = unpack('B'*len(val), val)
+             vl = len(val)
           else:
              val = val[0:vl]
              if len(val) > 0 and not val[-1].isalnum():

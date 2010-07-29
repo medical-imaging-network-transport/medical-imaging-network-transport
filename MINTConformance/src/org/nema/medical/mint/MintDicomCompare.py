@@ -31,6 +31,7 @@ import sys
 import traceback
 
 from os.path import join
+from struct import unpack
 
 from org.nema.medical.mint.DicomStudy    import DicomStudy
 from org.nema.medical.mint.MintAttribute import MintAttribute
@@ -115,31 +116,8 @@ class MintDicomCompare():
        numTags = instance.numTags()
        for n in range(0, numTags):
            tag = instance.tag(n)
-           if instance.isHeader(tag):
-              break
-           attr = mint.find(tag, instance.seriesInstanceUID(), instance.sopInstanceUID())
-           if attr == None:
-              self.__check("Data Element", 
-                           tag, 
-                           "None", 
-                           instance.seriesInstanceUID(), 
-                           instance.sopInstanceUID())
-           else:
-              val = instance.value(tag)
-              
-              if not instance.isImplicit(tag):
-                 self.__check(tag+"VR",
-                              instance.vr(tag),
-                              attr.vr(),
-                              instance.seriesInstanceUID(), 
-                              instance.sopInstanceUID())
-                            
-              if not attr.isBinary():
-                 self.__check(tag+" Value",
-                              instance.value(tag),
-                              attr.val(),
-                              instance.seriesInstanceUID(), 
-                              instance.sopInstanceUID())
+           if not instance.isPrivateHeader(tag):
+              self.__checkTag(instance, mint, tag)
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
        if obj1 != obj2:
@@ -150,87 +128,107 @@ class MintDicomCompare():
              if sop != "":
                 print "  - SOP Instance UID", sop
           print "+++", msg, ":", obj1, "!=", obj2
-
-   def __checkForBinary(self, attr):
-       if attr.bid() != None and attr.isBinary() and attr.bid() not in self.__binaryitems:
-          self.__binaryitems.append(attr.bid())
        
-   def __checkBinary(self):
-       bufsize = 1024
+   def __checkTag(self, instance, mint, tag):
+       attr = mint.find(tag, instance.seriesInstanceUID(), instance.sopInstanceUID())
+       if attr == None:
+          self.__check("Data Element", 
+                       tag, 
+                       "None", 
+                       instance.seriesInstanceUID(), 
+                       instance.sopInstanceUID())
+       else:
+          val = instance.value(tag)
+          
+          if not instance.isImplicit(tag):
+             self.__check(tag+"VR",
+                          instance.vr(tag),
+                          attr.vr(),
+                          instance.seriesInstanceUID(), 
+                          instance.sopInstanceUID())
+                            
+          if instance.isBinary(tag):
+             self.__checkBinary(instance, mint, tag, attr)
+          else:
+             self.__check(tag+" Value",
+                          instance.value(tag),
+                          attr.val(),
+                          instance.seriesInstanceUID(), 
+                          instance.sopInstanceUID())
+
+   def __checkBinary(self, instance, mint, tag, attr):
+
+       binaryitem = attr.bid()
        
        # ---
-       # Loop through each binary item.
+       # Check for MINT binary item.
        # ---
-       for binaryitem in self.__binaryitems:
-       
-           # ---
-           # Check for binary item in study 1.
-           # ---
-           dat1 = os.path.join(self.__binary1, binaryitem+".dat")
-           if not os.access(dat1, os.F_OK):
-              self.count += 1
-              print "File not found", ":", dat1
-              pass
+       dat = os.path.join(self.__binary, binaryitem+".dat")
+       if not os.access(dat, os.F_OK):
+          self.count += 1
+          print "File not found", ":", dat
+          pass
            
-           # ---
-           # Check for binary item in study 2.
-           # ---
-           dat2 = os.path.join(self.__binary2, binaryitem+".dat")
-           if not os.access(dat2, os.F_OK):
-              self.count += 1
-              print "File not found", ":", dat2
-              pass
-              
-           # ---
-           # Check for binary item sizes.
-           # ---
-           size1 = os.path.getsize(dat1)
-           size2 = os.path.getsize(dat2)
-           self.check(binaryitem+".dat size",
-                      size1,
-                      size2)
+       # ---
+       # Check binary item sizes.
+       # ---
+       size1 = instance.length(tag)
+       size2 = os.path.getsize(dat)
+       self.__check(tag+" "+binaryitem+".dat size",
+                    size1,
+                    size2,
+                    instance.seriesInstanceUID(), 
+                    instance.sopInstanceUID())
 
-           # ---
-           # Check for binary item byte for byte.
-           # ---
-           if size1 == size2:
-              bid1 = open(dat1, "rb")
-              bid2 = open(dat2, "rb")
-           
-              # ---
-              # Read in a block.
-              # ---
-              block = 0
-              buf1 = bid1.read(bufsize)
-              while buf1 != "":
-                 buf2 = bid2.read(bufsize)
-                 n1 = len(buf1)
-                 n2 = len(buf2)
-                 assert n1 == n2 # These better be equal
+       # ---
+       # Check binary item byte for byte.
+       # ---
+       if size1 == size2:
+          bid = open(dat, "rb")
+          val = instance.value(tag)
+          assert size1 == len(val) # These better be equal
+
+          # ---
+          # Read in a block.
+          # ---
+          bufsize = 1024
+          block = 0
+          buf = bid.read(bufsize)
+          bytes = unpack('B'*len(buf), buf)
+          n = len(bytes)
+          bytesCompared = 0
+          while n > 0:          
+
+             # ---
+             # Loop through block.
+             # ---
+             diff = False
+             for i in range(0, n):
+                 self.__check(binaryitem+".dat byte "+str(block*bufsize+i),
+                              val[bytesCompared],
+                              bytes[i],
+                              instance.seriesInstanceUID(), 
+                              instance.sopInstanceUID())
                  
-                 # ---
-                 # Loop through block.
-                 # ---
-                 diff = False
-                 for i in range(0, n1):
-                     if buf1[i] != buf2[i]:
-                        self.count += 1
-                        print binaryitem+".dat byte "+str(block*bufsize+i)+" differs."
-                        diff = True
-                        break
-                        
-                 # ---
-                 # Skip to end if difference was found.
-                 # ---
-                 if diff:
-                    buf1 = ""
-                 else:
-                    buf1 = bid1.read(1024)
-                    block += 1
+                 if val[bytesCompared] != bytes[i]:
+                    diff = True
+                    break
+                    
+                 bytesCompared += 1
 
-              bid1.close()
-              bid2.close()
-           
+             # ---
+             # Skip to end if difference was found.
+             # ---
+             if diff:
+                n = -1
+             else:
+                buf = bid.read(bufsize)
+                bytes = unpack('B'*len(buf), buf)
+                n = len(bytes)
+                block += 1
+             
+          bid.close()
+ 
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
