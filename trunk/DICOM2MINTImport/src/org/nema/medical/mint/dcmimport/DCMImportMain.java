@@ -43,8 +43,8 @@ public class DCMImportMain {
             }
         }
 
-        //Too many or not enough arguments
-        if( args.length < 4 && args.length > 6) {
+        //Not enough arguments
+        if(args.length < 4) {
             System.err.println("An invalid number of arguments was specified: once|daemon, xml|gpb, [DIRECTORY], and [URL] must be defined.\n");
             printUsage();
             return;
@@ -90,24 +90,22 @@ public class DCMImportMain {
 
         boolean deletePhysicalFiles = true;
         boolean forceCreate = false;
-        if (args.length > 4) {
-            int curArgIdx = 4;
+        int curArgIdx = 4;
 
-            if (args[curArgIdx].equals("nodelete")) {
-                deletePhysicalFiles = false;
-                ++curArgIdx;
-            }
+        if (curArgIdx < args.length && args[curArgIdx].equals("nodelete")) {
+            deletePhysicalFiles = false;
+            ++curArgIdx;
+        }
 
-            if (args[curArgIdx].equals("forcecreate")) {
-                forceCreate = true;
-                ++curArgIdx;
-            }
+        if (curArgIdx < args.length && args[curArgIdx].equals("forcecreate")) {
+            forceCreate = true;
+            ++curArgIdx;
+        }
 
-            if (curArgIdx < args.length - 1) {
-                System.err.println("Invalid arguments.");
-                printUsage();
-                return;
-            }
+        if (curArgIdx < args.length) {
+            System.err.println("Invalid arguments.");
+            printUsage();
+            return;
         }
 
         //Now check that the server exists
