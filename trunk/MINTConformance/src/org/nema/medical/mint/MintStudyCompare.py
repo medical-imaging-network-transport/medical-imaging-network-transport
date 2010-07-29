@@ -31,6 +31,7 @@ import sys
 import traceback
 
 from os.path import join
+from struct import unpack
 
 from org.nema.medical.mint.MintStudy import MintStudy
 
@@ -186,7 +187,6 @@ class MintStudyCompare():
           self.__binaryitems.append(attr.bid())
        
    def __checkBinary(self):
-       bufsize = 1024
        
        # ---
        # Loop through each binary item.
@@ -212,7 +212,7 @@ class MintStudyCompare():
               pass
               
            # ---
-           # Check for binary item sizes.
+           # Check binary item sizes.
            # ---
            size1 = os.path.getsize(dat1)
            size2 = os.path.getsize(dat2)
@@ -221,7 +221,7 @@ class MintStudyCompare():
                       size2)
 
            # ---
-           # Check for binary item byte for byte.
+           # Check binary item byte for byte.
            # ---
            if size1 == size2:
               bid1 = open(dat1, "rb")
@@ -230,12 +230,16 @@ class MintStudyCompare():
               # ---
               # Read in a block.
               # ---
+              bufsize = 1024
               block = 0
               buf1 = bid1.read(bufsize)
-              while buf1 != "":
+              bytes1 = unpack('B'*len(buf1), buf1)
+              n1 = len(bytes1)
+              bytesCompared = 0
+              while n1 > 0:   
                  buf2 = bid2.read(bufsize)
-                 n1 = len(buf1)
-                 n2 = len(buf2)
+                 bytes2 = unpack('B'*len(buf2), buf2)
+                 n2 = len(bytes2)
                  assert n1 == n2 # These better be equal
                  
                  # ---
@@ -243,24 +247,30 @@ class MintStudyCompare():
                  # ---
                  diff = False
                  for i in range(0, n1):
-                     if buf1[i] != buf2[i]:
-                        self.__count += 1
-                        print binaryitem+".dat byte "+str(block*bufsize+i)+" differs."
+                     self.check(binaryitem+".dat byte "+str(block*bufsize+i),
+                                bytes1[i],
+                                bytes2[i])
+                
+                     if bytes1[i] != bytes2[i]:
                         diff = True
                         break
-                        
+                     
+                     bytesCompared += 1
+
                  # ---
                  # Skip to end if difference was found.
                  # ---
                  if diff:
-                    buf1 = ""
+                    n1 = -1
                  else:
-                    buf1 = bid1.read(1024)
+                    buf1 = bid1.read(bufsize)
+                    bytes1 = unpack('B'*len(buf1), buf1)
+                    n1 = len(bytes1)
                     block += 1
 
               bid1.close()
               bid2.close()
-           
+
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
