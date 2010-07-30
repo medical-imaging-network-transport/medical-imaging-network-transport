@@ -101,6 +101,9 @@ public final class ProcessImportDir {
                     dcmStream.setHandler(new StopTagInputHandler(Tag.StudyInstanceUID + 1));
                     final DicomObject dcmObj = dcmStream.readDicomObject();
                     studyUID = Dcm2MetaBuilder.extractStudyInstanceUID(dcmObj);
+                    if (studyUID == null) {
+                        throw new IOException("DICOM file without study instance UID - skipping: " + plainFile.getPath());
+                    }
                 } finally {
                     dcmStream.close();
                 }
