@@ -56,8 +56,20 @@ class MintDicomCompare():
        self.__mint = MintStudy(mintStudyXml)
        self.__binary = os.path.join(os.path.dirname(mintStudyXml), "binaryitems")
        self.__binaryitems = []
-       self.count = 0
+       self.__count = 0
+       self.__verbose = False
+       self.__tagsSkipped = 0
+       self.__binaryTagsCompared = 0
+       self.__textTagsCompared = 0
+       self.__bytesCompared = 0
+       self.__lazy= False
 
+   def setVerbose(self, verbose):
+       self.__verbose = verbose
+       
+   def setLazy(self, lazy):
+       self.__lazy = lazy
+       
    def compare(self):       
        dicm = self.__dicom
        mint = self.__mint
@@ -67,12 +79,28 @@ class MintDicomCompare():
                     mint.numInstances())
        
        numInstances = dicm.numInstances()
+       instancesCompared = 0
        for n in range(0, numInstances):
            instance = dicm.instances(n)
            self.__compareInstances(instance, mint)
-           
-       if self.count != 0:
-          print self.count, "difference(s) found."
+           instancesCompared += 1
+
+       # ---
+       # Print out stats if verbose.
+       # ---
+       
+       if self.__verbose:
+           print "%10d instance(s) compared." % (instancesCompared)
+           print "%10d tag(s) skipped." % (self.__tagsSkipped)
+           print "%10d text tag(s) compared." % (self.__textTagsCompared)
+           print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
+           print "%10d byte(s) compared." % (self.__bytesCompared)          
+
+       # ---
+       # Always print differences.
+       # ---
+       if self.__count != 0:
+          print "%10d difference(s) found." % (self.__count)
 
    def __compareInstances(self, instance, mint): 
 
@@ -118,10 +146,12 @@ class MintDicomCompare():
            tag = instance.tag(n)
            if not instance.isUnknown(tag):
               self.__checkTag(instance, mint, tag)
+           else:
+              self.__tagsSkipped += 1
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
        if obj1 != obj2:
-          self.count += 1
+          self.__count += 1
           print "- Study Instance UID", self.__studyInstanceUID
           if series != "":
              print " - Series Instance UID", series
@@ -146,15 +176,17 @@ class MintDicomCompare():
                           attr.vr(),
                           instance.seriesInstanceUID(), 
                           instance.sopInstanceUID())
-                            
+
           if instance.isBinary(tag):
              self.__checkBinary(instance, mint, tag, attr)
+             self.__binaryTagsCompared += 1
           else:
              self.__check(tag+" Value",
                           instance.value(tag),
                           attr.val(),
                           instance.seriesInstanceUID(), 
                           instance.sopInstanceUID())
+             self.__textTagsCompared += 1
 
    def __checkBinary(self, instance, mint, tag, attr):
 
@@ -165,7 +197,7 @@ class MintDicomCompare():
        # ---
        dat = os.path.join(self.__binary, binaryitem+".dat")
        if not os.access(dat, os.F_OK):
-          self.count += 1
+          self.__count += 1
           print "File not found", ":", dat
           return
            
@@ -183,7 +215,7 @@ class MintDicomCompare():
        # ---
        # Check binary item byte for byte.
        # ---
-       if size1 == size2:
+       if not self.__lazy and size1 == size2:
           bid = open(dat, "rb")
           val = instance.value(tag)
           assert size1 == len(val) # These better be equal
@@ -196,7 +228,7 @@ class MintDicomCompare():
           buf = bid.read(bufsize)
           bytes = unpack('B'*len(buf), buf)
           n = len(bytes)
-          bytesCompared = 0
+          b = 0
           while n > 0:          
 
              # ---
@@ -205,16 +237,17 @@ class MintDicomCompare():
              diff = False
              for i in range(0, n):
                  self.__check(binaryitem+".dat byte "+str(block*bufsize+i),
-                              val[bytesCompared],
+                              val[b],
                               bytes[i],
                               instance.seriesInstanceUID(), 
                               instance.sopInstanceUID())
                  
-                 if val[bytesCompared] != bytes[i]:
+                 if val[b] != bytes[i]:
                     diff = True
                     break
                     
-                 bytesCompared += 1
+                 self.__bytesCompared += 1
+                 b += 1
 
              # ---
              # Skip to end if difference was found.
@@ -233,20 +266,56 @@ class MintDicomCompare():
 # main
 # -----------------------------------------------------------------------------
 def main():
-    progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "")
-    
+   
+    # ---
+    # Get options.
+    # ---
+    progName = os.path.basename(sys.argv[0])
+    (options, args)=getopt.getopt(sys.argv[1:], "vlh")
+
+    # ---
+    # Check for verbose option.
+    # ---
+    verbose = False
+    for opt in options:
+        if opt[0] == "-v":
+           verbose = True
+           
+    # ---
+    # Check for lazy option.
+    # ---
+    lazy = False
+    for opt in options:
+        if opt[0] == "-l":
+           lazy = True
+           
+    # ---
+    # Check for help option.
+    # ---
+    help = False
+    for opt in options:
+        if opt[0] == "-h":
+           help = True
+           
     try:
-       if len(args) != 2:
-          print "Usage", progName, "<dicom_study_dir> <mint_study.xml>"
+       # ---
+       # Check usage.
+       # ---
+       if help or len(args) != 2:
+          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study.xml>"
+          print "  -v: verbose"
+          print "  -l: lazy check (skips binary content)"
+          print "  -h: displays usage"
           sys.exit(1)
           
        # ---
        # Read MINT metadata.
        # ---
-       dicomStudyDir = sys.argv[1];
-       mintStudyXml = sys.argv[2];
+       dicomStudyDir = args[0];
+       mintStudyXml = args[1];
        studies = MintDicomCompare(dicomStudyDir, mintStudyXml)
+       studies.setVerbose(verbose)
+       studies.setLazy(lazy)
        studies.compare()
        
     except Exception, exception:
