@@ -24,6 +24,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
 
+import com.google.protobuf.ByteString;
+
 
 /**
  * Schema fragment(s) for this class:
@@ -238,6 +240,7 @@ public class Attribute
         if (attrData.hasStringValue()) attr.setVal(attrData.getStringValue());
         if (attrData.hasExclude()) attr.setExclude(attrData.getStringValue());
         if (attrData.hasBinaryItemId()) { attr.setBid(attrData.getBinaryItemId()); }
+        if (attrData.hasBytes()) { attr.setBytes(attrData.getBytes().toByteArray()); }
         for (ItemData itemData : attrData.getItemsList()) {
             attr.addItem(Item.fromGPB(itemData));
         }
@@ -251,6 +254,7 @@ public class Attribute
         if (this.vr != null) builder.setVr(this.vr);
         if (this.val != null) builder.setStringValue(this.val);
         if (this.exclude != null) builder.setExclude(this.val);
+        if (this.bytes != null) builder.setBytes(ByteString.copyFrom(this.bytes));
         for (Item item : this.items) {
             builder.addItems(item.toGPB());
         }
