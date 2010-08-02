@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
@@ -102,12 +103,12 @@ public class StudyUpdateProcessor extends TimerTask {
 				/*
 				 * Need to load current study studyinformation
 				 */
-				Study existingStudy = StudyUtil.loadStudy(typeFolder);
+				Study existingStudy = StudyIO.loadStudy(typeFolder);
 	
 				/*
 				 * Need to load new study information
 				 */
-				Study newStudy = StudyUtil.loadStudy(jobFolder);
+				Study newStudy = StudyIO.loadStudy(jobFolder);
 				
 				if(!StudyUtil.validateStudy(newStudy, jobFolder))
 				{

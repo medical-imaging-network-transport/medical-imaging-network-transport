@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
 
@@ -35,6 +36,7 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
  *   &lt;xs:attribute type="xs:string" use="required" name="vr"/>
  *   &lt;xs:attribute type="xs:string" use="optional" name="val"/>
  *   &lt;xs:attribute type="xs:string" use="optional" name="bid"/>
+ *   &lt;xs:attribute type="xs:string" use="optional" name="bytes"/>
  * &lt;/xs:complexType>
  * </pre>
  */
@@ -45,6 +47,8 @@ public class Attribute
     private String vr;
     private String val;
     private int bid = -1; // index must be a positive integer
+    private byte[] bytes;
+    private String bytesEncoded;
     private String exclude;
 
     /**
@@ -161,6 +165,52 @@ public class Attribute
     }
 
     /**
+     * Get the actual bytes stored in the base64 encoded attribute value 'bytes'.
+     *
+     * @return bytes
+     */
+	public byte[] getBytes() {
+		if (bytes == null && bytesEncoded != null) {
+			bytes = Base64.decodeBase64(bytesEncoded.getBytes());			
+		}
+		return bytes;
+	}
+
+    /**
+     * Set the 'bytes' attribute value using the exact bytes (this will be encoded as base64 in xml and json)
+     * Negative values are not valid, except -1 which signifies no value,
+     * since zero is valid and null is not allowed for a primitive.
+     * @param bytes
+     */
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
+		this.bytesEncoded = null;
+	}
+
+    /**
+     * Get the actual bytes stored in the base64 encoded attribute value 'bytes'.
+     *
+     * @return bytes
+     */
+	public String getBytesEncoded() {
+		if (bytesEncoded == null && bytes != null) {
+			bytesEncoded = new String(Base64.encodeBase64(bytes));
+		}
+		return bytesEncoded;
+	}
+
+    /**
+     * Set the 'bytes' attribute value using the exact bytes (this will be encoded as base64 in xml and json)
+     * Negative values are not valid, except -1 which signifies no value,
+     * since zero is valid and null is not allowed for a primitive.
+     * @param bytesEncoded
+     */
+	public void setBytes(String bytesEncoded) {
+		this.bytesEncoded = bytesEncoded;
+		this.bytes = null;
+	}
+
+	/**
      * Get the 'exclude' attribute value.
      *
      * @return exclude
@@ -207,4 +257,5 @@ public class Attribute
         AttributeData data = builder.build();
         return data;
     }
+
 }

@@ -25,9 +25,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.codec.binary.Base64;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -38,6 +40,68 @@ import org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData;
 import com.google.gson.Gson;
 
 public class StudyIO {
+	
+    /**
+     * This method will try to load study information from a metadata file in
+     * the provided directory
+     *
+     * @param directory This should be a folder with a gpb, xml, or json metadata file
+     *                  in it (or a gzip version of one of those)
+     * @return Study loaded
+     * @throws IOException if unable to read files from the directory
+     */
+    public static Study loadStudy(File directory) throws IOException {
+        ArrayList<File> possibleFiles = new ArrayList<File>();
+        possibleFiles.add(new File(directory, "metadata.gpb.gz"));
+        possibleFiles.add(new File(directory, "metadata.gpb"));
+        possibleFiles.add(new File(directory, "metadata.xml.gz"));
+        possibleFiles.add(new File(directory, "metadata.xml"));
+        possibleFiles.add(new File(directory, "metadata.json.gz"));
+        possibleFiles.add(new File(directory, "metadata.json"));
+
+        Study study = null;
+        for (File file : possibleFiles) {
+            if (file.exists()) {
+                study = StudyIO.parseFile(file);
+                break;
+            }
+        }
+
+        if (study == null) {
+            throw new RuntimeException("unable to locate metadata file");
+        }
+
+        return study;
+    }
+    
+    static public Study parseFile(File file) throws IOException {
+		String name = file.getName();
+		if (name.endsWith(".xml") || name.endsWith(".xml.gz")) {
+			return parseFromXML(file);
+		}
+		else if (name.endsWith(".gpb") || name.endsWith(".gpb.gz")) {
+			return parseFromGPB(file);
+		}
+		else if (name.endsWith(".json") || name.endsWith(".json.gz")) {
+			return parseFromJSON(file);
+		}
+		else throw new IllegalArgumentException("unknown file type" + file);
+	}
+	
+	static public void writeFile(Study study, File file) throws IOException {
+		String name = file.getName();
+		if (name.endsWith(".xml") || name.endsWith(".xml.gz")) {
+			writeToXML(study,file);
+		}
+		else if (name.endsWith(".gpb") || name.endsWith(".gpb.gz")) {
+			writeToGPB(study,file);
+		}
+		else if (name.endsWith(".json") || name.endsWith(".json.gz")) {
+			writeToJSON(study,file);
+		}
+		else throw new IllegalArgumentException("unknown file type" + file);
+		
+	}
 	
 	static public Study parseFromXML(File file) throws IOException {
 		Study study = null;
@@ -187,4 +251,13 @@ public class StudyIO {
 		}
     }
 
+    // used to convert base64 to byte[]
+	static public byte[] base64decode(String string) {
+		return Base64.decodeBase64(string.getBytes());
+    }
+
+    // used to convert byte[] to base64
+	static public String base64encode(byte[] bytes) {
+		return new String(Base64.encodeBase64(bytes));
+    }
 }

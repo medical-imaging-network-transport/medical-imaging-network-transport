@@ -44,37 +44,6 @@ public final class StudyUtil {
     private static final String BINARY_FILE_EXTENSION = "dat";
 
     /**
-     * This method will try to load study information from a metadata file in
-     * the provided directory
-     *
-     * @param directory
-     *            This should be a folder with a gpb, xml, or json metadata file
-     *            in it.
-     * @return Study loaded
-     * @throws IOException
-     */
-    public static Study loadStudy(File directory) throws IOException
-    {
-        File metadataGPB = new File(directory,"metadata.gpb");
-        File metadataXML = new File(directory,"metadata.xml");
-        File metadataJSON = new File(directory,"metadata.json");
-
-        Study study;
-
-        if (metadataXML.exists()) {
-            study = StudyIO.parseFromXML(metadataXML);
-        } else if (metadataGPB.exists()) {
-            study = StudyIO.parseFromGPB(metadataGPB);
-        } else if (metadataJSON.exists()) {
-            study = StudyIO.parseFromJSON(metadataJSON);
-        } else {
-            throw new RuntimeException("unable to locate metadata file");
-        }
-
-        return study;
-    }
-
-    /**
      * This method will looks for BINARY_FILE_EXTENSION files and will try to
      * perform a parseInt on the front of the files. The largest int parsed will
      * be returned. -1 will be returned when not BINARY_FILE_EXTENSION files are
