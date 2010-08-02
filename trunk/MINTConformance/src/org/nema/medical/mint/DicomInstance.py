@@ -41,7 +41,7 @@ PIXEL_DATA_TAG          = "7fe00010"
 reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
 binaryVRs   = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
 
-headerTags = {
+part10Tags = {
    "00020000" : "File Meta Information",
    "00020001" : "File Meta Information Version",
    "00020002" : "Media Storage SOP Class UID",
@@ -174,11 +174,11 @@ class DicomInstance():
    def tag(self, n):
        return self.__tags[n]
        
-   def isPrivateHeader(self, tag):
-       return self.group(tag) == "0002"
+   def isUnknown(self, tag):
+       return int(self.group(tag),16) < 8
        
-   def isPrivateData(self, tag):
-       return self.isPrivateHeader(tag) or int(self.group(tag),16) % 2 != 0
+   def isPrivate(self, tag):
+       return int(self.group(tag),16) % 2 != 0
        
    def isImplicit(self, tag):
        return self.vr(tag) == "  "
@@ -187,8 +187,8 @@ class DicomInstance():
        return self.vr(tag) in binaryVRs or tag == PIXEL_DATA_TAG
        
    def tagName(self, tag):
-       if headerTags.has_key(tag):
-          return headerTags[tag]
+       if part10Tags.has_key(tag):
+          return part10Tags[tag]
        elif studyTags.has_key(tag):
           return studyTags[tag]
        elif seriesTags.has_key(tag):
@@ -219,8 +219,10 @@ class DicomInstance():
            val = s.value(tag)
            if tag == PIXEL_DATA_TAG:
               val = "<Pixel Data>"
-           elif self.isPrivateData(tag):
+           elif self.isPrivate(tag):
               val = "<Private>"
+           elif self.isUnknown(tag):
+              val = "<Unknown>"
            print tag, s.tagName(tag), s.vr(tag), s.length(tag), val
            
    def __open(self):
@@ -245,10 +247,10 @@ class DicomInstance():
           tag=self.__getTag(group, element)
           
           # ---
-          # If this is a header tag then the VR is explicit
+          # If this is an unknown tag then the VR is explicit
           # ---
           vr="  "    
-          if self.isPrivateHeader(tag):
+          if self.isUnknown(tag):
              vr=dcm.read(2)
           
           # ---

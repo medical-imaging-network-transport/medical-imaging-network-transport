@@ -116,7 +116,7 @@ class MintDicomCompare():
        numTags = instance.numTags()
        for n in range(0, numTags):
            tag = instance.tag(n)
-           if not instance.isPrivateHeader(tag):
+           if not instance.isUnknown(tag):
               self.__checkTag(instance, mint, tag)
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
@@ -167,7 +167,7 @@ class MintDicomCompare():
        if not os.access(dat, os.F_OK):
           self.count += 1
           print "File not found", ":", dat
-          pass
+          return
            
        # ---
        # Check binary item sizes.
