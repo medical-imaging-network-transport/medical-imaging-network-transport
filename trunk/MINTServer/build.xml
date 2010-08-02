@@ -1,69 +1,71 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="MINTServer">
-	<property file="build.properties" />
-	<property name="build.dir" value="${basedir}/build" />
+    <property file="build.properties" />
+    <property name="build.dir" value="${basedir}/build" />
 
-	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
-	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
-	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
+    <property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
+    <available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
+    <fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
 
-	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
-	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
-	<fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
+    <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
+    <available file="${common.project.basedir}" type="dir" property="common.project.available" />
+    <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
 
-	<target name="clean">
+    <target name="clean">
+        <ant dir="${common.project.basedir}" target="clean" inheritall="false" />
+
         <mkdir dir="${build.dir}/ant-classes" />
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}/ant-classes" includes="**/*" />
         </delete>
-	</target>
+    </target>
 
-	<target name="build" depends="clean" description="Compile the Java files">
-		<ant dir="${common.project.basedir}" target="jar" inheritall="false" />
+    <target name="build" description="Compile the Java files">
+        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
-		<path id="build.classpath">
-			<fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
-			<fileset dir="${basedir}/ant-lib" includes="*.jar" />
-			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/build" includes="*.jar" />
-		</path>
-		<property name="build.classpath" refid="build.classpath" />
+        <path id="build.classpath">
+            <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
+            <fileset dir="${basedir}/ant-lib" includes="*.jar" />
+            <fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+        </path>
+        <property name="build.classpath" refid="build.classpath" />
 
-		<mkdir dir="${build.dir}/ant-classes" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
-			<compilerarg value="-Xlint:-path" />
-		</javac>
-		<copy todir="${build.dir}/ant-classes">
-			<fileset dir="${basedir}/src">
-				<exclude name="**/*.java" />
-			</fileset>
-		</copy>
-	</target>
+        <mkdir dir="${build.dir}/ant-classes" />
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+            <compilerarg value="-Xlint:-path" />
+        </javac>
+        <copy todir="${build.dir}/ant-classes">
+            <fileset dir="${basedir}/src">
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+    </target>
 
-	<target name="war" depends="build" description="Make WARs for deployment">
-		<war destfile="${build.dir}/${ant.project.name}.war" webxml="WebContent/WEB-INF/web.xml">
-			<classes dir="${build.dir}/ant-classes" />
-			<fileset dir="${basedir}/WebContent">
-				<exclude name="META-INF" />
-			</fileset>
-			<lib dir="${metadata.project.basedir}/lib" includes="*.jar" />
-			<lib dir="${metadata.project.basedir}/build" includes="*.jar" />
-			<lib dir="${common.project.basedir}/lib" includes="*.jar" />
-			<lib dir="${common.project.basedir}/build" includes="*.jar" />
-			<metainf dir="WebContent/META-INF" />
-		</war>
-	</target>
-	
-	<target name="doc" depends="war" description="Make JavaDoc archives">
-		<mkdir dir="${build.dir}/doc" />
-		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
-			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-			<classpath refid="build.classpath" />
-			<doctitle>MINTServer</doctitle>
-		</javadoc>
-		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
-		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
-	</target>
+    <target name="war" depends="build" description="Make WARs for deployment">
+        <war destfile="${build.dir}/${ant.project.name}.war" webxml="WebContent/WEB-INF/web.xml">
+            <classes dir="${build.dir}/ant-classes" />
+            <fileset dir="${basedir}/WebContent">
+                <exclude name="META-INF" />
+            </fileset>
+            <lib dir="${metadata.project.basedir}/lib" includes="*.jar" />
+            <lib dir="${metadata.project.basedir}/build" includes="*.jar" />
+            <lib dir="${common.project.basedir}/lib" includes="*.jar" />
+            <lib dir="${common.project.basedir}/build" includes="*.jar" />
+            <metainf dir="WebContent/META-INF" />
+        </war>
+    </target>
+
+    <target name="doc" depends="war" description="Make JavaDoc archives">
+        <mkdir dir="${build.dir}/doc" />
+        <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+            <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+            <classpath refid="build.classpath" />
+            <doctitle>MINTServer</doctitle>
+        </javadoc>
+        <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+        <jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+    </target>
 </project>
