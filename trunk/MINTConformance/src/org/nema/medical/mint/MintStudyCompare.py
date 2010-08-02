@@ -61,7 +61,23 @@ class MintStudyCompare():
        self.__binaryitems = []
        
        self.__count = 0
+       self.__verbose = False
+       self.__studyAttributesCompared = 0
+       self.__seriesCompared = 0
+       self.__seriesAttributesCompared = 0
+       self.__normalizedInstanceAttributesCompared = 0
+       self.__instancesCompared = 0
+       self.__instanceAttributesCompared = 0
+       self.__binaryItemsCompared = 0
+       self.__bytesCompared = 0
+       self.__lazy= False
 
+   def setVerbose(self, verbose):
+       self.__verbose = verbose
+       
+   def setLazy(self, lazy):
+       self.__lazy = lazy
+       
    def compare(self):
        s1 = self.__study1
        s2 = self.__study2
@@ -85,7 +101,8 @@ class MintStudyCompare():
            if attr2 == None:
               self.check("Study Attribute", attr1.toString(), "None")
            else:
-              self.check("Study Attribute", attr1.toString(), attr2.toString())       
+              self.check("Study Attribute", attr1.toString(), attr2.toString())
+           self.__studyAttributesCompared += 1
            self.__checkForBinary(attr1)
               
        self.check("Number of series",
@@ -97,9 +114,26 @@ class MintStudyCompare():
            series1 = s1.series(n)
            series2 = s2.seriesByUID(series1.seriesInstanceUID())
            self.__compareSeries(series1, series2)
+           self.__seriesCompared += 1
            
        self.__checkBinary()
 
+       # ---
+       # Print out stats if verbose.
+       # ---       
+       if self.__verbose:
+           print "%10d study attribute(s) compared." % (self.__studyAttributesCompared)
+           print "%10d series compared." % (self.__seriesCompared)
+           print "%10d series attribute(s) compared." % (self.__seriesAttributesCompared)
+           print "%10d normalized instance attribute(s) compared." % (self.__normalizedInstanceAttributesCompared)
+           print "%10d instance(s) compared." % (self.__instancesCompared)
+           print "%10d instance attribute(s) compared." % (self.__instanceAttributesCompared)
+           print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
+           print "%10d byte(s) compared." % (self.__bytesCompared)    
+
+       # ---
+       # Always print differences.
+       # ---
        if self.__count != 0:
           print self.__count, "difference(s) found."
                  
@@ -130,8 +164,9 @@ class MintStudyCompare():
            if attr2 == None:
               self.check(series+" Attribute", attr1.toString(), "None")       
            else:
-              self.check(series+" Attribute", attr1.toString(), attr2.toString())       
+              self.check(series+" Attribute", attr1.toString(), attr2.toString())
            self.__checkForBinary(attr1)
+           self.__seriesAttributesCompared += 1
 
        numNormalizedInstanceAttributes = series1.numNormalizedInstanceAttributes()
        for n in range(0, numNormalizedInstanceAttributes):
@@ -142,6 +177,7 @@ class MintStudyCompare():
            else:
               self.check(series+" Normalized Instance Attribute", attr1.toString(), attr2.toString())       
            self.__checkForBinary(attr1)
+           self.__normalizedInstanceAttributesCompared += 1
 
        self.check("Number of "+series+" Instances",
                   series1.numInstances(), 
@@ -154,6 +190,7 @@ class MintStudyCompare():
            if series2.numInstances() >= n+1:
               instance2 = series2.instance(n)
            self.__compareInstances(instance1, instance2)
+           self.__instancesCompared += 1
 
    def __compareInstances(self, instance1, instance2):
        instance = "Instance "+instance1.sopInstanceUID()
@@ -181,6 +218,7 @@ class MintStudyCompare():
            else:
               self.check(instance+" Attribute", attr1.toString(), attr2.toString())
            self.__checkForBinary(attr1)
+           self.__instanceAttributesCompared += 1
 
    def __checkForBinary(self, attr):
        if attr.bid() != None and attr.isBinary() and attr.bid() not in self.__binaryitems:
@@ -223,7 +261,7 @@ class MintStudyCompare():
            # ---
            # Check binary item byte for byte.
            # ---
-           if size1 == size2:
+           if not self.__lazy and size1 == size2:
               bid1 = open(dat1, "rb")
               bid2 = open(dat2, "rb")
            
@@ -235,7 +273,6 @@ class MintStudyCompare():
               buf1 = bid1.read(bufsize)
               bytes1 = unpack('B'*len(buf1), buf1)
               n1 = len(bytes1)
-              bytesCompared = 0
               while n1 > 0:   
                  buf2 = bid2.read(bufsize)
                  bytes2 = unpack('B'*len(buf2), buf2)
@@ -255,7 +292,7 @@ class MintStudyCompare():
                         diff = True
                         break
                      
-                     bytesCompared += 1
+                     self.__bytesCompared += 1
 
                  # ---
                  # Skip to end if difference was found.
@@ -270,25 +307,60 @@ class MintStudyCompare():
 
               bid1.close()
               bid2.close()
+              
+           self.__binaryItemsCompared += 1
 
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
 def main():
-    progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "")
-    
+   
+    # ---
+    # Get options.
+    # ---
+    progName = os.path.basename(sys.argv[0])
+    (options, args)=getopt.getopt(sys.argv[1:], "vlh")
+
+    # ---
+    # Check for verbose option.
+    # ---
+    verbose = False
+    for opt in options:
+        if opt[0] == "-v":
+           verbose = True
+           
+    # ---
+    # Check for lazy option.
+    # ---
+    lazy = False
+    for opt in options:
+        if opt[0] == "-l":
+           lazy = True
+           
+    # ---
+    # Check for help option.
+    # ---
+    help = False
+    for opt in options:
+        if opt[0] == "-h":
+           help = True
+           
     try:
-       if len(args) != 2:
-          print "Usage", progName, "<mint_study1.xml> <mint_study2.xml>"
+       if help or len(args) != 2:
+          print "Usage:", progName, "[options] <mint_study1.xml> <mint_study2.xml>"
+          print "  -v: verbose"
+          print "  -l: lazy check (skips binary content)"
+          print "  -h: displays usage"
           sys.exit(1)
           
        # ---
        # Read MINT metadata.
        # ---
-       study1 = sys.argv[1];
-       study2 = sys.argv[2];
+       study1 = args[0];
+       study2 = args[1];
        studies = MintStudyCompare(study1, study2)
+       studies.setVerbose(verbose)
+       studies.setLazy(lazy)
        studies.compare()
        
     except Exception, exception:
