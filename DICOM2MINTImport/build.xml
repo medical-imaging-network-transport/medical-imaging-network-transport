@@ -12,13 +12,15 @@
     <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
 
     <target name="clean">
+        <ant dir="${common.project.basedir}" target="clean" inheritall="false" />
+
         <mkdir dir="${build.dir}/ant-classes" />
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}/ant-classes" includes="**/*" />
         </delete>
     </target>
 
-    <target name="build" depends="clean" description="Compile the Java files">
+    <target name="build" description="Compile the Java files">
         <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
         <path id="build.classpath">
