@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 
 /**
  * @author Rex
@@ -46,7 +47,7 @@ public class StudyMergeTest {
 	{
 		File studyDicomDir = getStudyDicomDir();
 		
-		Study study = StudyUtil.loadStudy(studyDicomDir);
+		Study study = StudyIO.loadStudy(studyDicomDir);
 		
 		assertNotNull(study);
 	}

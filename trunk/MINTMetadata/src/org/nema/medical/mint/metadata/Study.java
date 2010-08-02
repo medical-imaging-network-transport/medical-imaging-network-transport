@@ -16,9 +16,12 @@
 
 package org.nema.medical.mint.metadata;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
 import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
@@ -42,6 +45,8 @@ public class Study implements AttributeStore
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
     private String studyInstanceUID;
+    private String type;
+    private String version;
 
     /**
      * @param tag
@@ -126,6 +131,64 @@ public class Study implements AttributeStore
      */
     public void setStudyInstanceUID(String studyInstanceUID) {
         this.studyInstanceUID = studyInstanceUID;
+    }
+    
+    /**
+     * Get the 'type' attribute value.
+     *
+     * @return value
+     */
+	public String getType() {
+		return type;
+	}
+    
+    /**
+     * Set the 'type' attribute value.
+     *
+     * @param type
+     */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+    /**
+     * Get the 'type' attribute value.
+     *
+     * @return value
+     */
+	public String getVersion() {
+		return version;
+	}
+
+    /**
+     * Set the 'version' attribute value.
+     *
+     * @param version
+     */
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+    /**
+     * @return a list of all binary item IDs currently in the study
+     */
+    public Collection<Integer> getBinaryItemIDs() {
+		final Set<Integer> items = new TreeSet<Integer>();
+
+		// iterate through each instance and collect the bids
+		for (Iterator<Series> i = this.seriesIterator(); i.hasNext();) {
+			for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
+				for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
+					Attribute a = iii.next();
+
+					int bid = a.getBid();
+					if (bid >= 0) {
+						items.add(bid);
+					}
+				}
+			}
+		}
+		return items;
     }
 
     //  Google Protocol Buffer support - package protection intentional
@@ -223,5 +286,6 @@ public class Study implements AttributeStore
             }
         }
     }
+
 
 }

@@ -2,6 +2,7 @@
 <project basedir="." default="doc" name="mint-metadata">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
+	<property name="project.version" value="0.9.3" />
 
 	<target name="clean">
 		<mkdir dir="${build.dir}/ant-classes" />
@@ -82,7 +83,7 @@
 	</target>
 
 	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
-		<jar destfile="${build.dir}/${ant.project.name}.jar">
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}.jar">
 			<fileset dir="${build.dir}/ant-classes" />
 			<fileset dir="${basedir}/src">
 				<exclude name="**/*.java" />
@@ -97,8 +98,9 @@
 			<classpath refid="build.classpath" />
 			<doctitle>MINTMetadata</doctitle>
 		</javadoc>
-		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
-		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-sources.jar" basedir="${basedir}/src" includes="**" />
+		<copy file="config/mint-metadata.pom" tofile="${build.dir}/mint-metadata-${project.version}.pom"/>
 	</target>
 
 	<!-- task definitions -->

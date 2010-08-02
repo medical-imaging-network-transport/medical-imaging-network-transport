@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
@@ -83,7 +84,7 @@ public class StudyCreateProcessor extends TimerTask {
 			changelogRoot.mkdirs();
 
 			//load study into memory
-			Study study = StudyUtil.loadStudy(jobFolder);
+			Study study = StudyIO.loadStudy(jobFolder);
 			LOG.info("job " + jobID + " loaded");
 			
 			if(!StudyUtil.validateStudy(study, jobFolder))

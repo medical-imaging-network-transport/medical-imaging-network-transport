@@ -25,6 +25,8 @@ message StudyData
 {
     // identifier
     optional string study_instance_uid = 1;
+    optional string type = 4;
+    optional string version = 5;
     
     // studies contain attributes and series
     repeated AttributeData attributes = 2;
@@ -76,6 +78,7 @@ message AttributeData
     optional string string_value = 4;    // if a "normal" attribute
     optional uint32 binary_item_id = 5;  // if a binary item
     repeated ItemData items = 6;         // if a "sequence" attribute
+    repeated byte bytes = 7;             // if an embedded binary item
 }
 
 //------------------------------------------------------------------------------

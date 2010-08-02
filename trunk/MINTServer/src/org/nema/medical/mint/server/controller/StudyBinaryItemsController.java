@@ -31,11 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -163,7 +163,7 @@ public class StudyBinaryItemsController {
             //need to return all items in current metadata
             File typeRoot = new File(studyRoot, type);
 
-            org.nema.medical.mint.metadata.Study study = StudyUtil.loadStudy(typeRoot);
+            org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
 
             // iterate through each instance and collect the bids
             for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
