@@ -204,7 +204,6 @@ public final class ProcessImportDir {
         qparams.add(new BasicNameValuePair("studyInstanceUID", studyInstanceUID));
         qparams.add(new BasicNameValuePair("patientID", patientID == null ? "" : patientID));
         final String fullURI = queryURI + "?" + URLEncodedUtils.format(qparams, "UTF-8");
-        System.err.println(fullURI);
         final HttpGet httpGet = new HttpGet(fullURI);
         final String response = httpClient.execute(httpGet, new BasicResponseHandler());
         final NodeList nodeList;
