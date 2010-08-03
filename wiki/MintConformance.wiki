@@ -1,4 +1,4 @@
-#MINTConformance Package
+#summary MINTConformance Package
 
 = Iteration 1 =
 
