@@ -42,6 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.http.NameValuePair;
@@ -73,6 +74,7 @@ import org.nema.medical.mint.util.Iter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * @author Uli Bubenheimer
@@ -184,16 +186,25 @@ public final class ProcessImportDir {
             final MetaBinaryFiles sendData = studySendIter.next();
             studySendIter.remove();
 
+            //Determine whether study exists and we need to perform an update
+            final Study metadata = sendData.metaBinaryPair.getMetadata();
+            final String studyInstanceUID = metadata.getStudyInstanceUID();
             final String studyUUID;
             if (forceCreate) {
                 studyUUID = null;
             } else {
-                //Determine whether study exists and we need to perform an update
-                final Study metadata = sendData.metaBinaryPair.getMetadata();
-                studyUUID = doesStudyExist(metadata.getStudyInstanceUID(), metadata.getAttribute(Tag.PatientID).getVal());
+                studyUUID = doesStudyExist(studyInstanceUID, metadata.getAttribute(Tag.PatientID).getVal());
             }
 
-            send(sendData.metaBinaryPair, sendData.studyInstanceFiles, studyUUID);
+            try {
+                send(sendData.metaBinaryPair, sendData.studyInstanceFiles, studyUUID);
+            } catch (final IOException e) {
+                System.err.println("Study " + studyInstanceUID + " has been skipped: I/O error while uploading study to server:");
+                System.err.println(e.getLocalizedMessage());
+                e.printStackTrace();
+            } catch (final SAXException e) {
+                System.err.println("Study " + studyInstanceUID + " has been skipped: error while parsing server response to study upload.");
+            }
         }
 
         return studySendQueue.isEmpty();
@@ -285,7 +296,7 @@ public final class ProcessImportDir {
         }
     }
 
-    private void send(final MetaBinaryPair studyData, final Collection<File> studyFiles, final String existingStudyUUID) throws Exception {
+    private void send(final MetaBinaryPair studyData, final Collection<File> studyFiles, final String existingStudyUUID) throws IOException, SAXException {
         final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
@@ -336,9 +347,13 @@ public final class ProcessImportDir {
 
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
         final String jobID;
-        final Document responseDoc = documentBuilder.parse(
-                new ByteArrayInputStream(response.getBytes()));
-        jobID = xPath.evaluate("/html/body/dl/dd[@class='JobID']/text()", responseDoc).trim();
+        final Document responseDoc = documentBuilder.parse(new ByteArrayInputStream(response.getBytes()));
+        try {
+            jobID = xPath.evaluate("/html/body/dl/dd[@class='JobID']/text()", responseDoc).trim();
+        } catch(final XPathExpressionException e) {
+            //This shouldn't happen
+            throw new RuntimeException(e);
+        }
         jobIDInfo.put(jobID, studyFiles);
     }
 
