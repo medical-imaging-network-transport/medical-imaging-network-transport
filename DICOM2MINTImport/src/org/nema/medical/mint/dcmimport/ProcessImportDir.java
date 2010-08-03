@@ -16,11 +16,13 @@
 
 package org.nema.medical.mint.dcmimport;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +54,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -129,6 +132,7 @@ public final class ProcessImportDir {
         for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
             final String studyUID = studyFiles.getKey();
             assert studyUID != null;
+            System.err.println("Creating MINT for study instance UID " + studyUID);
             final BinaryData binaryData = new BinaryDcmData();
             final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
             metaBinaryPair.setBinaryData(binaryData);
@@ -166,15 +170,39 @@ public final class ProcessImportDir {
             }
             builder.finish();
 
-            addToSendQueue(metaBinaryPair, studyFiles.getValue());
+            try {
+                addToSendQueue(metaBinaryPair, studyFiles.getValue());
+            } catch (final IOException e) {
+                //Catastrophic error
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    private void addToSendQueue(final MetaBinaryPair studyData, final Collection<File> studyFiles) {
+    private void addToSendQueue(final MetaBinaryPair studyData, final Collection<File> studyFiles) throws IOException {
+        //Write metadata to disk so that we don't run out of memory while working on more studies
+        final Study study = studyData.getMetadata();
+        final File studyMetaFile = File.createTempFile("metadata", useXMLNotGPB ? ".xml" : ".gpb");
+        studyMetaFile.deleteOnExit();
+        final OutputStream outStream = new BufferedOutputStream(new FileOutputStream(studyMetaFile));
+        try {
+            if (useXMLNotGPB) {
+                StudyIO.writeToXML(study, outStream);
+            } else {
+                StudyIO.writeToGPB(study, outStream);
+            }
+        } finally {
+            outStream.close();
+        }
+
         final MetaBinaryFiles mbf = new MetaBinaryFiles();
-        mbf.metaBinaryPair = studyData;
+        mbf.studyInstanceUID = study.getStudyInstanceUID();
+        mbf.patientID = study.getValueForAttribute(Tag.PatientID);
+        mbf.metadataFile = studyMetaFile;
+        mbf.binaryData = studyData.getBinaryData();
         mbf.studyInstanceFiles = studyFiles;
         studySendQueue.add(mbf);
+
     }
 
     /**
@@ -187,23 +215,25 @@ public final class ProcessImportDir {
             studySendIter.remove();
 
             //Determine whether study exists and we need to perform an update
-            final Study metadata = sendData.metaBinaryPair.getMetadata();
-            final String studyInstanceUID = metadata.getStudyInstanceUID();
+            final String studyInstanceUID = sendData.studyInstanceUID;
+            System.err.println("Uploading study instance UID " + studyInstanceUID);
             final String studyUUID;
             if (forceCreate) {
                 studyUUID = null;
             } else {
-                studyUUID = doesStudyExist(studyInstanceUID, metadata.getAttribute(Tag.PatientID).getVal());
+                studyUUID = doesStudyExist(studyInstanceUID, sendData.patientID);
             }
 
             try {
-                send(sendData.metaBinaryPair, sendData.studyInstanceFiles, studyUUID);
+                send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
             } catch (final IOException e) {
                 System.err.println("Study " + studyInstanceUID + " has been skipped: I/O error while uploading study to server:");
                 System.err.println(e.getLocalizedMessage());
                 e.printStackTrace();
             } catch (final SAXException e) {
                 System.err.println("Study " + studyInstanceUID + " has been skipped: error while parsing server response to study upload.");
+            } finally {
+                sendData.metadataFile.delete();
             }
         }
 
@@ -296,21 +326,9 @@ public final class ProcessImportDir {
         }
     }
 
-    private void send(final MetaBinaryPair studyData, final Collection<File> studyFiles, final String existingStudyUUID) throws IOException, SAXException {
+    private void send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles, final String existingStudyUUID) throws IOException, SAXException {
         final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
-
-        final Study study = studyData.getMetadata();
-        final ByteArrayOutputStream studyOutStream = new ByteArrayOutputStream();
-        final String fileName = useXMLNotGPB ? "metadata.xml" : "metadata.gpb";
-
-        if (useXMLNotGPB) {
-            StudyIO.writeToXML(study, studyOutStream);
-        } else {
-            StudyIO.writeToGPB(study, studyOutStream);
-        }
-
-        final ByteArrayInputStream studyInStream = new ByteArrayInputStream(studyOutStream.toByteArray());
 
         //Need to specify the 'type' of the data being sent
         entity.addPart("type", new StringBody("DICOM"));
@@ -319,9 +337,8 @@ public final class ProcessImportDir {
         }
 
         //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
-        entity.addPart(fileName, new InputStreamBody(studyInStream, (useXMLNotGPB ? "text/xml" : "application/octet-stream"), fileName));
+        entity.addPart(metadataFile.getName(), new FileBody(metadataFile, useXMLNotGPB ? "text/xml" : "application/octet-stream"));
 
-        final BinaryData binaryData = studyData.getBinaryData();
         //We support only one type
         assert binaryData instanceof BinaryDcmData;
         for (final InputStream binaryStream: Iter.iter(((BinaryDcmData) binaryData).streamIterator())) {
@@ -394,7 +411,10 @@ public final class ProcessImportDir {
     }
 
     private static class MetaBinaryFiles {
-        public MetaBinaryPair metaBinaryPair;
+        public String studyInstanceUID;
+        public String patientID;
+        public File metadataFile;
+        public BinaryData binaryData;
         public Collection<File> studyInstanceFiles;
     }
 
