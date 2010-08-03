@@ -22,11 +22,13 @@ import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import org.dcm4che2.data.DicomElement;
 import org.dcm4che2.data.DicomObject;
+import org.dcm4che2.io.DicomCodingException;
 import org.dcm4che2.io.DicomInputStream;
 
 /**
@@ -40,6 +42,11 @@ public final class BinaryDcmData implements BinaryData {
         public FileTagpath(final File dcmFile, final int[] tagPath) {
             this.dcmFile = dcmFile;
             this.tagPath = tagPath;
+        }
+
+        @Override
+        public String toString() {
+            return "<" + dcmFile + "," + Arrays.toString(tagPath) + ">";
         }
 
         public final File dcmFile;
@@ -57,7 +64,7 @@ public final class BinaryDcmData implements BinaryData {
         }
 
         @Override
-        public int read() throws IOException {
+        public int read() throws IOException, DicomCodingException {
             byte[] binaryItem = binaryItemRef.get();
             if (binaryItem == null) {
                 binaryItem = fileTagpathToFile(tagPath);
@@ -87,7 +94,11 @@ public final class BinaryDcmData implements BinaryData {
 
     @Override
     public byte[] getBinaryItem(final int index) {
-        return fileTagpathToFile(binaryItems.get(index));
+        try {
+            return fileTagpathToFile(binaryItems.get(index));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public InputStream getBinaryItemStream(final int index) {
@@ -132,7 +143,11 @@ public final class BinaryDcmData implements BinaryData {
 
             @Override
             public byte[] next() {
-                return fileTagpathToFile(itemIterator.next());
+                try {
+                    return fileTagpathToFile(itemIterator.next());
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
@@ -144,24 +159,29 @@ public final class BinaryDcmData implements BinaryData {
         };
     }
 
-    private byte[] fileTagpathToFile(final FileTagpath binaryItemPath) {
+    private byte[] fileTagpathToFile(final FileTagpath binaryItemPath) throws IOException, DicomCodingException {
         final File targetDcmFile = binaryItemPath.dcmFile;
         if (!targetDcmFile.equals(cachedRootDicomObjectFile)) {
             final DicomObject newRootDicomObject;
+            final DicomInputStream stream = new DicomInputStream(targetDcmFile);
             try {
-                final DicomInputStream stream = new DicomInputStream(targetDcmFile);
-                try {
-                    newRootDicomObject = stream.readDicomObject();
-                } finally {
-                    stream.close();
-                }
-            } catch(final IOException e) {
-                throw new RuntimeException(e);
+                newRootDicomObject = stream.readDicomObject();
+            } finally {
+                stream.close();
             }
 
             cachedRootDicomObject = newRootDicomObject;
             cachedRootDicomObjectFile = targetDcmFile;
         }
-        return cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+        final byte[] binaryData;
+        try {
+            binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+        } catch (final UnsupportedOperationException e) {
+            //Something wrong with the DICOM format
+            final DicomCodingException newEx = new DicomCodingException("DICOM syntax error at: " + binaryItemPath);
+            newEx.initCause(e);
+            throw newEx;
+        }
+        return binaryData;
     }
 }
