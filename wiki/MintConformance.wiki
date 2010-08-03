@@ -5,6 +5,15 @@
 The MINT Conformance tools require [http://www.python.org Python2.5] or later. 
 
 
+Unix:
+
+PYTHONPATH=$MC_HOME/MINTConformance/src
+
+Windows:
+
+set PYTHONPATH=%MC_HOME%\MINTConformance\src
+
+
 = Iteration 2 =
 
 Blah, blah, blah:
