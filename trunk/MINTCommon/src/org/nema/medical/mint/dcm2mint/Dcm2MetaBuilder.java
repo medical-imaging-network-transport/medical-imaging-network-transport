@@ -304,8 +304,13 @@ public final class Dcm2MetaBuilder {
 
              final Attribute attr = newAttr(elem);
              assert attr != null;
-             attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
-             metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
+//             final byte[] binaryData = elem.getBytes();
+//             if (binaryData.length > 256) {
+                 attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
+                 metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
+//             } else {
+//                 attr.setBytes(binaryData);
+//             }
              attrs.putAttribute(attr);
          }
 
