@@ -22,6 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,35 +41,69 @@ public class StudyMetadataController {
 	protected StudyDAO studyDAO = null;
 
 	@RequestMapping("/studies/{uuid}/{type}/metadata")
-	public void studiesMetadata(@PathVariable("uuid") final String uuid, @PathVariable("type") final String type, final HttpServletRequest httpServletRequest,
-			final HttpServletResponse response) throws IOException {
-		if (StringUtils.isBlank(uuid)) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-			return;
-		}
-		try {
-			String metadata = null;
-			if (StringUtils.endsWith(httpServletRequest.getRequestURI(),".gpb")) {
-				response.setContentType("application/octet-stream");
-				metadata = "/metadata.gpb";
-			} else {
-				response.setContentType("text/xml");
-				metadata = "/metadata.xml";
-			}
-			final File file = new File(studiesRoot , uuid + "/" + type + metadata);
-			if (file.exists() && file.canRead()) {
-				response.setContentLength(Long.valueOf(file.length()).intValue());
-				Utils.streamFile(file, response.getOutputStream());
-			} else {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
-				return;
-			}
-		} catch (final IOException e) {
-			if (!response.isCommitted()) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-						"Unable to provide study metadata. See server logs.");
-				return;
-			}
-		}
+	public void studiesMetadata(final @PathVariable("uuid") String uuid, 
+								final @PathVariable("type") String type,
+							    final HttpServletRequest req,
+							    final HttpServletResponse res)
+			throws IOException {
+        if (StringUtils.isBlank(uuid)) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+            return;
+        }
+        try {
+            String filename;
+
+            String uri = req.getRequestURI();
+            boolean gzip = uri.endsWith(".gz");
+            uri = StringUtils.substringBeforeLast(uri, ".gz");
+            String extension = StringUtils.substringAfterLast(uri, ".");
+
+            if ("gpb".equals(extension)) {
+                res.setContentType("application/octet-stream");
+                filename = "metadata.gpb";
+            } else if ("json".equals(extension)) {
+                res.setContentType("text/plain");
+                filename = "metadata.json";
+            } else if ("xml".equals(extension) || uri.endsWith("metadata")) {
+                res.setContentType("text/xml");
+                filename = "metadata.xml";
+            } else {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown metadata type.");
+                return;
+            }
+
+            if (gzip) {
+                filename = filename + ".gz";
+                res.setContentType("application/gzip");
+            }
+
+            final File studyDir = new File(studiesRoot, uuid);
+            if (!studyDir.exists() || !studyDir.canRead()) {
+                LOG.error("Unable to locate directory for study: " + studyDir);
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+                return;
+            }
+            final File typeDir = new File(studyDir, type);
+            if (!typeDir.exists() || !typeDir.canRead()) {
+                LOG.error("Unable to locate directory for study: " + studyDir);
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+                return;
+            }
+
+            final File file = new File(typeDir, filename);
+            if (file.exists() && file.canRead()) {
+                res.setContentLength(Long.valueOf(file.length()).intValue());
+                Utils.streamFile(file, res.getOutputStream());
+            } else {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+            }
+        } catch (final IOException e) {
+            if (!res.isCommitted()) {
+                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Unable to provide study metadata. See server logs.");
+            }
+        }
 	}
+	
+	private static final Logger LOG = Logger.getLogger(StudyMetadataController.class);
 }
