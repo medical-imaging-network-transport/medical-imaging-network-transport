@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -43,15 +44,18 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
@@ -147,6 +151,14 @@ public final class ProcessImportDir {
                     System.err.println("Skipping file: " + instanceFile);
                     instanceFileIter.remove();
                     continue;
+                } catch (final Error e) {
+                    //Some catastrophic error
+                    System.err.println("Fatal error while processing file: " + instanceFile);
+                    throw e;
+                } catch (final RuntimeException e) {
+                    //Some catastrophic error
+                    System.err.println("Fatal error while processing file: " + instanceFile);
+                    throw e;
                 }
                 builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
             }
@@ -188,8 +200,10 @@ public final class ProcessImportDir {
     }
 
     private String doesStudyExist(final String studyInstanceUID, final String patientID) throws Exception {
-        final HttpGet httpGet = new HttpGet(queryURI + "?studyInstanceUID=" + studyInstanceUID
-                + "&patientID=" + (patientID == null ? "" : patientID));
+        final List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+        qparams.add(new BasicNameValuePair("studyInstanceUID", studyInstanceUID));
+        qparams.add(new BasicNameValuePair("patientID", patientID == null ? "" : patientID));
+        final HttpGet httpGet = new HttpGet(queryURI + URLEncodedUtils.format(qparams, "UTF-8"));
         final String response = httpClient.execute(httpGet, new BasicResponseHandler());
         final NodeList nodeList;
         try {
