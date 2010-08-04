@@ -18,7 +18,9 @@ package org.nema.medical.mint.metadata;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -174,20 +176,48 @@ public class Study implements AttributeStore
      */
     public Collection<Integer> getBinaryItemIDs() {
 		final Set<Integer> items = new TreeSet<Integer>();
+		
+		/*
+		 * Should need only one instance of this structure because should be
+		 * emptied after each us (enforced by the while loop)
+		 */
+		Queue<Attribute> sequence = new LinkedList<Attribute>();
 
 		// iterate through each instance and collect the bids
-		for (Iterator<Series> i = this.seriesIterator(); i.hasNext();) {
-			for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
-				for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
-					Attribute a = iii.next();
+        for (Iterator<Series> i = this.seriesIterator(); i.hasNext();) {
+            for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
+                for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
+                    Attribute a = iii.next();
 
-					int bid = a.getBid();
-					if (bid >= 0) {
-						items.add(bid);
-					}
-				}
-			}
-		}
+                    sequence.add(a);
+                    
+					/*
+					 * Iteratively checks for bids in each attribute and any
+					 * sequence attributes beneath it
+					 */
+                    while(!sequence.isEmpty())
+                    {
+                    	Attribute curr = sequence.remove();
+                    	
+                    	//Check if bid exists
+                    	int bid = curr.getBid();
+                        if (bid >= 0) {
+                            items.add(bid);
+                        }
+                    	
+                        //Add children to queue
+                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                    	{
+                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                    		{
+                    			sequence.add(iiiii.next());
+                    		}
+                    	}
+                    }
+                }
+            }
+        }
+        
 		return items;
     }
 
