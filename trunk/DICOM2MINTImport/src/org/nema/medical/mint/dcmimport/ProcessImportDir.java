@@ -363,7 +363,6 @@ public final class ProcessImportDir {
 //            ++i;
 //        }
 
-        System.err.println("isChunked: " + entity.isChunked());
         httpPost.setEntity(entity);
 
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
