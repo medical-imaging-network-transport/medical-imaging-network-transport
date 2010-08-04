@@ -248,9 +248,18 @@ public class JobsController {
 		map.addAttribute("job", jobInfo);
 		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
+		
+		File studyFolder = new File(studiesRoot, studyUUID);
+		
+		if(!studyFolder.exists())
+		{
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			map.put("error_msg", "study with uuid " + studyUUID + " does not exists so cannot update");
+			return "error";
+		}
 
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
+				studyFolder, type, jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
 
