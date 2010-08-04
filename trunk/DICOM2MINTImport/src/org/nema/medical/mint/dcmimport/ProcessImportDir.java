@@ -131,6 +131,7 @@ public final class ProcessImportDir {
             }
         }
 
+        outerLoop:
         for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
             final String studyUID = studyFiles.getKey();
             assert studyUID != null;
@@ -169,7 +170,14 @@ public final class ProcessImportDir {
                     System.err.println("Fatal error while processing file: " + instanceFile);
                     throw e;
                 }
-                builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
+                try {
+                    builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
+                } catch (final UnsupportedOperationException e) {
+                    System.err.println("Skipping study " + studyUID + ": DICOM syntax error in file " + instanceFile + ":");
+                    System.err.println(e.getLocalizedMessage());
+                    e.printStackTrace();
+                    continue outerLoop;
+                }
             }
             builder.finish();
 
@@ -230,11 +238,11 @@ public final class ProcessImportDir {
             try {
                 send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
             } catch (final IOException e) {
-                System.err.println("Study " + studyInstanceUID + " has been skipped: I/O error while uploading study to server:");
+                System.err.println("Skipping study " + studyInstanceUID + ": I/O error while uploading study to server:");
                 System.err.println(e.getLocalizedMessage());
                 e.printStackTrace();
             } catch (final SAXException e) {
-                System.err.println("Study " + studyInstanceUID + " has been skipped: error while parsing server response to study upload.");
+                System.err.println("Skipping study " + studyInstanceUID + ": error while parsing server response to study upload.");
             } finally {
                 sendData.metadataFile.delete();
             }
