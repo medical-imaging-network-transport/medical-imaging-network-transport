@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class DCMImportMain {
 
+    private static final int DEFAULT_BINARY_INLINE_THRESHOLD = 256;
+
     public static void main(final String[] args) {
         //Validate inputs before doing any processing
         //Make sure we have arguments and someone isn't looking for usage
@@ -92,6 +94,21 @@ public class DCMImportMain {
         boolean forceCreate = false;
         int curArgIdx = 4;
 
+        int binaryInlineThreshold = DEFAULT_BINARY_INLINE_THRESHOLD;
+
+        if (curArgIdx < args.length) {
+            //Check if the next arg is a non-negative integer
+            try {
+                final int tmpBinaryInlineThreshold = Integer.parseInt(args[curArgIdx]);
+                if (tmpBinaryInlineThreshold >= 0) {
+                    binaryInlineThreshold = tmpBinaryInlineThreshold;
+                    ++curArgIdx;
+                }
+            } catch (final NumberFormatException e) {
+                //Not an integer
+            }
+        }
+
         if (curArgIdx < args.length && args[curArgIdx].equals("nodelete")) {
             deletePhysicalFiles = false;
             ++curArgIdx;
@@ -126,7 +143,7 @@ public class DCMImportMain {
 
         //Finished validating inputs, call the actual processing code
         //Create an instance of the Directory Processing Class
-        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, serverURI, useXMLNotGPB, deletePhysicalFiles, forceCreate);
+        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, serverURI, useXMLNotGPB, deletePhysicalFiles, forceCreate, binaryInlineThreshold);
 
         if (runOnceOnly) {
             try {
@@ -182,7 +199,7 @@ public class DCMImportMain {
     }
 
     private static void printUsage() {
-        System.err.println("Usage: DICOM2MINTImport once|daemon xml|gpb {DIRECTORY} {URL} [nodelete] [forcecreate]");
+        System.err.println("Usage: DICOM2MINTImport once|daemon xml|gpb {DIRECTORY} {URL} [binThreshold] [nodelete] [forcecreate]");
         System.err.println("Converts any and all DICOM files in the specified directory into the MINT standard");
         System.err.println("format and sends Create Study messages for each study found in the directory");
         System.err.println("to the MINTServer defined by the input URL.");
@@ -192,6 +209,9 @@ public class DCMImportMain {
         System.err.println("    xml|gpb      specify either option to define the DICOM metadata output format");
         System.err.println("    {DIRECTORY}  the file path where DICOM files are located");
         System.err.println("    {URL}        the Base URL path of the MINTServer.");
+        System.err.println("    binThreshold an optional, non-negative integer specifying the minimum size of a DICOM tag" +
+                           "                 for storing it in an external file rather than inline in the metadata." +
+                           "                 The default threshold is " + DEFAULT_BINARY_INLINE_THRESHOLD);
         System.err.println("    nodelete     an optional argument specifying to not delete DICOM files which" +
                            "                 were sucessfully uploaded to the server.");
         System.err.println("    forcecreate  an optional argument specifying to never update existing studies.");

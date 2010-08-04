@@ -85,7 +85,8 @@ import org.xml.sax.SAXException;
 public final class ProcessImportDir {
 
     public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB,
-            final boolean deletePhysicalInstanceFiles, final boolean forceCreate) {
+            final boolean deletePhysicalInstanceFiles, final boolean forceCreate,
+            final int binaryInlineThreshold) {
         this.importDir = importDir;
         this.createURI = URI.create(serverURI + "/jobs/createstudy");
         this.queryURI = URI.create(serverURI + "/studies");
@@ -93,6 +94,7 @@ public final class ProcessImportDir {
         this.useXMLNotGPB = useXMLNotGPB;
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
         this.forceCreate = forceCreate;
+        this.binaryInlineThreshold = binaryInlineThreshold;
     }
 
     public void processDir() {
@@ -139,6 +141,7 @@ public final class ProcessImportDir {
             //Constrain processing
             metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
             final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(STUDY_LEVEL_TAGS, SERIES_LEVEL_TAGS, metaBinaryPair);
+            builder.setBinaryInlineThreshold(binaryInlineThreshold);
             final Iterator<File> instanceFileIter = studyFiles.getValue().iterator();
             while (instanceFileIter.hasNext()) {
                 final File instanceFile = instanceFileIter.next();
@@ -360,6 +363,7 @@ public final class ProcessImportDir {
 //            ++i;
 //        }
 
+        System.err.println("isChunked: " + entity.isChunked());
         httpPost.setEntity(entity);
 
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
@@ -431,6 +435,7 @@ public final class ProcessImportDir {
         Collections.synchronizedMap(new HashMap<String, Collection<File>>());
     private final boolean deletePhysicalInstanceFiles;
     private final boolean forceCreate;
+    private final int binaryInlineThreshold;
 
     private static final Set<Integer> STUDY_LEVEL_TAGS = getTags("StudyTags.txt");
     private static final Set<Integer> SERIES_LEVEL_TAGS = getTags("SeriesTags.txt");
