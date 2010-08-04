@@ -16,6 +16,7 @@
 package org.nema.medical.mint.server.processor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,7 +99,22 @@ public class StudyUpdateProcessor extends TimerTask {
 				File typeFolder = new File(studyFolder, type);
 				File changelogRoot = new File(studyFolder, "changelog");
 				
+				if(!typeFolder.exists())
+				{
+					throw new FileNotFoundException("The folder for type " + type + " for study uuid " + studyUUID + " does not exist, may need to do a create first.");
+				}
+				
+				if(!changelogRoot.exists())
+				{
+					throw new FileNotFoundException("The changelog for study uuid " + studyUUID + " does not exist, may need to do a create first.");
+				}
+				
 				File existingBinaryFolder = new File(typeFolder, "binaryitems");
+				
+				if(!existingBinaryFolder.exists())
+				{
+					throw new FileNotFoundException("The binary item folder for study uuid " + studyUUID + " does not exist, may need to do a create first.");
+				}
 				
 				/*
 				 * Need to load current study studyinformation

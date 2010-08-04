@@ -591,7 +591,14 @@ public final class StudyUtil {
             }
         }
 
-        //Collect id from attributes
+		/*
+		 * Collect id from attributes
+		 * 
+		 * NOTE: Study has a method that does almost exactly this except that
+		 * this method detects repeated bids (which is not allowed). Do not just
+		 * replace the below with that method without first considering this
+		 * fact.
+		 */
         for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
         {
             for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
