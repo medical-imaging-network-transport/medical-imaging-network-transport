@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class StudyBinaryItemsController {
             return;
         }
 
-        final List<Integer> itemList;
+        final Collection<Integer> itemList;
         try {
         	itemList = parseItemList(seq, type, studyRoot);
         } catch (final NumberFormatException e) {
@@ -156,7 +157,7 @@ public class StudyBinaryItemsController {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-    private List<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
+    private Collection<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
         final List<Integer> itemList = new ArrayList<Integer>();
 
         if (seq.equals("all")) {
@@ -165,37 +166,7 @@ public class StudyBinaryItemsController {
 
             org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
 
-            // iterate through each instance and collect the bids
-            for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-                for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
-                    for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
-                        Attribute a = iii.next();
-
-                        Queue<Attribute> sequence = new LinkedList<Attribute>();
-                        sequence.add(a);
-                        
-                        while(!sequence.isEmpty())
-                        {
-                        	Attribute curr = sequence.remove();
-                        	
-                        	//Check if bid exists
-                        	int bid = curr.getBid();
-                            if (bid >= 0) {
-                                itemList.add(bid);
-                            }
-                        	
-                            //Add children to queue
-                        	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
-                        	{
-                        		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
-                        		{
-                        			sequence.add(iiiii.next());
-                        		}
-                        	}
-                        }
-                    }
-                }
-            }
+            itemList.addAll(study.getBinaryItemIDs());
         } else {
             String[] elements = seq.split(",");
 
