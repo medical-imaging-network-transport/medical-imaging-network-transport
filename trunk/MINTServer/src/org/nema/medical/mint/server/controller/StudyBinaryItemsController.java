@@ -22,20 +22,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.Attribute;
-import org.nema.medical.mint.metadata.Instance;
-import org.nema.medical.mint.metadata.Item;
-import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -166,7 +159,7 @@ public class StudyBinaryItemsController {
 
             org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
 
-            itemList.addAll(study.getBinaryItemIDs());
+            return study.getBinaryItemIDs();
         } else {
             String[] elements = seq.split(",");
 
