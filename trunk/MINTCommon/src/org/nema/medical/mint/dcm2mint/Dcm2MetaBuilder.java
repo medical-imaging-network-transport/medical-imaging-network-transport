@@ -105,6 +105,24 @@ public final class Dcm2MetaBuilder {
        this.metaBinaryPair = metaBinaryPair;
    }
 
+   /**
+    * @return the minimum number of bytes from a DICOM binary tag required to trigger
+    *   storing in an external binary file rather than inline in the MINT metadata.
+    *   A value of 0 means to store all binary data in external files.
+    */
+   public int getBinaryInlineThreshold() {
+       return binaryInlineThreshold;
+   }
+
+   /**
+    * @param value the minimum number of bytes from a DICOM binary tag required to trigger
+    *   storing in an external binary file rather than inline in the MINT metadata.
+    *   A value of 0 means to store all binary data in external files.
+    */
+   public void setBinaryInlineThreshold(final int value) {
+       binaryInlineThreshold = value;
+   }
+
    public static String extractStudyInstanceUID(final DicomObject dcmObj) {
        return dcmObj.getString(Tag.StudyInstanceUID);
    }
@@ -304,13 +322,13 @@ public final class Dcm2MetaBuilder {
 
              final Attribute attr = newAttr(elem);
              assert attr != null;
-//             final byte[] binaryData = elem.getBytes();
-//             if (binaryData.length > 256) {
+             final byte[] binaryData = elem.getBytes();
+             if (binaryData.length >= binaryInlineThreshold) {
                  attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
                  metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
-//             } else {
-//                 attr.setBytes(binaryData);
-//             }
+             } else {
+                 attr.setBytes(binaryData);
+             }
              attrs.putAttribute(attr);
          }
 
@@ -362,4 +380,5 @@ public final class Dcm2MetaBuilder {
      private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =
          new HashMap<String, Map<Integer, NormalizationCounter>>();
      private final MetaBinaryPair metaBinaryPair;
+     private int binaryInlineThreshold = 256;
 }
