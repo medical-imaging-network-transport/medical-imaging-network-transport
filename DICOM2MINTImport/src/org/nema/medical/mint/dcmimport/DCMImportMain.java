@@ -155,8 +155,9 @@ public class DCMImportMain {
                 for (;;) {
                     //Wait 1 second before hitting the server for updates
                     Thread.sleep(1000);
-
-                    if (importProcessor.handleSends() && importProcessor.handleResponses()) {
+                    importProcessor.handleResponses();
+                    importProcessor.handleSends();
+                    if (importProcessor.sendingDone()) {
                         break;
                     }
                 }
@@ -169,8 +170,8 @@ public class DCMImportMain {
             final Runnable checkResponsesTask = new Runnable() {
                 public void run() {
                     try {
-                        importProcessor.handleSends();
                         importProcessor.handleResponses();
+                        importProcessor.handleSends();
                     } catch(final Exception e) {
                         System.err.println("An exception occurred while uploading to the server:");
                         e.printStackTrace();
