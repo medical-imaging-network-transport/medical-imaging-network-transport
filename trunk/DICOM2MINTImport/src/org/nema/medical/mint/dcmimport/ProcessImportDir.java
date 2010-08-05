@@ -213,15 +213,18 @@ public final class ProcessImportDir {
         mbf.binaryData = studyData.getBinaryData();
         mbf.studyInstanceFiles = studyFiles;
         studySendQueue.add(mbf);
-
     }
 
     /**
      * @throws IOException
      */
-    public boolean handleSends() throws Exception {
+    public void handleSends() throws Exception {
+        if (!jobIDInfo.isEmpty()) {
+            //To prevent disk churn leading to slowness on the server side, have it handle just one study at a time
+            return;
+        }
         final Iterator<MetaBinaryFiles> studySendIter = studySendQueue.iterator();
-        while (studySendIter.hasNext()) {
+        if (studySendIter.hasNext()) {
             final MetaBinaryFiles sendData = studySendIter.next();
             studySendIter.remove();
 
@@ -247,8 +250,10 @@ public final class ProcessImportDir {
                 sendData.metadataFile.delete();
             }
         }
+    }
 
-        return studySendQueue.isEmpty();
+    public boolean sendingDone() {
+        return studySendQueue.isEmpty() && jobIDInfo.isEmpty();
     }
 
     private String doesStudyExist(final String studyInstanceUID, final String patientID) throws Exception {
@@ -284,7 +289,7 @@ public final class ProcessImportDir {
      * @return true if responses for all uploaded studies are completed.
      * @throws IOException
      */
-    public boolean handleResponses() throws IOException {
+    public void handleResponses() throws IOException {
         final ResponseHandler<String> responseHandler = new BasicResponseHandler();
         final Iterator<Entry<String, Collection<File>>> studyIter = jobIDInfo.entrySet().iterator();
         while (studyIter.hasNext()) {
@@ -324,8 +329,6 @@ public final class ProcessImportDir {
 
             studyIter.remove();
         }
-
-        return jobIDInfo.isEmpty();
     }
 
     private void removeStudyFiles(final Collection<File> studyFiles, final boolean delete) {
