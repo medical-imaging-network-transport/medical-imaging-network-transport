@@ -25,7 +25,7 @@ The MINTConformance package was developed based on the draft [http://groups.goog
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] 
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py]
 
-  * [MintCoonformance#MintCompare.py]
+  * [MintConformance#MintCompare.py]
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py]
 
 == MintStudyCompare.sh ==
