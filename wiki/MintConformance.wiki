@@ -28,9 +28,9 @@ The MINTConformance package was developed based on the draft [http://groups.goog
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py]
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py]
 
-== [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] ==
+== Mint Study Compare Shell Script == 
 
-This tool is a simple shell script that compares two MINT studies by running the Unix _diff_ command on the metadata.xml files and the _cmp_ command on each of the binary items. This tool checks that the MINT studies are exactly equal. 
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] tool is a simple shell script that compares two MINT studies by running the Unix _diff_ command on the metadata.xml files and the _cmp_ command on each of the binary items. This tool checks that the MINT studies are exactly equal. 
 
 Because we are running directly from the subversion trunk instead on an installation, the permissions on the tools are not executable. Launch the tool by using the Unix _sh_ command to parse the file. To run this script on Windows, it requires a [http://www.cygwin.com/ cyqwin] command shell.
 
