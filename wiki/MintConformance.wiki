@@ -1,6 +1,6 @@
 #summary This documentation describes how to run the various MINT Conformance Tools.
 
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="3" />
 
 = Setting up your environment =
 
