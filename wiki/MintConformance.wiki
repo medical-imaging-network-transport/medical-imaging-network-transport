@@ -20,7 +20,7 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 --------------------
 
-= Using the Tools =
+= MINTConformance Tools =
 
 The MINTConformance package was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group]. it currently consists of three tools.
 
