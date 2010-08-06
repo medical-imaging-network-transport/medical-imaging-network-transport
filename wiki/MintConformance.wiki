@@ -16,7 +16,7 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 = Tools =
 
-The MINTConformance package currently consists of three tools. It was developed based on the draft [http://groups.google.com/group/mint-user/files/MINT+Conformance+Test.ppt MINT Conformance Test] specification located in the mint-user Google Group.
+The MINTConformance package currently consists of three tools. It was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group].
 
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] 
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py]
