@@ -25,8 +25,8 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 The MINTConformance package was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group]. it currently consists of three tools.
 
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] 
-  * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py]
-  * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py]
+  * 
+
 
 == Mint Study Compare Shell Script == 
 
@@ -64,9 +64,9 @@ To see differences, we can compare an older MINT study to a newer one. The examp
 ./binaryitems/2.dat 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/binaryitems/2.dat differ: byte 759, line 4
 }}}
 
-== MintStudyCompare.py ==
+== Mint Study Compare Python Application ==
 
-This tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py] tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
 
 Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
 
