@@ -93,7 +93,7 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    2097152 byte(s) compared.
 }}}
 
-To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be missing in a study.
+To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
 
 {{{
 > cd $MC_HOME/MINTConformance/testdata/MINT
