@@ -34,3 +34,10 @@ Running the tool with no arguments displays the usage:
 > $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh
 Usage: MintStudyCompare.sh <mint_study1.xml> <mint_study2.xml>
 }}}
+
+To test the tool, you can use the sample data located in the MINTConformance/testdata directory. In the example below, we run the tool with the identical MINT studies so no differences are found. As with most Unix applications, no news is good news. Therefore, no output means the metadata and binary files are exactly equal.
+
+{{{
+> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
+> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.xml metadata.xml
+}}}
