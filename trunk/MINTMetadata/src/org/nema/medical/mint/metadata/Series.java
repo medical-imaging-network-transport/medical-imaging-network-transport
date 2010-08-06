@@ -16,9 +16,7 @@
 
 package org.nema.medical.mint.metadata;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,7 +42,7 @@ public class Series implements AttributeStore
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new TreeMap<Integer,Attribute>();
-    private final List<Instance> instanceList = new ArrayList<Instance>();
+    private final Map<String, Instance> instances = new TreeMap<String, Instance>();
     private String seriesInstanceUID;
     private String exclude;
 
@@ -115,59 +113,37 @@ public class Series implements AttributeStore
      * @param inst
      */
     public void putInstance(final Instance inst) {
-        instanceList.add(inst);
+        instances.put(inst.getSOPInstanceUID(), inst);
     }
 
     /**
-     * removes an Instance from the Series based on it's sop UID
+     * removes an Instance from the Series based on its SOP Instance UID
      * @param sopInstanceUID
      */
     public Instance removeInstance(final String sopInstanceUID) {
-        for(int x = 0; x < instanceList.size(); ++x)
-        {
-            Instance i = instanceList.get(x);
-            if (i != null
-                    && (i.getSOPInstanceUID() == sopInstanceUID ||
-                            (i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
-            {
-                return instanceList.remove(x);
-            }
-        }
-
-        return null;
+        return instances.remove(sopInstanceUID);
     }
 
     /**
-     * gets an Instance from the Series based on it's sop UID
+     * gets an Instance from the Series based on its SOP Instance UID
      * @param sopInstanceUID
      */
     public Instance getInstance(final String sopInstanceUID) {
-        for(int x = 0; x < instanceList.size(); ++x)
-        {
-            Instance i = instanceList.get(x);
-            if (i != null
-                    && (i.getSOPInstanceUID() == sopInstanceUID ||
-                            (i.getSOPInstanceUID() != null && i.getSOPInstanceUID().equals(sopInstanceUID))))
-            {
-                return instanceList.get(x);
-            }
-        }
-
-        return null;
+        return instances.get(sopInstanceUID);
     }
 
     /**
      * @return an iterator of all Instances in the Series
      */
     public Iterator<Instance> instanceIterator() {
-        return instanceList.iterator();
+        return instances.values().iterator();
     }
 
     /**
      * @return the number of Instances in the Series
      */
     public int instanceCount() {
-        return instanceList.size();
+        return instances.size();
     }
 
     /**
@@ -239,7 +215,7 @@ public class Series implements AttributeStore
         for (Attribute attr : this.normalizedInstanceAttributeMap.values()) {
             builder.addNormalizedInstanceAttributes(attr.toGPB());
         }
-        for (Instance inst : this.instanceList) {
+        for (Instance inst : this.instances.values()) {
             builder.addInstances(inst.toGPB());
         }
         SeriesData data = builder.build();
