@@ -48,35 +48,12 @@ To see differences, we can compare an older MINT study to a newer one. The examp
 > cd $MC_HOME/MINTConformance/testdata/MINT
 > sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.1.xml 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml
 1,190c1,190
-< ﻿<?xml version="1.0" encoding="utf-8" ?>
-
+< <?xml version="1.0" encoding="utf-8" ?>
 < <StudyMeta studyInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873">
-
 <     <Attributes>
-
 <         <Attr tag="00080020" vr="DA" val="20020711" />
-
 <         <Attr tag="00080030" vr="TM" val="144114.000" />
-
 <         <Attr tag="00080050" vr="SH" val="1126" />
-
-<         <Attr tag="00080090" vr="PN" val="" />
-
-<         <Attr tag="00100010" vr="PN" val="20 phase" />
-
-<         <Attr tag="00100020" vr="LO" val="JM8-ECG-TEST" />
-
-<         <Attr tag="00100030" vr="DA" val="" />
-
-<         <Attr tag="00100040" vr="CS" val="F" />
-
-<         <Attr tag="00101010" vr="AS" val="073Y" />
-
-<         <Attr tag="00104000" vr="LT" val="1-5B" />
-
-<         <Attr tag="0020000d" vr="UI" val="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873" />
-
 ...
 ./binaryitems/2.dat 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/binaryitems/2.dat differ: byte 759, line 4
 }}}
-
