@@ -161,11 +161,11 @@ public final class ProcessImportDir {
                     System.err.println("Skipping file: " + instanceFile);
                     instanceFileIter.remove();
                     continue;
-                } catch (final Error e) {
-                    //Some catastrophic error
+                } catch (final RuntimeException e) {
+                    //Some near-catastrophic error
                     System.err.println("Fatal error while processing file: " + instanceFile);
                     throw e;
-                } catch (final RuntimeException e) {
+                } catch (final Error e) {
                     //Some catastrophic error
                     System.err.println("Fatal error while processing file: " + instanceFile);
                     throw e;
@@ -340,7 +340,8 @@ public final class ProcessImportDir {
         }
     }
 
-    private void send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles, final String existingStudyUUID) throws IOException, SAXException {
+    private void send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles,
+            final String existingStudyUUID) throws IOException, SAXException {
         final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
@@ -351,7 +352,8 @@ public final class ProcessImportDir {
         }
 
         //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
-        entity.addPart(metadataFile.getName(), new FileBody(metadataFile, useXMLNotGPB ? "text/xml" : "application/octet-stream"));
+        entity.addPart(metadataFile.getName(),
+                new FileBody(metadataFile, useXMLNotGPB ? "text/xml" : "application/octet-stream"));
 
         //We support only one type
         assert binaryData instanceof BinaryDcmData;
