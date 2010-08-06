@@ -35,7 +35,7 @@ Because we are running directly from the subversion trunk instead on an installa
 Running the tool with no arguments displays the usage:
 
 {{{
-> $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh
+> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh
 Usage: MintStudyCompare.sh <mint_study1.xml> <mint_study2.xml>
 }}}
 
@@ -71,15 +71,26 @@ Launch the tool by using the _python_ command to parse the file. This tool shoul
 Running the tool with no arguments displays the usage:
 
 {{{
-> $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh
-Usage: MintStudyCompare.sh <mint_study1.xml> <mint_study2.xml>
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py
+Usage: MintStudyCompare.py [options] <mint_study1.xml> <mint_study2.xml>
+  -v: verbose
+  -l: lazy check (skips binary content)
+  -h: displays usage
 }}}
 
-To test the tool, you can use the sample data located in the MINTConformance/testdata directory. In the example below, we run the tool with the identical MINT studies so no differences are found. As with most Unix applications, no news is good news. Therefore, no output means the metadata and binary files are exactly equal.
+The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
 
 {{{
 > cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
-> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.xml metadata.xml
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py -v metadata.xml metadata.xml
+        12 study attribute(s) compared.
+         2 series compared.
+        14 series attribute(s) compared.
+       102 normalized instance attribute(s) compared.
+         4 instance(s) compared.
+        24 instance attribute(s) compared.
+         4 binary item(s) compared.
+   2097152 byte(s) compared.
 }}}
 
 To see differences, we can compare an older MINT study to a newer one. The example below shows both metadata changes and binary differences.
