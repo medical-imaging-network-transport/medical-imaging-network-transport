@@ -2,15 +2,17 @@
 
 = Setting up your environment =
 
-The MINT Conformance tools require [http://www.python.org Python2.5] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. For example, if *MC_PATH* is the path to your subversion trunk, then set your PYTHONPATH as follows:
+The MINT Conformance tools require [http://www.python.org Python2.5] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. The python application must also be in your *PATH*. For example, if *MC_PATH* is the path to your subversion trunk, then set your PYTHONPATH as follows:
 
 *Unix*
 {{{
+PATH=${PATH}:/pub/python/bin
 PYTHONPATH=$MC_HOME/MINTConformance/src
 }}}
 
 *Windows*
 {{{
+set PATH=%PATH%;C:\Python2.6
 set PYTHONPATH=%MC_HOME%\MINTConformance\src
 }}}
 
@@ -64,7 +66,7 @@ To see differences, we can compare an older MINT study to a newer one. The examp
 
 This tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
 
-Because we are running directly from the subversion trunk instead on an installation, the permissions on the tools are not executable. Launch the tool by using the Unix _sh_ command to parse the file. To run this script on Windows, it requires a [http://www.cygwin.com/ cyqwin] command shell.
+Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
 
 Running the tool with no arguments displays the usage:
 
