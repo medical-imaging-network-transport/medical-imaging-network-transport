@@ -14,8 +14,7 @@ PYTHONPATH=$MC_HOME/MINTConformance/src
 set PYTHONPATH=%MC_HOME%\MINTConformance\src
 }}}
 
-Horizontal rule
----- 
+--------------------
 
 = Tools =
 
