@@ -28,7 +28,7 @@ The MINTConformance package was developed based on the draft [http://groups.goog
   * 
 
 
-== Mint Study Compare Shell Script == 
+== MintStudyCompare Shell Script == 
 
 The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] tool is a simple shell script that compares two MINT studies by running the Unix _diff_ command on the metadata.xml files and the _cmp_ command on each of the binary items. This tool checks that the MINT studies are exactly equal. 
 
