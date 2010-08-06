@@ -1,0 +1,92 @@
+Agenda
+  * Progress this week
+  * August Meeting @ JHU
+  * RSNA Demo
+
+Notes
+  * Progress this week
+    * Reference Implementation
+      * Bug fixes (missing files)
+      * Did not implement binary item optimizations
+      * In memory lock of study on updates is implemented by Rex
+    * Bulk Loading
+      * Bulk loading added to reference implementation last week
+      * Vital did add bulk loading to their AV client
+      * Initial performance testing was lower than we had hoped - around 50 MB/s
+      * Need to do testing using real hardware and investigate further
+    * MINT2DICOM
+      * Not a perfect conversion - losing 2 or 3 elements
+      * Jack is investigating to see which elements and why
+      * Could be DICOM Part 10 Header attributes?
+      * Jack reports that the regenerated dicom images do not load into ClearCanvas
+      * Chris suggested to make sure the transfer syntax uid is set, otherwise it may not display properly
+      * Gorkem confirmed that the dropped attributes are Part 10 header items and the transfer syntax is not set
+    * Conformance Testing
+      * Tim Culp uploaded first rev of iteration 3
+      * Iteration 2 = Mint study compare (MINT 2 MINT)
+      * Iteration 3 = Mint DICOM Compare (MINT 2 DICOM) 
+      * Updated to skip over attributes with group < 8
+      * Finding that some VRs are showing up as text in MINT, not as BIDs
+      * Need to finalize which VRs are binary items
+      * How to handle implicit transfer syntaxes - vital is using a DICOM standard based data dictionary for this mapping
+      * Question about supporting sequences - yes they are implemented/supported
+      * Todo
+        * sequences
+        * multi-frame
+        * conformance test after update
+      * What should validator do with bad DICOM?  Nothing...
+        * Importer should reject or at least log/warn if DICOM is bad (wrong VR)
+    * JHU DMZ Server
+      * Up and running with MINT! (VM)
+      * Separate server running SVN (VM)
+        * Will be used as a source code backup
+        * Will be used to hold data sets
+        * How to setup to mirror/sync from google code svn? 
+      * Could use TRAC for issue tracking 
+  * August working meeting at JHU
+    * Jim to send out email announcement
+    * Share invite with other vendors 
+    * Start at 10 AM Monday Morning
+    * Dinner Monday evening
+    * Agenda
+      * Overview / demo
+        * Hope to demo on high speed networks (infiniband, 10gig)
+      * Code/design walkthrough
+      * Review implementation challenges
+      * Design meetings
+      * Roadmap planning
+      * RSNA
+       
+  * Root level XML tag
+    * Currently says "StudyMeta" - should we rename it to "MINTStudyMeta"
+    * Should add a version number as an attribute
+    * Should add the type as as an attribute (e.g. DICOM or proprietary)
+    * Should we use XML namespaces for this?
+   
+Decisions
+  * Data dictionary VR will be used for tags if it sent in as unknown
+  * For reference implementation, we will encode binary items inline in the XML as base64 if they are less than 100 bytes
+  * From a standard point of view, a binary item could be encoded as base 64 or extracted as a separate binary item id
+  * Gorkem to work on CC Bulk Loading
+  * Add version number and type to the MINT Metadata
+
+New Actions
+  * Characterizing bulk loading performance as implemented today in vital av [Chris Hafey]
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta [Chris Hafey]
+  * Send out address of JHU MINT Server to Rick [Chris Hafey]
+  * Send out JHU SVN URL [Gorkem]
+  * Package up MINT Compatible Clear Canvas as a ZIP and post [Chris Hafey]
+  
+Old Actions
+  * Jim to send out JHU august working meeting information to mailing list
+  * Jim to talk to invite other vendors to come to August JHU meeting
+  * Chris to ask vital RSNA folks about RSNA network performance/cost
+  * Gorkem to run dvtk on original DICOM files vs regenerated files
+  * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson)
+  * Define performance test environment (Jim Philbin)
+  * Setup Performance Test Environment (Jim Philbin)
+  * Post Anonymized Test Data Sets in DICOM P10 to JHU SVN Server (Gorkem)
+  * Provide anonymous FTP site to access data sets (Jim Philbin)
+  * Create MINT2DICOM Converter (Gorkem)
+  * Iteration 1,2 & 3 Conformance Test (Tim Culp)
+  * MINT Server Implementation - Phase 2 (Tim Dawson)
