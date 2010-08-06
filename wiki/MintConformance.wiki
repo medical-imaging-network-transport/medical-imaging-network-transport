@@ -19,8 +19,8 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 The MINTConformance package currently consists of three tools.
 
   * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] 
-  * MintStudyCompare.py
-  * MintDicomCompare.py
+  * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py]
+  * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py]
 
 == MintStudyCompare.sh ==
 
