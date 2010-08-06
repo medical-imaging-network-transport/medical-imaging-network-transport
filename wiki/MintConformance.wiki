@@ -97,7 +97,7 @@ To see differences, we can compare an older MINT study to a newer one. The examp
 
 {{{
 > cd $MC_HOME/MINTConformance/testdata/MINT
-> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml metadata.2.xml
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml metadata.2.xml
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00080008 vr=CS val=ORIGINAL\PRIMARY\AXIAL != tag=00080008 vr=CS val=ORIGINAL
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200020 vr=CS val=L\P != tag=00200020 vr=CS val=L
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200037 vr=DS val=1.000000\0.000000\0.000000\0.000000\1.000000\0.000000 != tag=00200037 vr=DS val=1.000000
