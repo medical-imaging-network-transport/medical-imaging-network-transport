@@ -18,7 +18,7 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 The MINTConformance package currently consists of three tools.
 
-  * MintStudyCompare.sh 
+  * [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh MintStudyCompare.sh] 
   * MintStudyCompare.py
   * MintDicomCompare.py
 
