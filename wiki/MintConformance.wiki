@@ -26,4 +26,4 @@ The MINTConformance package currently consists of three tools.
 
 This tool is a simple shell script that compares two MINT studies by running the Unix _diff_ command on the metadata.xml files and the _cmp_ command on each of the binary items. This tool checks that the MINT studies are exactly equal. 
 
-To run the script on Windows, it requires a cyqwin command shell.
+Because we are running directly from the subversion trunk instead on an installation, the permissions on the tools are not executable. Launch the tool by using the Unix _sh_ command to parse the file. To run this script on Windows, it requires a [http://www.cygwin.com/ cyqwin] command shell.
