@@ -59,3 +59,39 @@ To see differences, we can compare an older MINT study to a newer one. The examp
 ...
 ./binaryitems/2.dat 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/binaryitems/2.dat differ: byte 759, line 4
 }}}
+
+== MintStudyCompare.py ==
+
+This tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
+
+Because we are running directly from the subversion trunk instead on an installation, the permissions on the tools are not executable. Launch the tool by using the Unix _sh_ command to parse the file. To run this script on Windows, it requires a [http://www.cygwin.com/ cyqwin] command shell.
+
+Running the tool with no arguments displays the usage:
+
+{{{
+> $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh
+Usage: MintStudyCompare.sh <mint_study1.xml> <mint_study2.xml>
+}}}
+
+To test the tool, you can use the sample data located in the MINTConformance/testdata directory. In the example below, we run the tool with the identical MINT studies so no differences are found. As with most Unix applications, no news is good news. Therefore, no output means the metadata and binary files are exactly equal.
+
+{{{
+> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
+> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.xml metadata.xml
+}}}
+
+To see differences, we can compare an older MINT study to a newer one. The example below shows both metadata changes and binary differences.
+
+{{{
+> cd $MC_HOME/MINTConformance/testdata/MINT
+> sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.1.xml 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml
+1,190c1,190
+< <?xml version="1.0" encoding="utf-8" ?>
+< <StudyMeta studyInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873">
+<     <Attributes>
+<         <Attr tag="00080020" vr="DA" val="20020711" />
+<         <Attr tag="00080030" vr="TM" val="144114.000" />
+<         <Attr tag="00080050" vr="SH" val="1126" />
+...
+./binaryitems/2.dat 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/binaryitems/2.dat differ: byte 759, line 4
+}}}
