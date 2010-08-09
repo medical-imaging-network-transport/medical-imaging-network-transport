@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,7 +60,7 @@ public class StudyBinaryItemsController {
             return;
         }
 
-        final Collection<Integer> itemList;
+        final Iterator<Integer> itemList;
         try {
         	itemList = parseItemList(seq, type, studyRoot);
         } catch (final NumberFormatException e) {
@@ -68,56 +68,65 @@ public class StudyBinaryItemsController {
             return;
         }
 
-        if (itemList == null || itemList.isEmpty()) {
+        if (!itemList.hasNext()) {
         	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive binary items. See server log for details.");
-            LOG.error("Unable to locate binary items: " + seq);
+            LOG.error("Unable to locate binary items: " + seq + " or there are no binary items.");
             return;
         }
 
-        List<File> binaryItems = new ArrayList<File>(itemList.size());
-        for (int i : itemList) {
-            final File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
+        final OutputStream out = res.getOutputStream();
+        
+        int i = itemList.next();
+        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
+        if (!file.exists() || !file.canRead()) {
+        	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
+            LOG.error("BinaryItemsFile " + file + " does not exist");
+            return;
+        }
+
+        // write the appropriate header
+        final boolean multipart = itemList.hasNext();
+        if (multipart) {
+        	res.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
+            out.write(("--" + MP_BOUNDARY).getBytes());
+        } else {
+        	res.setContentType("application/octet-stream");
+        	res.setContentLength((int) file.length());
+        }
+        
+        streamBinaryItem(file,out);
+        
+        if(multipart)
+        {
+        	out.write(("\n--" + MP_BOUNDARY).getBytes());
+        }
+
+        for (;itemList.hasNext();) {
+        	i = itemList.next();
+        	
+            file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
             if (!file.exists() || !file.canRead()) {
             	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
                 LOG.error("BinaryItemsFile " + file + " does not exist");
                 return;
             }
-            binaryItems.add(file);
-        }
+        	
+            final long itemsize = file.length();
+            String index = file.getName().split("\\.")[0];
+            out.write("\nContent-Type: application/octet-stream\n".getBytes());
+            out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
+            out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
 
-        final OutputStream out = res.getOutputStream();
-
-        // write the appropriate header
-        final boolean multipart = binaryItems.size() > 1;
-        if (multipart) {
-        	res.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
-            out.write(("--" + MP_BOUNDARY).getBytes());
-            out.flush();
-        } else {
-        	res.setContentType("application/octet-stream");
-        	res.setContentLength((int) binaryItems.get(0).length());
-        }
-
-        for (File binaryItem : binaryItems) {
-            if (multipart) {
-                final long itemsize = binaryItem.length();
-                String index = binaryItem.getName().split("\\.")[0];
-                out.write("\nContent-Type: application/octet-stream\n".getBytes());
-                out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
-                out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
-            }
-
-            streamBinaryItem(binaryItem,out);
+            streamBinaryItem(file,out);
             
-            if (multipart) {
-                out.write(("\n--" + MP_BOUNDARY).getBytes());
-                out.flush();
-            }
+            out.write(("\n--" + MP_BOUNDARY).getBytes());
         }
+        
         if (multipart) {
             out.write("--".getBytes());
-            out.flush();
         }
+        
+        out.flush();
     }
 
     private void streamBinaryItem(final File file, final OutputStream outputStream) throws IOException {
@@ -150,16 +159,39 @@ public class StudyBinaryItemsController {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-    private Collection<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
+    private Iterator<Integer> parseItemList(String seq, String type, File studyRoot) throws NumberFormatException, IOException {
         final List<Integer> itemList = new ArrayList<Integer>();
 
         if (seq.equals("all")) {
-            //need to return all items in current metadata
-            File typeRoot = new File(studyRoot, type);
+        	//NOTE: the following code may no longer be used for all but haven't decided yet
+//            //need to return all items in current metadata
+//            File typeRoot = new File(studyRoot, type);
+//
+//            org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
+//
+//            return study.getBinaryItemIDs().iterator();
+        	final File binaryRoot = new File(studyRoot, type + "/binaryitems");
+        	binaryRoot.list();
+        	
+        	return new Iterator<Integer>() {
+        		private Iterator<String> binaryNames = Arrays.asList(binaryRoot.list()).iterator();
 
-            org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
+				@Override
+				public boolean hasNext() {
+					return binaryNames.hasNext();
+				}
 
-            return study.getBinaryItemIDs();
+				@Override
+				public Integer next() throws NumberFormatException {
+					String next = binaryNames.next();
+					return Integer.valueOf(next.substring(0, next.indexOf('.')));
+				}
+
+				@Override
+				public void remove() {
+					binaryNames.remove();
+				}
+			};
         } else {
             String[] elements = seq.split(",");
 
@@ -189,7 +221,7 @@ public class StudyBinaryItemsController {
             }
         }
 
-        return itemList;
+        return itemList.iterator();
     }
 
     private static final Logger LOG = Logger.getLogger(StudyBinaryItemsController.class);
