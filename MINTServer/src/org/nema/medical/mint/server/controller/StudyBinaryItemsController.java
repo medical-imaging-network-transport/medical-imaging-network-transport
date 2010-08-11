@@ -89,6 +89,12 @@ public class StudyBinaryItemsController {
         if (multipart) {
         	res.setContentType("multipart/x-mixed-replace; boundary=\"" + MP_BOUNDARY + "\"");
             out.write(("--" + MP_BOUNDARY).getBytes());
+            
+            final long itemsize = file.length();
+            String index = file.getName().split("\\.")[0];
+            out.write("\nContent-Type: application/octet-stream\n".getBytes());
+            out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
+            out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
         } else {
         	res.setContentType("application/octet-stream");
         	res.setContentLength((int) file.length());
