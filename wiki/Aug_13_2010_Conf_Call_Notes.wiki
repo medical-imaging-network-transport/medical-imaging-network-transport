@@ -1,0 +1,47 @@
+Agenda
+  * Progress this week
+  * August Meeting @ JHU
+
+Notes
+  * Progress this week
+    * Gorkem visited Vital Images
+      * Worked on clear canvas plugin 
+      * Discovered a bug where where the namespace wasn't being returned by the server
+      * Implemented bulk loading - had to implement a multi-part mime parser
+      * Should have some numbers for Monday meeting
+    * Rex
+      * Changed the get all binary items to return all items on disk
+        * No parsing is done which avoids the initial pause/delay
+        * Closed out all known issues
+        * Gorkem reports a new bug in the multi-part response with item boundary
+  * August Meeting @ JHU
+    * ~15 people coming, some people would like to dial in 
+    * Meet at 8:30 AM to verify test environment
+    * Demo list
+      * DICOM to MINT - new study (Gorkem)
+      * Clear Canvas loading from MINT (Gorkem)
+      * DICOM to MINT - update study with new series (Gorkem)
+      * MINT to DICOM (Gorkem)
+      * Conformance Test (Tim Culp)
+      * Vital implementation (Chris)
+    * Discuss standard documentation as part of roadmap
+
+Decisions
+
+
+New Actions
+  * Get meeting place setup for JHU Meeting (Chris)
+  * Look into setting up infiniband for bulk loading performance (Gorkem/Jim)
+  
+Old Actions
+  * Gorkem to stand up a FTP server to distribute the data
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Send out address of JHU MINT Server to Rick (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+  * Gorkem to run dvtk on original DICOM files vs regenerated files
+  * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson) (eclipse may make this easy)
+  * Define performance test environment (Jim Philbin)
+  * Setup Performance Test Environment (Jim Philbin)
+  * Create MINT2DICOM Converter (Gorkem)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp)
+  * MINT Server Implementation - Phase 2 (Tim Dawson)
