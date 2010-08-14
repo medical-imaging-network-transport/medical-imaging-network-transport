@@ -22,7 +22,7 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 = MINTConformance Tools =
 
-The MINTConformance package was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group]. it currently consists of three tools.
+The MINTConformance package was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group]. It currently consists of three tools.
 
 == Mint Study Compare Shell Script == 
 
@@ -70,6 +70,58 @@ Running the tool with no arguments displays the usage:
 
 {{{
 > python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py
+Usage: MintStudyCompare.py [options] <mint_study1.xml> <mint_study2.xml>
+  -v: verbose
+  -l: lazy check (skips binary content)
+  -h: displays usage
+}}}
+
+The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
+
+{{{
+> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py -v metadata.xml metadata.xml
+        12 study attribute(s) compared.
+         2 series compared.
+        14 series attribute(s) compared.
+       102 normalized instance attribute(s) compared.
+         4 instance(s) compared.
+        24 instance attribute(s) compared.
+         4 binary item(s) compared.
+   2097152 byte(s) compared.
+}}}
+
+To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
+
+{{{
+> cd $MC_HOME/MINTConformance/testdata/MINT
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml metadata.2.xml
+Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00080008 vr=CS val=ORIGINAL\PRIMARY\AXIAL != tag=00080008 vr=CS val=ORIGINAL
+Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200020 vr=CS val=L\P != tag=00200020 vr=CS val=L
+Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200037 vr=DS val=1.000000\0.000000\0.000000\0.000000\1.000000\0.000000 != tag=00200037 vr=DS val=1.000000
+...
+2.dat size : 524288 != 524287
+        12 study attribute(s) compared.
+         2 series compared.
+        14 series attribute(s) compared.
+       102 normalized instance attribute(s) compared.
+         4 instance(s) compared.
+        24 instance attribute(s) compared.
+         4 binary item(s) compared.
+   1572864 byte(s) compared.
+17 difference(s) found.
+}}}
+
+== Mint Dicom Compare Python Application ==
+
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py] tool is a smart python application that compares a DICOM study to a MINT study by parsing the data elements in the DICOM and comparing them to the metadata and binary items in the MINT study.
+
+Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
+
+Running the tool with no arguments displays the usage:
+
+{{{
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py
 Usage: MintStudyCompare.py [options] <mint_study1.xml> <mint_study2.xml>
   -v: verbose
   -l: lazy check (skips binary content)
