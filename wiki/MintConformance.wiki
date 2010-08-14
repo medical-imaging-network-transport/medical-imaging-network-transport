@@ -153,3 +153,10 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    2097152 byte(s) compared.
         32 difference(s) found.
 }}}
+
+--------------------
+
+== To Do ==
+
+   * Something
+   * Something else
