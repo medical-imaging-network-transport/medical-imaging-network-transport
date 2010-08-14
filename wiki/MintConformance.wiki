@@ -161,6 +161,7 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
 Next steps for conformance testing are listed below.
 
    * Implement sequencing data elements (SQ)
+   * Provide support for bulk binary
    * Resolve binary/text differences between DICOM and MINT
    * Revisit Part 10 header differences between DICOM and MINT
    * Comparisons before and after updates
