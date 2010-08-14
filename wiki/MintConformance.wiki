@@ -131,19 +131,6 @@ Usage: MintDicomCompare.py [options] <dicom_study_dir> <mint_study.xml>
 The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py -v metadata.xml metadata.xml
-        12 study attribute(s) compared.
-         2 series compared.
-        14 series attribute(s) compared.
-       102 normalized instance attribute(s) compared.
-         4 instance(s) compared.
-        24 instance attribute(s) compared.
-         4 binary item(s) compared.
-   2097152 byte(s) compared.
-}}}
-
-{{{
 > cd $MC_HOME/MINTConformance/testdata
 > python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py -v DICOM MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml
 - Study Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873
