@@ -98,6 +98,8 @@ public final class ProcessImportDir {
     }
 
     public void processDir() {
+        System.err.println("Gathering files for allocation to studies...");
+        final long fileGatherStart = System.currentTimeMillis();
         final SortedSet<File> resultFiles = new TreeSet<File>();
         findPlainFilesRecursive(importDir, resultFiles);
         resultFiles.removeAll(handledFiles);
@@ -130,12 +132,18 @@ public final class ProcessImportDir {
                 System.err.println("Skipping file: " + plainFile);
             }
         }
+        final long fileGatherEnd = System.currentTimeMillis();
+        System.err.println("Gathering files and study allocation completed in "
+                + String.format("%.1f", (fileGatherEnd - fileGatherStart) / 1000.0f) + " seconds.");
 
         outerLoop:
         for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
             final String studyUID = studyFiles.getKey();
             assert studyUID != null;
-            System.err.println("Creating MINT for study instance UID " + studyUID);
+            final Collection<File> instanceFiles = studyFiles.getValue();
+            final int instanceFileCount = instanceFiles.size();
+            System.err.println("Creating MINT for " + instanceFileCount + " instances of study instance UID " + studyUID + "...");
+            final long mintConvertStart = System.currentTimeMillis();
             final BinaryData binaryData = new BinaryDcmData();
             final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
             metaBinaryPair.setBinaryData(binaryData);
@@ -143,7 +151,7 @@ public final class ProcessImportDir {
             metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
             final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(STUDY_LEVEL_TAGS, SERIES_LEVEL_TAGS, metaBinaryPair);
             builder.setBinaryInlineThreshold(binaryInlineThreshold);
-            final Iterator<File> instanceFileIter = studyFiles.getValue().iterator();
+            final Iterator<File> instanceFileIter = instanceFiles.iterator();
             while (instanceFileIter.hasNext()) {
                 final File instanceFile = instanceFileIter.next();
                 final TransferSyntax transferSyntax;
@@ -182,11 +190,16 @@ public final class ProcessImportDir {
             builder.finish();
 
             try {
-                addToSendQueue(metaBinaryPair, studyFiles.getValue());
+                addToSendQueue(metaBinaryPair, instanceFiles);
             } catch (final IOException e) {
                 //Catastrophic error
                 throw new RuntimeException(e);
             }
+
+            final long mintConvertEnd = System.currentTimeMillis();
+            System.err.println("MINT creation for study instance UID " + studyUID + " ("
+                    + instanceFileCount + " instances) completed in "
+                    + String.format("%.1f", (mintConvertEnd - mintConvertStart) / 1000.0f) + " seconds.");
         }
     }
 
@@ -235,11 +248,28 @@ public final class ProcessImportDir {
             if (forceCreate) {
                 studyUUID = null;
             } else {
+                final long existQueryStart = System.currentTimeMillis();
                 studyUUID = doesStudyExist(studyInstanceUID, sendData.patientID);
+                final long existQueryEnd = System.currentTimeMillis();
+                System.err.print("Completed querying server for existing study for study instance UID "
+                        + studyInstanceUID + " in "
+                        + String.format("%.1f", (existQueryEnd - existQueryStart) / 1000.0f) + " seconds. ");
+                if (studyUUID == null) {
+                    System.err.println("Study does not exist yet.");
+                } else {
+                    System.err.println("Study exists, Study ID " + studyUUID);
+                }
             }
 
             try {
-                send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
+                final long uploadStart = System.currentTimeMillis();
+                final JobInfo jobInfo = send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
+                final long uploadEnd = System.currentTimeMillis();
+                assert studyUUID == null || studyUUID.equals(jobInfo.studyID);
+                System.err.println("Completed uploading MINT to server for study instance UID "
+                        + studyInstanceUID + " (" + sendData.studyInstanceFiles.size() + " instances) in "
+                        + String.format("%.1f", (uploadEnd - uploadStart) / 1000.0f) + " seconds, Job ID "
+                        + jobInfo.getJobID() + ", Study ID " + jobInfo.getStudyID());
             } catch (final IOException e) {
                 System.err.println("Skipping study " + studyInstanceUID + ": I/O error while uploading study to server:");
                 System.err.println(e.getLocalizedMessage());
@@ -291,12 +321,17 @@ public final class ProcessImportDir {
      */
     public void handleResponses() throws IOException {
         final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        final Iterator<Entry<String, Collection<File>>> studyIter = jobIDInfo.entrySet().iterator();
+        final Iterator<Entry<String, JobInfo>> studyIter = jobIDInfo.entrySet().iterator();
         while (studyIter.hasNext()) {
-            final Entry<String, Collection<File>> studyEntry = studyIter.next();
+            final Entry<String, JobInfo> studyEntry = studyIter.next();
             final String jobID = studyEntry.getKey();
             final HttpGet httpGet = new HttpGet(createURI + "/" + jobID);
             final String response = httpClient.execute(httpGet, responseHandler);
+
+            //Debugging only
+//            System.err.println("Server job status response:");
+//            System.err.println(response);
+
             final String statusStr;
             try {
                 final Document responseDoc = documentBuilder.parse(
@@ -309,16 +344,21 @@ public final class ProcessImportDir {
                 continue;
             }
 
-            final Collection<File> studyFiles = studyEntry.getValue();
+            final JobInfo jobInfo = studyEntry.getValue();
+            final Collection<File> studyFiles = jobInfo.getFiles();
             if (statusStr.equals("IN_PROGRESS")) {
                 continue;
             } else if (statusStr.equals("FAILED")) {
-                System.err.println("Querying job " + jobID + ": Server upload failed:");
+                System.err.println("Querying job " + jobID + ": server processing failed:");
                 System.err.println(response);
                 //Do not delete the study's files in case of failure
                 removeStudyFiles(studyFiles, false);
             } else if (statusStr.equals("SUCCESS")) {
-                System.err.println("Querying job " + jobID + ": Server upload succeeded");
+                final long approxJobEndTime = System.currentTimeMillis();
+                //Always round down the job processing time, as it's usually too high anyway
+                System.err.println("Querying job " + jobID + ": server processing completed in approximately "
+                        + ((approxJobEndTime - jobInfo.getJobStartTime()) / 1000) + " seconds for "
+                        + studyFiles.size() + " instance files, Study ID " + jobInfo.getStudyID() + ".");
                 removeStudyFiles(studyFiles, true);
             } else {
                 System.err.println("Querying job " + jobID + ": unknown server response:");
@@ -340,7 +380,7 @@ public final class ProcessImportDir {
         }
     }
 
-    private void send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles,
+    private JobInfo send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles,
             final String existingStudyUUID) throws IOException, SAXException {
         final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
@@ -379,15 +419,25 @@ public final class ProcessImportDir {
         httpPost.setEntity(entity);
 
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
+        final long uploadEndTime = System.currentTimeMillis();
+
+        //Debugging only
+//        System.err.println("Server response:");
+//        System.err.println(response);
+
         final String jobID;
+        final String studyID;
         final Document responseDoc = documentBuilder.parse(new ByteArrayInputStream(response.getBytes()));
         try {
             jobID = xPath.evaluate("/html/body/dl/dd[@class='JobID']/text()", responseDoc).trim();
+            studyID = xPath.evaluate("/html/body/dl/dd[@class='StudyID']/text()", responseDoc).trim();
         } catch(final XPathExpressionException e) {
             //This shouldn't happen
             throw new RuntimeException(e);
         }
-        jobIDInfo.put(jobID, studyFiles);
+        final JobInfo jobInfo = new JobInfo(jobID, studyID, studyFiles, uploadEndTime);
+        jobIDInfo.put(jobID, jobInfo);
+        return jobInfo;
     }
 
     private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles) {
@@ -443,8 +493,35 @@ public final class ProcessImportDir {
     private final boolean useXMLNotGPB;
     private final Collection<MetaBinaryFiles> studySendQueue =
         new ConcurrentLinkedQueue<MetaBinaryFiles>();
-    private final Map<String, Collection<File>> jobIDInfo =
-        Collections.synchronizedMap(new HashMap<String, Collection<File>>());
+
+    private static final class JobInfo {
+        private final String jobID;
+        private final String studyID;
+        private final Collection<File> files;
+        private final long jobStartTime;
+
+        public JobInfo(final String jobID, final String studyID, final Collection<File> files, final long jobStartTime) {
+            this.jobID = jobID;
+            this.studyID = studyID;
+            this.files = files;
+            this.jobStartTime = jobStartTime;
+        }
+        public final String getJobID() {
+            return jobID;
+        }
+        public final String getStudyID() {
+            return studyID;
+        }
+        public final Collection<File> getFiles() {
+            return files;
+        }
+        public final long getJobStartTime() {
+            return jobStartTime;
+        }
+    }
+
+    private final Map<String, JobInfo> jobIDInfo =
+        Collections.synchronizedMap(new HashMap<String, JobInfo>());
     private final boolean deletePhysicalInstanceFiles;
     private final boolean forceCreate;
     private final int binaryInlineThreshold;
