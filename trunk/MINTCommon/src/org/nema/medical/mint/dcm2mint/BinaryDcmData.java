@@ -40,8 +40,13 @@ import org.dcm4che2.io.DicomInputStream;
 public final class BinaryDcmData implements BinaryData {
     private static final class FileTagpath {
         public FileTagpath(final File dcmFile, final int[] tagPath) {
+            this(dcmFile, tagPath, -1);
+        }
+        
+        public FileTagpath(File dcmFile, int[] tagPath, int fragment) {
             this.dcmFile = dcmFile;
             this.tagPath = tagPath;
+            this.fragment = fragment;
         }
 
         @Override
@@ -51,6 +56,7 @@ public final class BinaryDcmData implements BinaryData {
 
         public final File dcmFile;
         public final int[] tagPath;
+        public final int fragment;
     }
 
     private final List<FileTagpath> binaryItems = new ArrayList<FileTagpath>();
@@ -85,10 +91,14 @@ public final class BinaryDcmData implements BinaryData {
 
     @Override
     public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
+        add(dcmFile, tagPath, dcmElem, -1);
+    }
+    
+    public void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int fragment) {
         final int[] newTagPath = new int[tagPath.length + 1];
         System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
         newTagPath[tagPath.length] = dcmElem.tag();
-        final FileTagpath storeElem = new FileTagpath(dcmFile, newTagPath);
+        final FileTagpath storeElem = new FileTagpath(dcmFile, newTagPath, fragment);
         binaryItems.add(storeElem);
     }
 
@@ -175,7 +185,13 @@ public final class BinaryDcmData implements BinaryData {
         }
         final byte[] binaryData;
         try {
-            binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+            if (binaryItemPath.fragment >= 0) {
+                // multiframe
+                DicomElement element = cachedRootDicomObject.get(binaryItemPath.tagPath);
+                binaryData = element.getFragment(binaryItemPath.fragment);
+            } else {
+                binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+            }
         } catch (final UnsupportedOperationException e) {
             //Something wrong with the DICOM format
             final DicomCodingException newEx = new DicomCodingException("DICOM syntax error at: " + binaryItemPath);
