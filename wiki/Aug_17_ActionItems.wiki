@@ -1,0 +1,52 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Add your content here.
+
+
+= New Actions =
+
+* Get MINT DICOM data dictionary populated with current standard (Rex)
+* Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+* Add jibx bindings and java objects for data dictionary (Tim Dawson)
+* Use cases for proprietary data (Jim)
+* Use cases for de-id (Jim)
+* Add support for multi-frame binary items to reference implementation (server and DICOM to MINT) (Jeremy)
+* Update clear canvas to support Multi-frame MINT (Gorkem)
+* Update conformance test to support Multi-frame (Tim Culp)
+* Specify XSD's for all resources that were XHTML (Tim Dawson + Jeremey + Rex)
+* Changelog XSD
+   * Add XML element for application identity
+   * Add XML element for user identity
+* Extract user identity from HTTP Header and stick in changelog (Rex)
+* Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+* Study Update with baseline version implementation (Rex)
+* Specify MINT standard on Wiki (Chris Hafey + All)
+  * Error codes
+  * URL
+  * XSD
+  * Validation rules
+* Implement binary item exclusion on get all binary items (Rex)
+* Modify DICOM2MINT for Part 10 headers (Tim Dawson)
+* Modify MINT Create/Update for Part 10 headers (Tim Dawson)
+* Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+* Add unit test for all future changes (All)
+* Performance cookbook (Gorkem + Chris + All)
+* Develop integration tests (Jim + Tim Culp)
+* Add support for non DICOM types (Chris)
+* Document how to build reference implementation + clear canvas plugin(Gorkem)
+* Document how to install reference implementation from binary build (Gorkem)
+* Document how to use reference 
+* Contact clear canvas folks about adding native support for MINT (Chris)
+* Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
+* 
+
+= Done =
+* Modify Conformance test for Part 10 headers (Tim Culp)
+
+= Future =
+* GUI Tool to replace XHTML functionality / work with MINT server
+
+
+
