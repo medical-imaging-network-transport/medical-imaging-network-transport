@@ -7,18 +7,18 @@ Add your content here.
 
 = New Actions =
 
-* Get MINT DICOM data dictionary populated with current standard (Rex)
-* Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
-* Add jibx bindings and java objects for data dictionary (Tim Dawson)
-* Use cases for proprietary data (Jim)
-* Use cases for de-id (Jim)
-* Add support for multi-frame binary items to reference implementation (server and DICOM to MINT) (Jeremy)
-* Update clear canvas to support Multi-frame MINT (Gorkem)
-* Update conformance test to support Multi-frame (Tim Culp)
-* Specify XSD's for all resources that were XHTML (Tim Dawson + Jeremey + Rex)
-* Changelog XSD
-   * Add XML element for application identity
-   * Add XML element for user identity
+  * Get MINT DICOM data dictionary populated with current standard (Rex)
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Add support for multi-frame binary items to reference implementation (server and DICOM to MINT) (Jeremy)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Specify XSD's for all resources that were XHTML (Tim Dawson + Jeremey + Rex)
+  * Changelog XSD
+    * Add XML element for application identity
+    * Add XML element for user identity
 * Extract user identity from HTTP Header and stick in changelog (Rex)
 * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
 * Study Update with baseline version implementation (Rex)
@@ -47,6 +47,4 @@ Add your content here.
 
 = Future =
 * GUI Tool to replace XHTML functionality / work with MINT server
-
-
 
