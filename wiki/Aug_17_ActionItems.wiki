@@ -19,32 +19,31 @@ Add your content here.
   * Changelog XSD
     * Add XML element for application identity
     * Add XML element for user identity
-* Extract user identity from HTTP Header and stick in changelog (Rex)
-* Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
-* Study Update with baseline version implementation (Rex)
-* Specify MINT standard on Wiki (Chris Hafey + All)
-  * Error codes
-  * URL
-  * XSD
-  * Validation rules
-* Implement binary item exclusion on get all binary items (Rex)
-* Modify DICOM2MINT for Part 10 headers (Tim Dawson)
-* Modify MINT Create/Update for Part 10 headers (Tim Dawson)
-* Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
-* Add unit test for all future changes (All)
-* Performance cookbook (Gorkem + Chris + All)
-* Develop integration tests (Jim + Tim Culp)
-* Add support for non DICOM types (Chris)
-* Document how to build reference implementation + clear canvas plugin(Gorkem)
-* Document how to install reference implementation from binary build (Gorkem)
-* Document how to use reference 
-* Contact clear canvas folks about adding native support for MINT (Chris)
-* Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
-* 
+  * Extract user identity from HTTP Header and stick in changelog (Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with baseline version implementation (Rex)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Implement binary item exclusion on get all binary items (Rex)
+  * Modify DICOM2MINT for Part 10 headers (Tim Dawson)
+  * Modify MINT Create/Update for Part 10 headers (Tim Dawson)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+  * Document how to build reference implementation + clear canvas plugin(Gorkem)
+  * Document how to install reference implementation from binary build (Gorkem)
+  * Document how to use reference 
+  * Contact clear canvas folks about adding native support for MINT (Chris)
+  * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
+  * 
 
 = Done =
-* Modify Conformance test for Part 10 headers (Tim Culp)
+  * Modify Conformance test for Part 10 headers (Tim Culp)
 
 = Future =
-* GUI Tool to replace XHTML functionality / work with MINT server
-
+  * GUI Tool to replace XHTML functionality / work with MINT server
