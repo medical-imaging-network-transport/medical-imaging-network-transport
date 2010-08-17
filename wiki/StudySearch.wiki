@@ -29,19 +29,32 @@ For each study matching the query, the following is returned:
 The following XSD defines the search results
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:element name="Study"
-    minOccurs="0" 
-    maxOccurs="unbounded">
+  <xsd:element name="Studies">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="studyUUID" xsd:string>
-        <xsd:element name="lastUpdateDateTime" type="xsd:string"/>
+        <xsd:element name="Study" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="studyUUID">
+                <xsd:complexType>
+                  <xsd:attribute name="value" type="xsd:string"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="lastUpdateDateTime">
+                <xsd:complexType>
+                  <xsd:attribute name="value" type="xsd:dateTime"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>
 
 Sample XML:
+<?xml version="1.0" encoding="utf-8"?>
 <studies>
   <study>
    <studyUUID value="560e1d6d-6b0b-4351-8430-a44c278ed345"/>
