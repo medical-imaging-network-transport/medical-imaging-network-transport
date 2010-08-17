@@ -323,6 +323,7 @@ public final class Dcm2MetaBuilder {
              final Attribute attr = newAttr(elem);
              assert attr != null;
              if (elem.hasFragments()) {
+                 // FIXME: this is wrong, fragments != frames
                  attr.setBid(metaBinaryPair.getBinaryData().size());
                  attr.setFrameCount(elem.countItems());
                  for (int i = 0; i < elem.countItems(); i++) {
