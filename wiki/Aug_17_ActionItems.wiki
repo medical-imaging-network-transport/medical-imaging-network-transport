@@ -56,7 +56,7 @@ Add your content here.
     * Various date/time logic (see ppt)
     * Search results to just include
       * Study UUID
-      * DateTime of last change
+      * dateTime of last change
   * Changelog changes (Rex)
     * add type
     * remove reason
