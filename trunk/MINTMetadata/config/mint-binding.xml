@@ -27,6 +27,7 @@
     <value style="attribute" name="vr" get-method="getVr" set-method="setVr"/>
     <value style="attribute" name="val" get-method="getVal" set-method="setVal" usage="optional"/>
     <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>    
+    <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional" default="1"/>    
     <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>    
     <value style="attribute" name="exclude" field="exclude" usage="optional"/>
   </mapping>

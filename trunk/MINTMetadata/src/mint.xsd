@@ -38,6 +38,7 @@
 		<attribute name="val" type="string" use="optional"></attribute>
 		<attribute name="bytes" type="string" use="optional"></attribute>
 		<attribute name="bid" type="unsignedInt" use="optional"></attribute>
+		<attribute name="frameCount" type="unsignedInt" use="optional"></attribute>
 		<attribute name="exclude" type="string" use="optional"></attribute>
 	</complexType>
 

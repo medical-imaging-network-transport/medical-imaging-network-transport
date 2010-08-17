@@ -1657,6 +1657,13 @@ public final class MINT2GPB {
     public boolean hasBinaryItemId() { return hasBinaryItemId; }
     public int getBinaryItemId() { return binaryItemId_; }
     
+    // optional uint32 frame_count = 8;
+    public static final int FRAME_COUNT_FIELD_NUMBER = 8;
+    private boolean hasFrameCount;
+    private int frameCount_ = 0;
+    public boolean hasFrameCount() { return hasFrameCount; }
+    public int getFrameCount() { return frameCount_; }
+    
     // optional bytes bytes = 7;
     public static final int BYTES_FIELD_NUMBER = 7;
     private boolean hasBytes;
@@ -1706,6 +1713,9 @@ public final class MINT2GPB {
       if (hasBytes()) {
         output.writeBytes(7, getBytes());
       }
+      if (hasFrameCount()) {
+        output.writeUInt32(8, getFrameCount());
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -1742,6 +1752,10 @@ public final class MINT2GPB {
       if (hasBytes()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(7, getBytes());
+      }
+      if (hasFrameCount()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(8, getFrameCount());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1920,6 +1934,9 @@ public final class MINT2GPB {
         if (other.hasBinaryItemId()) {
           setBinaryItemId(other.getBinaryItemId());
         }
+        if (other.hasFrameCount()) {
+          setFrameCount(other.getFrameCount());
+        }
         if (other.hasBytes()) {
           setBytes(other.getBytes());
         }
@@ -1982,6 +1999,10 @@ public final class MINT2GPB {
             }
             case 58: {
               setBytes(input.readBytes());
+              break;
+            }
+            case 64: {
+              setFrameCount(input.readUInt32());
               break;
             }
           }
@@ -2085,6 +2106,24 @@ public final class MINT2GPB {
       public Builder clearBinaryItemId() {
         result.hasBinaryItemId = false;
         result.binaryItemId_ = 0;
+        return this;
+      }
+      
+      // optional uint32 frame_count = 8;
+      public boolean hasFrameCount() {
+        return result.hasFrameCount();
+      }
+      public int getFrameCount() {
+        return result.getFrameCount();
+      }
+      public Builder setFrameCount(int value) {
+        result.hasFrameCount = true;
+        result.frameCount_ = value;
+        return this;
+      }
+      public Builder clearFrameCount() {
+        result.hasFrameCount = false;
+        result.frameCount_ = 0;
         return this;
       }
       
@@ -2551,14 +2590,14 @@ public final class MINT2GPB {
       "anceData\022\030\n\020sop_instance_uid\030\001 \001(\t\022\017\n\007ex" +
       "clude\030\002 \001(\t\022\033\n\023transfer_syntax_uid\030\003 \001(\t" +
       "\0220\n\nattributes\030\004 \003(\0132\034.mint.metadata.Att" +
-      "ributeData\"\236\001\n\rAttributeData\022\013\n\003tag\030\001 \001(" +
+      "ributeData\"\263\001\n\rAttributeData\022\013\n\003tag\030\001 \001(" +
       "\r\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024\n\014string" +
-      "_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\r\n\005" +
-      "bytes\030\007 \001(\014\022&\n\005items\030\006 \003(\0132\027.mint.metada" +
-      "ta.ItemData\"<\n\010ItemData\0220\n\nattributes\030\001 " +
-      "\003(\0132\034.mint.metadata.AttributeDataB0\n\"org",
-      ".nema.medical.mint.metadata.gpbB\010MINT2GP" +
-      "BH\001"
+      "_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\023\n\013" +
+      "frame_count\030\010 \001(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005item" +
+      "s\030\006 \003(\0132\027.mint.metadata.ItemData\"<\n\010Item" +
+      "Data\0220\n\nattributes\030\001 \003(\0132\034.mint.metadata",
+      ".AttributeDataB0\n\"org.nema.medical.mint." +
+      "metadata.gpbB\010MINT2GPBH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2594,7 +2633,7 @@ public final class MINT2GPB {
           internal_static_mint_metadata_AttributeData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_AttributeData_descriptor,
-              new java.lang.String[] { "Tag", "Exclude", "Vr", "StringValue", "BinaryItemId", "Bytes", "Items", },
+              new java.lang.String[] { "Tag", "Exclude", "Vr", "StringValue", "BinaryItemId", "FrameCount", "Bytes", "Items", },
               org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.class,
               org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData.Builder.class);
           internal_static_mint_metadata_ItemData_descriptor =
