@@ -38,7 +38,7 @@ Add your content here.
   * Add support for non DICOM types (Chris)
     * Data dictionaries for Vital Volumes 
     * Data dictionary for generic mime type attachments
-   
+    * Root study URL to list all types in study
   * Document how to build reference implementation + clear canvas plugin(Gorkem)
   * Document how to install reference implementation from binary build (Gorkem)
   * Document how to use reference 
@@ -50,7 +50,19 @@ Add your content here.
   * Update metadata format in (Tim Dawson)
     * # of instances (attribute instanceCount) in a series to series tag
     * # of instances (attribute instanceCount) in a study to study tag
+  * Update study queries (Tim Dawson)
+    * Add support for accession number issuer
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * DateTime of last change
+  * Changelog changes (Rex)
+    * add type
+    * remove reason
+
   * 
+
 
 = Done =
   * Modify Conformance test for Part 10 headers (Tim Culp)
