@@ -202,7 +202,14 @@ public class Study implements AttributeStore
                     	//Check if bid exists
                     	int bid = curr.getBid();
                         if (bid >= 0) {
-                            items.add(bid);
+                            int frameCount = curr.getFrameCount();
+                            if (frameCount > 1) {
+                                for (int newBid = bid; newBid < (bid + frameCount); newBid++) {
+                                    items.add(newBid);
+                                }
+                            } else {
+                                items.add(bid);
+                            }
                         }
                     	
                         //Add children to queue
