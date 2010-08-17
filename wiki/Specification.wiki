@@ -15,10 +15,9 @@ Add your content here.
 
 = High Level Components =
 
-  * [Study Search]
-  * [Study Create]
-  * [Study Update]
-  * [Study Changes]
-  * [Data Dictionary]
-  * [Study Access]
-
+  * StudySearch
+  * StudyCreate
+  * StudyUpdate
+  * StudyChanges
+  * DataDictionary
+  * StudyAccess
