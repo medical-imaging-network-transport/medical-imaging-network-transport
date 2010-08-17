@@ -60,9 +60,23 @@ Add your content here.
   * Changelog changes (Rex)
     * add type
     * remove reason
+  * Send email to MINT-user group saying if you want access to MINT server to email him (Gorkem)
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * CSTORE SCP -> MINT (Tim Dawson)
 
   * 
-
+= Old Actions =
+    * Gorkem to stand up a FTP server to distribute the data
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+   
+    * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+    * Gorkem to run dvtk on original DICOM files vs regenerated files
+    * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson) (eclipse may make this easy)
+    * Define performance test environment (Jim Philbin)
+    * Setup Performance Test Environment (Jim Philbin)
+    * Create MINT2DICOM Converter (Gorkem)
+    * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+    * MINT Server Implementation - Phase 2 (Tim Dawson) 
 
 = Done =
   * Modify Conformance test for Part 10 headers (Tim Culp)
