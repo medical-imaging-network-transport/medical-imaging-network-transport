@@ -1,0 +1,24 @@
+#summary MINT Specification Home Page
+
+= Introduction =
+
+Add your content here.
+
+= Use Cases =
+
+  * [Create new study]
+  * [Update existing study]
+  * [Search for study]
+  * [Get Study Metadata]
+  * [Get Study Binary Items]
+  * [Get List of study changes]
+
+= High Level Components =
+
+  * [Study Search]
+  * [Study Create]
+  * [Study Update]
+  * [Study Changes]
+  * [Data Dictionary]
+  * [Study Access]
+
