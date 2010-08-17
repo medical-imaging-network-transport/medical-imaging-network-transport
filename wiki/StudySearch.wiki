@@ -1,0 +1,42 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+The purpose of the study search resource is to support a basic searching facility to find a study.
+
+
+= URL =
+
+$MINTROOT/studies
+
+= Search Parameters =
+
+Search parameters are passed as URL query strings.  Only studies which match all search parameters are returned (logical AND).  The search parameters are:
+
+  * studyInstanceUID - Search by study instance uid
+  * patientId - Search by patient ID.  Can optionally specify the patientIdIssuer
+  * accessionNumber - search by accession number.  Can optionally specify the accessionNumberIssuer
+  * studyDateTimeFrom/studyDateTimeTo - DateTime range to search on
+  * pageSize - number of studies to return per query
+
+
+= Search Results =
+
+For each study matching the query, the following is returned:
+  * studyUUID
+  * lastUpdateDateTime - the DateTime the study was last updated
+
+The following XSD defines the search results
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <xsd:element name="Study"
+                     minOccurs="0" 
+                     maxOccurs="unbounded">
+           <xsd:complexType>
+              <xsd:sequence>
+                 <xsd:element name="studyUUID" xsd:string>
+                 <xsd:element name="lastUpdateDateTime" type="xsd:string"/>
+             </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+  </xsd:schema>
