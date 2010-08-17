@@ -63,6 +63,11 @@ Add your content here.
   * Send email to MINT-user group saying if you want access to MINT server to email him (Gorkem)
   * Measure performance of MINT vs DICOM as per PPT (Gorkem)
   * CSTORE SCP -> MINT (Tim Dawson)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Target a MINT meeting at RSNA Sunday @ 5PM (Jim Philbin)
+  * look into a meeting room at RSNA for MINT meeting (Wayne Dejarnette)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
 
   * 
 = Old Actions =
