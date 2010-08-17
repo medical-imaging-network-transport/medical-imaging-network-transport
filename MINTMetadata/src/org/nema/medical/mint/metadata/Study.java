@@ -227,6 +227,9 @@ public class Study implements AttributeStore
     static Study fromGPB(StudyData studyData) {
         Study study = new Study();
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
+        if (studyData.hasType()) study.setType(studyData.getType());
+        if (studyData.hasVersion()) study.setType(studyData.getVersion());
+
         for (AttributeData attrData : studyData.getAttributesList()) {
             Attribute attr = Attribute.fromGPB(attrData);
             study.putAttribute(attr);
@@ -242,6 +245,12 @@ public class Study implements AttributeStore
         StudyData.Builder builder = StudyData.newBuilder();
         if (this.studyInstanceUID != null) {
             builder.setStudyInstanceUid(this.studyInstanceUID);
+        }
+        if (this.type != null) {
+            builder.setType(this.type);
+        }
+        if (this.version != null) {
+            builder.setVersion(this.version);
         }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
