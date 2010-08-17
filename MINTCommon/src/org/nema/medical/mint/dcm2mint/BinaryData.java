@@ -27,4 +27,5 @@ public interface BinaryData extends Iterable<byte[]> {
     byte[] getBinaryItem(int index);
     int size();
     void add(File dcmFile, int[] tagPath, DicomElement dcmElem);
+    void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int fragment);
 }

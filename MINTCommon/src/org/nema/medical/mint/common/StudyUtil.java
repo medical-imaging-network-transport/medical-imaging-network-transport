@@ -193,7 +193,8 @@ public final class StudyUtil {
                         {
                             bid += shiftAmount;
                             curr.setBid(bid);
-                        }
+                            // frameCount is relative to bid, no need to change it
+                        } 
                     	
                         //Add children to queue
                     	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
@@ -446,6 +447,9 @@ public final class StudyUtil {
             }else if(!(a.getBid() == attr.getBid())) {
                 //Binary IDs not equal : false
                 equal = false;
+            }else if(a.getBid() >= 0) {
+                //Binary IDs valid but frame counts not equal : false
+                equal = (a.getFrameCount() == attr.getFrameCount());
             }else if(!((a.getVal() == attr.getVal()) || (a.getVal() != null && a.getVal().equals(attr.getVal())))) {
                 //Value fields not equal : false
                 equal = false;
@@ -617,10 +621,23 @@ public final class StudyUtil {
                     	int bid = curr.getBid();
                         if(bid >= 0)
                         {
-                            if(!studyBids.add(bid))
+                            int frameCount = curr.getFrameCount();
+                            if (frameCount >= 1)
                             {
-                                //If the set already contained the bid, should be unique reference
-                                return false;
+                                for (int newBid = bid; newBid < (bid + frameCount); newBid++)
+                                {
+                                    if (!studyBids.add(newBid))
+                                    {
+                                        //If the set already contained the bid, should be unique reference
+                                        return false;
+                                    }
+                                }
+                            } else {
+                                if(!studyBids.add(bid))
+                                {
+                                    //If the set already contained the bid, should be unique reference
+                                    return false;
+                                }
                             }
                         }
                     	

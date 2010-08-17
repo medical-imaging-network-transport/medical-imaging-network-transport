@@ -322,12 +322,22 @@ public final class Dcm2MetaBuilder {
 
              final Attribute attr = newAttr(elem);
              assert attr != null;
-             final byte[] binaryData = elem.getBytes();
-             if (binaryData.length >= binaryInlineThreshold) {
-                 attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
-                 metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
+             if (elem.hasFragments()) {
+                 attr.setBid(metaBinaryPair.getBinaryData().size());
+                 attr.setFrameCount(elem.countItems());
+                 for (int i = 0; i < elem.countItems(); i++) {
+                     // always use binary item; the spec doesn't support
+                     // inline fragments
+                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem, i);
+                 }
              } else {
-                 attr.setBytes(binaryData);
+                 final byte[] binaryData = elem.getBytes();
+                 if (binaryData.length >= binaryInlineThreshold) {
+                     attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
+                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
+                 } else {
+                     attr.setBytes(binaryData);
+                 }
              }
              attrs.putAttribute(attr);
          }
