@@ -136,7 +136,9 @@ class MintStudyCompare():
        # ---
        if self.__count != 0:
           print self.__count, "difference(s) found."
-                 
+
+       return self.__count
+      
    def check(self, msg, obj1, obj2):
        if obj1 != obj2:
           self.__count += 1
@@ -361,7 +363,8 @@ def main():
        studies = MintStudyCompare(study1, study2)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
-       studies.compare()
+
+       return studies.compare()
        
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

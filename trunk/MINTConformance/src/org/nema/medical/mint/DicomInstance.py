@@ -39,7 +39,10 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 PIXEL_DATA_TAG          = "7fe00010"
 
 reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
-binaryVRs   = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
+binaryVRs   = ("OB", "OW", "UN")
+
+# Other Binary VRs that are represented as text for clarity
+# ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT")
 
 part10Tags = {
    "00020000" : "File Meta Information",
@@ -149,6 +152,18 @@ seriesTags = {
    "7fe00010" : "Pixel Data"
 }
 
+# TODO: Replace with DCM4CHE data dictionary
+implicitVRs = {
+   "00280002" : "US",
+   "00280006" : "US",
+   "00280010" : "US",
+   "00280011" : "US",
+   "00280100" : "US",
+   "00280101" : "US",
+   "00280102" : "US",
+   "00280103" : "US"
+}
+
 # -----------------------------------------------------------------------------
 # DicomInstance
 # -----------------------------------------------------------------------------
@@ -174,8 +189,25 @@ class DicomInstance():
    def tag(self, n):
        return self.__tags[n]
        
-   def isUnknown(self, tag):
+   # TODO: How do I discover if VR is explicit?
+   def isExplicit(self):
+       return False
+       
+   # TODO: How do I discover endianness?
+   def endian(self):
+       #if bigEndian:
+       #   return ">"
+       #else:
+       return "<"
+
+   def isPixelData(self, tag):
+       return tag == PIXEL_DATA_TAG
+       
+   def isPart10Header(self, tag):
        return int(self.group(tag),16) < 8
+       
+   def isUnknown(self, tag):
+       return self.vr(tag)=="VN"
        
    def isPrivate(self, tag):
        return int(self.group(tag),16) % 2 != 0
@@ -217,12 +249,14 @@ class DicomInstance():
        for n in range(0, numTags):
            tag = s.tag(n)
            val = s.value(tag)
-           if tag == PIXEL_DATA_TAG:
+           if   self.isPixelData(tag):
               val = "<Pixel Data>"
            elif self.isPrivate(tag):
               val = "<Private>"
            elif self.isUnknown(tag):
               val = "<Unknown>"
+           elif self.isBinary(tag):
+              val = "<Binary Item>"
            print tag, s.tagName(tag), s.vr(tag), s.length(tag), val
            
    def __open(self):
@@ -250,8 +284,10 @@ class DicomInstance():
           # If this is an unknown tag then the VR is explicit
           # ---
           vr="  "    
-          if self.isUnknown(tag):
+          if self.isExplicit() or self.isPart10Header(tag):
              vr=dcm.read(2)
+          
+          endian = self.endian()
           
           # ---
           # Read the length
@@ -260,23 +296,59 @@ class DicomInstance():
              dcm.read(2) # throw away reserve
              n = 4
              vl=dcm.read(4)
-             vl = unpack('<L', vl)
+             vl = unpack(endian+"L", vl)
           elif vr != "  ": # Explicit without reserve
              vl=dcm.read(2)
-             vl = unpack('<h', vl)
+             vl = unpack(endian+"h", vl)
           else: # Implicit
+             if implicitVRs.has_key(tag):
+                vr=implicitVRs[tag]
              n = 4
              vl=dcm.read(4)
-             vl = unpack('<L', vl)
+             vl = unpack(endian+"L", vl)
           vl=vl[0]
           
           # ---
           # Read the val
           # ---
           val=dcm.read(vl)
-          if self.isBinary(tag):
+          
+          # Signed Short
+          if   vr=="SS":
+             val = unpack(endian+"h", val)[0]
+
+          # Unsigned Short
+          elif vr=="US":
+             val = str(unpack(endian+"H", val)[0])
+
+          # Signed Long
+          elif vr=="SL":
+             val = unpack(endian+"l", val)[0]
+
+          # Unsigned Long
+          elif vr=="UL":
+             val = unpack(endian+"L", val)[0]
+
+          # Single Precision Float
+          elif vr=="FL":
+             val = unpack(endian+"f", val)[0]
+
+          # Double Precision Float
+          elif vr=="FD":
+             val = unpack(endian+"d", val)[0]
+          
+          # TODO: Other Float 4 FLOAT
+          elif vr=="OF":                       
+             val = unpack(endian+"f", val)[0]
+
+          # Attribute Tag 4 ULONG
+          elif vr=="AT":                       
+             val = unpack(endian+"L", val)[0]
+          
+          elif self.isBinary(tag):
              val = unpack('B'*len(val), val)
              vl = len(val)
+          
           else:
              val = val[0:vl]
              if len(val) > 0 and not val[-1].isalnum():
@@ -302,8 +374,9 @@ class DicomInstance():
        return s
    
    def __getTag(self, group, element):
-       g = unpack('<h', group)
-       e = unpack('<h', element)
+       endian = self.endian()
+       g = unpack(endian+"h", group)
+       e = unpack(endian+"h", element)
        s = self.__bin2str(g) + self.__bin2str(e)
        s = s.lower()
        return s

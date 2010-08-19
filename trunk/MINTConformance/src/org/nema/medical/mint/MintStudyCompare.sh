@@ -49,6 +49,7 @@ check()
 # ---
 # Get command line arguments.
 # ---
+diff_status=0
 progName=`basename $0`
 if [ $# != 2 ]
 then
@@ -68,6 +69,10 @@ check $study2 $binary2
 # Compare studies.
 # ---
 diff $study1 $study2
+if [ $? != 0 ]
+then 
+   diff_status=1
+fi
 
 # --- 
 # Compare binary items.
@@ -78,6 +83,10 @@ do
    dat=`basename $item1`
    item2=$binary2/$dat
    cmp $item1 $item2
+   if [ $? != 0 ]
+   then 
+      diff_status=1
+   fi
 done
 
-exit 0
+exit $diff_status
