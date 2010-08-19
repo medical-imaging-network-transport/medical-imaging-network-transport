@@ -162,6 +162,7 @@ Next steps for conformance testing are listed below.
 
    * Implement sequencing data elements (SQ)
    * Detect endianness, explicit VRs
+   * Use DCM4CHE data dictionary
    * Provide support for bulk binary
    * Resolve binary/text differences between DICOM and MINT
    * Revisit Part 10 header differences between DICOM and MINT
