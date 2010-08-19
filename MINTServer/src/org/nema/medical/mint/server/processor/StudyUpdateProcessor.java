@@ -209,7 +209,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				Change updateInfo = new Change();
 				updateInfo.setId(UUID.randomUUID().toString());
 				updateInfo.setStudyID(studyUUID);
-				updateInfo.setDescription("Update of existing study.");
+				updateInfo.setType(type);
 				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
 				updateDAO.saveChange(updateInfo);
 	

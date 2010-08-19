@@ -132,7 +132,7 @@ public class StudyCreateProcessor extends TimerTask {
 			Change updateInfo = new Change();
 			updateInfo.setId(UUID.randomUUID().toString());
 			updateInfo.setStudyID(studyUUID);
-			updateInfo.setDescription("Initial Creation of Study");
+			updateInfo.setType(type);
 			updateInfo.setIndex(0);
 			updateDAO.saveChange(updateInfo);
 
