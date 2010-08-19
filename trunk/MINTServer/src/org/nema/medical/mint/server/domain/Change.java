@@ -46,7 +46,7 @@ public class Change {
 	private int changeIndex;
 	
 	@Column
-	private String changeDescription;
+	private String changeType;
 	
 	@Column(name="changeDateTime")
 	private Timestamp dateTime = now();
@@ -75,12 +75,12 @@ public class Change {
 		this.changeIndex = updateIndex;
 	}
 
-	public String getDescription() {
-		return changeDescription;
+	public String getType() {
+		return changeType;
 	}
 
-	public void setDescription(String changeDescription) {
-		this.changeDescription = changeDescription;
+	public void setType(String changeType) {
+		this.changeType = changeType;
 	}
 
 	public Timestamp getDateTime() {

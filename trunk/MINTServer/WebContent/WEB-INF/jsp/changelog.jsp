@@ -23,12 +23,12 @@ dd { margin: 0 0 1em 0; padding: 0; }
 				<dd class='StudyUUID'>${change.studyID}</dd>
 				<dt>Change Number</dt>
 				<dd class='ChangeIndex'>${change.index}</dd>
-				<dt>Change Description</dt>
-				<dd class='ChangeDescription'>${change.description}</dd>
+				<dt>Change Type</dt>
+				<dd class='ChangeType'>${change.type}</dd>
 				<dt>Change Time</dt>
 				<dd class='ChangeTime'>${change.dateTime}</dd>
 				<dt>Links</dt>
-				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/DICOM/metadata'>Study Metadata</a></dd>
+				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/${change.type}/metadata'>Study Metadata</a></dd>
 				<dd class='ChangeMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/changelog/${change.index}'>Change Metadata</a></dd>
 			</dl>
 			</li>
