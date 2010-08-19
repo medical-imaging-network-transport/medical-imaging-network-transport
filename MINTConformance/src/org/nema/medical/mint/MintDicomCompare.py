@@ -58,7 +58,6 @@ class MintDicomCompare():
        self.__binaryitems = []
        self.__count = 0
        self.__verbose = False
-       self.__tagsSkipped = 0
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
        self.__bytesCompared = 0
@@ -91,7 +90,6 @@ class MintDicomCompare():
        
        if self.__verbose:
            print "%10d instance(s) compared." % (instancesCompared)
-           print "%10d tag(s) skipped." % (self.__tagsSkipped)
            print "%10d text tag(s) compared." % (self.__textTagsCompared)
            print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
            print "%10d byte(s) compared." % (self.__bytesCompared)          
@@ -101,6 +99,8 @@ class MintDicomCompare():
        # ---
        if self.__count != 0:
           print "%10d difference(s) found." % (self.__count)
+
+       return self.__count
 
    def __compareInstances(self, instance, mint): 
 
@@ -144,10 +144,7 @@ class MintDicomCompare():
        numTags = instance.numTags()
        for n in range(0, numTags):
            tag = instance.tag(n)
-           if not instance.isUnknown(tag):
-              self.__checkTag(instance, mint, tag)
-           else:
-              self.__tagsSkipped += 1
+           self.__checkTag(instance, mint, tag)
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
        if obj1 != obj2:
@@ -316,7 +313,8 @@ def main():
        studies = MintDicomCompare(dicomStudyDir, mintStudyXml)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
-       studies.compare()
+
+       return studies.compare()
        
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
