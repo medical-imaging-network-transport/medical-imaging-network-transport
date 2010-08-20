@@ -2,13 +2,13 @@
 <project basedir="." default="doc" name="mint-metadata">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
-	<property name="project.version" value="0.9.3" />
+	<property name="project.version" value="0.9.5" />
 
 	<target name="clean">
-		<mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
-			<fileset dir="${build.dir}/ant-classes" includes="**/*" />
+			<fileset dir="${build.dir}" includes="**/*" />
 		</delete>
+		<mkdir dir="${build.dir}/ant-classes" />
 	</target>
 
 	<target name="build" depends="clean" description="Compile the Java files">
@@ -33,7 +33,7 @@
 		</javac>
 	</target>
 
-	<target name="protoc" depends="build">
+	<target name="protoc" depends="build" description="generates protobuf class">
 		<exec executable="protoc" failonerror="true">
 			<arg value="--proto_path=config" />
 			<arg value="--java_out=src" />

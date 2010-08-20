@@ -25,8 +25,13 @@ message StudyData
 {
     // identifier
     optional string study_instance_uid = 1;
+    
+    // used for validation against data dictionary
     optional string type = 4;
     optional string version = 5;
+
+    // computed by server on outbound, if provided on inbound must be correct
+    optional uint32 instance_count = 6;    
     
     // studies contain attributes and series
     repeated AttributeData attributes = 2;
@@ -41,6 +46,9 @@ message SeriesData
 
     // used only in updates when removing attributes
     optional string exclude = 2;  
+
+    // computed by server on outbound, if provided on inbound must be correct
+    optional uint32 instance_count = 6;
     
     // series contain series-level and normalized attributes, and instances
     repeated AttributeData attributes = 3;

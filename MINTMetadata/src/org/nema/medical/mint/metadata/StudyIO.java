@@ -82,9 +82,6 @@ public class StudyIO {
 		else if (name.endsWith(".gpb") || name.endsWith(".gpb.gz")) {
 			return parseFromGPB(file);
 		}
-		else if (name.endsWith(".json") || name.endsWith(".json.gz")) {
-			return parseFromJSON(file);
-		}
 		else throw new IllegalArgumentException("unknown file type" + file);
 	}
 	
@@ -95,9 +92,6 @@ public class StudyIO {
 		}
 		else if (name.endsWith(".gpb") || name.endsWith(".gpb.gz")) {
 			writeToGPB(study,file);
-		}
-		else if (name.endsWith(".json") || name.endsWith(".json.gz")) {
-			writeToJSON(study,file);
 		}
 		else throw new IllegalArgumentException("unknown file type" + file);
 		
@@ -142,6 +136,7 @@ public class StudyIO {
 	}
 	
 	static public void writeToXML(Study study, OutputStream out) throws IOException {
+		study.setInstanceCount(study.instanceCount());
 		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(Study.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
@@ -152,44 +147,6 @@ public class StudyIO {
 		}		
 	}
 	
-	static public Study parseFromJSON(File file) throws IOException {
-		Study study = null;
-		InputStream in = new FileInputStream(file);
-		if (file.getName().endsWith(".gz")) {
-			in = new GZIPInputStream(in);
-		}
-		try {
-			study = parseFromJSON(in);
-		} finally {
-			in.close();
-		}
-		return study;
-	}
-	
-	static public Study parseFromJSON(InputStream in) {
-		Reader reader = new InputStreamReader(in);
-		Study study = new Gson().fromJson(reader, Study.class);
-		return study;
-	}
-	
-	static public void writeToJSON(Study study, File file) throws IOException {
-		OutputStream out = new FileOutputStream(file);
-		if (file.getName().endsWith(".gz")) {
-			out = new GZIPOutputStream(out);
-		}
-		try {
-			writeToJSON(study, out);
-		} finally {
-			out.close();
-		}				
-	}	
-	
-	static public void writeToJSON(Study study, OutputStream out) throws IOException {
-		Writer writer = new OutputStreamWriter(out);
-		writer.write(new Gson().toJson(study));
-		writer.flush();
-	}	
-
 	static public Study parseFromGPB(File file) throws IOException {
 		Study study = null;
 		InputStream in = new FileInputStream(file);
@@ -222,6 +179,7 @@ public class StudyIO {
 	}
 	
 	static public void writeToGPB(Study study, OutputStream out) throws IOException {
+		study.setInstanceCount(study.instanceCount());
 		StudyData data = study.toGPB();
 		data.writeTo(out);
 	}

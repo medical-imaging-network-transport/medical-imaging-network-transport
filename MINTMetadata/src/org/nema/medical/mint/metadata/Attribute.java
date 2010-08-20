@@ -177,7 +177,7 @@ public class Attribute
     /**
      * Set the 'frameCount' attribute value.
      * The minimum (and default) value is 1.
-     * @param bid
+     * @param frameCount
      */
     public void setFrameCount(int frameCount) {
         if (frameCount < 1) frameCount = 1;

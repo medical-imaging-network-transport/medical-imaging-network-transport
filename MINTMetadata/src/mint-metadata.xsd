@@ -12,6 +12,7 @@
 		<attribute name="studyInstanceUID" type="string" use="required"></attribute>
 		<attribute name="type" type="string" use="optional"></attribute>
 		<attribute name="version" type="string" use="optional"></attribute>
+		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
 	</complexType>
 
 	<complexType name="AttributesType">
@@ -54,6 +55,7 @@
 		</sequence>
 		<attribute name="seriesInstanceUID" type="string" use="required"></attribute>
 		<attribute name="exclude" type="string" use="optional"></attribute>
+		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
 	</complexType>
 
 	<complexType name="ItemType">
