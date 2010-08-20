@@ -25,9 +25,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData;
+import org.nema.medical.mint.metadata.GPB.AttributeData;
+import org.nema.medical.mint.metadata.GPB.SeriesData;
+import org.nema.medical.mint.metadata.GPB.StudyData;
 
 
 /**

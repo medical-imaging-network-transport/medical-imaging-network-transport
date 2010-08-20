@@ -16,8 +16,8 @@
 //------------------------------------------------------------------------------
 
 package mint.metadata;
-option java_package = "org.nema.medical.mint.metadata.gpb";
-option java_outer_classname = "MINT2GPB";
+option java_package = "org.nema.medical.mint.metadata";
+option java_outer_classname = "GPB";
 option optimize_for = SPEED;
 
 //------------------------------------------------------------------------------

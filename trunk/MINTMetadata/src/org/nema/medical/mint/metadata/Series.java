@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData;
+import org.nema.medical.mint.metadata.GPB.AttributeData;
+import org.nema.medical.mint.metadata.GPB.InstanceData;
+import org.nema.medical.mint.metadata.GPB.SeriesData;
 
 
 /**

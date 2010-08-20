@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.ItemData;
+import org.nema.medical.mint.metadata.GPB.AttributeData;
+import org.nema.medical.mint.metadata.GPB.ItemData;
 
 import com.google.protobuf.ByteString;
 

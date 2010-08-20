@@ -20,11 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -35,9 +31,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData;
-
-import com.google.gson.Gson;
+import org.nema.medical.mint.metadata.GPB.StudyData;
 
 public class StudyIO {
 	
@@ -56,8 +50,6 @@ public class StudyIO {
         possibleFiles.add(new File(directory, "metadata.gpb"));
         possibleFiles.add(new File(directory, "metadata.xml.gz"));
         possibleFiles.add(new File(directory, "metadata.xml"));
-        possibleFiles.add(new File(directory, "metadata.json.gz"));
-        possibleFiles.add(new File(directory, "metadata.json"));
 
         Study study = null;
         for (File file : possibleFiles) {
