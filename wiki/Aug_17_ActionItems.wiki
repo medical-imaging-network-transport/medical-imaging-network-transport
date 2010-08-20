@@ -44,12 +44,8 @@ Add your content here.
   * Document how to use reference 
   * Contact clear canvas folks about adding native support for MINT (Chris)
   * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
-  * Remove JSON from implementation (Tim Dawson)
   * Make sure Date/Time is UTC and using DICOM DT Format (Tim Dawson)
   * Modify study summary to pull up study and series level tags (Tim Dawson)
-  * Update metadata format in (Tim Dawson)
-    * # of instances (attribute instanceCount) in a series to series tag
-    * # of instances (attribute instanceCount) in a study to study tag
   * Update study queries (Tim Dawson)
     * Add support for accession number issuer
     * Add support for studyDateTimeFrom + studyDateTimeTo
@@ -86,6 +82,10 @@ Add your content here.
 
 = Done =
   * Modify Conformance test for Part 10 headers (Tim Culp)
+  * Remove JSON from implementation (Tim Dawson)
+  * Update metadata format in (Tim Dawson)
+    * # of instances (attribute instanceCount) in a series to series tag
+    * # of instances (attribute instanceCount) in a study to study tag
 
 = Future =
   * GUI Tool to replace XHTML functionality / work with MINT server
