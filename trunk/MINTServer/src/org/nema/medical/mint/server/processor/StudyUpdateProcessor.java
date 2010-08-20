@@ -17,6 +17,8 @@ package org.nema.medical.mint.server.processor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -95,14 +97,10 @@ public class StudyUpdateProcessor extends TimerTask {
 			LOG.debug("Got lock, and starting process");
 			try
 			{
-				//Not calling mkdirs on these because they better already exist
 				File typeFolder = new File(studyFolder, type);
-				File changelogRoot = new File(studyFolder, "changelog");
 				
-				if(!typeFolder.exists())
-				{
-					throw new FileNotFoundException("The folder for type " + type + " for study uuid " + studyUUID + " does not exist, may need to do a create first.");
-				}
+				//Not calling mkdir on this because they better already exist
+				File changelogRoot = new File(studyFolder, "changelog");
 				
 				if(!changelogRoot.exists())
 				{
@@ -110,16 +108,23 @@ public class StudyUpdateProcessor extends TimerTask {
 				}
 				
 				File existingBinaryFolder = new File(typeFolder, "binaryitems");
+				existingBinaryFolder.mkdirs();
 				
-				if(!existingBinaryFolder.exists())
+				Study existingStudy;
+				
+				try
 				{
-					throw new FileNotFoundException("The binary item folder for study uuid " + studyUUID + " does not exist, may need to do a create first.");
+					/*
+					 * Need to load current study information
+					 */
+					existingStudy = StudyIO.loadStudy(typeFolder);
+				}catch(RuntimeException e){
+					/*
+					 * Do nothing, just means there is no existing study
+					 * which is fine.
+					 */
+					existingStudy = null;
 				}
-				
-				/*
-				 * Need to load current study studyinformation
-				 */
-				Study existingStudy = StudyIO.loadStudy(typeFolder);
 	
 				/*
 				 * Need to load new study information
@@ -150,31 +155,55 @@ public class StudyUpdateProcessor extends TimerTask {
 		        
 		        StudyUtil.writeStudy(newStudy, changelogFolder);
 				
+		        Collection<Integer> excludedBids = new HashSet<Integer>();
+		        if(existingStudy != null)
+		        {
+					/*
+					 * Need to move through the new study and look for things to exclude
+					 * and exclude them from the existing study.
+					 */
+					if(!StudyUtil.applyExcludes(existingStudy, newStudy, excludedBids))
+					{
+						//Applying Excludes failed!
+						throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
+					}
+		        }
+		        
 				/*
-				 * Need to move through the new study and look for things to exclude
-				 * and exclude them from the existing study.
+				 * Clean out excludes because excludes should not be left in
+				 * the newStudy.
 				 */
-				if(!StudyUtil.applyExcludes(existingStudy, newStudy))
-				{
-					//Applying Excludes failed!
-					throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
-				}
+	        	StudyUtil.removeExcludes(newStudy);
 				
 				/*
 				 * Need to merge the study documents and renormalize the result.
 				 * This means first denormalize, then merge, then normalize the
 				 * result
 				 */
-				if(!StudyUtil.denormalizeStudy(existingStudy))
-				{
-					throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
-				}
-				if(!StudyUtil.denormalizeStudy(newStudy))
+		        if(!StudyUtil.denormalizeStudy(newStudy))
 				{
 					throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
 				}
-				
-				existingStudy.mergeStudy(newStudy);
+		        
+		        if(existingStudy != null)
+		        {
+					if(!StudyUtil.denormalizeStudy(existingStudy))
+					{
+						throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
+					}
+					
+					StudyUtil.mergeStudy(existingStudy, newStudy, excludedBids);
+		        }else{
+					/*
+					 * If no existing study, new study becomes the existing
+					 * study. This happens when an update is done on a type that
+					 * has no data yet.
+					 */
+		        	existingStudy = newStudy;
+		        }
+		        
+		        //Rename all excluded binary files to have .exclude
+				StudyUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
 				
 				if(!StudyUtil.normalizeStudy(existingStudy))
 				{
