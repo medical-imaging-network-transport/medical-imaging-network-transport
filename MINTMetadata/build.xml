@@ -21,7 +21,7 @@
 		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
-		
+
 		<mkdir dir="${build.dir}/ant-test-classes" />
 		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
 			<classpath>
@@ -66,12 +66,18 @@
 		<delete>
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
 		</delete>
-		<bind verbose="true" load="true" binding="${basedir}/config/mint-binding.xml">
+		<jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-studymeta.jibx">
 			<classpath>
 				<pathelement path="${build.dir}/ant-classes" />
 				<pathelement location="lib/jibx-run.jar" />
 			</classpath>
-		</bind>
+		</jibx-bind>
+		<jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-studysummary.jibx">
+			<classpath>
+				<pathelement path="${build.dir}/ant-classes" />
+				<pathelement location="lib/jibx-run.jar" />
+			</classpath>
+		</jibx-bind>
 		<delete>
 			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class" />
 		</delete>
@@ -79,7 +85,6 @@
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
 			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/metadata/*.class" />
 		</copy>
-
 	</target>
 
 	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
@@ -104,7 +109,7 @@
 	</target>
 
 	<!-- task definitions -->
-	<taskdef name="bind" classname="org.jibx.binding.ant.CompileTask">
+	<taskdef name="jibx-bind" classname="org.jibx.binding.ant.CompileTask">
 		<classpath>
 			<fileset dir="lib" includes="*.jar" />
 			<fileset dir="ant-lib" includes="*.jar" />

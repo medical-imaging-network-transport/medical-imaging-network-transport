@@ -42,7 +42,7 @@ import org.nema.medical.mint.metadata.GPB.StudyData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Study implements AttributeStore
+public class Study implements AttributeStore, StudySummary
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
@@ -51,14 +51,16 @@ public class Study implements AttributeStore
     private String version;
     private int instanceCount = -1;
 
-    /**
-     * @param tag
-     * @return the attribute for the given tag
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getAttribute(int)
+	 */
     public Attribute getAttribute(final int tag) {
         return attributeMap.get(tag);
     }
 
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getValueForAttribute(int)
+	 */
     public String getValueForAttribute(final int tag) {
         Attribute attr = getAttribute(tag);
         return attr != null ? attr.getVal() : null;
@@ -80,17 +82,16 @@ public class Study implements AttributeStore
         attributeMap.remove(tag);
     }
 
-    /**
-     * @return an iterator of all Attributes in the Series
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#attributeIterator()
+	 */
     public Iterator<Attribute> attributeIterator() {
         return attributeMap.values().iterator();
     }
 
-    /**
-     * @param uid
-     * @return the series for the given uid
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getSeries(java.lang.String)
+	 */
     public Series getSeries(final String uid) {
         return seriesMap.get(uid);
     }
@@ -111,18 +112,16 @@ public class Study implements AttributeStore
         seriesMap.remove(uid);
     }
 
-    /**
-     * @return an iterator of all Series in the Study
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#seriesIterator()
+	 */
     public Iterator<Series> seriesIterator() {
         return seriesMap.values().iterator();
     }
 
-    /**
-     * Get the 'studyInstanceUID' attribute value.
-     *
-     * @return value
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getStudyInstanceUID()
+	 */
     public String getStudyInstanceUID() {
         return studyInstanceUID;
     }
@@ -136,11 +135,9 @@ public class Study implements AttributeStore
         this.studyInstanceUID = studyInstanceUID;
     }
     
-    /**
-     * Get the 'type' attribute value.
-     *
-     * @return value
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getType()
+	 */
 	public String getType() {
 		return type;
 	}
@@ -154,11 +151,9 @@ public class Study implements AttributeStore
 		this.type = type;
 	}
 
-    /**
-     * Get the 'type' attribute value.
-     *
-     * @return value
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getVersion()
+	 */
 	public String getVersion() {
 		return version;
 	}
@@ -172,25 +167,24 @@ public class Study implements AttributeStore
 		this.version = version;
 	}
 	
-    /**
-     * Get the 'instanceCount' attribute value.
-     *
-     * @return instanceCount
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getInstanceCount()
+	 */
 	public int getInstanceCount() {
-		return instanceCount;
+		return (instanceCount < 0) ? computeInstanceCount() : instanceCount;
 	}
-
-    /**
-     * @return the number of Instances in the Series
-     */
-    public int instanceCount() {
+	
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#computeInstanceCount()
+	 */
+	public int computeInstanceCount() {
         int count = 0;
         for (Series series : this.seriesMap.values()) {
-        	count += series.instanceCount();
+        	count += series.getInstanceCount();
         }
-        return count;
-    }
+        instanceCount = count;
+        return instanceCount;
+	}
 
     /**
      * Set the 'instanceCount' attribute value.
@@ -201,9 +195,9 @@ public class Study implements AttributeStore
 		this.instanceCount = instanceCount;
 	}
 
-    /**
-     * @return a list of all binary item IDs currently in the study
-     */
+    /* (non-Javadoc)
+	 * @see org.nema.medical.mint.metadata.StudySummary#getBinaryItemIDs()
+	 */
     public Collection<Integer> getBinaryItemIDs() {
 		final Set<Integer> items = new TreeSet<Integer>();
 		
@@ -266,6 +260,7 @@ public class Study implements AttributeStore
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
         if (studyData.hasVersion()) study.setType(studyData.getVersion());
+        if (studyData.hasInstanceCount()) study.setInstanceCount(studyData.getInstanceCount());
 
         for (AttributeData attrData : studyData.getAttributesList()) {
             Attribute attr = Attribute.fromGPB(attrData);
@@ -289,6 +284,7 @@ public class Study implements AttributeStore
         if (this.version != null) {
             builder.setVersion(this.version);
         }
+        builder.setInstanceCount(computeInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
         }

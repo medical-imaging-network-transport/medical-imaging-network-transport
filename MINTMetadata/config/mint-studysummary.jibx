@@ -13,8 +13,9 @@
     </collection>
     <collection name="SeriesList" add-method="putSeries" iter-method="seriesIterator" item-type="org.nema.medical.mint.metadata.Series">
     	<structure name="Series" map-as="SeriesType"/>
-    </collection>
+    </collection> 
     <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID"/>
+    <value style="attribute" name="instanceCount" pre-get="computeInstanceCount" get-method="getInstanceCount" set-method="setInstanceCount"/>
   </mapping>
   <mapping class="org.nema.medical.mint.metadata.Study" name="StudyMeta">
     <structure map-as="StudyMetaType"/>
@@ -29,32 +30,17 @@
     <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>    
     <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional" default="1"/>    
     <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>    
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
   </mapping>
   <mapping abstract="true" type-name="SeriesType" class="org.nema.medical.mint.metadata.Series">
     <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
     	<structure name="Attr" map-as="AttrType"/>
     </collection>
-    <collection name="NormalizedInstanceAttributes" add-method="putNormalizedInstanceAttribute" iter-method="normalizedInstanceAttributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
-    	<structure name="Attr" map-as="AttrType"/>
-    </collection>
-    <collection name="Instances" add-method="putInstance" iter-method="instanceIterator" item-type="org.nema.medical.mint.metadata.Instance">
-    	<structure name="Instance" map-as="InstanceType"/>
-    </collection>
     <value style="attribute" name="seriesInstanceUID" field="seriesInstanceUID"/>
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
+    <value style="attribute" name="instanceCount" get-method="getInstanceCount" set-method="setInstanceCount"/>
   </mapping>
   <mapping abstract="true" type-name="ItemType" class="org.nema.medical.mint.metadata.Item">
     <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
     	<structure name="Attr" map-as="AttrType"/>
     </collection>
-  </mapping>
-  <mapping abstract="true" type-name="InstanceType" class="org.nema.medical.mint.metadata.Instance">
-    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
-    	<structure name="Attr" map-as="AttrType"/>
-    </collection>
-    <value style="attribute" name="sopInstanceUID" field="sopInstanceUID"/>
-    <value style="attribute" name="transferSyntaxUID" field="transferSyntaxUID"/>
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
   </mapping>
 </binding>
