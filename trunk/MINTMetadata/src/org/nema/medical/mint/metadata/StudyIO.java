@@ -128,9 +128,31 @@ public class StudyIO {
 	}
 	
 	static public void writeToXML(Study study, OutputStream out) throws IOException {
-		study.setInstanceCount(study.instanceCount());
 		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(Study.class);
+			IMarshallingContext mctx = bfact.createMarshallingContext();
+			mctx.setIndent(2);
+			mctx.marshalDocument(study, "UTF-8", null, out);
+		} catch (JiBXException e) {
+			throw new IOException("Exception while marshalling data.",e);
+		}		
+	}
+	
+	static public void writeSummaryToXML(Study study, File file) throws IOException {
+		OutputStream out = new FileOutputStream(file);
+		if (file.getName().endsWith(".gz")) {
+			out = new GZIPOutputStream(out);
+		}
+		try {
+			writeToXML(study, out);
+		} finally {
+			out.close();
+		}		
+	}
+	
+	static public void writeSummaryToXML(Study study, OutputStream out) throws IOException {
+		try {
+			IBindingFactory bfact = BindingDirectory.getFactory(StudySummary.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
 			mctx.marshalDocument(study, "UTF-8", null, out);
@@ -171,7 +193,6 @@ public class StudyIO {
 	}
 	
 	static public void writeToGPB(Study study, OutputStream out) throws IOException {
-		study.setInstanceCount(study.instanceCount());
 		StudyData data = study.toGPB();
 		data.writeTo(out);
 	}

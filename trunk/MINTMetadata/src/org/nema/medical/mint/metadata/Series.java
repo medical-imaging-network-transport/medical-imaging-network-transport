@@ -189,10 +189,7 @@ public class Series implements AttributeStore
 	 * @return the instanceCount
 	 */
 	public int getInstanceCount() {
-		if (instanceCount < 0) {
-			instanceCount = instanceCount();
-		}
-		return instanceCount;
+		return (instanceCount < 0) ? computeInstanceCount() : instanceCount;
 	}
 
     /**
@@ -201,6 +198,12 @@ public class Series implements AttributeStore
 	public void setInstanceCount(int instanceCount) {
 		this.instanceCount = instanceCount;
 	}
+
+	public int computeInstanceCount() {
+		instanceCount = instanceCount();
+        return instanceCount;
+	}
+
 
 	//
     // Google Protocol Buffer support - package protection intentional
