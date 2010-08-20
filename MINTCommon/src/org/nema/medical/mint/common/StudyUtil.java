@@ -18,6 +18,7 @@ package org.nema.medical.mint.common;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,7 +42,8 @@ import org.nema.medical.mint.util.Iter;
 public final class StudyUtil {
     private static final Logger LOG = Logger.getLogger(StudyUtil.class);
 
-    private static final String BINARY_FILE_EXTENSION = "dat";
+    public static final String BINARY_FILE_EXTENSION = "dat";
+    public static final String EXCLUDED_BINARY_FILE_EXTENSION = "exclude";
 
     /**
      * This method will looks for BINARY_FILE_EXTENSION files and will try to
@@ -99,6 +101,11 @@ public final class StudyUtil {
      */
     public static boolean shiftItemIds(Study study, File binaryDirectory, int shiftAmount)
     {
+    	if(shiftAmount == 0)
+    	{
+    		return true;
+    	}
+    	
         /*
          * Need to shift the both the binary file names and the study bids to
          * stay consistent.
@@ -131,7 +138,7 @@ public final class StudyUtil {
         {
             String name = f.getName();
 
-            if(name.endsWith(BINARY_FILE_EXTENSION))
+            if(name.endsWith(BINARY_FILE_EXTENSION) || name.endsWith(EXCLUDED_BINARY_FILE_EXTENSION))
             {
                 if(!name.startsWith("metadata"))
                 {
@@ -211,6 +218,73 @@ public final class StudyUtil {
 
         return true;
     }
+    
+    /**
+     * This method should pull all data from the provided study into 'this'
+     * study and overwrite any existing values in 'this' study.
+     *
+     * @param sourceStudy
+     */
+    public static void mergeStudy(Study destinationStudy, Study sourceStudy, Collection<Integer> excludedBinaryIds)
+    {
+        //Merge study level attributes
+        for(Iterator<Attribute> i = sourceStudy.attributeIterator(); i.hasNext();)
+        {
+            Attribute attribute = i.next();
+
+            collectBidsInAttribute(destinationStudy.getAttribute(attribute.getTag()), excludedBinaryIds);
+            destinationStudy.putAttribute(attribute);
+        }
+
+        //Merge series from study
+        for(Iterator<Series> i = sourceStudy.seriesIterator(); i.hasNext();)
+        {
+            Series series = i.next();
+            Series thisSeries = destinationStudy.getSeries(series.getSeriesInstanceUID());
+
+            if(thisSeries != null)
+            {
+                //Merge attributes from series
+                for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    collectBidsInAttribute(thisSeries.getAttribute(attribute.getTag()), excludedBinaryIds);
+                    thisSeries.putAttribute(attribute);
+                }
+
+                //Merge instances from series
+                for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
+                {
+                    Instance instance = ii.next();
+                    Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
+
+                    if(thisInstance != null)
+                    {
+                        //Check if transfer syntax is existing, update current if it is provided
+                        String transferSyntaxUID = instance.getTransferSyntaxUID();
+                        if(transferSyntaxUID != null && !transferSyntaxUID.isEmpty())
+                        {
+                            thisInstance.setTransferSyntaxUID(transferSyntaxUID);
+                        }
+
+                        //Merge attributes for instances
+                        for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
+                        {
+                            Attribute attribute = iii.next();
+
+                            collectBidsInAttribute(thisInstance.getAttribute(attribute.getTag()), excludedBinaryIds);
+                            thisInstance.putAttribute(attribute);
+                        }
+                    }else{
+                        thisSeries.putInstance(instance);
+                    }
+                }
+            }else{
+            	destinationStudy.putSeries(series);
+            }
+        }
+    }
 
     /**
      * Iterates over excludeStudy and will remove from both studies any elements
@@ -221,7 +295,7 @@ public final class StudyUtil {
      * @param excludeStudy
      * @return true
      */
-    public static boolean applyExcludes(Study currentStudy, Study excludeStudy)
+    public static boolean applyExcludes(Study currentStudy, Study excludeStudy, Collection<Integer> excludedBinaryIds)
     {
         //Remove study level attributes?
         for(Iterator<Attribute> i = excludeStudy.attributeIterator(); i.hasNext();)
@@ -230,6 +304,8 @@ public final class StudyUtil {
 
             if(isExclude(attribute.getExclude()))
             {
+            	collectBidsInAttribute(currentStudy.getAttribute(attribute.getTag()), excludedBinaryIds);
+            	
                 //Non null exclude string means remove it
                 currentStudy.removeAttribute(attribute.getTag());
                 i.remove();
@@ -242,8 +318,13 @@ public final class StudyUtil {
             Series excludeSeries = i.next();
             Series currentSeries = currentStudy.getSeries(excludeSeries.getSeriesInstanceUID());
 
+            if(currentSeries == null)
+            	continue;
+            
             if(isExclude(excludeSeries.getExclude()))
             {
+            	collectBidsInSeries(currentSeries, excludedBinaryIds);
+            	
                 //Non null exclude string means exclude the series from the study
                 currentStudy.removeSeries(excludeSeries.getSeriesInstanceUID());
                 i.remove();
@@ -255,6 +336,8 @@ public final class StudyUtil {
 
                     if(isExclude(attribute.getExclude()))
                     {
+                    	collectBidsInAttribute(currentSeries.getAttribute(attribute.getTag()), excludedBinaryIds);
+                    	
                         //Non null exclude string means remove it
                         currentSeries.removeAttribute(attribute.getTag());
                         ii.remove();
@@ -269,10 +352,10 @@ public final class StudyUtil {
                     if(isExclude(attribute.getExclude()))
                     {
                         //Non null exclude string means remove it
-                        if(currentSeries != null)
-                        {
-                            currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
-                        }
+                        collectBidsInAttribute(currentSeries.getNormalizedInstanceAttribute(attribute.getTag()), excludedBinaryIds);
+                        	
+                        currentSeries.removeNormalizedInstanceAttribute(attribute.getTag());
+                        
                         ii.remove();
                     }
                 }
@@ -282,13 +365,16 @@ public final class StudyUtil {
                 {
                     Instance excludeInstance = ii.next();
                     Instance currentInstance = null;
-                    if(currentSeries != null)
-                    {
-                        currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID());
-                    }
+                    
+                    currentInstance = currentSeries.getInstance(excludeInstance.getSOPInstanceUID());
+                    
+                    if(currentInstance == null)
+                    	continue;
 
                     if(isExclude(excludeInstance.getExclude()))
                     {
+                    	collectBidsInInstance(currentInstance, excludedBinaryIds);
+                    	
                         currentSeries.removeInstance(excludeInstance.getSOPInstanceUID());
                         ii.remove();
                     }else{
@@ -300,10 +386,10 @@ public final class StudyUtil {
                             if(isExclude(attribute.getExclude()))
                             {
                                 //Non null exclude string means remove it
-                                if(currentInstance != null)
-                                {
-                                    currentInstance.removeAttribute(attribute.getTag());
-                                }
+                                collectBidsInAttribute(currentInstance.getAttribute(attribute.getTag()), excludedBinaryIds);
+                                	
+                                currentInstance.removeAttribute(attribute.getTag());
+                                
                                 iii.remove();
                             }
                         }
@@ -314,16 +400,160 @@ public final class StudyUtil {
 
         return true;
     }
+    
+	private static void collectBidsInSeries(Series series,
+			Collection<Integer> destinationCollection) {
+		if(series == null || destinationCollection == null)
+			return;
+		
+		for(Iterator<Attribute> i = series.attributeIterator(); i.hasNext();)
+        {
+			collectBidsInAttribute(i.next(), destinationCollection);
+        }
+		
+		for(Iterator<Attribute> i = series.normalizedInstanceAttributeIterator(); i.hasNext();)
+        {
+			collectBidsInAttribute(i.next(), destinationCollection);
+        }
+		
+		for(Iterator<Instance> i = series.instanceIterator(); i.hasNext();)
+        {
+			collectBidsInInstance(i.next(), destinationCollection);
+        }
+	}
+	
+	private static void collectBidsInInstance(Instance instance,
+			Collection<Integer> destinationCollection) {
+		if(instance == null || destinationCollection == null)
+			return;
+		
+		for(Iterator<Attribute> i = instance.attributeIterator(); i.hasNext();)
+        {
+			collectBidsInAttribute(i.next(), destinationCollection);
+        }
+	}
+
+	private static void collectBidsInAttribute(Attribute attribute,
+			Collection<Integer> destinationCollection) {
+		if(attribute == null || destinationCollection == null)
+			return;
+		
+		Queue<Attribute> sequence = new LinkedList<Attribute>();
+        sequence.add(attribute);
+        
+        while(!sequence.isEmpty())
+        {
+        	Attribute curr = sequence.remove();
+        	
+        	int bid = curr.getBid();
+            if(bid >= 0)
+            {
+                int frameCount = curr.getFrameCount();
+                if (frameCount >= 1)
+                {
+                    for (int newBid = bid; newBid < (bid + frameCount); newBid++)
+                    {
+                        destinationCollection.add(newBid);
+                    }
+                } else {
+                    destinationCollection.add(bid);
+                }
+            }
+        	
+            //Add children to queue
+        	for(Iterator<Item> i = curr.itemIterator(); i.hasNext();)
+        	{
+        		for(Iterator<Attribute> ii = i.next().attributeIterator(); ii.hasNext();)
+        		{
+        			sequence.add(ii.next());
+        		}
+        	}
+        }
+	}
+	
+	/**
+	 * Parse the study and removes any elements that are listed as exclude.
+	 * 
+	 * @param study
+	 */
+    public static void removeExcludes(Study study)
+    {
+    	//Remove study level attributes?
+        for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
+        {
+            Attribute attribute = i.next();
+
+            if(isExclude(attribute.getExclude()))
+            {
+            	i.remove();
+            }
+        }
+
+        //Remove series from study?
+        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+        {
+            Series series = i.next();
+
+            if(isExclude(series.getExclude()))
+            {
+            	i.remove();
+            }else{
+                //Remove attributes from series?
+                for(Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    if(isExclude(attribute.getExclude()))
+                    {
+                    	ii.remove();
+                    }
+                }
+
+                //Remove normalized attributes from series?
+                for(Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();)
+                {
+                    Attribute attribute = ii.next();
+
+                    if(isExclude(attribute.getExclude()))
+                    {
+                        ii.remove();
+                    }
+                }
+
+                //Remove instances from series?
+                for(Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();)
+                {
+                    Instance instance = ii.next();
+                    
+                    if(isExclude(instance.getExclude()))
+                    {
+                    	ii.remove();
+                    }else{
+                        //Remove attributes from instance?
+                        for(Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();)
+                        {
+                            Attribute attribute = iii.next();
+
+                            if(isExclude(attribute.getExclude()))
+                            {
+                                iii.remove();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 	/**
 	 * Determines if the provided string is a valid "exclude" string.
 	 * 
-	 * @param exculde
+	 * @param exclude
 	 * @return
 	 */
-    public static boolean isExclude(String exculde)
+    public static boolean isExclude(String exclude)
     {
-        return exculde != null;
+        return exclude != null;
     }
 
     /**
@@ -359,7 +589,9 @@ public final class StudyUtil {
     }
 
     /**
-     * Performs a normalization algorithm on the provided Study
+     * Performs a normalization algorithm on the provided Study.
+     * 
+     * TODO make this algorithm normalize using information from a data dictionary.
      *
      * @param study
      * @return true
@@ -654,4 +886,28 @@ public final class StudyUtil {
 
         return studyBids.equals(binaryItemIds);
     }
+    
+	/**
+	 * Will attempt to rename each file that is bid.dat where possible bids are
+	 * passed in the excludedBids collection to bid.exclude. Will return -1 if
+	 * successful and will return the bid of the rename that failed if something
+	 * went wrong.
+	 * 
+	 * @param existingBinaryFolder
+	 * @param excludedBids
+	 * @return
+	 */
+    public static int renameExcludedFiles(File existingBinaryFolder,
+			Collection<Integer> excludedBids) {
+		for(int bid : excludedBids)
+		{
+			File oldFile = new File(existingBinaryFolder, bid + "." + BINARY_FILE_EXTENSION);
+			File newFile = new File(existingBinaryFolder, bid + "." + EXCLUDED_BINARY_FILE_EXTENSION);
+			
+			if(!oldFile.renameTo(newFile))
+				return bid;
+		}
+		
+		return -1;
+	}
 }

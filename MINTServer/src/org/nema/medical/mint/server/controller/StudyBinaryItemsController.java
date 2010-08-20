@@ -24,12 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.common.StudyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,7 +79,11 @@ public class StudyBinaryItemsController {
         final OutputStream out = res.getOutputStream();
         
         int i = itemList.next();
-        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
+        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.BINARY_FILE_EXTENSION);
+        if (!file.exists() || !file.canRead()) {
+        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+        }
+        
         if (!file.exists() || !file.canRead()) {
         	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
             LOG.error("BinaryItemsFile " + file + " does not exist");
@@ -91,7 +97,7 @@ public class StudyBinaryItemsController {
             out.write(("--" + MP_BOUNDARY).getBytes());
             
             final long itemsize = file.length();
-            String index = file.getName().split("\\.")[0];
+            String index = Integer.toString(i);
             out.write("\nContent-Type: application/octet-stream\n".getBytes());
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
@@ -110,7 +116,11 @@ public class StudyBinaryItemsController {
         for (;itemList.hasNext();) {
         	i = itemList.next();
         	
-            file = new File(studyRoot + "/" + type + "/binaryitems/" + i + ".dat");
+        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.BINARY_FILE_EXTENSION);
+            if (!file.exists() || !file.canRead()) {
+            	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+            }
+            
             if (!file.exists() || !file.canRead()) {
             	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
                 LOG.error("BinaryItemsFile " + file + " does not exist");
@@ -118,7 +128,7 @@ public class StudyBinaryItemsController {
             }
         	
             final long itemsize = file.length();
-            String index = file.getName().split("\\.")[0];
+            String index = Integer.toString(i);
             out.write("\nContent-Type: application/octet-stream\n".getBytes());
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
@@ -169,28 +179,48 @@ public class StudyBinaryItemsController {
         final List<Integer> itemList = new ArrayList<Integer>();
 
         if (seq.equals("all")) {
-        	//NOTE: the following code may no longer be used for all but haven't decided yet
-//            //need to return all items in current metadata
-//            File typeRoot = new File(studyRoot, type);
-//
-//            org.nema.medical.mint.metadata.Study study = StudyIO.loadStudy(typeRoot);
-//
-//            return study.getBinaryItemIDs().iterator();
         	final File binaryRoot = new File(studyRoot, type + "/binaryitems");
         	binaryRoot.list();
         	
         	return new Iterator<Integer>() {
         		private Iterator<String> binaryNames = Arrays.asList(binaryRoot.list()).iterator();
-
+        		private String next = null;
+        		
 				@Override
 				public boolean hasNext() {
-					return binaryNames.hasNext();
+					getNext();
+					
+					return next != null;
 				}
 
 				@Override
 				public Integer next() throws NumberFormatException {
-					String next = binaryNames.next();
-					return Integer.valueOf(next.substring(0, next.indexOf('.')));
+					getNext();
+					
+					if(next == null)
+						throw new NoSuchElementException();
+					
+					int result = Integer.valueOf(next.substring(0, next.indexOf('.')));
+					
+					next = null;
+					
+					return result;
+				}
+				
+				private void getNext()
+				{
+					if(next == null && binaryNames.hasNext())
+					{
+						do
+						{
+							next = binaryNames.next();
+						}while(!next.endsWith(StudyUtil.BINARY_FILE_EXTENSION) && binaryNames.hasNext());
+						
+						if(!next.endsWith(StudyUtil.BINARY_FILE_EXTENSION))
+						{
+							next = null;
+						}
+					}
 				}
 
 				@Override
@@ -199,6 +229,12 @@ public class StudyBinaryItemsController {
 				}
 			};
         } else {
+			/*
+			 * TODO speed this up by removing the need to build an entire list
+			 * ahead of time. This is a slow operation if there are 100000
+			 * items. This can be done by implementing a custom iterator similar
+			 * to how to all method works.
+			 */
             String[] elements = seq.split(",");
 
             for (String element : elements) {
