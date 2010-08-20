@@ -56,6 +56,13 @@ public final class MINT2GPB {
     public boolean hasVersion() { return hasVersion; }
     public java.lang.String getVersion() { return version_; }
     
+    // optional uint32 instance_count = 6;
+    public static final int INSTANCE_COUNT_FIELD_NUMBER = 6;
+    private boolean hasInstanceCount;
+    private int instanceCount_ = 0;
+    public boolean hasInstanceCount() { return hasInstanceCount; }
+    public int getInstanceCount() { return instanceCount_; }
+    
     // repeated .mint.metadata.AttributeData attributes = 2;
     public static final int ATTRIBUTES_FIELD_NUMBER = 2;
     private java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData> attributes_ =
@@ -104,6 +111,9 @@ public final class MINT2GPB {
       if (hasVersion()) {
         output.writeString(5, getVersion());
       }
+      if (hasInstanceCount()) {
+        output.writeUInt32(6, getInstanceCount());
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -132,6 +142,10 @@ public final class MINT2GPB {
       if (hasVersion()) {
         size += com.google.protobuf.CodedOutputStream
           .computeStringSize(5, getVersion());
+      }
+      if (hasInstanceCount()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(6, getInstanceCount());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -308,6 +322,9 @@ public final class MINT2GPB {
         if (other.hasVersion()) {
           setVersion(other.getVersion());
         }
+        if (other.hasInstanceCount()) {
+          setInstanceCount(other.getInstanceCount());
+        }
         if (!other.attributes_.isEmpty()) {
           if (result.attributes_.isEmpty()) {
             result.attributes_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData>();
@@ -367,6 +384,10 @@ public final class MINT2GPB {
             }
             case 42: {
               setVersion(input.readString());
+              break;
+            }
+            case 48: {
+              setInstanceCount(input.readUInt32());
               break;
             }
           }
@@ -434,6 +455,24 @@ public final class MINT2GPB {
       public Builder clearVersion() {
         result.hasVersion = false;
         result.version_ = getDefaultInstance().getVersion();
+        return this;
+      }
+      
+      // optional uint32 instance_count = 6;
+      public boolean hasInstanceCount() {
+        return result.hasInstanceCount();
+      }
+      public int getInstanceCount() {
+        return result.getInstanceCount();
+      }
+      public Builder setInstanceCount(int value) {
+        result.hasInstanceCount = true;
+        result.instanceCount_ = value;
+        return this;
+      }
+      public Builder clearInstanceCount() {
+        result.hasInstanceCount = false;
+        result.instanceCount_ = 0;
         return this;
       }
       
@@ -592,6 +631,13 @@ public final class MINT2GPB {
     public boolean hasExclude() { return hasExclude; }
     public java.lang.String getExclude() { return exclude_; }
     
+    // optional uint32 instance_count = 6;
+    public static final int INSTANCE_COUNT_FIELD_NUMBER = 6;
+    private boolean hasInstanceCount;
+    private int instanceCount_ = 0;
+    public boolean hasInstanceCount() { return hasInstanceCount; }
+    public int getInstanceCount() { return instanceCount_; }
+    
     // repeated .mint.metadata.AttributeData attributes = 3;
     public static final int ATTRIBUTES_FIELD_NUMBER = 3;
     private java.util.List<org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData> attributes_ =
@@ -652,6 +698,9 @@ public final class MINT2GPB {
       for (org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData element : getInstancesList()) {
         output.writeMessage(5, element);
       }
+      if (hasInstanceCount()) {
+        output.writeUInt32(6, getInstanceCount());
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -680,6 +729,10 @@ public final class MINT2GPB {
       for (org.nema.medical.mint.metadata.gpb.MINT2GPB.InstanceData element : getInstancesList()) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, element);
+      }
+      if (hasInstanceCount()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(6, getInstanceCount());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -857,6 +910,9 @@ public final class MINT2GPB {
         if (other.hasExclude()) {
           setExclude(other.getExclude());
         }
+        if (other.hasInstanceCount()) {
+          setInstanceCount(other.getInstanceCount());
+        }
         if (!other.attributes_.isEmpty()) {
           if (result.attributes_.isEmpty()) {
             result.attributes_ = new java.util.ArrayList<org.nema.medical.mint.metadata.gpb.MINT2GPB.AttributeData>();
@@ -926,6 +982,10 @@ public final class MINT2GPB {
               addInstances(subBuilder.buildPartial());
               break;
             }
+            case 48: {
+              setInstanceCount(input.readUInt32());
+              break;
+            }
           }
         }
       }
@@ -970,6 +1030,24 @@ public final class MINT2GPB {
       public Builder clearExclude() {
         result.hasExclude = false;
         result.exclude_ = getDefaultInstance().getExclude();
+        return this;
+      }
+      
+      // optional uint32 instance_count = 6;
+      public boolean hasInstanceCount() {
+        return result.hasInstanceCount();
+      }
+      public int getInstanceCount() {
+        return result.getInstanceCount();
+      }
+      public Builder setInstanceCount(int value) {
+        result.hasInstanceCount = true;
+        result.instanceCount_ = value;
+        return this;
+      }
+      public Builder clearInstanceCount() {
+        result.hasInstanceCount = false;
+        result.instanceCount_ = 0;
         return this;
       }
       
@@ -2576,28 +2654,29 @@ public final class MINT2GPB {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023mint-metadata.proto\022\rmint.metadata\"\243\001\n" +
+      "\n\023mint-metadata.proto\022\rmint.metadata\"\273\001\n" +
       "\tStudyData\022\032\n\022study_instance_uid\030\001 \001(\t\022\014" +
-      "\n\004type\030\004 \001(\t\022\017\n\007version\030\005 \001(\t\0220\n\nattribu" +
-      "tes\030\002 \003(\0132\034.mint.metadata.AttributeData\022" +
-      ")\n\006series\030\003 \003(\0132\031.mint.metadata.SeriesDa" +
-      "ta\"\342\001\n\nSeriesData\022\033\n\023series_instance_uid" +
-      "\030\001 \001(\t\022\017\n\007exclude\030\002 \001(\t\0220\n\nattributes\030\003 " +
-      "\003(\0132\034.mint.metadata.AttributeData\022D\n\036nor" +
-      "malized_instance_attributes\030\004 \003(\0132\034.mint" +
-      ".metadata.AttributeData\022.\n\tinstances\030\005 \003",
-      "(\0132\033.mint.metadata.InstanceData\"\210\001\n\014Inst" +
-      "anceData\022\030\n\020sop_instance_uid\030\001 \001(\t\022\017\n\007ex" +
-      "clude\030\002 \001(\t\022\033\n\023transfer_syntax_uid\030\003 \001(\t" +
-      "\0220\n\nattributes\030\004 \003(\0132\034.mint.metadata.Att" +
-      "ributeData\"\263\001\n\rAttributeData\022\013\n\003tag\030\001 \001(" +
-      "\r\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024\n\014string" +
-      "_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\023\n\013" +
-      "frame_count\030\010 \001(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005item" +
-      "s\030\006 \003(\0132\027.mint.metadata.ItemData\"<\n\010Item" +
-      "Data\0220\n\nattributes\030\001 \003(\0132\034.mint.metadata",
-      ".AttributeDataB0\n\"org.nema.medical.mint." +
-      "metadata.gpbB\010MINT2GPBH\001"
+      "\n\004type\030\004 \001(\t\022\017\n\007version\030\005 \001(\t\022\026\n\016instanc" +
+      "e_count\030\006 \001(\r\0220\n\nattributes\030\002 \003(\0132\034.mint" +
+      ".metadata.AttributeData\022)\n\006series\030\003 \003(\0132" +
+      "\031.mint.metadata.SeriesData\"\372\001\n\nSeriesDat" +
+      "a\022\033\n\023series_instance_uid\030\001 \001(\t\022\017\n\007exclud" +
+      "e\030\002 \001(\t\022\026\n\016instance_count\030\006 \001(\r\0220\n\nattri" +
+      "butes\030\003 \003(\0132\034.mint.metadata.AttributeDat" +
+      "a\022D\n\036normalized_instance_attributes\030\004 \003(",
+      "\0132\034.mint.metadata.AttributeData\022.\n\tinsta" +
+      "nces\030\005 \003(\0132\033.mint.metadata.InstanceData\"" +
+      "\210\001\n\014InstanceData\022\030\n\020sop_instance_uid\030\001 \001" +
+      "(\t\022\017\n\007exclude\030\002 \001(\t\022\033\n\023transfer_syntax_u" +
+      "id\030\003 \001(\t\0220\n\nattributes\030\004 \003(\0132\034.mint.meta" +
+      "data.AttributeData\"\263\001\n\rAttributeData\022\013\n\003" +
+      "tag\030\001 \001(\r\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024" +
+      "\n\014string_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005" +
+      " \001(\r\022\023\n\013frame_count\030\010 \001(\r\022\r\n\005bytes\030\007 \001(\014" +
+      "\022&\n\005items\030\006 \003(\0132\027.mint.metadata.ItemData",
+      "\"<\n\010ItemData\0220\n\nattributes\030\001 \003(\0132\034.mint." +
+      "metadata.AttributeDataB0\n\"org.nema.medic" +
+      "al.mint.metadata.gpbB\010MINT2GPBH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2609,7 +2688,7 @@ public final class MINT2GPB {
           internal_static_mint_metadata_StudyData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_StudyData_descriptor,
-              new java.lang.String[] { "StudyInstanceUid", "Type", "Version", "Attributes", "Series", },
+              new java.lang.String[] { "StudyInstanceUid", "Type", "Version", "InstanceCount", "Attributes", "Series", },
               org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData.class,
               org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData.Builder.class);
           internal_static_mint_metadata_SeriesData_descriptor =
@@ -2617,7 +2696,7 @@ public final class MINT2GPB {
           internal_static_mint_metadata_SeriesData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_SeriesData_descriptor,
-              new java.lang.String[] { "SeriesInstanceUid", "Exclude", "Attributes", "NormalizedInstanceAttributes", "Instances", },
+              new java.lang.String[] { "SeriesInstanceUid", "Exclude", "InstanceCount", "Attributes", "NormalizedInstanceAttributes", "Instances", },
               org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData.class,
               org.nema.medical.mint.metadata.gpb.MINT2GPB.SeriesData.Builder.class);
           internal_static_mint_metadata_InstanceData_descriptor =

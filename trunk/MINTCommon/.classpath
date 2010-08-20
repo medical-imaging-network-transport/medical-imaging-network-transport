@@ -20,6 +20,10 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MINTMetadata"/>
-	<classpathentry kind="lib" path="ant-lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="ant-lib/junit-4.8.1.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

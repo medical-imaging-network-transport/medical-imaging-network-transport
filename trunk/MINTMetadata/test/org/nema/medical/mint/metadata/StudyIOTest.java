@@ -35,8 +35,6 @@ public class StudyIOTest {
 
 	static final File jibxFile = createTempFile("study-", ".xml");
 	static final File compressedJibxFile = createTempFile("study-", ".xml.gz");
-	static final File jsonFile = createTempFile("study-", ".json");
-	static final File compressedJsonFile = createTempFile("study-", ".json.gz");
 	static final File gpbFile = createTempFile("study-", ".gpb");
 	static final File compressedGpbFile = createTempFile("study-", ".gpb.gz");
 
@@ -59,28 +57,6 @@ public class StudyIOTest {
 	@Test
 	public void testCompressedJibxUnmarshal() throws Exception {
 		Study study = StudyIO.parseFromXML(compressedJibxFile);
-		assertNotNull(study);
-	}
-
-	@Test
-	public void testJsonMarshal() throws Exception {
-		StudyIO.writeToJSON(getStudy(), jsonFile);
-	}
-
-	@Test
-	public void testCompressedJsonMarshal() throws Exception {
-		StudyIO.writeToJSON(getStudy(), compressedJsonFile);
-	}
-
-	@Test
-	public void testJsonUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromJSON(jsonFile);
-		assertNotNull(study);
-	}
-
-	@Test
-	public void testCompressedJsonUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromJSON(compressedJsonFile);
 		assertNotNull(study);
 	}
 

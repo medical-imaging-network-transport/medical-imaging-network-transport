@@ -49,6 +49,7 @@ public class Study implements AttributeStore
     private String studyInstanceUID;
     private String type;
     private String version;
+    private int instanceCount = -1;
 
     /**
      * @param tag
@@ -169,6 +170,35 @@ public class Study implements AttributeStore
      */
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+    /**
+     * Get the 'instanceCount' attribute value.
+     *
+     * @return instanceCount
+     */
+	public int getInstanceCount() {
+		return instanceCount;
+	}
+
+    /**
+     * @return the number of Instances in the Series
+     */
+    public int instanceCount() {
+        int count = 0;
+        for (Series series : this.seriesMap.values()) {
+        	count += series.instanceCount();
+        }
+        return count;
+    }
+
+    /**
+     * Set the 'instanceCount' attribute value.
+     *
+     * @param instanceCount
+     */
+	public void setInstanceCount(int instanceCount) {
+		this.instanceCount = instanceCount;
 	}
 
     /**
@@ -332,6 +362,4 @@ public class Study implements AttributeStore
             }
         }
     }
-
-
 }

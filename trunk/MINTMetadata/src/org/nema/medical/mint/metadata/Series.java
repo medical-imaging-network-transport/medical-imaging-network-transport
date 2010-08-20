@@ -45,6 +45,7 @@ public class Series implements AttributeStore
     private final Map<String, Instance> instances = new TreeMap<String, Instance>();
     private String seriesInstanceUID;
     private String exclude;
+    private int instanceCount = -1;
 
     /**
      * @param tag
@@ -113,6 +114,7 @@ public class Series implements AttributeStore
      * @param inst
      */
     public void putInstance(final Instance inst) {
+    	this.instanceCount = -1;
         instances.put(inst.getSOPInstanceUID(), inst);
     }
 
@@ -121,6 +123,7 @@ public class Series implements AttributeStore
      * @param sopInstanceUID
      */
     public Instance removeInstance(final String sopInstanceUID) {
+    	this.instanceCount = -1;
         return instances.remove(sopInstanceUID);
     }
 
@@ -182,13 +185,37 @@ public class Series implements AttributeStore
         this.exclude = exclude;
     }
 
-    //
+	/**
+	 * @return the instanceCount
+	 */
+	public int getInstanceCount() {
+		if (instanceCount < 0) {
+			instanceCount = instanceCount();
+		}
+		return instanceCount;
+	}
+
+    /**
+	 * @param instanceCount the instanceCount to set
+	 */
+	public void setInstanceCount(int instanceCount) {
+		this.instanceCount = instanceCount;
+	}
+
+	//
     // Google Protocol Buffer support - package protection intentional
     //
     static Series fromGPB(SeriesData data) {
         Series series = new Series();
-        series.setSeriesInstanceUID(data.getSeriesInstanceUid());
-        if (data.hasExclude()) series.setExclude(data.getExclude());
+        if (data.hasSeriesInstanceUid()) {
+            series.setSeriesInstanceUID(data.getSeriesInstanceUid());        	
+        }
+        if (data.hasExclude()) {
+        	series.setExclude(data.getExclude());
+        }
+        if (data.hasInstanceCount()) {
+        	series.setInstanceCount(data.getInstanceCount());
+        }
         for (AttributeData attrData : data.getAttributesList()) {
             series.putAttribute(Attribute.fromGPB(attrData));
         }
@@ -209,6 +236,7 @@ public class Series implements AttributeStore
         if (this.exclude != null) {
             builder.setExclude(this.exclude);
         }
+        builder.setInstanceCount(this.getInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
         }

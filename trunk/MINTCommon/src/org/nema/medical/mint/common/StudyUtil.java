@@ -469,10 +469,8 @@ public final class StudyUtil {
     {
         StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb"));
         StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml"));
-        StudyIO.writeToJSON(study, new File(studyFolder, "metadata.json"));
         StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb.gz"));
         StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml.gz"));
-        StudyIO.writeToJSON(study, new File(studyFolder, "metadata.json.gz"));
 //        StudySummaryIO.writeSummaryToXHTML(study, new File(studyFolder, "summary.html"));
     }
 
