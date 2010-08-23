@@ -211,12 +211,14 @@ public final class Dcm2MetaBuilder {
              final int tag = dcmElement.tag();
              if (studyLevelTags.contains(tag)) {
                  if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, metaBinaryPair.getMetadata(), null, emptyTagPath);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                             metaBinaryPair.getMetadata(), null, emptyTagPath);
                  }
              }
              else if (seriesLevelTags.contains(tag)) {
                  if (series.getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, series, null, emptyTagPath);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                             series, null, emptyTagPath);
                  }
              }
              else {
@@ -224,7 +226,8 @@ public final class Dcm2MetaBuilder {
                  final Map<Integer, NormalizationCounter> seriesNormMap =
                      tagNormalizerTable.get(series.getSeriesInstanceUID());
                  assert seriesNormMap != null;
-                 handleDICOMElement(dcmPath, charSet, dcmElement, instance, seriesNormMap, emptyTagPath);
+                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                         instance, seriesNormMap, emptyTagPath);
              }
          }
      }
@@ -233,10 +236,11 @@ public final class Dcm2MetaBuilder {
              final File dcmPath,
              final SpecificCharacterSet charSet,
              final DicomElement dcmElem,
+             final DicomObject rootDcmObj,
              final AttributeStore attrs,
              final Map<Integer, NormalizationCounter> seriesNormMap,
              final int[] tagPath) {
-         final Store store = new Store(dcmPath, charSet, attrs, seriesNormMap, tagPath, dcmElem);
+         final Store store = new Store(dcmPath, charSet, attrs, seriesNormMap, tagPath, dcmElem, rootDcmObj);
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
@@ -254,13 +258,14 @@ public final class Dcm2MetaBuilder {
      private final class Store {
          public Store(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
                  final Map<Integer, NormalizationCounter> seriesNormMap, final int[] tagPath,
-                 final DicomElement elem) {
+                 final DicomElement elem, final DicomObject rootObj) {
              this.dcmPath = dcmPath;
              this.charSet = charSet;
              this.attrs = attrs;
              this.seriesNormMap = seriesNormMap;
              this.tagPath = tagPath;
              this.elem = elem;
+             this.rootObj = rootObj;
          }
 
          public void storePlain() {
@@ -312,7 +317,7 @@ public final class Dcm2MetaBuilder {
                  attr.addItem(newItem);
                  for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
                      // Don't use tag normalization in sequence items...
-                     handleDICOMElement(dcmPath, charSet, dcmElement, newItem, null, newTagPath);
+                     handleDICOMElement(dcmPath, charSet, dcmElement, rootObj, newItem, null, newTagPath);
                  }
              }
          }
@@ -322,22 +327,41 @@ public final class Dcm2MetaBuilder {
 
              final Attribute attr = newAttr(elem);
              assert attr != null;
-             if (elem.hasFragments()) {
-                 // FIXME: this is wrong, fragments != frames
+             
+             int numFrames = rootObj.getInt(Tag.NumberOfFrames, 1);
+             byte[] binaryData = elem.getBytes();
+             boolean isPixelData = elem.tag() == Tag.PixelData;
+             // cannot inline large data, or multiframe images, no matter how small
+             boolean isInlineable = (binaryData.length < binaryInlineThreshold)
+                 && !(isPixelData && numFrames > 1);
+             
+             if (isInlineable) {
+                 attr.setBytes(binaryData);
+             } else if (!isPixelData) {
+                 // non pixel data, sinble external binary item
                  attr.setBid(metaBinaryPair.getBinaryData().size());
-                 attr.setFrameCount(elem.countItems());
-                 for (int i = 0; i < elem.countItems(); i++) {
-                     // always use binary item; the spec doesn't support
-                     // inline fragments
-                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem, i);
-                 }
+                 metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
              } else {
-                 final byte[] binaryData = elem.getBytes();
-                 if (binaryData.length >= binaryInlineThreshold) {
-                     attr.setBid(metaBinaryPair.getBinaryData().size()); // Before we do the push back...
-                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
+                 // pixel data, in 1 or more frames
+                 attr.setBid(metaBinaryPair.getBinaryData().size());
+                 attr.setFrameCount(numFrames);
+                 
+                 int rows = rootObj.getInt(Tag.Rows, -1);
+                 int columns = rootObj.getInt(Tag.Columns, -1);
+                 int bitsAllocated = rootObj.getInt(Tag.BitsAllocated, -1);
+                 int samples = rootObj.getInt(Tag.SamplesPerPixel, -1);
+                 int frameLen;
+                 if (rows > 0 && columns > 0 && bitsAllocated > 0 && samples > 0) {
+                     // this may be an overly simplistic calculation
+                     frameLen = rows * columns * samples * (bitsAllocated / 8);
                  } else {
-                     attr.setBytes(binaryData);
+                     // without enough info, just assume that there's no padding
+                     frameLen = binaryData.length / numFrames;
+                 }
+                 
+                 for (int i = 0; i < numFrames; i++) {
+                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem,
+                             i * frameLen, frameLen);
                  }
              }
              attrs.putAttribute(attr);
@@ -349,6 +373,7 @@ public final class Dcm2MetaBuilder {
          private final Map<Integer, NormalizationCounter> seriesNormMap;
          private final int[] tagPath;
          private final DicomElement elem;
+         private final DicomObject rootObj;
      }
 
      private static boolean areNonValueFieldsEqual(final Attribute a, final DicomElement obj) {
