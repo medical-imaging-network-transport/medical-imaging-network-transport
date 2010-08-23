@@ -24,7 +24,7 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
-from org.nema.medical.mint.XmlNode import XmlNode
+from org.nema.medical.mint.XmlNode  import XmlNode
 
 # -----------------------------------------------------------------------------
 # MintAttribute
@@ -34,18 +34,37 @@ class MintAttribute():
    binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
    
    def __init__(self, node):
-       self.__tag = node.attributeWithName("tag")
-       self.__vr  = node.attributeWithName("vr")
-       self.__val = node.attributeWithName("val")
-       self.__bid = node.attributeWithName("bid")
+       self.__tag   = node.attributeWithName("tag")
+       self.__vr    = node.attributeWithName("vr")
+       self.__val   = node.attributeWithName("val")
+       self.__bid   = node.attributeWithName("bid")
+       self.__items = []
        
        if self.__val == None:
           self.__val = ""
+          
+       if self.__vr == "SQ":
+          items = node.childrenWithName("Item")
+          if items != None:
+             for item in items:
+                 attributeList = []
+                 self.__items.append(attributeList)
+                 attributes = item.childWithName("Attributes")
+                 if attributes != None:
+                    attrs = attributes.childrenWithName("Attr")
+                    for attr in attrs:
+                        attributeList.append(MintAttribute(attr))
                 
    def tag(self): return self.__tag;
    def vr (self): return self.__vr;
    def val(self): return self.__val;
    def bid(self): return self.__bid;
+   
+   def numItems(self): return len(self.__items)
+   def item(self, i):  return self.__items[i]
+   
+   def numItemAttributes(self, i): return len(self.item(i))
+   def itemAttribute(self, i, j): return self.item(i)[j]
    
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
@@ -54,8 +73,18 @@ class MintAttribute():
        
    def __str__(self):
        s = "tag="+self.__tag+" vr="+self.__vr
-       s += " val="+self.__val
+       if self.__val != "":
+          s += " val="+self.__val
        if self.__bid != None:
           s += " bid="+self.__bid
+
+       numItems = self.numItems()
+       for i in range(0, numItems):
+           s += "\n - Item\n"
+           numItemAttributes = self.numItemAttributes(i)
+           s += "  - Attributes\n"
+           for j in range(0, numItemAttributes):          
+               s += "     "+self.itemAttribute(i, j).toString()+'\n'
+
        return s
        

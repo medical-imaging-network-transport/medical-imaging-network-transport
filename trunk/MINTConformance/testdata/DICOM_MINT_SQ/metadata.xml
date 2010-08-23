@@ -1,0 +1,1073 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StudyMeta xmlns="http://medical.nema.org/mint" studyInstanceUID="1.2.840.113696.596650.500.3692040.20100718071812">
+  <Attributes>
+    <Attr tag="00080020" vr="DA" val="20100718"/>
+    <Attr tag="00080030" vr="TM" val="104349.000"/>
+    <Attr tag="00080050" vr="SH" val="7180754"/>
+    <Attr tag="00080090" vr="PN" val=""/>
+    <Attr tag="00081030" vr="LO" val="CT ABD W/PELVIS W/O CONT"/>
+    <Attr tag="00081032" vr="SQ">
+      <Item>
+        <Attributes>
+          <Attr tag="00080100" vr="SH" val="4705000"/>
+          <Attr tag="00080102" vr="SH" val="Siemens RIS"/>
+          <Attr tag="00080103" vr="SH"/>
+          <Attr tag="00080104" vr="LO" val="RIS detail service code"/>
+        </Attributes>
+      </Item>
+    </Attr>
+    <Attr tag="00081048" vr="PN" val="KING^ELIZABETH^^^"/>
+    <Attr tag="00081060" vr="PN"/>
+    <Attr tag="00081080" vr="LO"/>
+    <Attr tag="00081110" vr="SQ">
+      <Item>
+        <Attributes>
+          <Attr tag="00081150" vr="UI" val="1.2.840.10008.3.1.2.3.1"/>
+          <Attr tag="00081155" vr="UI" val="1.2.840.113696.596650.500.3692040.20100718071812"/>
+        </Attributes>
+      </Item>
+    </Attr>
+    <Attr tag="00100010" vr="PN" val="001"/>
+    <Attr tag="00100020" vr="LO" val="tt001"/>
+    <Attr tag="00100030" vr="DA" val="19440725"/>
+    <Attr tag="00100032" vr="TM"/>
+    <Attr tag="00100040" vr="CS" val="F"/>
+    <Attr tag="00101000" vr="LO" val="000000000001"/>
+    <Attr tag="00101001" vr="PN" val="001"/>
+    <Attr tag="00101010" vr="AS" val="065Y"/>
+    <Attr tag="00101020" vr="DS"/>
+    <Attr tag="00101030" vr="DS"/>
+    <Attr tag="00102160" vr="SH" val="W"/>
+    <Attr tag="00102180" vr="SH"/>
+    <Attr tag="001021b0" vr="LT"/>
+    <Attr tag="0020000d" vr="UI" val="1.2.840.113696.596650.500.3692040.20100718071812"/>
+    <Attr tag="00200010" vr="SH" val="CBN"/>
+  </Attributes>
+  <SeriesList>
+    <Series seriesInstanceUID="2.16.840.1.114255.187086712.1704407169.28101.43">
+      <Attributes>
+        <Attr tag="00080021" vr="DA" val="20100718"/>
+        <Attr tag="00080031" vr="TM" val="114039.000"/>
+        <Attr tag="00080060" vr="CS" val="PR"/>
+        <Attr tag="0008103e" vr="LO" val="PS 1 Series 2:Abdomen  5's"/>
+        <Attr tag="00180015" vr="CS" val="ABDOMEN"/>
+        <Attr tag="00181030" vr="LO"/>
+        <Attr tag="0020000e" vr="UI" val="2.16.840.1.114255.187086712.1704407169.28101.43"/>
+        <Attr tag="00200011" vr="IS" val="2000"/>
+      </Attributes>
+      <NormalizedInstanceAttributes/>
+      <Instances>
+        <Instance sopInstanceUID="2.16.840.1.114255.187086712.1704407169.30043.44" transferSyntaxUID="1.2.840.10008.1.2.1">
+          <Attributes>
+            <Attr tag="00080016" vr="UI" val="1.2.840.10008.5.1.4.1.1.11.1"/>
+            <Attr tag="00080018" vr="UI" val="2.16.840.1.114255.187086712.1704407169.30043.44"/>
+            <Attr tag="00080023" vr="DA" val="20100718"/>
+            <Attr tag="00080033" vr="TM" val="114039"/>
+            <Attr tag="00080054" vr="AE" val="IMG_ARCH_UV"/>
+            <Attr tag="00080070" vr="LO" val="VisualPACS_PR"/>
+            <Attr tag="00080080" vr="LO" val=""/>
+            <Attr tag="00081010" vr="SH" val=""/>
+            <Attr tag="00081040" vr="LO"/>
+            <Attr tag="00081090" vr="LO" val="UV_5.30.7.26"/>
+            <Attr tag="00081115" vr="SQ">
+              <Item>
+                <Attributes>
+                  <Attr tag="00081140" vr="SQ">
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005170"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005192"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005246"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005232"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005228"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005261"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005207"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005215"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005148"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005254"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005260"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005258"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005193"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005205"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005248"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005172"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005191"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005176"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005243"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005142"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005194"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005220"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005144"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005146"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005175"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005135"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005218"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005163"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005270"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005177"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005249"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005265"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005168"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005271"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005147"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005259"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005152"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005216"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005184"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005160"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005140"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005210"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005276"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005255"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005209"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005185"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005131"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005263"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005143"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005137"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005174"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005154"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005150"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005200"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005257"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005237"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005190"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005165"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005164"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005227"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005169"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005233"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005221"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005167"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005151"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005222"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005269"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005145"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005162"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005201"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005159"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005211"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005264"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005268"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005230"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005267"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005239"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005189"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005199"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005179"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005273"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005235"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005274"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005206"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005182"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005158"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005229"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005208"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005262"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005245"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005244"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005240"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005188"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005241"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005213"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005133"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005212"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005275"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005252"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005242"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005234"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005197"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005219"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005138"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005166"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005195"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005225"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005180"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005183"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005187"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005231"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005214"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005153"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005204"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005139"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005186"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005250"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005224"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005173"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005198"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005266"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005203"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005161"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005134"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005256"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005251"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005223"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005149"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005247"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005178"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005141"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005226"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005202"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005132"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005196"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005238"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005136"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005217"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005157"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005171"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005156"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005155"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005236"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005181"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005253"/>
+                      </Attributes>
+                    </Item>
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005272"/>
+                      </Attributes>
+                    </Item>
+                  </Attr>
+                  <Attr tag="0020000e" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005130"/>
+                </Attributes>
+              </Item>
+            </Attr>
+            <Attr tag="00090010" vr="LO" val="EMAGEON STUDY HOME"/>
+            <Attr tag="00091000" vr="LO" val="001"/>
+            <Attr tag="00091001" vr="LO" val="jhebcln2fic"/>
+            <Attr tag="00100021" vr="LO" val="JHH"/>
+            <Attr tag="00110010" vr="LO" val="ULTRAVISUAL_TAG_SET1"/>
+            <Attr tag="00111008" vr="UN" bytes="amhlbmRpMSA="/>
+            <Attr tag="00111010" vr="UN" bytes="AQA="/>
+            <Attr tag="00111011" vr="UN" bytes=""/>
+            <Attr tag="00111012" vr="UN" bytes="MS4zLjEyLjIuMTEwNy41LjEuNC41NDA1MS4zMDAwMDAxMDA3MTgxMjMyMTE5MDYwMDAwNTEzMAA="/>
+            <Attr tag="00111018" vr="UN" bytes="AAAAAA=="/>
+            <Attr tag="0011101a" vr="UN" bytes="TUFYIA=="/>
+            <Attr tag="00181000" vr="LO" val="UV_5.30.7.26"/>
+            <Attr tag="00181020" vr="LO" val="5.30.7.26"/>
+            <Attr tag="00200013" vr="IS" val="1"/>
+            <Attr tag="00281052" vr="DS" val="-1024.0"/>
+            <Attr tag="00281053" vr="DS" val="1.0"/>
+            <Attr tag="00281054" vr="LO" val="UNSPECIFIED"/>
+            <Attr tag="00283110" vr="SQ">
+              <Item>
+                <Attributes>
+                  <Attr tag="00281050" vr="DS" val="30.0"/>
+                  <Attr tag="00281051" vr="DS" val="410.0"/>
+                </Attributes>
+              </Item>
+            </Attr>
+            <Attr tag="0032000c" vr="CS" val="LOW"/>
+            <Attr tag="00321030" vr="LO"/>
+            <Attr tag="00321040" vr="DA" val="20100718"/>
+            <Attr tag="00321041" vr="TM" val="105506.000"/>
+            <Attr tag="00321050" vr="DA" val="20100718"/>
+            <Attr tag="00321051" vr="TM" val="120956.000"/>
+            <Attr tag="00324000" vr="LT"/>
+            <Attr tag="00380300" vr="LO" val="MBG-3^305P^^^JHH"/>
+            <Attr tag="00700001" vr="SQ">
+              <Item>
+                <Attributes>
+                  <Attr tag="00081140" vr="SQ">
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00081150" vr="UI" val="1.2.840.10008.5.1.4.1.1.2"/>
+                        <Attr tag="00081155" vr="UI" val="1.3.12.2.1107.5.1.4.54051.30000010071812321190600005143"/>
+                      </Attributes>
+                    </Item>
+                  </Attr>
+                  <Attr tag="00700002" vr="CS" val="Layer 1"/>
+                  <Attr tag="00700008" vr="SQ">
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00110010" vr="LO" val="ULTRAVISUAL_TAG_SET1"/>
+                        <Attr tag="00111001" vr="UN" bytes="VVZfQ09NUFVURURURVhUIA=="/>
+                        <Attr tag="00111002" vr="UN" bytes="AAAgQQAAAAAAAAAA"/>
+                        <Attr tag="00111003" vr="UN" bytes="//////////8="/>
+                        <Attr tag="00700003" vr="CS" val="PIXEL"/>
+                        <Attr tag="00700004" vr="CS" val="PIXEL"/>
+                        <Attr tag="00700006" vr="ST" val="2.56 cm"/>
+                        <Attr tag="00700010" vr="FL" val="208.55017\166.19896"/>
+                        <Attr tag="00700011" vr="FL" val="218.55017\176.19896"/>
+                        <Attr tag="00700012" vr="CS" val="LEFT"/>
+                        <Attr tag="00700014" vr="FL" val="195.68585\166.19896"/>
+                        <Attr tag="00700015" vr="CS" val="Y"/>
+                      </Attributes>
+                    </Item>
+                  </Attr>
+                  <Attr tag="00700009" vr="SQ">
+                    <Item>
+                      <Attributes>
+                        <Attr tag="00110010" vr="LO" val="ULTRAVISUAL_TAG_SET1"/>
+                        <Attr tag="00111001" vr="UN" bytes="VVZfUlVMRVI="/>
+                        <Attr tag="00111002" vr="UN" bytes="AAAgQQAAAAAAAAAA"/>
+                        <Attr tag="00111003" vr="UN" bytes="//////////8="/>
+                        <Attr tag="00111019" vr="UN" bytes=""/>
+                        <Attr tag="00700005" vr="CS" val="PIXEL"/>
+                        <Attr tag="00700020" vr="US" val="2"/>
+                        <Attr tag="00700021" vr="US" val="2"/>
+                        <Attr tag="00700022" vr="FL" val="195.68585\166.19896\193.00522\133.36125"/>
+                        <Attr tag="00700023" vr="CS" val="POLYLINE"/>
+                        <Attr tag="00700024" vr="CS" val="N"/>
+                      </Attributes>
+                    </Item>
+                  </Attr>
+                </Attributes>
+              </Item>
+            </Attr>
+            <Attr tag="00700041" vr="CS" val="N"/>
+            <Attr tag="00700042" vr="US" val="0"/>
+            <Attr tag="0070005a" vr="SQ">
+              <Item>
+                <Attributes>
+                  <Attr tag="00700052" vr="SL" val="0\-24"/>
+                  <Attr tag="00700053" vr="SL" val="512\537"/>
+                  <Attr tag="00700100" vr="CS" val="SCALE TO FIT"/>
+                  <Attr tag="00700102" vr="IS" val="1\1"/>
+                </Attributes>
+              </Item>
+            </Attr>
+            <Attr tag="00700060" vr="SQ">
+              <Item>
+                <Attributes>
+                  <Attr tag="00700002" vr="CS" val="Layer 1"/>
+                  <Attr tag="00700062" vr="IS" val="0"/>
+                  <Attr tag="00700066" vr="US" val="65535"/>
+                  <Attr tag="00700067" vr="US" val="65535\65535\0"/>
+                </Attributes>
+              </Item>
+            </Attr>
+            <Attr tag="00700080" vr="CS" val="PS 1 Series 2"/>
+            <Attr tag="00700081" vr="LO" val="PS 1 Series 2:Abdomen  5's"/>
+            <Attr tag="00700082" vr="DA" val="20100718"/>
+            <Attr tag="00700083" vr="TM" val="113348"/>
+            <Attr tag="00700084" vr="PN" val="jhendi1"/>
+            <Attr tag="20500020" vr="CS" val="IDENTITY"/>
+          </Attributes>
+        </Instance>
+      </Instances>
+    </Series>
+  </SeriesList>
+</StudyMeta>

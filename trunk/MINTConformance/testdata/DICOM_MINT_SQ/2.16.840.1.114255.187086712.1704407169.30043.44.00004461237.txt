@@ -1,0 +1,770 @@
+
+# Dicom-File-Format
+
+# Dicom-Meta-Information-Header
+# Used TransferSyntax: LittleEndianExplicit
+(0002,0000) UL 118                                      #   4, 1 MetaElementGroupLength
+(0002,0001) OB 00\01                                    #   2, 1 FileMetaInformationVersion
+(0002,0002) UI =GrayscaleSoftcopyPresentationStateStorage #  28, 1 MediaStorageSOPClassUID
+(0002,0003) UI (no value available)                     #   0, 0 MediaStorageSOPInstanceUID
+(0002,0010) UI =JPEG2000LosslessOnly                    #  22, 1 TransferSyntaxUID
+(0002,0012) UI [2.16.840.1.113664.1.1]                  #  22, 1 ImplementationClassUID
+
+# Dicom-Data-Set
+# Used TransferSyntax: JPEG 2000 (Lossless only)
+(0002,0000) UL 30                                       #   4, 1 MetaElementGroupLength
+(0002,0010) UN 31\2e\32\2e\38\34\30\2e\31\30\30\30\38\2e\31\2e\32\00 #  18, 1 TransferSyntaxUID
+(0008,0000) UL 17484                                    #   4, 1 IdentifyingGroupLength
+(0008,0016) UI =GrayscaleSoftcopyPresentationStateStorage #  28, 1 SOPClassUID
+(0008,0018) UI [2.16.840.1.114255.187086712.1704407169.30043.44] #  48, 1 SOPInstanceUID
+(0008,0020) DA [20100718]                               #   8, 1 StudyDate
+(0008,0021) DA [20100718]                               #   8, 1 SeriesDate
+(0008,0023) DA [20100718]                               #   8, 1 ContentDate
+(0008,0030) TM [104349.000]                             #  10, 1 StudyTime
+(0008,0031) TM [114039.000]                             #  10, 1 SeriesTime
+(0008,0033) TM [114039]                                 #   6, 1 ContentTime
+(0008,0050) SH [7180754]                                #   8, 1 AccessionNumber
+(0008,0054) AE [IMG_ARCH_UV]                            #  12, 1 RetrieveAETitle
+(0008,0060) CS [PR]                                     #   2, 1 Modality
+(0008,0070) LO [VisualPACS_PR]                          #  14, 1 Manufacturer
+(0008,0080) LO []                                       #  28, 1 InstitutionName
+(0008,0090) PN []                                       #  26, 1 ReferringPhysiciansName
+(0008,1010) SH []                                       #  12, 1 StationName
+(0008,1030) LO [CT ABD W/PELVIS W/O CONT]               #  24, 1 StudyDescription
+(0008,1032) SQ (Sequence with undefined length #=1)     # u/l, 1 ProcedureCodeSequence
+  (fffe,e000) na (Item with undefined length #=4)         # u/l, 1 Item
+    (0008,0100) SH [4705000]                                #   8, 1 CodeValue
+    (0008,0102) SH [Siemens RIS]                            #  12, 1 CodingSchemeDesignator
+    (0008,0103) SH (no value available)                     #   0, 0 CodingSchemeVersion
+    (0008,0104) LO [RIS detail service code]                #  24, 1 CodeMeaning
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0008,103e) LO [PS 1 Series 2:Abdomen  5's]             #  26, 1 SeriesDescription
+(0008,1040) LO (no value available)                     #   0, 0 InstitutionalDepartmentName
+(0008,1048) PN [KING^ELIZABETH^^^]                      #  18, 1 PhysiciansOfRecord
+(0008,1060) PN (no value available)                     #   0, 0 NameOfPhysiciansReadingStudy
+(0008,1080) LO (no value available)                     #   0, 0 AdmittingDiagnosesDescription
+(0008,1090) LO [UV_5.30.7.26]                           #  12, 1 ManufacturersModelName
+(0008,1110) SQ (Sequence with undefined length #=1)     # u/l, 1 ReferencedStudySequence
+  (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+    (0008,1150) UI =DetachedStudyManagementSOPClass         #  24, 1 ReferencedSOPClassUID
+    (0008,1155) UI [1.2.840.113696.596650.500.3692040.20100718071812] #  48, 1 ReferencedSOPInstanceUID
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0008,1115) SQ (Sequence with undefined length #=1)     # u/l, 1 ReferencedSeriesSequence
+  (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+    (0008,1140) SQ (Sequence with undefined length #=146)   # u/l, 1 ReferencedImageSequence
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005170] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005192] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005246] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005232] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005228] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005261] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005207] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005215] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005148] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005254] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005260] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005258] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005193] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005205] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005248] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005172] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005191] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005176] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005243] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005142] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005194] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005220] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005144] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005146] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005175] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005135] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005218] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005163] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005270] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005177] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005249] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005265] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005168] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005271] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005147] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005259] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005152] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005216] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005184] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005160] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005140] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005210] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005276] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005255] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005209] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005185] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005131] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005263] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005143] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005137] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005174] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005154] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005150] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005200] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005257] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005237] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005190] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005165] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005164] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005227] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005169] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005233] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005221] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005167] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005151] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005222] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005269] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005145] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005162] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005201] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005159] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005211] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005264] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005268] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005230] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005267] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005239] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005189] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005199] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005179] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005273] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005235] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005274] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005206] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005182] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005158] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005229] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005208] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005262] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005245] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005244] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005240] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005188] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005241] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005213] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005133] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005212] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005275] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005252] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005242] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005234] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005197] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005219] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005138] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005166] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005195] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005225] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005180] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005183] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005187] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005231] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005214] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005153] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005204] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005139] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005186] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005250] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005224] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005173] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005198] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005266] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005203] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005161] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005134] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005256] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005251] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005223] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005149] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005247] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005178] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005141] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005226] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005202] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005132] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005196] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005238] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005136] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005217] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005157] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005171] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005156] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005155] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005236] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005181] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005253] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005272] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+    (0020,000e) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005130] #  56, 1 SeriesInstanceUID
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0009,0000) UL 58                                       #   4, 1 PrivateGroupLength
+(0009,0010) LO [EMAGEON STUDY HOME]                     #  18, 1 PrivateCreator
+(0009,1000) LO [001]                                    #   4, 1 Unknown Tag & Data
+(0009,1001) LO [jhebcln2fic]                            #  12, 1 Unknown Tag & Data
+(0010,0000) UL 182                                      #   4, 1 PatientGroupLength
+(0010,0010) PN [001]                                    #  14, 1 PatientsName
+(0010,0020) LO [tt001]                                  #   8, 1 PatientID
+(0010,0021) LO [JHH]                                    #   4, 1 IssuerOfPatientID
+(0010,0030) DA [19440725]                               #   8, 1 PatientsBirthDate
+(0010,0032) TM (no value available)                     #   0, 0 PatientsBirthTime
+(0010,0040) CS [F]                                      #   2, 1 PatientsSex
+(0010,1000) LO [000000000001]                           #  12, 1 OtherPatientIDs
+(0010,1001) PN [001]                                    #  16, 1 OtherPatientNames
+(0010,1010) AS [065Y]                                   #   4, 1 PatientsAge
+(0010,1020) DS (no value available)                     #   0, 0 PatientsSize
+(0010,1030) DS (no value available)                     #   0, 0 PatientsWeight
+(0010,2160) SH [W]                                      #   2, 1 EthnicGroup
+(0010,2180) SH (no value available)                     #   0, 0 Occupation
+(0010,21b0) LT (no value available)                     #   0, 0 AdditionalPatientHistory
+(0011,0000) UL 174                                      #   4, 1 PrivateGroupLength
+(0011,0010) LO [ULTRAVISUAL_TAG_SET1]                   #  20, 1 PrivateCreator
+(0011,1008) UN 6a\68\65\6e\64\69\31\20                  #   8, 1 Unknown Tag & Data
+(0011,1010) UN 01\00                                    #   2, 1 Unknown Tag & Data
+(0011,1011) UN (no value available)                     #   0, 1 Unknown Tag & Data
+(0011,1012) UN 31\2e\33\2e\31\32\2e\32\2e\31\31\30\37\2e\35\2e\31\2e\34\2e\35\34... #  56, 1 Unknown Tag & Data
+(0011,1018) UN 00\00\00\00                              #   4, 1 Unknown Tag & Data
+(0011,101a) UN 4d\41\58\20                              #   4, 1 Unknown Tag & Data
+(0018,0000) UL 62                                       #   4, 1 AcquisitionGroupLength
+(0018,0015) CS [ABDOMEN]                                #   8, 1 BodyPartExamined
+(0018,1000) LO [UV_5.30.7.26]                           #  12, 1 DeviceSerialNumber
+(0018,1020) LO [5.30.7.26]                              #  10, 1 SoftwareVersions
+(0018,1030) LO (no value available)                     #   0, 0 ProtocolName
+(0020,0000) UL 146                                      #   4, 1 ImageGroupLength
+(0020,000d) UI [1.2.840.113696.596650.500.3692040.20100718071812] #  48, 1 StudyInstanceUID
+(0020,000e) UI [2.16.840.1.114255.187086712.1704407169.28101.43] #  48, 1 SeriesInstanceUID
+(0020,0010) SH [CBN]                                    #   4, 1 StudyID
+(0020,0011) IS [2000]                                   #   4, 1 SeriesNumber
+(0020,0013) IS [1]                                      #   2, 1 InstanceNumber
+(0028,0000) UL 110                                      #   4, 1 ImagePresentationGroupLength
+(0028,1052) DS [-1024.0]                                #   8, 1 RescaleIntercept
+(0028,1053) DS [1.0]                                    #   4, 1 RescaleSlope
+(0028,1054) LO [UNSPECIFIED]                            #  12, 1 RescaleType
+(0028,3110) SQ (Sequence with undefined length #=1)     # u/l, 1 SoftcopyVOILUTSequence
+  (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+    (0028,1050) DS [30.0]                                   #   4, 1 WindowCenter
+    (0028,1051) DS [410.0]                                  #   6, 1 WindowWidth
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0032,0000) UL 96                                       #   4, 1 StudyGroupLength
+(0032,000c) CS [LOW]                                    #   4, 1 StudyPriorityID
+(0032,1030) LO (no value available)                     #   0, 0 ReasonForStudy
+(0032,1040) DA [20100718]                               #   8, 1 StudyArrivalDate
+(0032,1041) TM [105506.000]                             #  10, 1 StudyArrivalTime
+(0032,1050) DA [20100718]                               #   8, 1 StudyCompletionDate
+(0032,1051) TM [120956.000]                             #  10, 1 StudyCompletionTime
+(0032,4000) LT (no value available)                     #   0, 0 StudyComments
+(0038,0000) UL 24                                       #   4, 1 VisitGroupLength
+(0038,0300) LO [MBG-3^305P^^^JHH]                       #  16, 1 CurrentPatientLocation
+(0070,0000) UL 968                                      #   4, 1 PresentationStateGroupLength
+(0070,0001) SQ (Sequence with undefined length #=1)     # u/l, 1 GraphicAnnotationSequence
+  (fffe,e000) na (Item with undefined length #=4)         # u/l, 1 Item
+    (0008,1140) SQ (Sequence with undefined length #=1)     # u/l, 1 ReferencedImageSequence
+      (fffe,e000) na (Item with undefined length #=2)         # u/l, 1 Item
+        (0008,1150) UI =CTImageStorage                          #  26, 1 ReferencedSOPClassUID
+        (0008,1155) UI [1.3.12.2.1107.5.1.4.54051.30000010071812321190600005143] #  56, 1 ReferencedSOPInstanceUID
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+    (0070,0002) CS [Layer 1]                                #   8, 1 GraphicLayer
+    (0070,0008) SQ (Sequence with undefined length #=1)     # u/l, 1 TextObjectSequence
+      (fffe,e000) na (Item with undefined length #=12)        # u/l, 1 Item
+        (0011,0010) LO [ULTRAVISUAL_TAG_SET1]                   #  20, 1 PrivateCreator
+        (0011,1001) UN 55\56\5f\43\4f\4d\50\55\54\45\44\54\45\58\54\20 #  16, 1 Unknown Tag & Data
+        (0011,1002) UN 00\00\20\41\00\00\00\00\00\00\00\00      #  12, 1 Unknown Tag & Data
+        (0011,1003) UN ff\ff\ff\ff\ff\ff\ff\ff                  #   8, 1 Unknown Tag & Data
+        (0070,0003) CS [PIXEL]                                  #   6, 1 BoundingBoxAnnotationUnits
+        (0070,0004) CS [PIXEL]                                  #   6, 1 AnchorPointAnnotationUnits
+        (0070,0006) ST [2.56 cm]                                #   8, 1 UnformattedTextValue
+        (0070,0010) FL 208.55\166.199                           #   8, 2 BoundingBoxTopLeftHandCorner
+        (0070,0011) FL 218.55\176.199                           #   8, 2 BoundingBoxBottomRightHandCorner
+        (0070,0012) CS [LEFT]                                   #   4, 1 BoundingBoxTextHorizontalJustification
+        (0070,0014) FL 195.686\166.199                          #   8, 2 AnchorPoint
+        (0070,0015) CS [Y]                                      #   2, 1 AnchorPointVisibility
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+    (0070,0009) SQ (Sequence with undefined length #=1)     # u/l, 1 GraphicObjectSequence
+      (fffe,e000) na (Item with undefined length #=11)        # u/l, 1 Item
+        (0011,0010) LO [ULTRAVISUAL_TAG_SET1]                   #  20, 1 PrivateCreator
+        (0011,1001) UN 55\56\5f\52\55\4c\45\52                  #   8, 1 Unknown Tag & Data
+        (0011,1002) UN 00\00\20\41\00\00\00\00\00\00\00\00      #  12, 1 Unknown Tag & Data
+        (0011,1003) UN ff\ff\ff\ff\ff\ff\ff\ff                  #   8, 1 Unknown Tag & Data
+        (0011,1019) UN (no value available)                     #   0, 1 Unknown Tag & Data
+        (0070,0005) CS [PIXEL]                                  #   6, 1 GraphicAnnotationUnits
+        (0070,0020) US 2                                        #   2, 1 GraphicDimensions
+        (0070,0021) US 2                                        #   2, 1 NumberOfGraphicPoints
+        (0070,0022) FL 195.686\166.199\193.00522\133.361        #  16, 4 GraphicData
+        (0070,0023) CS [POLYLINE]                               #   8, 1 GraphicType
+        (0070,0024) CS [N]                                      #   2, 1 GraphicFilled
+      (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+    (fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0070,0041) CS [N]                                      #   2, 1 ImageHorizontalFlip
+(0070,0042) US 0                                        #   2, 1 ImageRotation
+(0070,005a) SQ (Sequence with undefined length #=1)     # u/l, 1 DisplayedAreaSelectionSequence
+  (fffe,e000) na (Item with undefined length #=4)         # u/l, 1 Item
+    (0070,0052) SL 0\-24                                    #   8, 2 DisplayedAreaTopLeftHandCorner
+    (0070,0053) SL 512\537                                  #   8, 2 DisplayedAreaBottomRightHandCorner
+    (0070,0100) CS [SCALE TO FIT]                           #  12, 1 PresentationSizeMode
+    (0070,0102) IS [1\1]                                    #   4, 2 PresentationPixelAspectRatio
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0070,0060) SQ (Sequence with undefined length #=1)     # u/l, 1 GraphicLayerSequence
+  (fffe,e000) na (Item with undefined length #=4)         # u/l, 1 Item
+    (0070,0002) CS [Layer 1]                                #   8, 1 GraphicLayer
+    (0070,0062) IS [0]                                      #   2, 1 GraphicLayerOrder
+    (0070,0066) US 65535                                    #   2, 1 GraphicLayerRecommendedDisplayGrayscaleValue
+    (0070,0067) US 65535\65535\0                            #   6, 3 GraphicLayerRecommendedDisplayRGBValue
+  (fffe,e00d) na (ItemDelimitationItem)                   #   0, 0 ItemDelimitationItem
+(fffe,e0dd) na (SequenceDelimitationItem)               #   0, 0 SequenceDelimitationItem
+(0070,0080) CS [PS 1 Series 2]                          #  14, 1 ContentLabel
+(0070,0081) LO [PS 1 Series 2:Abdomen  5's]             #  26, 1 ContentDescription
+(0070,0082) DA [20100718]                               #   8, 1 PresentationCreationDate
+(0070,0083) TM [113348]                                 #   6, 1 PresentationCreationTime
+(0070,0084) PN [jhendi1]                                #   8, 1 ContentCreatorsName
+(2050,0000) UL 16                                       #   4, 1 PresentationLUTGroupLength
+(2050,0020) CS [IDENTITY]                               #   8, 1 PresentationLUTShape
