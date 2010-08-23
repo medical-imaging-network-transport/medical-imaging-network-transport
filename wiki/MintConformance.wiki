@@ -156,16 +156,23 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
 
 --------------------
 
-= To Do =
+= Next Steps =
 
-Next steps for conformance testing are listed below.
+*Done*
 
-   * Implement sequencing data elements (SQ)
+   * Resolve binary/text differences between DICOM and MINT
+   * Revisit Part 10 header differences between DICOM and MINT
+   * Parse sequencing data elements (SQ) in MintStudy
+   * Compare sequencing data elements (SQ) between MINT studies
+
+*To Do*
+
+   * Parse sequencing data elements (SQ) in DICOM 
+   * Compare sequencing data elements (SQ) between DICOM and MINT
    * Provide support for inline binary
-   * Detect endianness, explicit VRs
    * Use DCM4CHE data dictionary
    * Provide support for bulk binary
-   * Resolve binary/text differences between DICOM and MINT (done)
-   * Revisit Part 10 header differences between DICOM and MINT (done)
+   * SAX parsing for large metadata files (?)
+   * Detect endianness, explicit VRs
    * Comparisons before and after updates
    * Support multi-frame DICOM
