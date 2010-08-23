@@ -13,11 +13,11 @@ import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.VR;
 import org.dcm4che2.io.DicomOutputStream;
 import org.nema.medical.mint.metadata.Attribute;
+import org.nema.medical.mint.metadata.GPB.StudyData;
 import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
 import org.nema.medical.mint.metadata.Study;
-import org.nema.medical.mint.metadata.gpb.MINT2GPB.StudyData;
 
 /**
  * Code to convert MINT to DICOM. Relies heavily on dcm4che2 as a placeholder for the dicom object. 
