@@ -86,6 +86,11 @@ Add your content here.
   * Update metadata format in (Tim Dawson)
     * # of instances (attribute instanceCount) in a series to series tag
     * # of instances (attribute instanceCount) in a study to study tag
+  * Implement binary item exclusion on get all binary items (Rex)
+    * Excluded binary items will now have .exclude for a file extension and active ones will have .dat
+  * Changelog changes (Rex)
+    * add type
+    * remove reason
 
 = Future =
   * GUI Tool to replace XHTML functionality / work with MINT server
