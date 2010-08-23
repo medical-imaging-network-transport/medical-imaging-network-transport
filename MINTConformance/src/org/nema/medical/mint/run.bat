@@ -9,6 +9,7 @@ set MC_HOME=\sandbox\medical-imaging-network-transport
 set MC_SRC=MINTConformance\src\org\nema\medical\mint
 set MC_DICOM=MINTConformance\testdata\DICOM
 set MC_MINT=MINTConformance\testdata\MINT\7cc45edf-d5a6-4264-b8ae-1d24d857f04b\DICOM
+set MC_DICOM_MINT_SQ=MINTConformance\testdata\DICOM_MINT_SQ
 set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 echo "Parse a DICOM Instance..."
@@ -20,8 +21,14 @@ echo "Parse a DICOM Study..."
 echo "Parse a MINT Study..."
 %PYTHON% %MC_HOME%\%MC_SRC%\MintStudy.py %MC_HOME%\%MC_MINT%\metadata.xml
 
+echo "Parse a MINT Study (with sequences)..."
+%PYTHON% %MC_HOME%\%MC_SRC%\MintStudy.py %MC_HOME%\%MC_DICOM_MINT_SQ%\metadata.xml
+
 echo "Compare MINT Studies..."
-%PYTHON% %MC_HOME%\%MC_SRC%\MintStudyCompare.py %MC_HOME%\%MC_MINT%\metadata.xml %MC_HOME%\%MC_MINT%\metadata.xml
+%PYTHON% %MC_HOME%\%MC_SRC%\MintStudyCompare.py -v %MC_HOME%\%MC_MINT%\metadata.xml %MC_HOME%\%MC_MINT%\metadata.xml
+
+echo "Compare MINT Studies (with sequences)..."
+%PYTHON% %MC_HOME%\%MC_SRC%\MintStudyCompare.py -v %MC_HOME%\%MC_DICOM_MINT_SQ%\metadata.xml %MC_HOME%\%MC_DICOM_MINT_SQ%\metadata.xml
 
 echo "Compare DICOM to MINT..."
 %PYTHON% %MC_HOME%\%MC_SRC%\MintDicomCompare.py %MC_HOME%\%MC_DICOM% %MC_HOME%\%MC_MINT%\metadata.xml

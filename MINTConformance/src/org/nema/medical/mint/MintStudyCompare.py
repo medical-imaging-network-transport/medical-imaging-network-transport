@@ -69,6 +69,8 @@ class MintStudyCompare():
        self.__instancesCompared = 0
        self.__instanceAttributesCompared = 0
        self.__binaryItemsCompared = 0
+       self.__sequenceItemsCompared = 0
+       self.__sequenceAttributesCompared = 0
        self.__bytesCompared = 0
        self.__lazy= False
 
@@ -81,7 +83,10 @@ class MintStudyCompare():
    def compare(self):
        s1 = self.__study1
        s2 = self.__study2
-       
+
+       # ---
+       # Compare study level attributes
+       # ---
        self.check("Study xmlns",
                   s1.xmlns(), 
                   s2.xmlns())
@@ -98,12 +103,8 @@ class MintStudyCompare():
        for n in range(0, numAttributes):
            attr1 = s1.attribute(n)
            attr2 = s2.attributeByTag(attr1.tag())
-           if attr2 == None:
-              self.check("Study Attribute", attr1.toString(), "None")
-           else:
-              self.check("Study Attribute", attr1.toString(), attr2.toString())
+           self.__checkAttributes("Study Attribute", attr1, attr2)
            self.__studyAttributesCompared += 1
-           self.__checkForBinary(attr1)
               
        self.check("Number of series",
                   s1.numSeries(), 
@@ -128,6 +129,8 @@ class MintStudyCompare():
            print "%10d normalized instance attribute(s) compared." % (self.__normalizedInstanceAttributesCompared)
            print "%10d instance(s) compared." % (self.__instancesCompared)
            print "%10d instance attribute(s) compared." % (self.__instanceAttributesCompared)
+           print "%10d sequence items(s) compared." % (self.__sequenceItemsCompared)
+           print "%10d sequence attributes(s) compared." % (self.__sequenceAttributesCompared)
            print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
            print "%10d byte(s) compared." % (self.__bytesCompared)    
 
@@ -144,6 +147,39 @@ class MintStudyCompare():
           self.__count += 1
           print msg, ":", obj1, "!=", obj2
 
+   def __checkAttributes(self, msg, attr1, attr2):
+       if attr2 == None:
+          self.check(msg, attr1.toString(), "None") 
+       elif attr1.vr() == "SQ":
+          self.__checkSequence(msg, attr1, attr2)
+       else:
+          self.check(msg, attr1.toString(), attr2.toString())                 
+          self.__checkForBinary(attr1)
+   
+   def __checkSequence(self, msg, attr1, attr2):
+
+       numItems1 = attr1.numItems()
+       numItems2 = attr2.numItems()
+       self.check(msg+" number of items",
+                  numItems1, 
+                  numItems2)
+                  
+       if numItems1 == numItems2:
+          for i in range(0, numItems1):
+              numItemAttributes1 = attr1.numItemAttributes(i)
+              numItemAttributes2 = attr2.numItemAttributes(i)
+              self.check(msg+" number of item attributes",
+                         numItemAttributes1, 
+                         numItemAttributes2)
+
+              if numItemAttributes1 == numItemAttributes2:
+                 for j in range(0, numItemAttributes1):
+                     a1 = attr1.itemAttribute(i, j)
+                     a2 = attr2.itemAttribute(i, j)
+                     self.__checkAttributes(msg+" Item "+str(i)+" Attribute", a1, a2)            
+                     self.__sequenceAttributesCompared += 1
+                 self.__sequenceItemsCompared += 1
+                                       
    def __compareSeries(self, series1, series2):
                  
        uid = series1.seriesInstanceUID()
@@ -163,10 +199,7 @@ class MintStudyCompare():
        for n in range(0, numAttributes):
            attr1 = series1.attribute(n)
            attr2 = series2.attributeByTag(attr1.tag())
-           if attr2 == None:
-              self.check(series+" Attribute", attr1.toString(), "None")       
-           else:
-              self.check(series+" Attribute", attr1.toString(), attr2.toString())
+           self.__checkAttributes(series+" Attribute", attr1, attr2)
            self.__checkForBinary(attr1)
            self.__seriesAttributesCompared += 1
 
@@ -174,10 +207,7 @@ class MintStudyCompare():
        for n in range(0, numNormalizedInstanceAttributes):
            attr1 = series1.normalizedInstanceAttribute(n)
            attr2 = series2.normalizedInstanceAttributeByTag(attr1.tag())
-           if attr2 == None:
-              self.check(series+" Normalized Instance Attribute", attr1.toString(), "None")       
-           else:
-              self.check(series+" Normalized Instance Attribute", attr1.toString(), attr2.toString())       
+           self.__checkAttributes(series+" Normalized Instance Attribute", attr1, attr2)       
            self.__checkForBinary(attr1)
            self.__normalizedInstanceAttributesCompared += 1
 
@@ -215,10 +245,7 @@ class MintStudyCompare():
        for n in range(0, numAttributes):
            attr1 = instance1.attribute(n)
            attr2 = instance2.attributeByTag(attr1.tag())
-           if attr2 == None:
-              self.check(instance+" Attribute", attr1.toString(), "None")
-           else:
-              self.check(instance+" Attribute", attr1.toString(), attr2.toString())
+           self.__checkAttributes(instance+" Attribute", attr1, attr2)
            self.__checkForBinary(attr1)
            self.__instanceAttributesCompared += 1
 
