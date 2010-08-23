@@ -39,14 +39,11 @@ import org.dcm4che2.io.DicomInputStream;
  */
 public final class BinaryDcmData implements BinaryData {
     private static final class FileTagpath {
-        public FileTagpath(final File dcmFile, final int[] tagPath) {
-            this(dcmFile, tagPath, -1);
-        }
-        
-        public FileTagpath(File dcmFile, int[] tagPath, int fragment) {
+        public FileTagpath(File dcmFile, int[] tagPath, int offset, int len) {
             this.dcmFile = dcmFile;
             this.tagPath = tagPath;
-            this.fragment = fragment;
+            this.offset = offset;
+            this.len = len;
         }
 
         @Override
@@ -56,7 +53,11 @@ public final class BinaryDcmData implements BinaryData {
 
         public final File dcmFile;
         public final int[] tagPath;
-        public final int fragment;
+        /** Offset in PixelData at which to find image.  This can probably
+         * overflow an int, but System.arrayCopy doesn't take longs. */
+        public final int offset;
+        /** Length of image in PixelData */
+        public final int len;
     }
 
     private final List<FileTagpath> binaryItems = new ArrayList<FileTagpath>();
@@ -91,14 +92,14 @@ public final class BinaryDcmData implements BinaryData {
 
     @Override
     public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
-        add(dcmFile, tagPath, dcmElem, -1);
+        add(dcmFile, tagPath, dcmElem, -1, -1);
     }
     
-    public void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int fragment) {
+    public void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int offset, int length) {
         final int[] newTagPath = new int[tagPath.length + 1];
         System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
         newTagPath[tagPath.length] = dcmElem.tag();
-        final FileTagpath storeElem = new FileTagpath(dcmFile, newTagPath, fragment);
+        final FileTagpath storeElem = new FileTagpath(dcmFile, newTagPath, offset, length);
         binaryItems.add(storeElem);
     }
 
@@ -183,14 +184,14 @@ public final class BinaryDcmData implements BinaryData {
             cachedRootDicomObject = newRootDicomObject;
             cachedRootDicomObjectFile = targetDcmFile;
         }
-        final byte[] binaryData;
+        byte[] binaryData;
         try {
-            if (binaryItemPath.fragment >= 0) {
-                // multiframe
-                DicomElement element = cachedRootDicomObject.get(binaryItemPath.tagPath);
-                binaryData = element.getFragment(binaryItemPath.fragment);
-            } else {
-                binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+            binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
+            if (binaryItemPath.len > 0) {
+                // multi-frame image
+                byte[] slice = new byte[binaryItemPath.len];
+                System.arraycopy(binaryData, binaryItemPath.offset, slice, 0, binaryItemPath.len);
+                binaryData = slice;
             }
         } catch (final UnsupportedOperationException e) {
             //Something wrong with the DICOM format
