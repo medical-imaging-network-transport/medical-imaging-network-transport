@@ -1,8 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-<html>
-<head><title>Study Summary for $studyInstanceUID</title></head><body><h1>Study Summary for $studyInstanceUID</h1><ul>
-#foreach ($key in $values.keySet())
-<li><ul><li class='tag'>$key</li><li class='description'>$descriptions.get($key)</li><li class='value'>$values.get($key)</li></ul></li>
-#end
-</ul></body></html>

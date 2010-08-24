@@ -1,20 +1,9 @@
 <!-- THIS FILE IS SUPPOSED TO REPRESENT THE DICOM STANDARD -->
 <metadata type="DICOM" version="1.0">
-	<attributes> <!-- this part is optional, probably very long if we have it at all -->
+	<attributes unknown-attributes="include/ignore/reject?"> 
+		<!-- this part is optional, probably very long if we have it at all -->
 		<attribute tag='7fe00010' vr='OW' desc="Binary data tag." />
 	</attributes>
-	<summary-attributes>
-		<attribute tag='00080020' class="StudyDate" desc="Study Date" />
-		<attribute tag='00080030' class="StudyTime" desc="Study Time" />
-		<attribute tag='00080050' class="AccessionNumber" desc="Accession Number" />
-		<attribute tag='00100010' class="PatientName" desc="Patient's Name" />
-		<attribute tag='00100020' class="PatientID" desc="Patient ID" />
-		<attribute tag='00100040' class="PatientSex" desc="Patient's Sex" />
-		<attribute tag='00101010' class="PatientAge" desc="Patient's Age" />
-		<attribute tag='00104000' class="PatientComments" desc="Patient Comments" />
-		<attribute tag='0020000d' class="StudyInstanceUID" desc="Study Instance UID" />
-		<attribute tag='00200010' class="StudyID" desc="Study ID" />
-	</summary-attributes>
 	<study-attributes>
 		<attribute tag='00080020' desc="Study Date" />
 		<attribute tag='00080030' desc="Study Time" />

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="build/test-classes" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MINTCommon"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
@@ -10,7 +11,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/MINTMetadata"/>
-	<classpathentry kind="lib" path="ant-lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="ant-lib/servlet-api.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/h2-1.2.138.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
@@ -21,6 +26,15 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.springframework.core-3.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.springframework.orm-3.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.springframework.transaction-3.0.3.RELEASE.jar"/>
-	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/velocity-1.5.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.springframework.expression-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.springframework.jdbc-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.springframework.web-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.springframework.web.servlet-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-fileupload-1.2.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

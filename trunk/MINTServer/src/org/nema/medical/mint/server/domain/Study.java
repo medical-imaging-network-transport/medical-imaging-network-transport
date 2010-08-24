@@ -59,6 +59,11 @@ public class Study implements Serializable {
 	@Column
 	private String accessionNumber;
 
+	// Issuer of Accession Number ID (0008,0051) T2
+	@Column
+	private String issuerOfAccessionNumber;
+
+
 	// Patient's name (0010,0010) T2
 	// Patient's full name.
 	// The patient's name in DICOM VR PN (family name complex^given name
@@ -118,8 +123,11 @@ public class Study implements Serializable {
 	@Column
 	private String issuerOfPatientID;
 
-	// The conjoined studyDate and studyTime from DICOM. If a parse error
-	// occurs, this is set to null.
+	// The conjoined studyDate (0008,0020), studyTime (0008,0030), and timezoneOffsetFromUTC
+	// from DICOM. If studyDate is not provided, this field will be null.  If date is provided
+	// but studyTime is not provided, time is set to noon.  If timezoneOffsetFromUTC is not 
+	// provided, the time will be assumed to match the server time.
+	// 00080020, 00080030, 00080201
 	// INDEXED
 	@Column(name="studyDateTime")
 	private Timestamp dateTime;
@@ -146,10 +154,6 @@ public class Study implements Serializable {
 		return id != null ? id.equals(study.id) : study.id == null;
 	}
 
-	public String getAccessionNumber() {
-		return accessionNumber;
-	}
-
 	public String getID() {
 		return id;
 	}
@@ -157,6 +161,14 @@ public class Study implements Serializable {
 	// hack so that {study.id} works in JSP
 	public String getId() {
 		return id;
+	}
+
+	public String getAccessionNumber() {
+		return accessionNumber;
+	}
+
+	public String getIssuerOfAccessionNumber() {
+		return issuerOfAccessionNumber;
 	}
 
 	public String getPatientName() {
@@ -188,12 +200,16 @@ public class Study implements Serializable {
 		return id.hashCode();
 	}
 
+	public void setID(final String id) {
+		this.id = id;
+	}
+
 	public void setAccessionNumber(final String accessionNumber) {
 		this.accessionNumber = accessionNumber;
 	}
 
-	public void setID(final String id) {
-		this.id = id;
+	public void setIssuerOfAccessionNumber(String issuerOfAccessionNumber) {
+		this.issuerOfAccessionNumber = issuerOfAccessionNumber;
 	}
 
 	public void setPatientName(final String patientName) {
@@ -224,5 +240,6 @@ public class Study implements Serializable {
 	public String toString() {
 		return String.format("Study{id=%s, instanceUID=%s}", id, studyInstanceUID);
 	}
+
 
 }

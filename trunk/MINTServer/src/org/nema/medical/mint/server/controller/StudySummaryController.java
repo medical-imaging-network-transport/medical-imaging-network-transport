@@ -21,6 +21,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,27 +38,43 @@ public class StudySummaryController {
 	@RequestMapping("/studies/{uuid}/{type}/summary")
 	public void studiesSummary(@PathVariable("uuid") final String uuid,
 			@PathVariable("type") final String type, 
-			final HttpServletResponse httpServletResponse) throws IOException {
+			final HttpServletResponse res) throws IOException {
 		if (StringUtils.isBlank(uuid)) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing Study UUID");
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing Study UUID");
 			return;
 		}
-		try {
-			httpServletResponse.setContentType("text/html");
-			final File file = new File(studiesRoot, uuid + "/" + type + "/summary.html");
-			if (file.exists() && file.canRead()) {
-				httpServletResponse.setContentLength(Long.valueOf(file.length()).intValue());
-				Utils.streamFile(file, httpServletResponse.getOutputStream());
-			} else {
-				httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
-				return;
-			}
+
+		final File studyDir = new File(studiesRoot, uuid);
+        if (!studyDir.exists() || !studyDir.canRead()) {
+            LOG.error("Unable to locate directory for study: " + studyDir);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+            return;
+        }
+        final File typeDir = new File(studyDir, type);
+        if (!typeDir.exists() || !typeDir.canRead()) {
+            LOG.error("Unable to locate directory for study: " + studyDir);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+            return;
+        }
+
+        try {			
+			final File file = new File(typeDir, "/summary.xml");
+            if (!file.exists()) {
+                Study study = StudyIO.loadStudy(typeDir);
+                StudyIO.writeSummaryToXML(study,file);
+            }
+
+			res.setContentType("text/xml");
+			res.setContentLength(Long.valueOf(file.length()).intValue());
+			Utils.streamFile(file, res.getOutputStream());
 		} catch (final IOException e) {
-			if (!httpServletResponse.isCommitted()) {
-				httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			if (!res.isCommitted()) {
+				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Unable to provide study summary. See server logs.");
 				return;
 			}
 		}
 	}
+	
+	private static final Logger LOG = Logger.getLogger(StudySummaryController.class);
 }

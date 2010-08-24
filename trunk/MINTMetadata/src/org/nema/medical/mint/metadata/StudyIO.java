@@ -106,7 +106,7 @@ public class StudyIO {
 	static public Study parseFromXML(InputStream in) throws IOException {
 		Study study = null;
 		try {
-			IBindingFactory bfact = BindingDirectory.getFactory(Study.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("metadata",Study.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			study = (Study)uctx.unmarshalDocument(in, null);
 		} catch (JiBXException e) {
@@ -129,7 +129,7 @@ public class StudyIO {
 	
 	static public void writeToXML(Study study, OutputStream out) throws IOException {
 		try {
-			IBindingFactory bfact = BindingDirectory.getFactory(Study.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("metadata",Study.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
 			mctx.marshalDocument(study, "UTF-8", null, out);
@@ -144,7 +144,7 @@ public class StudyIO {
 			out = new GZIPOutputStream(out);
 		}
 		try {
-			writeToXML(study, out);
+			writeSummaryToXML(study, out);
 		} finally {
 			out.close();
 		}		
@@ -152,7 +152,7 @@ public class StudyIO {
 	
 	static public void writeSummaryToXML(Study study, OutputStream out) throws IOException {
 		try {
-			IBindingFactory bfact = BindingDirectory.getFactory(StudySummary.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("summary",Study.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
 			mctx.marshalDocument(study, "UTF-8", null, out);

@@ -27,6 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.changelog.ChangeSet;
+import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +52,56 @@ public class ChangeLogController {
 	protected ChangeDAO changeDAO = null;
 
 	@ModelAttribute("changes")
-	public List<Change> getChanges() {
-		return new LinkedList<Change>();
+	public List<org.nema.medical.mint.changelog.Change> getChanges() {
+		return new LinkedList<org.nema.medical.mint.changelog.Change>();
 	}
 
+	@RequestMapping("/changelogXML")
+	public void changelogXML(
+            @RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+			@ModelAttribute("changes") final List<org.nema.medical.mint.changelog.Change> changes,
+			final HttpServletRequest req,
+			final HttpServletResponse res) throws IOException, JiBXException {
+
+        // TODO read pageSize from a config file
+        if (pageSize == null) pageSize = 50;
+        if (pageNum == null) pageNum = 1;
+        int firstIndex = (pageNum-1)*pageSize;
+        
+        final List<Change> changesFound;
+        
+		if (since != null) {
+
+			Date date = null;
+			try {
+				date = Utils.parseDate(since);
+			} catch (ParseException e) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
+				return;
+			}
+			if (date.getTime() > System.currentTimeMillis()) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
+				return;
+			}
+			changesFound = changeDAO.findChanges(date, firstIndex, pageSize);
+		} else {
+			changesFound = changeDAO.findChanges(firstIndex, pageSize);
+		}
+		
+		if (changesFound != null) {
+			for (Change change : changesFound) {
+				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime()));
+			}
+		}
+		ChangeSet changeSet = new ChangeSet(changes);
+		IBindingFactory bfact = BindingDirectory.getFactory(ChangeSet.class);
+		IMarshallingContext mctx = bfact.createMarshallingContext();
+		mctx.setIndent(2);
+		mctx.marshalDocument(changeSet, "UTF-8", null, res.getOutputStream());
+	}
+	
 	@RequestMapping("/changelog")
 	public String changelog(
             @RequestParam(value = "since", required = false) String since,

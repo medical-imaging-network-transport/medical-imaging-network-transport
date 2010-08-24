@@ -1,0 +1,16 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="changelog">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="study-change" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:attribute name="studyUUID" type="xsd:string" use="required"/>
+            <xsd:attribute name="changeNumber" type="xsd:integer" use="required"/>
+            <xsd:attribute name="type" type="xsd:string" use="required"/>
+            <xsd:attribute name="dateTime" type="xsd:dateTime" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

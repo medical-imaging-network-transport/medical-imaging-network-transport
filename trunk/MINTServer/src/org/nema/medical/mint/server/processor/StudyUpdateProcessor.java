@@ -215,7 +215,6 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * binary data files.
 				 */
 				StudyUtil.writeStudy(existingStudy, typeFolder);
-				StudySummaryIO.writeSummaryToXHTML(existingStudy, new File(typeFolder, "summary.html"));
 				
 				StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
 				
