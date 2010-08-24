@@ -90,6 +90,12 @@ public class Change {
 	public void setDateTime(Timestamp dateTime) {
 		this.dateTime = dateTime;
 	}
-	
-	
+
+	public String getStudyUUID() {
+		return studyID;
+	}
+
+	public int getChangeNumber() {
+		return changeIndex;
+	}
 }

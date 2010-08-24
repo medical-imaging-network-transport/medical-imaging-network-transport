@@ -3,6 +3,7 @@
     <wb-module deploy-name="MINTServer">
         <wb-resource deploy-path="/" source-path="/WebContent"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
         <dependent-module archiveName="MINTCommon.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MINTCommon/MINTCommon">
             <dependency-type>uses</dependency-type>
         </dependent-module>

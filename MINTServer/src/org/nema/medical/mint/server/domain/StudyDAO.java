@@ -15,33 +15,73 @@
  */
 package org.nema.medical.mint.server.domain;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.nema.medical.mint.server.controller.Utils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class StudyDAO extends HibernateDaoSupport {
 
-    public enum SearchKeyType { String, Date, Number
-    }
+    public enum SearchKeyType { String, Date, Number }
     public enum SearchKey {
-        // study search fields
-        studyInstanceUID("studyInstanceUID"), accessionNumber("accessionNumber"),
-        // patient search fields
-        patientID("patientID"), issuerOfPatientID("issuerOfPatientID"),
-        // date & pagination
-        since(SearchKeyType.Date), pageSize(SearchKeyType.Number), pageNum(SearchKeyType.Number);
+        studyInstanceUID {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("studyInstanceUID", value);
+			}
+		},
+        accessionNumber {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("accessionNumber", value);
+			}
+		}, 
+		issuerOfAccessionNumber {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("issuerOfAccessionNumber", value);
+			}
+		},
+        patientID {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("patientID", value);
+			}
+		},
+		issuerOfPatientID {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("issuerOfPatientID", value);
+			}
+		},
+        studyDateTimeFrom(SearchKeyType.Date) {
+			@Override
+			Criterion getRestrictions(String value) throws ParseException {
+				return Restrictions.gt("dateTime", Utils.parseDate(value));
+			}
+		},
+		studyDateTimeTo(SearchKeyType.Date) {
+			@Override
+			Criterion getRestrictions(String value) throws ParseException {
+				return Restrictions.lt("dateTime", Utils.parseDate(value));
+			}
+		};
 
-        SearchKey(String field) { this.field = field; this.type = SearchKeyType.String; }
-        SearchKey(SearchKeyType type) { this.type = type; this.field = null; }
+        SearchKey() { this.field = null; this.type = SearchKeyType.String; }
+        SearchKey(SearchKeyType type) { this.field = null; this.type = type; }
         public final SearchKeyType type;
         public final String field;
+        
+        abstract Criterion getRestrictions(String value) throws ParseException;
     }
 
 	public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
@@ -54,29 +94,13 @@ public class StudyDAO extends HibernateDaoSupport {
 		return Math.min(Math.max(value, min), max);
 	}
 
-    public List<Study> findStudies(Map<SearchKey, Object> searchParams) {
-        int pageNum = 0;
-        int pageSize = 50;
+    @SuppressWarnings("unchecked")
+	public List<Study> findStudies(Map<SearchKey, String> searchParams, int pageNum, int pageSize) throws ParseException {
 
         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class);
         detachedCriteria.addOrder(Order.desc("updateTime"));
         for (SearchKey key : searchParams.keySet()) {
-            Object value = searchParams.get(key);
-            if (key.field != null) {
-                detachedCriteria.add(Restrictions.eq(key.field, value));
-            } else switch (key) {
-                case since:
-                    detachedCriteria.add(Restrictions.gt("updateTime",value));
-                    break;
-                case pageNum:
-                    pageNum = (Integer)value;
-                    break;
-                case pageSize:
-                    pageSize = (Integer)value;
-                    break;
-                default:
-                    throw new RuntimeException("unknown search key " + key);
-            }
+			detachedCriteria.add(key.getRestrictions(searchParams.get(key)));
         }
 
         int firstResult = (pageNum-1) * pageSize;

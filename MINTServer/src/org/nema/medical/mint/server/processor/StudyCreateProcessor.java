@@ -96,8 +96,6 @@ public class StudyCreateProcessor extends TimerTask {
 			//write study into type folder
 			StudyUtil.writeStudy(study, typeFolder);
 			LOG.info("study metadata for " + jobID + " written");
-	        StudySummaryIO.writeSummaryToXHTML(study, new File(typeFolder, "summary.html"));
-			LOG.info("study summary for " + jobID + " written");
 	        
 	        //Write metadata to change log
 	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);

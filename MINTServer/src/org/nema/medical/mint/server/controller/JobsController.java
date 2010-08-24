@@ -60,7 +60,7 @@ public class JobsController {
 
 	private static final Logger LOG = Logger.getLogger(JobsController.class);
 	private static final List<String> supportedMetadataExtensions = Arrays
-			.asList(".gpb", ".gpb.gz", ".xml", ".xml.gz", ".json", ".json.gz");
+			.asList(".gpb", ".gpb.gz", ".xml", ".xml.gz");
 
 	private ExecutorService executor;
 

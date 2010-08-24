@@ -18,12 +18,12 @@
 		<property name="build.classpath" refid="build.classpath" />
 
 		<mkdir dir="${build.dir}/ant-classes" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" debug="true" classpathref="build.classpath" includeantruntime="no">
 			<compilerarg value="-Xlint:-path" />
 		</javac>
 
 		<mkdir dir="${build.dir}/ant-test-classes" />
-		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" debug="true" classpathref="build.classpath" includeantruntime="no">
 			<classpath>
 				<pathelement path="${build.dir}/ant-test-classes" />
 				<pathelement path="${build.dir}/ant-classes" />
@@ -66,24 +66,22 @@
 		<delete>
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
 		</delete>
-		<jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-studymeta.jibx">
+		<jibx-bind verbose="true" load="true">
+			<bindingfileset dir="${basedir}/config" casesensitive="yes">
+			  <include name="**/*.jibx"/>
+			</bindingfileset>
 			<classpath>
 				<pathelement path="${build.dir}/ant-classes" />
 				<pathelement location="lib/jibx-run.jar" />
 			</classpath>
 		</jibx-bind>
-		<jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-studysummary.jibx">
-			<classpath>
-				<pathelement path="${build.dir}/ant-classes" />
-				<pathelement location="lib/jibx-run.jar" />
-			</classpath>
-		</jibx-bind>
+		<!-- <jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-changelog.jibx"> -->
 		<delete>
 			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class" />
 		</delete>
 		<copy todir="${build.dir}/classes" overwrite="true">
 			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
-			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/metadata/*.class" />
+			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/**/*.class" />
 		</copy>
 	</target>
 

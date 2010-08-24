@@ -28,7 +28,28 @@ public class Utils {
     public static final Date parseDate(String dateStr) throws ParseException {
         Date date = null;
         ParseException ex = null;
-        for (String format : new String[]{"yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd","yyyyMMdd'T'HHmmss","yyyyMMdd"}) {
+
+        // a + in a URL is replaced with a space, and spaces aren't allowed, so why not...
+        dateStr = dateStr.replace(' ','+');
+        
+        //this is zero time so we need to add that TZ indicator for 
+        if ( dateStr.endsWith( "Z" ) ) {
+        	dateStr = dateStr.substring( 0, dateStr.length() - 1) + "GMT-00:00";
+        } else if (dateStr.contains("T")){
+        	int dashIndex = dateStr.lastIndexOf('-');
+        	int plusIndex = dateStr.lastIndexOf('+');
+			int timeIndex = dateStr.indexOf('T');
+			if (dashIndex > timeIndex || plusIndex > timeIndex) {
+                int inset = 6;
+                
+                String s0 = dateStr.substring( 0, dateStr.length() - inset );
+                String s1 = dateStr.substring( dateStr.length() - inset, dateStr.length() );
+
+                dateStr = s0 + "GMT" + s1;
+        	}
+        }
+
+        for (String format : new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz","yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss.SSS","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd"}) {
             try {
                 date = new SimpleDateFormat(format).parse(dateStr);
                 break;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<binding xmlns:tns="http://medical.nema.org/mint" name="binding" package="org.nema.medical.mint.metadata" trim-whitespace="true">
+<binding xmlns:tns="http://medical.nema.org/mint" name="metadata" trim-whitespace="true">
   <namespace uri="http://medical.nema.org/mint" default="elements"/>
   <format label="int.hex" type="int" serializer="org.nema.medical.mint.metadata.StudyIO.int2hex"
           deserializer="org.nema.medical.mint.metadata.StudyIO.hex2int"/>

@@ -703,7 +703,7 @@ public final class StudyUtil {
         StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml"));
         StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb.gz"));
         StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml.gz"));
-//        StudySummaryIO.writeSummaryToXHTML(study, new File(studyFolder, "summary.html"));
+        StudyIO.writeSummaryToXML(study, new File(studyFolder, "summary.xml"));
     }
 
     public static void moveBinaryItems(File jobFolder, File studyBinaryFolder) {
