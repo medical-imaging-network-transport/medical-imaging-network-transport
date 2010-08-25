@@ -1,4 +1,5 @@
 __all__ = [
+   "DicomAttribute.py",
    "DicomSeries.py",
    "DicomStudy.py",
    "MintAttribute.py",

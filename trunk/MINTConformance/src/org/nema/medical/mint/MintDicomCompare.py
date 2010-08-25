@@ -141,8 +141,8 @@ class MintDicomCompare():
        # ---
        # Check tags.
        # ---
-       numTags = instance.numTags()
-       for n in range(0, numTags):
+       numAttributes = instance.numAttributes()
+       for n in range(0, numAttributes):
            tag = instance.tag(n)
            self.__checkTag(instance, mint, tag)
                                   
@@ -165,27 +165,26 @@ class MintDicomCompare():
                        instance.seriesInstanceUID(), 
                        instance.sopInstanceUID())
        else:
-          val = instance.value(tag)
-          
-          if not instance.isImplicit(tag):
-             self.__check(tag+"VR",
-                          instance.vr(tag),
+          dicomAttr = instance.attributeByTag(tag) 
+          if instance.isExplicit():
+             self.__check(tag+" VR",
+                          dicomAttr.vr(),
                           attr.vr(),
                           instance.seriesInstanceUID(), 
                           instance.sopInstanceUID())
 
-          if instance.isBinary(tag):
-             self.__checkBinary(instance, mint, tag, attr)
+          if dicomAttr.isBinary():
+             self.__checkBinary(instance, dicomAttr, mint, attr)
              self.__binaryTagsCompared += 1
           else:
              self.__check(tag+" Value",
-                          instance.value(tag),
+                          dicomAttr.val(),
                           attr.val(),
                           instance.seriesInstanceUID(), 
                           instance.sopInstanceUID())
              self.__textTagsCompared += 1
 
-   def __checkBinary(self, instance, mint, tag, attr):
+   def __checkBinary(self, instance, dicomAttr, mint, attr):
 
        binaryitem = attr.bid()
        
@@ -201,9 +200,9 @@ class MintDicomCompare():
        # ---
        # Check binary item sizes.
        # ---
-       size1 = instance.length(tag)
+       size1 = dicomAttr.vl()
        size2 = os.path.getsize(dat)
-       self.__check(tag+" "+binaryitem+".dat size",
+       self.__check(dicomAttr.tag()+" "+binaryitem+".dat size",
                     size1,
                     size2,
                     instance.seriesInstanceUID(), 
@@ -214,7 +213,7 @@ class MintDicomCompare():
        # ---
        if not self.__lazy and size1 == size2:
           bid = open(dat, "rb")
-          val = instance.value(tag)
+          val = dicomAttr.val()
           assert size1 == len(val) # These better be equal
 
           # ---
