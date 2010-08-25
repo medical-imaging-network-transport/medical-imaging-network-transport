@@ -22,12 +22,12 @@ namespace MINTLoader
         public override StudyItemList Query(QueryParameters queryParams, object targetServer)
         {
             ApplicationEntity selectedServer = (ApplicationEntity)targetServer;
-
+            
             StudyItemList list = new StudyItemList();
             foreach (var key in MINTApi.GetStudies(selectedServer.Host))
             {
                 var item = new StudyItem(key.StudyUid, key, MINTApi.LoaderName);
-
+                
                 MINTApi.FillStudyItem(item, key);
                 list.Add(item);
             }

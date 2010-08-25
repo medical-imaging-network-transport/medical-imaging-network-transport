@@ -32,6 +32,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Collections.Generic;
 using ClearCanvas.Common;
 using ClearCanvas.Common.Utilities;
 using ClearCanvas.Dicom;
@@ -46,8 +47,10 @@ namespace MINTLoader
 	internal partial class MINTSopDataSource : DicomMessageSopDataSource, IStreamingSopDataSource
 	{
         public readonly Uri BinaryUri;
+        protected MINTBinaryStream binaryStream;
+        protected bool useBulkLoading;
 
-        public MINTSopDataSource(InstanceMINTXml instanceXml)
+        public MINTSopDataSource(InstanceMINTXml instanceXml, MINTBinaryStream BinaryStream, bool UseBulkLoading)
 			: base(new DicomFile("", new DicomAttributeCollection(), instanceXml.Collection))
 		{
 			//These don't get set properly for instance xml.
@@ -56,6 +59,8 @@ namespace MINTLoader
 			sourceFile.MediaStorageSopInstanceUid = instanceXml[DicomTags.SopInstanceUid].GetString(0, "");
 			sourceFile.MetaInfo[DicomTags.SopClassUid].SetString(0, instanceXml[DicomTags.SopClassUid].GetString(0, ""));
             BinaryUri = instanceXml.PixelDataUri;
+            binaryStream = BinaryStream;
+            useBulkLoading = UseBulkLoading;
 		}
 
 		private InstanceXmlDicomAttributeCollection AttributeCollection

@@ -171,7 +171,8 @@ namespace MINTLoader
 
             var docElem = doc.DocumentElement;
 
-            var topLevelUlNodes = docElem.SelectNodes("//ns:ul/ns:li/ns:ul", nsMan);
+            //var topLevelUlNodes = docElem.SelectNodes("//ns:ul/ns:li/ns:ul", nsMan);
+            var topLevelUlNodes = docElem.SelectNodes("//li/ul");
             if (topLevelUlNodes == null)
             {
                 return;
@@ -179,13 +180,15 @@ namespace MINTLoader
 
             foreach (XmlNode topLevelUlNode in topLevelUlNodes)
             {
-                string tag = GetVal(topLevelUlNode, "tag", nsMan);
+                //string tag = GetVal(topLevelUlNode, "tag", nsMan);
+                string tag = topLevelUlNode.SelectSingleNode(string.Format("li[@class='tag']")).InnerText;
                 if (string.IsNullOrEmpty(tag))
                 {
                     continue;
                 }
 
-                string value = GetVal(topLevelUlNode, "value", nsMan);
+                //string value = GetVal(topLevelUlNode, "value", nsMan);
+                string value = topLevelUlNode.SelectSingleNode(string.Format("li[@class='value']")).InnerText;
                 switch (tag)
                 {
                     case "00080020":
@@ -227,8 +230,9 @@ namespace MINTLoader
 
         private static string GetVal(XmlNode topLevelUlNode, string p, XmlNamespaceManager nsMan)
         {
-            var liNode = topLevelUlNode.SelectSingleNode(string.Format("ns:li[@class='{0}']", p), nsMan);
-            return liNode == null ? "" : liNode.InnerText;
+            //var liNode = topLevelUlNode.SelectSingleNode(string.Format("li[@class='{0}']", p));
+            //return liNode == null ? "" : liNode.InnerText;
+            return null;
         }
 
         private static string AllStudiesUri(string serviceUri)
