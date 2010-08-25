@@ -39,6 +39,7 @@ using ClearCanvas.Dicom.ServiceModel.Streaming;
 using ClearCanvas.ImageViewer.Common;
 using ClearCanvas.ImageViewer.Imaging;
 using ClearCanvas.ImageViewer.StudyManagement;
+using System.Collections.Generic;
 using System.Threading;
 using ClearCanvas.ImageViewer.StudyLoaders.Streaming;
 
@@ -189,8 +190,10 @@ namespace MINTLoader
 			public readonly int FrameNumber;
 			public readonly string TransferSyntaxUid;
 			public readonly Uri BaseUrl;
+            private MINTBinaryStream BinaryStream;
+            private bool UseBulkLoading;
 
-			public FramePixelDataRetriever(FramePixelData source)
+			public FramePixelDataRetriever(FramePixelData source, MINTBinaryStream binaryStream, bool useBulkLoading)
 			{
                 BaseUrl = source.Parent.BinaryUri;
 
@@ -199,6 +202,8 @@ namespace MINTLoader
 				SopInstanceUid = source.Parent.SopInstanceUid;
 				FrameNumber = source.FrameNumber;
 				TransferSyntaxUid = source.Parent.TransferSyntaxUid;
+                BinaryStream = binaryStream;
+                UseBulkLoading = useBulkLoading;
 			}
 
 			public RetrievePixelDataResult Retrieve()
@@ -219,8 +224,9 @@ namespace MINTLoader
 				const int retryTimeout = 1500;
 				int retryDelay = 50;
 				int retryCounter = 0;
-
-                MINTStreamingClient client = new MINTStreamingClient(this.BaseUrl);
+                
+                //Second parameter true to use bulk loading, false to load images one by one
+                MINTStreamingClient client = new MINTStreamingClient(this.BaseUrl, UseBulkLoading, BinaryStream);
 				RetrievePixelDataResult result = null;
 				lastRetrieveException = null;
 
@@ -309,7 +315,7 @@ namespace MINTLoader
 					//construct this object before the lock so there's no chance of deadlocking
 					//with the parent data source (because we are accessing it's tags at the 
 					//same time as it's trying to get the pixel data).
-					FramePixelDataRetriever retriever = new FramePixelDataRetriever(this);
+					FramePixelDataRetriever retriever = new FramePixelDataRetriever(this, Parent.binaryStream, Parent.useBulkLoading);
 
 					lock (_syncLock)
 					{
@@ -333,7 +339,7 @@ namespace MINTLoader
 				//construct this object before the lock so there's no chance of deadlocking
 				//with the parent data source (because we are accessing it's tags at the 
 				//same time as it's trying to get the pixel data).
-				FramePixelDataRetriever retriever = new FramePixelDataRetriever(this);
+				FramePixelDataRetriever retriever = new FramePixelDataRetriever(this, Parent.binaryStream, Parent.useBulkLoading);
 
 				lock (_syncLock)
 				{

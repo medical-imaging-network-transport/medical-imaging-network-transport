@@ -33,9 +33,11 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using ClearCanvas.Common;
 using ClearCanvas.Common.Utilities;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Cache;
 using ClearCanvas.Dicom.ServiceModel.Streaming;
@@ -49,14 +51,18 @@ namespace MINTLoader
     public class MINTStreamingClient
     {
         private readonly Uri _baseUri;
+        private bool _useBulkLoading;
+        private MINTBinaryStream _binaryStream;
 
         /// <summary>
         /// Creates an instance of <see cref="StreamingClient"/> to connect to a streaming server.
         /// </summary>
         /// <param name="baseUri">Base Uri to the location where the streaming server is located (eg http://localhost:1000/wado)</param>
-        public MINTStreamingClient(Uri baseUri)
+        public MINTStreamingClient(Uri baseUri, bool useBulkLoading, MINTBinaryStream binaryStream)
         {
             _baseUri = baseUri;
+            _useBulkLoading = useBulkLoading;
+            _binaryStream = binaryStream;
         }
 
         #region Public Methods
@@ -65,52 +71,71 @@ namespace MINTLoader
         {
 			try
 			{
-				CodeClock clock = new CodeClock();
-				clock.Start();
+                if (_useBulkLoading)
+                {
+                    //FrameStreamingResultMetaData result = new FrameStreamingResultMetaData();
 
-				FrameStreamingResultMetaData result = new FrameStreamingResultMetaData();
-				
+                    string[] uriSplit = Regex.Split(_baseUri.ToString(), "/");
+                    //Console.WriteLine("URI: " + _baseUri);
+                    //Console.WriteLine("binary item no: " + uriSplit[uriSplit.Length - 1]); 
+                    
+                    //byte[] binaryData = new byte[1000000];
+                    //_binaryItems.TryGetValue(1, out binaryData);
+                    int binaryItemNumber = Int32.Parse(uriSplit[uriSplit.Length - 1]);
+                    //byte[] binaryData = _binaryStream.GetBinaryData(binaryItemNumber);
+                    //result = _binaryStream.GetMetadata(binaryItemNumber);
 
-				result.Speed.Start();
+                    RetrievePixelDataResult pixelDataResult = new RetrievePixelDataResult(_binaryStream.GetBinaryData(binaryItemNumber), _binaryStream.GetMetadata(binaryItemNumber));
+                    return pixelDataResult;
+                }
+                else
+                {                    
+                    CodeClock clock = new CodeClock();
+                    clock.Start();
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_baseUri);
-                request.Timeout = 30000;
-				request.KeepAlive = false;
+                    FrameStreamingResultMetaData result = new FrameStreamingResultMetaData();
 
-				HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    result.Speed.Start();
 
-				if (response.StatusCode != HttpStatusCode.OK)
-				{
-					throw new StreamingClientException(response.StatusCode, HttpUtility.HtmlDecode(response.StatusDescription));
-				}
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_baseUri);
+                    request.Timeout = 30000;
+                    request.KeepAlive = false;
 
-				Stream responseStream = response.GetResponseStream();
-				BinaryReader reader = new BinaryReader(responseStream);
-				byte[] buffer = reader.ReadBytes((int) response.ContentLength);
-				reader.Close();
-				responseStream.Close();
-				response.Close();
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-				result.Speed.SetData(buffer.Length);
-				result.Speed.End();
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new StreamingClientException(response.StatusCode, HttpUtility.HtmlDecode(response.StatusDescription));
+                    }
 
-				result.ResponseMimeType = response.ContentType;
-				result.Status = response.StatusCode;
-				result.StatusDescription = response.StatusDescription;
-				result.Uri = response.ResponseUri;
-				result.ContentLength = buffer.Length;
-				result.IsLast = (response.Headers["IsLast"] != null && bool.Parse(response.Headers["IsLast"]));
+                    Stream responseStream = response.GetResponseStream();
+                    BinaryReader reader = new BinaryReader(responseStream);
+                    byte[] buffer = reader.ReadBytes((int)response.ContentLength);
+                    reader.Close();
+                    responseStream.Close();
+                    response.Close();
 
-				clock.Stop();
-				PerformanceReportBroker.PublishReport("MINT", "RetrievePixelData", clock.Seconds);
+                    result.Speed.SetData(buffer.Length);
+                    result.Speed.End();
 
-				RetrievePixelDataResult pixelDataResult;
-				if (response.Headers["Compressed"] != null && bool.Parse(response.Headers["Compressed"]))
-					pixelDataResult = new RetrievePixelDataResult(CreateCompressedPixelData(response, buffer), result);
-				else
-					pixelDataResult = new RetrievePixelDataResult(buffer, result);
+                    result.ResponseMimeType = response.ContentType;
+                    result.Status = response.StatusCode;
+                    result.StatusDescription = response.StatusDescription;
+                    result.Uri = response.ResponseUri;
+                    result.ContentLength = buffer.Length;
+                    result.IsLast = (response.Headers["IsLast"] != null && bool.Parse(response.Headers["IsLast"]));
 
-				return pixelDataResult;
+                    clock.Stop();
+                    PerformanceReportBroker.PublishReport("MINT", "RetrievePixelData", clock.Seconds);
+
+                    RetrievePixelDataResult pixelDataResult;
+                    if (response.Headers["Compressed"] != null && bool.Parse(response.Headers["Compressed"]))
+                        pixelDataResult = new RetrievePixelDataResult(CreateCompressedPixelData(response, buffer), result);
+                    else
+                        pixelDataResult = new RetrievePixelDataResult(buffer, result);
+
+                    return pixelDataResult;
+                }
 			}
 			catch (WebException ex)
 			{
@@ -133,6 +158,13 @@ namespace MINTLoader
 			Platform.CheckForEmptyString(studyInstanceUid, "studyInstanceUid");
 			Platform.CheckForEmptyString(seriesInstanceUid, "seriesInstanceUid");
 			Platform.CheckForEmptyString(sopInstanceUid, "sopInstanceUid");
+
+
+            Console.WriteLine("URI At this point: " + _baseUri);
+            Console.WriteLine("serverAE: " + serverAE);
+            Console.WriteLine("Study instance uid: " + studyInstanceUid);
+            Console.WriteLine("Series instance uid: " + seriesInstanceUid);
+            Console.WriteLine("sopInstanceUID: " + sopInstanceUid);
 
 			StringBuilder url = new StringBuilder();
 			if (_baseUri.ToString().EndsWith("/"))

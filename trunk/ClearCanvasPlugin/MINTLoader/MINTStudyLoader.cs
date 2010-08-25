@@ -14,6 +14,8 @@ namespace MINTLoader
     {
         private MINTApi.StudyKey _studyKey;
         private IEnumerator<InstanceMINTXml> _instances;
+        private MINTBinaryStream binaryStream;
+        private bool UseBulkLoading;
 
         public MINTStudyLoader()
             : base(MINTApi.LoaderName)
@@ -41,12 +43,20 @@ namespace MINTLoader
 
                 loadedInstances.AddInstance(patientId, patientsName, studyInstanceUid);
 
+                UseBulkLoading = true;
+                if (UseBulkLoading)
+                {
+                    binaryStream = new MINTBinaryStream();
+                    binaryStream.SetBaseURI(_studyKey.MetadataUri);
+                    binaryStream.RetrievePixelData();
+                }
                 return allInstances.Count;
 
             }
-            catch
+            catch(Exception e)
             {
-                result = EventResult.MajorFailure;
+                Console.WriteLine("EXCEPTION" + e.Message);
+                //result = EventResult.MajorFailure;
                 throw;
             }
             finally
@@ -65,7 +75,7 @@ namespace MINTLoader
             if (!_instances.MoveNext())
                 return null;
 
-            return new MINTSopDataSource(_instances.Current);
+            return new MINTSopDataSource(_instances.Current, binaryStream, UseBulkLoading);
 
         }
 

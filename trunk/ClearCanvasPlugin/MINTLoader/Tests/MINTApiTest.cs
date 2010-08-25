@@ -4,6 +4,7 @@
 
 using MINTLoader;
 using System.Collections.Generic;
+using System;
 using System.IO;
 using ClearCanvas.ImageViewer.StudyManagement;
 using ClearCanvas.Dicom.Iod;
@@ -226,6 +227,67 @@ namespace MINTUnitTest
             Assert.AreEqual("19920601", item.PatientsBirthDate);
             Assert.AreEqual("M", item.PatientsSex);
             Assert.AreEqual("7570281", item.StudyId);
+        }
+
+        static string studyBulkBinaryItems = "--BinaryItemBoundary-7afb50349c2148c3a5d6a324891a481c\n" +
+                                            "Content-Type: application/octet-stream\n" +
+                                            "Content-ID: <2660@6078eadb-5c2a-4d33-9221-b4f8363f32e7>\n" +
+                                            "Content-Length: 10\n" +
+                                            "\n" +
+                                            "JHH001002 \n" +            
+                                            "--BinaryItemBoundary-7afb50349c2148c3a5d6a324891a481c\n" +
+                                            "Content-Type: application/octet-stream\n" +
+                                            "Content-ID: <2661@6078eadb-5c2a-4d33-9221-b4f8363f32e7>\n" +
+                                            "Content-Length: 10\n" +
+                                            "\n" +
+                                            "emageonjhu\n" +
+                                            "--BinaryItemBoundary-7afb50349c2148c3a5d6a324891a481c\n" +
+                                            "Content-Type: application/octet-stream\n" +
+                                            "Content-ID: <2662@6078eadb-5c2a-4d33-9221-b4f8363f32e7>\n" +
+                                            "Content-Length: 6\n" +
+                                            "\n" +
+                                            "Series\n" +
+                                            "--BinaryItemBoundary-7afb50349c2148c3a5d6a324891a481c--\n";
+
+        /// <summary>
+        ///A test for MINTBinaryStreamReader
+        ///</summary>
+        [Test]
+        public void BinaryStreamReaderTest()
+        {
+            Stream binaryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(studyBulkBinaryItems)); 
+            MINTBinaryStreamReader stream = new MINTBinaryStreamReader(binaryStream);
+            Dictionary<int, byte[]> readIn = new Dictionary<int, byte[]>();
+            readIn = stream.ReadStream();
+            Dictionary<int, byte[]> initial = new Dictionary<int, byte[]>();
+            byte[] binaryData = new byte[10];
+            binaryData = System.Text.Encoding.UTF8.GetBytes("JHH001002 ");
+            byte[] outputData = new byte[10];
+            readIn.TryGetValue(2661, out outputData);
+            Assert.AreEqual(binaryData, outputData);
+
+            binaryData = new byte[10];
+            binaryData = System.Text.Encoding.UTF8.GetBytes("emageonjhu");
+            outputData = new byte[10];
+            readIn.TryGetValue(2660, out outputData);
+            Assert.AreEqual(binaryData, outputData);
+
+            binaryData = new byte[6];
+            binaryData = System.Text.Encoding.UTF8.GetBytes("Series");
+            outputData = new byte[6];
+            readIn.TryGetValue(2660, out outputData);
+            Assert.AreEqual(binaryData, outputData);
+            /*
+            initial.Add(2660, binaryData);
+            binaryData = new byte[10];
+            binaryData = System.Text.Encoding.UTF8.GetBytes("emageonjhu");
+            initial.Add(2661, binaryData);
+            binaryData = new byte[10];
+            binaryData = System.Text.Encoding.UTF8.GetBytes("Series");
+            initial.Add(2662, binaryData); */
+            //byte[] initial = new System.Text.UTF8Encoding().GetBytes(binaryitem10char);
+           // byte[] initial = BitConverter.GetBytes(2660);
+           
         }
     }
 }
