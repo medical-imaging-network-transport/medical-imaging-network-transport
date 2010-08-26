@@ -25,12 +25,29 @@ public class MINTBinaryStreamReader
 	 * @param binaryAddress
 	 * @throws MalformedURLException
 	 */
-	public MINTBinaryStreamReader(URL binaryAddress) throws MalformedURLException 
+	public MINTBinaryStreamReader() 
 	{
-		BinaryAddress = new URL(binaryAddress, "all");
 		String crlf = "\r\n";
 		crlfByte = crlf.getBytes();
 		binaryItems = new Hashtable<Integer, byte[]>();
+	}
+	
+	/**
+	 * Default constructor.
+	 * @param binaryAddress
+	 * @throws MalformedURLException
+	 */
+	public MINTBinaryStreamReader(URL binaryAddress) throws MalformedURLException 
+	{
+		SetAddress(binaryAddress);
+		String crlf = "\r\n";
+		crlfByte = crlf.getBytes();
+		binaryItems = new Hashtable<Integer, byte[]>();
+	}
+	
+	public void SetAddress(URL binaryAddress) throws MalformedURLException
+	{
+		BinaryAddress = new URL(binaryAddress, "all");
 	}
 	
 	/**
@@ -95,7 +112,7 @@ public class MINTBinaryStreamReader
 	 */
 	public byte[] readBinaryData(InputStream inputStream, int contentLength) throws IOException
 	{
-		byte[] binaryData = new byte[contentLength];
+		final byte[] binaryData = new byte[contentLength];
 
 		// Try to read contentLength many bytes
 		int readBytes = inputStream.read(binaryData, 0, contentLength);
@@ -132,18 +149,23 @@ public class MINTBinaryStreamReader
 		return binaryItems.get(contentID);
 	}
 	
+	
+	public void readHttpStream() throws IOException
+	{
+		URLConnection binaryAddressConnection = BinaryAddress.openConnection(); 
+		InputStream inputStream = binaryAddressConnection.getInputStream();
+		readStream(inputStream);
+	}
+	
+	
 	/**
 	 * readStream function. Main driver for the bulk loading section, creates an input stream to the URL of bulk items, 
 	 * and reads the header information and calls helper functions to extract information.
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public void readStream() throws IOException
+	public void readStream(InputStream inputStream) throws IOException
 	{
-		URLConnection binaryAddressConnection = BinaryAddress.openConnection();
-		 
-		InputStream inputStream = binaryAddressConnection.getInputStream();
-
 		String delimiterLine = new String();
 		String contentTypeLine = new String();
 		String contentIDLine = new String();
@@ -194,7 +216,6 @@ public class MINTBinaryStreamReader
 			{
 				break;
 			}
-			
 		}
 	}
 }
