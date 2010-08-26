@@ -88,7 +88,7 @@ public class MINT2DICOM
 		                {
 		                	//Get the data and put in the object
 		                	//Here we again use the binary reader class we created, though we only use the functionality to 
-		                	//read binary data from a stream fiven the content length
+		                	//read binary data from a stream given the content length
 			                currentObject.putBytes(newAttribute.getTag(), getVR(newAttribute.getVr()), binaryReader.readBinaryData(temp.getInputStream(), contentLength));
 			            }
             		}
@@ -205,7 +205,7 @@ public class MINT2DICOM
         {
         	try 
         	{
-				binaryReader.readStream();
+				binaryReader.readHttpStream();
 			} 
         	catch (IOException e) 
 			{
