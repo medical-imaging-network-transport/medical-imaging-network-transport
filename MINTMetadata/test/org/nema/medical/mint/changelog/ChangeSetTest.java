@@ -1,7 +1,6 @@
 package org.nema.medical.mint.changelog;
 
 import org.junit.Test;
-import org.nema.medical.mint.metadata.StudyIO;
 
 public class ChangeSetTest {
 
