@@ -116,6 +116,8 @@ Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Insta
 
 The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py] tool is a smart python application that compares a DICOM study to a MINT study by parsing the data elements in the DICOM and comparing them to the metadata and binary items in the MINT study.
 
+There are some subtle differences between the DICOM and MINT representations if you are using another tool for comparison. Some Binary VRs are represented as text in MINT for clarity ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT") so the values will not compare directly to the DICOM binaries. Arrays of these primitive types are represented as strings with the values separated by a "\" delimiter (ie. 208.55017\166.19896). Note that the precision for floating point representations is set to 6.
+
 Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
 
 Running the tool with no arguments displays the usage:
@@ -173,6 +175,7 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    * Provide support for inline binary
    * Use DCM4CHE data dictionary
    * Provide support for bulk binary
+   * Add flag for changing the floating point precision
    * SAX parsing for large metadata files (?)
    * Comparisons before and after updates
    * Support multi-frame DICOM
