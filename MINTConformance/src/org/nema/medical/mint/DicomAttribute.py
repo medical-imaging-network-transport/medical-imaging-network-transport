@@ -131,9 +131,9 @@ class DicomAttribute():
    def isPixelData(self)      : return self.__tag == self.PIXEL_DATA_TAG
    def isPart10Header(self)   : return int(self.group(),16) < 8
    def isTransferSyntax(self) : return self.__tag == self.TRANSFER_SYNTAX_UID_TAG
-   def isUnknown(self)        : return self.__vr == "UN" and not self.isTransferSyntax()
+   def isUnknown(self)        : return self.__vr == "UN"
    def isPrivate(self)        : return int(self.group(),16) % 2 != 0
-   def isBinary(self)         : return (self.__vr in self.binaryVRs or self.__tag == self.PIXEL_DATA_TAG) and not self.isTransferSyntax()
+   def isBinary(self)         : return (self.__vr in self.binaryVRs or self.__tag == self.PIXEL_DATA_TAG)
    def isItemStart(self)      : return self.__tag == self.ITEM_TAG
    def isItemStop(self)       : return self.__tag == self.ITEM_DELIMITATION_TAG
    def isSequencStart(self)   : return self.__ve == "SQ"
@@ -173,42 +173,26 @@ class DicomAttribute():
    def __readVal(self, dcm, endian):
       
        # Check for undefined length
-       if self.__vl == 0xffffffff:
-          return
+       if self.__vl == 0xffffffff: return
           
        self.__val=dcm.read(self.__vl)
           
        # Signed Short
-       if   self.__vr=="SS":
-          self.__val = self.__val2str(2, "h", "%d")
-
+       if   self.__vr=="SS": self.__val = self.__val2str(2, "h", "%d")
        # Unsigned Short
-       elif self.__vr=="US":
-          self.__val = self.__val2str(2, "H", "%d")
-
+       elif self.__vr=="US": self.__val = self.__val2str(2, "H", "%d")
        # Signed Long
-       elif self.__vr=="SL":
-          self.__val = self.__val2str(4, "l", "%d")
-          
+       elif self.__vr=="SL": self.__val = self.__val2str(4, "l", "%d")
        # Unsigned Long
-       elif self.__vr=="UL":
-          self.__val = self.__val2str(4, "L", "%d")
-
+       elif self.__vr=="UL": self.__val = self.__val2str(4, "L", "%d")
        # Single Precision Float
-       elif self.__vr=="FL":
-          self.__val = self.__val2str(4, "f", "%.5f")
-
+       elif self.__vr=="FL": self.__val = self.__val2str(4, "f", "%.5f")
        # Double Precision Float
-       elif self.__vr=="FD":
-          self.__val = self.__val2str(8, "d", "%.5f")
-          
+       elif self.__vr=="FD": self.__val = self.__val2str(8, "d", "%.5f")
        # TODO: Other Float 4 FLOAT
-       elif self.__vr=="OF":                       
-          self.__val = self.__val2str(4, "f", "%.5f")
-
+       elif self.__vr=="OF": self.__val = self.__val2str(4, "f", "%.5f")
        # Attribute Tag 4 ULONG
-       elif self.__vr=="AT":                       
-          self.__val = self.__val2str(4, "L", "%d")
+       elif self.__vr=="AT": self.__val = self.__val2str(4, "L", "%d")
           
        elif self.isBinary():
           self.__val = unpack('B'*len(self.__val), self.__val)

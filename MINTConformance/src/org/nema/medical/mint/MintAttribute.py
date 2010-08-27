@@ -68,11 +68,8 @@ class MintAttribute():
    
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
-   def toString(self):
-       return self.__str__()
-       
-   def __str__(self):
-       s = "tag="+self.__tag+" vr="+self.__vr
+   def toString(self, indent=""):
+       s = indent+"tag="+self.__tag+" vr="+self.__vr
        if self.__val != "":
           s += " val="+self.__val
        if self.__bid != None:
@@ -80,11 +77,23 @@ class MintAttribute():
 
        numItems = self.numItems()
        for i in range(0, numItems):
-           s += "\n - Item\n"
+           indent += " "
+           s += "\n"+indent+"- Item\n"
            numItemAttributes = self.numItemAttributes(i)
-           s += "  - Attributes\n"
-           for j in range(0, numItemAttributes):          
-               s += "     "+self.itemAttribute(i, j).toString()+'\n'
-
+           indent += " "
+           s += indent+"- Attributes\n"
+           indent += " "
+           for j in range(0, numItemAttributes):
+               s += self.itemAttribute(i, j).toString(indent)+"\n"
+           #s += self.itemAttribute(i, numItemAttributes-1).toString(indent)
+           indent = indent[0:-1]
+           s += indent+"- Attributes\n"
+           indent = indent[0:-1]
+           s += indent+"- Item"
+           indent = indent[0:-1]
+           
        return s
+
+   def __str__(self):
+       return self.toString()
        

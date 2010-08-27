@@ -112,8 +112,29 @@ class MintSeries():
                 attr = instance.find(tag)           
        return attr
        
-   def toString(self):
-       return self.__str__()
+   def toString(self, indent=""):
+       s  = indent+"- Series Instance UID=" + self.__seriesInstanceUID + '\n'
+       indent += " "
+       s += indent+"- Attributes\n"       
+       indent += " "
+       numAttributes = self.numAttributes()
+       for n in range(0, numAttributes):
+           s += self.attribute(n).toString(indent)+'\n'
+
+       s += indent+"- Normalized Instance Attributes\n"
+       indent += " "
+       numNormalizedInstanceAttributes = self.numNormalizedInstanceAttributes()
+       for n in range(0, numNormalizedInstanceAttributes):
+           s += self.normalizedInstanceAttribute(n).toString(indent)+'\n'
+       s += indent+"- Instances\n"
+       indent += " "
+       numInstances = self.numInstances()
+       for n in range(0, numInstances):
+           instance = self.instance(n)
+           s += instance.toString(indent)
+       indent = indent[0:-1]
+       
+       return s
        
    def __read(self, root):
        self.__seriesInstanceUID = root.attributeWithName("seriesInstanceUID")
@@ -155,22 +176,4 @@ class MintSeries():
        self.__sopInstanceUIDs.sort()
 
    def __str__(self):
-       s  = "  - Series Instance UID=" + self.__seriesInstanceUID + '\n'
-       
-       s += "   - Attributes\n"       
-       numAttributes = self.numAttributes()
-       for n in range(0, numAttributes):
-           s += "      "+self.attribute(n).toString()+'\n'
-
-       s += "   - Normalized Instance Attributes\n"
-       numNormalizedInstanceAttributes = self.numNormalizedInstanceAttributes()
-       for n in range(0, numNormalizedInstanceAttributes):
-           s += "      "+self.normalizedInstanceAttribute(n).toString()+'\n'
-
-       s += "   - Instances\n"
-       numInstances = self.numInstances()
-       for n in range(0, numInstances):
-           instance = self.instance(n)
-           s += instance.toString()
-
-       return s
+       return self.__str__()
