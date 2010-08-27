@@ -41,29 +41,27 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 # DicomInstance
 # -----------------------------------------------------------------------------
 class DicomInstance():
-   def __init__(self, dcmName, transferSyntax=""):
+   def __init__(self, dcmName):
      
        self.__dcmName = dcmName
        self.__attributes = {}
        self.__tags = []
        self.__explicit = False
        self.__endian = "<" # Default little endian
-       self.__transferSyntaxOverride = False
-       self.__setTransferSyntax(transferSyntax)
        
        self.__open()
        
    def studyInstanceUID(self):
-       attb = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
-       return attb.val()
+       attr = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
+       return attr.val()
        
    def seriesInstanceUID(self):
-       attb = self.attributeByTag(SERIES_INSTANCE_UID_TAG)
-       return attb.val()
+       attr = self.attributeByTag(SERIES_INSTANCE_UID_TAG)
+       return attr.val()
 
    def sopInstanceUID(self):
-       attb = self.attributeByTag(SOP_INSTANCE_UID_TAG)
-       return attb.val()
+       attr = self.attributeByTag(SOP_INSTANCE_UID_TAG)
+       return attr.val()
        
    def isExplicit(self):
        return self.__explicit
@@ -94,8 +92,8 @@ class DicomInstance():
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
            tag = self.tag(n)
-           attb = self.attributeByTag(tag)
-           print attb
+           attr = self.attributeByTag(tag)
+           print attr
            
    def __open(self):
        dcm = open(self.__dcmName, "rb")
@@ -110,41 +108,31 @@ class DicomInstance():
        # ---
        # Read data elements
        # ---
-       attb = DicomAttribute(dcm, self.__explicit, self.__endian)
-       while attb.isValid():
-          self.__attributes[attb.tag()] = attb
-          
-          # ---
-          # Check for transfer syntax.
-          # ---
-          if attb.isTransferSyntax() and not self.__transferSyntaxOverride:
-             self.__setTransferSyntax(attb.val())
-                
-          attb = DicomAttribute(dcm, self.__explicit, self.__endian)
+       attr = DicomAttribute(dcm, self.__explicit, self.__endian)
+       while attr.isValid():
+          self.__attributes[attr.tag()] = attr
+          if attr.isTransferSyntax(): self.__setTransferSyntax(attr.val()) 
+          attr = DicomAttribute(dcm, self.__explicit, self.__endian)
 
        dcm.close()
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
    
    def __setTransferSyntax(self, transferSyntax):
-       if transferSyntax == "":
-          return
-          
-       if transferSyntax == DicomAttribute.IMPLICIT_VR_LITTLE_ENDIAN:
-          self.__explicit = False
-          self.__endian   = "<"
-       elif transferSyntax == DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN:
+       if transferSyntax == DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN:
           self.__explicit = True    
           self.__endian   = "<" 
        elif transferSyntax == DicomAttribute.EXPLICIT_VR_BIG_ENDIAN:
           self.__explicit = True    
           self.__endian   = ">"
-       self.__transferSyntaxOverride = True
-   
-   def __attb(self, tag, index):
-       if self.__attbs.has_key(tag):
-          attbs = self.__attbs[tag]
-          return attbs[index]
+       else:
+          self.__explicit = False
+          self.__endian   = "<"
+       
+   def __attr(self, tag, index):
+       if self.__attrs.has_key(tag):
+          attrs = self.__attrs[tag]
+          return attrs[index]
        else:
           None
        
@@ -153,22 +141,8 @@ class DicomInstance():
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "iebh")
+    (options, args)=getopt.getopt(sys.argv[1:], "h")
     
-    # ---
-    # Check for transfer syntax.
-    # ---
-    transferSyntax = ""
-    for opt in options:
-        if opt[0] == "-i":
-           transferSyntax = DicomAttribute.IMPLICIT_VR_LITTLE_ENDIAN
-    for opt in options:
-        if opt[0] == "-e":
-           transferSyntax = DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN
-    for opt in options:
-        if opt[0] == "-b":
-           transferSyntax = DicomAttribute.EXPLICIT_VR_BIG_ENDIAN
-           
     # ---
     # Check for help option.
     # ---
@@ -180,9 +154,6 @@ def main():
     try:
        if len(args) != 1 or help:
           print "Usage", progName, "[options] <dicom_file>"
-          print "  -i: implicit VR little endian"
-          print "  -e: explicit VR little endian"
-          print "  -b: explicit VR big endian"
           print "  -h: displays usage"
           sys.exit(1)
           
@@ -190,7 +161,7 @@ def main():
        # Read dicom.
        # ---
        dcmName = args[0];
-       instance = DicomInstance(dcmName, transferSyntax)
+       instance = DicomInstance(dcmName)
        instance._print()
                         
     except Exception, exception:

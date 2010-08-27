@@ -129,6 +129,25 @@ class MintStudy():
              attr = series.find(tag, sopInstanceUID)
        return attr
        
+   def toString(self, indent=""):
+       s =  indent+"- Study Instance UID="+self.__studyInstanceUID+'\n'
+       indent += " "
+       s += indent+"- xmlns="+self.xmlns()+"\n"
+       s += indent+"- Attributes\n"
+       indent += " "
+       numAttributes = self.numAttributes()
+       for n in range(0, numAttributes):
+           s += self.attribute(n).toString(indent)+'\n'
+              
+       s += indent+"- Series List\n"
+       indent += " "
+       numSeries = self.numSeries()
+       for n in range(0, numSeries):
+           s += self.series(n).toString(indent)
+       indent = indent[0:-1]
+
+       return s
+
    def __readFromFile(self, metadataName):
        self.__xml.readFromFile(metadataName)
       
@@ -160,21 +179,7 @@ class MintStudy():
           self.__seriesInstanceUIDs.sort()
        
    def __str__(self):
-       s =  "- Study Instance UID="+self.__studyInstanceUID+'\n'
-       s += " - xmlns="+self.xmlns()+"\n"
-       s += " - Attributes\n"
-       
-       numAttributes = self.numAttributes()
-       for n in range(0, numAttributes):
-           s += "    "+self.attribute(n).toString()+'\n'
-              
-       s += " - Series List\n"
-
-       numSeries = self.numSeries()
-       for n in range(0, numSeries):
-           s += self.series(n).toString()
-
-       return s
+       return self.toString()
        
 # -----------------------------------------------------------------------------
 # main
