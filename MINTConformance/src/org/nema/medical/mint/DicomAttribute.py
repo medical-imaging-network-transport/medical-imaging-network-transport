@@ -127,16 +127,17 @@ class DicomAttribute():
    def numItemAttributes(self, i): return len(self.item(i))
    def itemAttribute(self, i, j): return self.item(i)[j]
           
-   def isValid(self)        : return self.__tag != None
-   def isPixelData(self)    : return self.__tag == self.PIXEL_DATA_TAG
-   def isPart10Header(self) : return int(self.group(),16) < 8
-   def isUnknown(self)      : return self.__vr == "UN"
-   def isPrivate(self)      : return int(self.group(),16) % 2 != 0
-   def isBinary(self)       : return self.__vr in self.binaryVRs or self.__tag == self.PIXEL_DATA_TAG
-   def isItemStart(self)    : return self.__tag == self.ITEM_TAG
-   def isItemStop(self)     : return self.__tag == self.ITEM_DELIMITATION_TAG
-   def isSequencStart(self) : return self.__ve == "SQ"
-   def isSequenceStop(self) : return self.__tag == self.SQ_DELIMITATION_TAG
+   def isValid(self)          : return self.__tag != None
+   def isPixelData(self)      : return self.__tag == self.PIXEL_DATA_TAG
+   def isPart10Header(self)   : return int(self.group(),16) < 8
+   def isTransferSyntax(self) : return self.__tag == self.TRANSFER_SYNTAX_UID_TAG
+   def isUnknown(self)        : return self.__vr == "UN" and not self.isTransferSyntax()
+   def isPrivate(self)        : return int(self.group(),16) % 2 != 0
+   def isBinary(self)         : return (self.__vr in self.binaryVRs or self.__tag == self.PIXEL_DATA_TAG) and not self.isTransferSyntax()
+   def isItemStart(self)      : return self.__tag == self.ITEM_TAG
+   def isItemStop(self)       : return self.__tag == self.ITEM_DELIMITATION_TAG
+   def isSequencStart(self)   : return self.__ve == "SQ"
+   def isSequenceStop(self)   : return self.__tag == self.SQ_DELIMITATION_TAG
 
    def toString(self, indent=""):
        s = "tag="+self.__tag+" vr="+self.__vr+" val= "
@@ -165,10 +166,12 @@ class DicomAttribute():
           elif self.__val != "":
              s += self.__val
 
+       s += " # "+self.tagName()
+       
        return s
        
    def __readVal(self, dcm, endian):
-   
+      
        # Check for undefined length
        if self.__vl == 0xffffffff:
           return
@@ -245,11 +248,16 @@ class DicomAttribute():
    def __str__(self):
        return self.toString()
 
+   TRANSFER_SYNTAX_UID_TAG = "00020010"
    PIXEL_DATA_TAG          = "7fe00010"
    ITEM_TAG                = "fffee000"
    ITEM_DELIMITATION_TAG   = "fffee00d"
    SQ_DELIMITATION_TAG     = "fffee0dd"
    
+   IMPLICIT_VR_LITTLE_ENDIAN = "1.2.840.10008.1.2"
+   EXPLICIT_VR_LITTLE_ENDIAN = "1.2.840.10008.1.2.1"
+   EXPLICIT_VR_BIG_ENDIAN    = "1.2.840.10008.1.2.2" 
+
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN")
 

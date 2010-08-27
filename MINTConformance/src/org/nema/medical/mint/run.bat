@@ -15,6 +15,9 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 echo "Parse a DICOM Instance..."
 %PYTHON% %MC_HOME%\%MC_SRC%\DicomInstance.py %MC_HOME%\%MC_DICOM%\1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037.dcm
 
+echo "Parse a DICOM Instance (with sequences)..."
+%PYTHON% %MC_HOME%\%MC_SRC%\DicomInstance.py -e %MC_HOME%\%MC_DICOM_MINT_SQ%\2.16.840.1.114255.187086712.1704407169.30043.44.00004461237.dcm
+
 echo "Parse a DICOM Study..."
 %PYTHON% %MC_HOME%\%MC_SRC%\DicomStudy.py %MC_HOME%\%MC_DICOM%
 
@@ -31,4 +34,4 @@ echo "Compare MINT Studies (with sequences)..."
 %PYTHON% %MC_HOME%\%MC_SRC%\MintStudyCompare.py -v %MC_HOME%\%MC_DICOM_MINT_SQ%\metadata.xml %MC_HOME%\%MC_DICOM_MINT_SQ%\metadata.xml
 
 echo "Compare DICOM to MINT..."
-%PYTHON% %MC_HOME%\%MC_SRC%\MintDicomCompare.py %MC_HOME%\%MC_DICOM% %MC_HOME%\%MC_MINT%\metadata.xml
+%PYTHON% %MC_HOME%\%MC_SRC%\MintDicomCompare.py -v %MC_HOME%\%MC_DICOM% %MC_HOME%\%MC_MINT%\metadata.xml
