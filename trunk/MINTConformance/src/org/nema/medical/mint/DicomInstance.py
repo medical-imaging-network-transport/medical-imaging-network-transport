@@ -41,11 +41,17 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 # DicomInstance
 # -----------------------------------------------------------------------------
 class DicomInstance():
-   def __init__(self, dcmName):
+   def __init__(self, dcmName, transferSyntax=""):
+     
        self.__dcmName = dcmName
        self.__attributes = {}
        self.__tags = []
-       self.__open()   
+       self.__explicit = False
+       self.__endian = "<" # Default little endian
+       self.__transferSyntaxOverride = False
+       self.__setTransferSyntax(transferSyntax)
+       
+       self.__open()
        
    def studyInstanceUID(self):
        attb = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
@@ -59,6 +65,9 @@ class DicomInstance():
        attb = self.attributeByTag(SOP_INSTANCE_UID_TAG)
        return attb.val()
        
+   def isExplicit(self):
+       return self.__explicit
+                        
    def numAttributes(self):
        return len(self.__tags)
        
@@ -80,10 +89,7 @@ class DicomInstance():
           return self.__attributes[tag]
        else:
           return None
-       
-   def isExplicit(self) : return False # TODO: Discover if VR is explicit
-   def endian(self)     : return "<"   # TODO: Discover endianness
-
+   
    def _print(self):
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
@@ -104,17 +110,37 @@ class DicomInstance():
        # ---
        # Read data elements
        # ---
-       explicit = self.isExplicit()
-       endian = self.endian()
-       attb = DicomAttribute(dcm, explicit, endian)
+       attb = DicomAttribute(dcm, self.__explicit, self.__endian)
        while attb.isValid():
           self.__attributes[attb.tag()] = attb
-          attb = DicomAttribute(dcm, explicit, endian)
+          
+          # ---
+          # Check for transfer syntax.
+          # ---
+          if attb.isTransferSyntax() and not self.__transferSyntaxOverride:
+             self.__setTransferSyntax(attb.val())
+                
+          attb = DicomAttribute(dcm, self.__explicit, self.__endian)
 
        dcm.close()
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
-      
+   
+   def __setTransferSyntax(self, transferSyntax):
+       if transferSyntax == "":
+          return
+          
+       if transferSyntax == DicomAttribute.IMPLICIT_VR_LITTLE_ENDIAN:
+          self.__explicit = False
+          self.__endian   = "<"
+       elif transferSyntax == DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN:
+          self.__explicit = True    
+          self.__endian   = "<" 
+       elif transferSyntax == DicomAttribute.EXPLICIT_VR_BIG_ENDIAN:
+          self.__explicit = True    
+          self.__endian   = ">"
+       self.__transferSyntaxOverride = True
+   
    def __attb(self, tag, index):
        if self.__attbs.has_key(tag):
           attbs = self.__attbs[tag]
@@ -126,19 +152,45 @@ class DicomInstance():
 # main
 # -----------------------------------------------------------------------------
 def main():
-    progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "")
+    progName = os.path.basename(sys.argv[0])
+    (options, args)=getopt.getopt(sys.argv[1:], "iebh")
+    
+    # ---
+    # Check for transfer syntax.
+    # ---
+    transferSyntax = ""
+    for opt in options:
+        if opt[0] == "-i":
+           transferSyntax = DicomAttribute.IMPLICIT_VR_LITTLE_ENDIAN
+    for opt in options:
+        if opt[0] == "-e":
+           transferSyntax = DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN
+    for opt in options:
+        if opt[0] == "-b":
+           transferSyntax = DicomAttribute.EXPLICIT_VR_BIG_ENDIAN
+           
+    # ---
+    # Check for help option.
+    # ---
+    help = False
+    for opt in options:
+        if opt[0] == "-h":
+           help = True
     
     try:
-       if len(args) != 1:
-          print "Usage", progName, "<dicom_file>"
+       if len(args) != 1 or help:
+          print "Usage", progName, "[options] <dicom_file>"
+          print "  -i: implicit VR little endian"
+          print "  -e: explicit VR little endian"
+          print "  -b: explicit VR big endian"
+          print "  -h: displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
-       dcmName = sys.argv[1];
-       instance = DicomInstance(dcmName)
+       dcmName = args[0];
+       instance = DicomInstance(dcmName, transferSyntax)
        instance._print()
                         
     except Exception, exception:
