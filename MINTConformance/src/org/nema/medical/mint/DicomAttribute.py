@@ -53,8 +53,10 @@ class DicomAttribute():
        # ---
        # If explicit or Part 10 header tag then read the VR.
        # ---
-       self.__vr=""    
-       if explicit or self.isPart10Header():
+       self.__vr=""
+       if self.isItemStart() or self.isItemStop() or self.isSequenceStop():
+          pass # no VR
+       elif explicit or self.isPart10Header():
           self.__vr=dcm.read(2)
                  
        # ---
@@ -73,67 +75,24 @@ class DicomAttribute():
           vl=dcm.read(4)
           vl = unpack(endian+"L", vl)
        self.__vl=vl[0]
-          
+
+       # ---
+       # Read Sequence Data Elements
+       # ---
        if self.__vr == "SQ":
-          pass
-          #   itemGroup=dcm.read(2)
-          #   itemElement=dcm.read(2)
-          #   itemTag=self.__getTag(itemGroup, itemElement)             
-          #   itemVl=dcm.read(4)
-          #   itemVl=unpack(endian+"L", itemVl)
-          #
-          #   print "\n - item tag =", itemTag, "vl =", itemVl[0]
-          #
-          #   return ( itemTag, vr, self.__readAttribute(dcm) )
+          item = DicomAttribute(dcm, True, endian)
+          while not item.isSequenceStop():
+             attrs = []
+             self.__items.append(attrs)
+             itemAttr = DicomAttribute(dcm, True, endian)
+             while not itemAttr.isItemStop():
+                 attrs.append(itemAttr)
+                 itemAttr = DicomAttribute(dcm, True, endian)
+             item = DicomAttribute(dcm, True, endian)
 
-       # ---
        # Read the val
-       # ---
-       self.__val=dcm.read(self.__vl)
+       self.__readVal(dcm, endian)
           
-       # Signed Short
-       if   self.__vr=="SS":
-          self.__val = str(unpack(endian+"h", self.__val)[0])
-
-       # Unsigned Short
-       elif self.__vr=="US":
-          self.__val = str(unpack(endian+"H", self.__val)[0])
-
-       # Signed Long
-       elif self.__vr=="SL":
-          self.__val = str(unpack(endian+"l", self.__val)[0])
-
-       # Unsigned Long
-       elif self.__vr=="UL":
-          self.__val = str(unpack(endian+"L", self.__val)[0])
-
-       # Single Precision Float
-       elif self.__vr=="FL":
-          self.__val = str(unpack(endian+"f", self.__val)[0])
-
-       # Double Precision Float
-       elif self.__vr=="FD":
-          self.__val = str(unpack(endian+"d", self.__val)[0])
-          
-       # TODO: Other Float 4 FLOAT
-       elif self.__vr=="OF":                       
-          self.__val = str(unpack(endian+"f", self.__val)[0])
-
-       # Attribute Tag 4 ULONG
-       elif self.__vr=="AT":                       
-          self.__val = str(unpack(endian+"L", self.__val)[0])
-          
-       elif self.isBinary():
-          self.__val = unpack('B'*len(self.__val), self.__val)
-          self.__vl = len(self.__val)
-          
-       else:
-          self.__val = self.__val[0:self.__vl]
-          if len(self.__val) > 0 and not self.__val[-1].isalnum():
-             self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
-          self.__val = self.__val.rstrip() # strip whitespace
-          self.__vl = len(self.__val) # reset length
-                                    
    def group(self)   : return self.__tag[0:4]
    def element(self) : return self.__tag[4:]
    def tag(self)     : return self.__tag;
@@ -174,10 +133,91 @@ class DicomAttribute():
    def isUnknown(self)      : return self.__vr == "UN"
    def isPrivate(self)      : return int(self.group(),16) % 2 != 0
    def isBinary(self)       : return self.__vr in self.binaryVRs or self.__tag == self.PIXEL_DATA_TAG
-      
-   def toString(self):
-       return self.__str__()
+   def isItemStart(self)    : return self.__tag == self.ITEM_TAG
+   def isItemStop(self)     : return self.__tag == self.ITEM_DELIMITATION_TAG
+   def isSequencStart(self) : return self.__ve == "SQ"
+   def isSequenceStop(self) : return self.__tag == self.SQ_DELIMITATION_TAG
+
+   def toString(self, indent=""):
+       s = "tag="+self.__tag+" vr="+self.__vr+" val= "
+
+       if self.__vr == "SQ":
+          indent += " "
+          numItems = self.numItems()
+          for i in range(0, numItems):
+              s += "\n"+indent+"- Item\n"
+              numItemAttributes = self.numItemAttributes(i)
+              indent += " "
+              s += indent+"- Attributes\n"
+              indent += " "
+              for j in range(0, numItemAttributes-1):
+                s += indent+"- "+self.itemAttribute(i, j).toString(indent)+"\n"
+              s += indent+"- "+self.itemAttribute(i, numItemAttributes-1).toString(indent)
+              indent = indent[0:-2]
+
+       elif self.__val != "":
+          if self.isPixelData():
+             s += "<Pixel Data>"
+          elif self.isBinary():
+             s += "<Binary Data>"
+          elif self.isUnknown():
+             s += "<Unknown>"
+          elif self.__val != "":
+             s += self.__val
+
+       return s
        
+   def __readVal(self, dcm, endian):
+   
+       # Check for undefined length
+       if self.__vl == 0xffffffff:
+          return
+          
+       self.__val=dcm.read(self.__vl)
+          
+       # Signed Short
+       if   self.__vr=="SS":
+          self.__val = self.__val2str(2, "h", "%d")
+
+       # Unsigned Short
+       elif self.__vr=="US":
+          self.__val = self.__val2str(2, "H", "%d")
+
+       # Signed Long
+       elif self.__vr=="SL":
+          self.__val = self.__val2str(4, "l", "%d")
+          
+       # Unsigned Long
+       elif self.__vr=="UL":
+          self.__val = self.__val2str(4, "L", "%d")
+
+       # Single Precision Float
+       elif self.__vr=="FL":
+          self.__val = self.__val2str(4, "f", "%.5f")
+
+       # Double Precision Float
+       elif self.__vr=="FD":
+          self.__val = self.__val2str(8, "d", "%.5f")
+          
+       # TODO: Other Float 4 FLOAT
+       elif self.__vr=="OF":                       
+          self.__val = self.__val2str(4, "f", "%.5f")
+
+       # Attribute Tag 4 ULONG
+       elif self.__vr=="AT":                       
+          self.__val = self.__val2str(4, "L", "%d")
+          
+       elif self.isBinary():
+          self.__val = unpack('B'*len(self.__val), self.__val)
+          self.__vl = len(self.__val)
+          
+       else:
+          self.__val = self.__val[0:self.__vl]
+          if len(self.__val) > 0 and not self.__val[-1].isalnum():
+             self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
+          self.__val = self.__val.rstrip() # strip whitespace
+          self.__vl = len(self.__val) # reset length
+
    def __bin2str(self, b):
        h = hex(b[0])
        s = str(h).replace("0x", "")
@@ -193,25 +233,23 @@ class DicomAttribute():
        s = s.lower()
        return s
 
+   def __val2str(self, size, type, format):
+       vals = ""
+       numVals = self.__vl / size
+       for n in range(0, numVals):
+           i = n * size
+           val = unpack(self.__endian+type, self.__val[i:i+size])[0]
+           vals += str(format % val)+"\\"    
+       return vals[0:-1]
+   
    def __str__(self):
-       s = "tag="+self.__tag+" vr="+self.__vr
-       if self.__val != "":
-          s += " val="+self.valstr()
-
-#       numItems = self.numItems()
-#       for i in range(0, numItems):
-#           s += "\n - Item\n"
-#           numItemAttributes = self.numItemAttributes(i)
-#           s += "  - Attributes\n"
-#           for j in range(0, numItemAttributes):          
-#               s += "     "+self.itemAttribute(i, j).toString()+'\n'
-
-       return s
+       return self.toString()
 
    PIXEL_DATA_TAG          = "7fe00010"
    ITEM_TAG                = "fffee000"
-   ITEM_DELINEATION_TAG    = "fffee00d"
-
+   ITEM_DELIMITATION_TAG   = "fffee00d"
+   SQ_DELIMITATION_TAG     = "fffee0dd"
+   
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN")
 
