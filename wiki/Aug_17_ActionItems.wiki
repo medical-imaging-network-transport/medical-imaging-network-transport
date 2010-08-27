@@ -45,7 +45,6 @@ Add your content here.
   * Contact clear canvas folks about adding native support for MINT (Chris)
   * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
   * Make sure Date/Time is UTC and using DICOM DT Format (Tim Dawson)
-  * Modify study summary to pull up study and series level tags (Tim Dawson)
   * Update study queries (Tim Dawson)
     * Add support for accession number issuer
     * Add support for studyDateTimeFrom + studyDateTimeTo
@@ -86,6 +85,7 @@ Add your content here.
   * Update metadata format in (Tim Dawson)
     * # of instances (attribute instanceCount) in a series to series tag
     * # of instances (attribute instanceCount) in a study to study tag
+  * Modify study summary to pull up study and series level tags (Tim Dawson)
   * Implement binary item exclusion on get all binary items (Rex)
     * Excluded binary items will now have .exclude for a file extension and active ones will have .dat
   * Changelog changes (Rex)
