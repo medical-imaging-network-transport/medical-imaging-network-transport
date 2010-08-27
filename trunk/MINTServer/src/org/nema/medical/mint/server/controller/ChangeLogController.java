@@ -32,7 +32,6 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.changelog.ChangeSet;
-import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
