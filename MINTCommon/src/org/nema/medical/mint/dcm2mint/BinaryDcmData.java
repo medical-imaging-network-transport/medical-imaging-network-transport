@@ -16,7 +16,9 @@
 
 package org.nema.medical.mint.dcm2mint;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
@@ -72,11 +74,7 @@ public final class BinaryDcmData implements BinaryData {
 
         @Override
         public int read() throws IOException, DicomCodingException {
-            byte[] binaryItem = binaryItemRef.get();
-            if (binaryItem == null) {
-                binaryItem = fileTagpathToFile(tagPath);
-                binaryItemRef = new WeakReference<byte[]>(binaryItem);
-            }
+            final byte[] binaryItem = getBinaryItem();
             if (pos >= binaryItem.length) {
                 return -1;
             }
@@ -85,6 +83,37 @@ public final class BinaryDcmData implements BinaryData {
             return (char) binaryItem[pos++];
         }
 
+        @Override
+        public int read(final byte[] b, final int off, int len) throws IOException {
+            final byte[] binaryItem = getBinaryItem();
+            final int readableBytes = binaryItem.length - pos;
+            if (readableBytes <= 0) {
+                return -1;
+            }
+
+            if (readableBytes < len) {
+                len = readableBytes;
+            }
+            System.arraycopy(binaryItem, pos, b, off, len);
+            pos += len;
+            return len;
+        }
+
+        @Override
+        public int available() throws IOException {
+            final byte[] binaryItem = getBinaryItem();
+            return binaryItem.length - pos;
+        }
+
+        private byte[] getBinaryItem() throws IOException, DicomCodingException {
+            byte[] binaryItem = binaryItemRef.get();
+            if (binaryItem == null) {
+                binaryItem = fileTagpathToFile(tagPath);
+                binaryItemRef = new WeakReference<byte[]>(binaryItem);
+            }
+            return binaryItem;
+        }
+        
         private Reference<byte[]> binaryItemRef = new WeakReference<byte[]>(null);
         private final FileTagpath tagPath;
         private int pos = 0;
@@ -94,7 +123,7 @@ public final class BinaryDcmData implements BinaryData {
     public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
         add(dcmFile, tagPath, dcmElem, -1, -1);
     }
-    
+
     public void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int offset, int length) {
         final int[] newTagPath = new int[tagPath.length + 1];
         System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
@@ -174,7 +203,7 @@ public final class BinaryDcmData implements BinaryData {
         final File targetDcmFile = binaryItemPath.dcmFile;
         if (!targetDcmFile.equals(cachedRootDicomObjectFile)) {
             final DicomObject newRootDicomObject;
-            final DicomInputStream stream = new DicomInputStream(targetDcmFile);
+            final DicomInputStream stream = new DicomInputStream(new BufferedInputStream(new FileInputStream(targetDcmFile), 600000));
             try {
                 newRootDicomObject = stream.readDicomObject();
             } finally {

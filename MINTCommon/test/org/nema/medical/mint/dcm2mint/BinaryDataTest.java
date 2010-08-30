@@ -20,7 +20,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.dcm4che2.data.BasicDicomObject;
 import org.dcm4che2.data.DicomElement;
@@ -36,7 +38,7 @@ import org.junit.Test;
  */
 public final class BinaryDataTest {
 
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void testBinaryDcmData() throws IOException {
         final byte[] bytes1 = { 2, 1, 0, -1 };
         final byte[] bytes2 = { 3, 8 };
@@ -103,6 +105,41 @@ public final class BinaryDataTest {
             assertTrue(Arrays.equals(dcmData.getBinaryItem(0), bytes1));
             assertTrue(Arrays.equals(dcmData.getBinaryItem(1), bytes1));
             assertTrue(Arrays.equals(dcmData.getBinaryItem(2), bytes2));
+        }
+        
+        {
+            final InputStream stream = dcmData.getBinaryItemStream(1);
+            final byte[] newBytes1 = new byte[bytes1.length];
+            assertTrue(stream.available() == bytes1.length);
+            final int bytesRead = stream.read(newBytes1);
+            assertTrue(bytesRead == bytes1.length);
+            assertTrue(stream.read() == -1);
+            stream.close();
+        }
+        
+        {
+            final InputStream stream = dcmData.getBinaryItemStream(0);
+            assertTrue(stream.available() == bytes1.length);
+            assertTrue(stream.read() == (char) bytes1[0]);
+            assertTrue(stream.read() == (char) bytes1[1]);
+            assertTrue(stream.read() == (char) bytes1[2]);
+            assertTrue(stream.read() == (char) bytes1[3]);
+            assertTrue(stream.read() == -1);
+            stream.close();
+        }
+
+        {
+            final Iterator<InputStream> streamIter = dcmData.streamIterator();
+            assertTrue(streamIter.hasNext());
+            final InputStream stream = dcmData.streamIterator().next();
+            final byte[] newBytes1 = new byte[bytes1.length];
+            assertTrue(stream.available() == bytes1.length);
+            final int bytesRead = stream.read(newBytes1);
+            assertTrue(bytesRead == bytes1.length);
+            assertTrue(stream.read() == -1);
+            stream.close();
+            //Trigger an expected exception
+            streamIter.remove();
         }
     }
 }
