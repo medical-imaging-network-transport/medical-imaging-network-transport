@@ -18,8 +18,8 @@ package org.nema.medical.mint.dcm2mint;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.dcm4che2.data.DicomElement;
 import org.dcm4che2.data.DicomObject;
@@ -123,12 +123,20 @@ public final class Dcm2MetaBuilder {
        binaryInlineThreshold = value;
    }
 
+   public boolean isP10Aware() {
+       return p10Aware;
+   }
+
+   public void setP10Aware(final boolean p10Aware) {
+       this.p10Aware = p10Aware;
+   }
+
    public static String extractStudyInstanceUID(final DicomObject dcmObj) {
        return dcmObj.getString(Tag.StudyInstanceUID);
    }
 
    /**
-   This function completes the build of the meta data and returns the results.
+   Completes the build of the meta data and returns the results.
 
    Normalizing the duplicate attributes in each series greatly reduces the size of the meta data
    and improves parsing times significantly.
@@ -206,31 +214,40 @@ public final class Dcm2MetaBuilder {
          // Now, iterate through all items in the object and store each appropriately.
          // This dispatches the Attribute storage to one of the study level, series level
          // or instance-level Attributes sets.
-         final int[] emptyTagPath = new int[0];
-         for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
-             final int tag = dcmElement.tag();
-             if (studyLevelTags.contains(tag)) {
-                 if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                             metaBinaryPair.getMetadata(), null, emptyTagPath);
-                 }
-             }
-             else if (seriesLevelTags.contains(tag)) {
-                 if (series.getAttribute(tag) == null) {
-                     handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                             series, null, emptyTagPath);
-                 }
-             }
-             else {
-                 // tagNormalizerTable is only used for instance-level storage...
-                 final Map<Integer, NormalizationCounter> seriesNormMap =
-                     tagNormalizerTable.get(series.getSeriesInstanceUID());
-                 assert seriesNormMap != null;
-                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                         instance, seriesNormMap, emptyTagPath);
+         if (p10Aware) {
+             for (final DicomElement dcmElement: Iter.iter(dcmObj.fileMetaInfoIterator())) {
+                 handleTopElems(dcmPath, dcmObj, series, instance, charSet, dcmElement);
              }
          }
+         for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
+             handleTopElems(dcmPath, dcmObj, series, instance, charSet, dcmElement);
+         }
      }
+
+    private void handleTopElems(final File dcmPath, final DicomObject dcmObj, final Series series,
+            final Instance instance, final SpecificCharacterSet charSet, final DicomElement dcmElement) {
+        final int tag = dcmElement.tag();
+         if (studyLevelTags.contains(tag)) {
+             if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
+                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                         metaBinaryPair.getMetadata(), null, emptyTagPath);
+             }
+         }
+         else if (seriesLevelTags.contains(tag)) {
+             if (series.getAttribute(tag) == null) {
+                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                         series, null, emptyTagPath);
+             }
+         }
+         else {
+             // tagNormalizerTable is only used for instance-level storage...
+             final Map<Integer, NormalizationCounter> seriesNormMap =
+                 tagNormalizerTable.get(series.getSeriesInstanceUID());
+             assert seriesNormMap != null;
+             handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
+                     instance, seriesNormMap, emptyTagPath);
+         }
+    }
 
      private void handleDICOMElement(
              final File dcmPath,
@@ -401,7 +418,7 @@ public final class Dcm2MetaBuilder {
          return attr;
      }
 
-     private static class NormalizationCounter {
+     private static final class NormalizationCounter {
 
          /** The DICOM attribute. */
          Attribute attr;
@@ -411,10 +428,13 @@ public final class Dcm2MetaBuilder {
          long count = 1;
      }
 
+     private static final int[] emptyTagPath = new int[0];
+     
      private final Set<Integer> studyLevelTags;
      private final Set<Integer> seriesLevelTags;
      private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =
          new HashMap<String, Map<Integer, NormalizationCounter>>();
      private final MetaBinaryPair metaBinaryPair;
      private int binaryInlineThreshold = 256;
+     private boolean p10Aware = true;
 }
