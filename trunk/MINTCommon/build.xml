@@ -13,6 +13,7 @@
         <mkdir dir="${build.dir}/ant-classes" />
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}/ant-classes" includes="**/*" />
+            <fileset dir="${build.dir}/ant-test-classes" includes="**/*" />
         </delete>
     </target>
 
@@ -27,12 +28,12 @@
         <property name="build.classpath" refid="build.classpath" />
 
         <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="off" listfiles="false" classpathref="build.classpath" includeantruntime="no">
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="on" listfiles="false" classpathref="build.classpath" includeantruntime="no">
             <compilerarg value="-Xlint:-path" />
         </javac>
 
         <mkdir dir="${build.dir}/ant-test-classes" />
-        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="yes" includeantruntime="no">
             <classpath>
                 <pathelement path="${build.dir}/ant-test-classes" />
                 <pathelement path="${build.dir}/ant-classes" />
@@ -43,13 +44,14 @@
     </target>
 
     <target name="test" depends="build">
-        <mkdir dir="${build.dir}/test-reports" />
+    	<mkdir dir="${build.dir}/test-reports" />
         <junit printsummary="yes" haltonfailure="yes">
             <classpath>
                 <fileset dir="${basedir}/lib" includes="*.jar" />
                 <pathelement path="${build.dir}/ant-classes" />
                 <pathelement path="${build.dir}/ant-test-classes" />
                 <pathelement location="ant-lib/junit-4.8.1.jar" />
+            	<path refid="build.classpath" />
             </classpath>
 
             <formatter type="plain" />
