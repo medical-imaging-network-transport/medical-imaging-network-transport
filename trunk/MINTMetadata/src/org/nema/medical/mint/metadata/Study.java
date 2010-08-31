@@ -259,7 +259,7 @@ public class Study implements AttributeStore, StudySummary
         Study study = new Study();
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
-        if (studyData.hasVersion()) study.setType(studyData.getVersion());
+        if (studyData.hasVersion()) study.setVersion(studyData.getVersion());
         if (studyData.hasInstanceCount()) study.setInstanceCount(studyData.getInstanceCount());
 
         for (AttributeData attrData : studyData.getAttributesList()) {
