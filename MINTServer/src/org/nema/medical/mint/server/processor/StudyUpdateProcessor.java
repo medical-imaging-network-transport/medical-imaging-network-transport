@@ -50,10 +50,10 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private String type;
-	private JobInfoDAO jobInfoDAO;
-	private StudyDAO studyDAO;
-	private ChangeDAO updateDAO;
+	private final String type, sourceUser, sourceHost, sourceAddress;
+	private final JobInfoDAO jobInfoDAO;
+	private final StudyDAO studyDAO;
+	private final ChangeDAO updateDAO;
 
 	/**
 	 * extracts files from the jobFolder, merges them in the studyFolder
@@ -63,10 +63,13 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, String sourceUser, String sourceHost, String sourceAddress, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;
+		this.sourceUser = sourceUser;
+		this.sourceHost = sourceHost;
+		this.sourceAddress = sourceAddress;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -125,11 +128,21 @@ public class StudyUpdateProcessor extends TimerTask {
 					 */
 					existingStudy = null;
 				}
-	
+				
 				/*
 				 * Need to load new study information
 				 */
 				Study newStudy = StudyIO.loadStudy(jobFolder);
+				
+				/*
+				 * If the study versions are not the same, then this
+				 * update is for a version that is not the most recent and
+				 * should not be applied.
+				 */
+				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
+				{
+					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
+				}
 				
 				if(!StudyUtil.validateStudy(newStudy, jobFolder))
 				{
@@ -193,6 +206,9 @@ public class StudyUpdateProcessor extends TimerTask {
 					}
 					
 					StudyUtil.mergeStudy(existingStudy, newStudy, excludedBids);
+					
+					// Get next version number
+					existingStudy.setVersion(StudyUtil.getNextVersion(existingStudy.getVersion()));
 		        }else{
 					/*
 					 * If no existing study, new study becomes the existing
@@ -200,6 +216,10 @@ public class StudyUpdateProcessor extends TimerTask {
 					 * has no data yet.
 					 */
 		        	existingStudy = newStudy;
+		        	
+		        	// Set to base level version
+		        	existingStudy.setVersion(StudyUtil.getBaseVersion());
+		        	existingStudy.setType(type);
 		        }
 		        
 		        //Rename all excluded binary files to have .exclude
@@ -238,6 +258,9 @@ public class StudyUpdateProcessor extends TimerTask {
 				updateInfo.setId(UUID.randomUUID().toString());
 				updateInfo.setStudyID(studyUUID);
 				updateInfo.setType(type);
+				updateInfo.setSourceUser(sourceUser);
+				updateInfo.setSourceHost(sourceHost);
+				updateInfo.setSourceAddress(sourceAddress);
 				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
 				updateDAO.saveChange(updateInfo);
 	

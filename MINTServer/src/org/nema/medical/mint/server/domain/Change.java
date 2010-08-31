@@ -50,6 +50,15 @@ public class Change {
 	
 	@Column(name="changeDateTime")
 	private Timestamp dateTime = now();
+	
+	@Column
+	private String sourceUser;
+	
+	@Column
+	private String sourceHost;
+	
+	@Column
+	private String sourceAddress;
 
 	public String getId() {
 		return id;
@@ -98,4 +107,30 @@ public class Change {
 	public int getChangeNumber() {
 		return changeIndex;
 	}
+
+	public String getSourceUser() {
+		return sourceUser;
+	}
+
+	public void setSourceUser(String sourceUser) {
+		this.sourceUser = sourceUser;
+	}
+
+	public String getSourceHost() {
+		return sourceHost;
+	}
+
+	public void setSourceHost(String sourceHost) {
+		this.sourceHost = sourceHost;
+	}
+
+	public String getSourceAddress() {
+		return sourceAddress;
+	}
+
+	public void setSourceAddress(String sourceAddress) {
+		this.sourceAddress = sourceAddress;
+	}
+
+	
 }

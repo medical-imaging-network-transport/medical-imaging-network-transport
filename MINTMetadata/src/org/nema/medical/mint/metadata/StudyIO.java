@@ -39,7 +39,7 @@ public class StudyIO {
      * This method will try to load study information from a metadata file in
      * the provided directory
      *
-     * @param directory This should be a folder with a gpb, xml, or json metadata file
+     * @param directory This should be a folder with a gpb or xml metadata file
      *                  in it (or a gzip version of one of those)
      * @return Study loaded
      * @throws IOException if unable to read files from the directory

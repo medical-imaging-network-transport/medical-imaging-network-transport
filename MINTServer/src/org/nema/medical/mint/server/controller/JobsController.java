@@ -155,7 +155,8 @@ public class JobsController {
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
-				new File(studiesRoot, studyUUID), type, jobInfoDAO, studyDAO,
+				new File(studiesRoot, studyUUID), type, req.getRemoteUser(),
+				req.getRemoteHost(), req.getRemoteAddr(), jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
 
@@ -259,8 +260,8 @@ public class JobsController {
 		}
 
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				studyFolder, type, jobInfoDAO, studyDAO,
-				updateDAO);
+				studyFolder, type, req.getRemoteUser(), req.getRemoteHost(),
+				req.getRemoteAddr(), jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp
