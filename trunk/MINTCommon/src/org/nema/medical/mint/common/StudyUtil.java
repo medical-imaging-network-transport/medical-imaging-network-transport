@@ -44,6 +44,8 @@ public final class StudyUtil {
 
     public static final String BINARY_FILE_EXTENSION = "dat";
     public static final String EXCLUDED_BINARY_FILE_EXTENSION = "exclude";
+    
+    public static final String INITIAL_VERSION = "0";
 
     /**
      * This method will looks for BINARY_FILE_EXTENSION files and will try to
@@ -910,4 +912,34 @@ public final class StudyUtil {
 		
 		return -1;
 	}
+    
+    /**
+     * Returns the version to set a study to on creation.
+     * @return
+     */
+    public static String getBaseVersion()
+    {
+    	return INITIAL_VERSION;
+    }
+    
+    /**
+     * Generates the next version string after the provided string.  An example of this for a 0 based index version system would be to pass in "3" and get back "4".  Values don't need to be sequential but the 'next' value should at least be bigger than the current.
+     * @param current
+     * @return
+     */
+    public static String getNextVersion(String current)
+    {
+    	String result = null;
+    	
+    	try
+    	{
+    		long l = Long.parseLong(current);
+    		
+    		result = Long.toString(l + 1L);
+    	}catch(NumberFormatException e){
+    		LOG.error("Failed to generate next version number.");
+    	}
+    	
+    	return result;
+    }
 }
