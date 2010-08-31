@@ -37,10 +37,10 @@ public class StudyCreateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private String type;
-	private JobInfoDAO jobInfoDAO;
-	private StudyDAO studyDAO;
-	private ChangeDAO updateDAO;
+	private final String type, sourceUser, sourceHost, sourceAddress;
+	private final JobInfoDAO jobInfoDAO;
+	private final StudyDAO studyDAO;
+	private final ChangeDAO updateDAO;
 
 	/**
 	 * extracts files from the jobFolder, places them in the studyFolder updates
@@ -59,10 +59,13 @@ public class StudyCreateProcessor extends TimerTask {
 	 * @param studyDAO
 	 *            needed to update the database
 	 */
-	public StudyCreateProcessor(File jobFolder, File studyFolder, String type, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyCreateProcessor(File jobFolder, File studyFolder, String type, String sourceUser, String sourceHost, String sourceAddress, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;
+		this.sourceUser = sourceUser;
+		this.sourceHost = sourceHost;
+		this.sourceAddress = sourceAddress;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -93,6 +96,10 @@ public class StudyCreateProcessor extends TimerTask {
 			}
 			LOG.info("job " + jobID + " validated");
 			
+			// Set to base level version
+	        study.setVersion(StudyUtil.getBaseVersion());
+	        study.setType(type);
+			
 			//write study into type folder
 			StudyUtil.writeStudy(study, typeFolder);
 			LOG.info("study metadata for " + jobID + " written");
@@ -100,7 +107,7 @@ public class StudyCreateProcessor extends TimerTask {
 	        //Write metadata to change log
 	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
 	        
-	        // todo copy the previous file, unmarshalling again is too time consuming
+	        // TODO copy the previous file, unmarshalling again is too time consuming
 	        StudyUtil.writeStudy(study, changelogFolder);
 			LOG.info("study changelog for " + jobID + " written");
 
@@ -131,6 +138,9 @@ public class StudyCreateProcessor extends TimerTask {
 			updateInfo.setId(UUID.randomUUID().toString());
 			updateInfo.setStudyID(studyUUID);
 			updateInfo.setType(type);
+			updateInfo.setSourceUser(sourceUser);
+			updateInfo.setSourceHost(sourceHost);
+			updateInfo.setSourceAddress(sourceAddress);
 			updateInfo.setIndex(0);
 			updateDAO.saveChange(updateInfo);
 

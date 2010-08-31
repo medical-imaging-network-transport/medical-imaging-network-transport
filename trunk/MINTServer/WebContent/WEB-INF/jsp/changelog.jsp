@@ -27,6 +27,12 @@ dd { margin: 0 0 1em 0; padding: 0; }
 				<dd class='ChangeType'>${change.type}</dd>
 				<dt>Change Time</dt>
 				<dd class='ChangeTime'>${change.dateTime}</dd>
+				<dt>Change User</dt>
+				<dd class='ChangeUser'>${change.sourceUser}</dd>
+				<dt>Change Host</dt>
+				<dd class='ChangeHost'>${change.sourceHost}</dd>
+				<dt>Change Address</dt>
+				<dd class='ChangeAddress'>${change.sourceAddress}</dd>
 				<dt>Links</dt>
 				<dd class='StudyMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/${change.type}/metadata'>Study Metadata</a></dd>
 				<dd class='ChangeMetadata'><a href='<%=request.getContextPath()%>/studies/${change.studyID}/changelog/${change.index}'>Change Metadata</a></dd>
