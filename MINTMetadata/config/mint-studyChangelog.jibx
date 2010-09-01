@@ -9,5 +9,8 @@
     <value style="attribute" name="changeNumber" get-method="getChangeNumber"/>
     <value style="attribute" name="type" get-method="getType"/>    
     <value style="attribute" name="dateTime" get-method="getDateTime"/>    
+    <value style="attribute" name="remoteHost" get-method="getRemoteHost"/>    
+    <value style="attribute" name="remoteUser" get-method="getRemoteUser" usage="optional"/>    
+    <value style="attribute" name="principal" get-method="getPrincipal" usage="optional"/>    
   </mapping>
 </binding>
