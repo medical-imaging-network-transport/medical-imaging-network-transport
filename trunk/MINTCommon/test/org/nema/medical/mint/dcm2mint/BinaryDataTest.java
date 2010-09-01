@@ -63,71 +63,71 @@ public final class BinaryDataTest {
             for (@SuppressWarnings("unused") final byte[] bytes: dcmData) {
                 ++i;
             }
-            assertEquals(i, 0);
+            assertEquals(0, i);
         }
 
         dcmData.add(dcmFile, new int[] {}, pixelDataDcmElem);
         {
-            assertEquals(dcmData.size(), 1);
+            assertEquals(1, dcmData.size());
             int i = 0;
             for (final byte[] bytes: dcmData) {
-                assertArrayEquals(bytes, bytes1);
+                assertArrayEquals(bytes1, bytes);
                 ++i;
             }
-            assertEquals(i, 1);
-            assertArrayEquals(dcmData.getBinaryItem(0), bytes1);
+            assertEquals(1, i);
+            assertArrayEquals(bytes1, dcmData.getBinaryItem(0));
         }
 
         dcmData.add(dcmFile, new int[] {}, varPixelDataDcmElem);
         {
-            assertEquals(dcmData.size(), 2);
+            assertEquals(2, dcmData.size());
             int i = 0;
             for (final byte[] bytes: dcmData) {
-                assertArrayEquals(bytes, bytes1);
+                assertArrayEquals(bytes1, bytes);
                 ++i;
             }
-            assertEquals(i, 2);
-            assertArrayEquals(dcmData.getBinaryItem(0), bytes1);
-            assertArrayEquals(dcmData.getBinaryItem(1), bytes1);
+            assertEquals(2, i);
+            assertArrayEquals(bytes1, dcmData.getBinaryItem(0));
+            assertArrayEquals(bytes1, dcmData.getBinaryItem(1));
         }
 
         dcmData.add(dcmFile, new int[] {}, overlayDataDcmElem);
         {
-            assertEquals(dcmData.size(), 3);
+            assertEquals(3, dcmData.size());
             int i = 0;
             for (final byte[] bytes: dcmData) {
                 if (i == 0 || i == 1) {
-                    assertArrayEquals(bytes, bytes1);
+                    assertArrayEquals(bytes1, bytes);
                 } else {
                     assertEquals(i, 2);
-                    assertArrayEquals(bytes, bytes2);
+                    assertArrayEquals(bytes2, bytes);
                 }
                 ++i;
             }
             assertEquals(i, 3);
-            assertArrayEquals(dcmData.getBinaryItem(0), bytes1);
-            assertArrayEquals(dcmData.getBinaryItem(1), bytes1);
-            assertArrayEquals(dcmData.getBinaryItem(2), bytes2);
+            assertArrayEquals(bytes1, dcmData.getBinaryItem(0));
+            assertArrayEquals(bytes1, dcmData.getBinaryItem(1));
+            assertArrayEquals(bytes2, dcmData.getBinaryItem(2));
         }
         
         {
             final InputStream stream = dcmData.getBinaryItemStream(1);
             final byte[] newBytes1 = new byte[bytes1.length];
-            assertEquals(stream.available(), bytes1.length);
+            assertEquals(bytes1.length, stream.available());
             final int bytesRead = stream.read(newBytes1);
-            assertEquals(bytesRead, bytes1.length);
-            assertEquals(stream.read(), -1);
+            assertEquals(bytes1.length, bytesRead);
+            assertEquals(-1, stream.read());
             stream.close();
         }
         
         {
             final InputStream stream = dcmData.getBinaryItemStream(0);
-            assertEquals(stream.available(), bytes1.length);
-            assertEquals(stream.read(), (char) bytes1[0]);
-            assertEquals(stream.read(), (char) bytes1[1]);
-            assertEquals(stream.read(), (char) bytes1[2]);
-            assertEquals(stream.read(), (char) bytes1[3]);
-            assertEquals(stream.read(), -1);
+            assertEquals(bytes1.length, stream.available());
+            assertEquals((char) bytes1[0], stream.read());
+            assertEquals((char) bytes1[1], stream.read());
+            assertEquals((char) bytes1[2], stream.read());
+            assertEquals((char) bytes1[3], stream.read());
+            assertEquals(-1, stream.read());
             stream.close();
         }
 
@@ -136,10 +136,10 @@ public final class BinaryDataTest {
             assertTrue(streamIter.hasNext());
             final InputStream stream = dcmData.streamIterator().next();
             final byte[] newBytes1 = new byte[bytes1.length];
-            assertEquals(stream.available(), bytes1.length);
+            assertEquals(bytes1.length, stream.available());
             final int bytesRead = stream.read(newBytes1);
-            assertEquals(bytesRead, bytes1.length);
-            assertEquals(stream.read(), -1);
+            assertEquals(bytes1.length, bytesRead);
+            assertEquals(-1, stream.read());
             stream.close();
             //Trigger an expected exception
             streamIter.remove();
