@@ -32,11 +32,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -159,8 +159,8 @@ public final class ProcessImportDir {
                 try {
                     final DicomInputStream dcmStream = new DicomInputStream(instanceFile);
                     try {
-                        transferSyntax = dcmStream.getTransferSyntax();
                         dcmObj = dcmStream.readDicomObject();
+                        transferSyntax = dcmStream.getTransferSyntax();
                     } finally {
                         dcmStream.close();
                     }
