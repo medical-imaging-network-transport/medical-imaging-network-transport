@@ -8,21 +8,21 @@
   <format label="base64" type="byte[]" serializer="org.nema.medical.mint.metadata.StudyIO.base64encode"
           deserializer="org.nema.medical.mint.metadata.StudyIO.base64decode"/>
   <mapping abstract="true" type-name="StudyMetaType" class="org.nema.medical.mint.metadata.Study">
-    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
-    	<structure name="Attr" map-as="AttrType"/>
+    <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
+    	<structure name="attr" map-as="AttrType"/>
     </collection>
-    <collection name="SeriesList" add-method="putSeries" iter-method="seriesIterator" item-type="org.nema.medical.mint.metadata.Series">
-    	<structure name="Series" map-as="SeriesType"/>
+    <collection name="seriesList" add-method="putSeries" iter-method="seriesIterator" item-type="org.nema.medical.mint.metadata.Series">
+    	<structure name="series" map-as="SeriesType"/>
     </collection> 
     <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID"/>
     <value style="attribute" name="instanceCount" pre-get="computeInstanceCount" get-method="getInstanceCount"/>
   </mapping>
-  <mapping class="org.nema.medical.mint.metadata.Study" name="StudyMeta">
+  <mapping class="org.nema.medical.mint.metadata.Study" name="studyMeta">
     <structure map-as="StudyMetaType"/>
   </mapping>
   <mapping abstract="true" type-name="AttrType" class="org.nema.medical.mint.metadata.Attribute">
     <collection add-method="addItem" iter-method="itemIterator" item-type="org.nema.medical.mint.metadata.Item">
-    	<structure name="Item" map-as="ItemType"/>
+    	<structure name="item" map-as="ItemType"/>
     </collection>
     <value style="attribute" name="tag" get-method="getTag" format="int.hex" />
     <value style="attribute" name="vr" get-method="getVr"/>
@@ -32,15 +32,15 @@
     <value style="attribute" name="bytes" get-method="getBytes" format="base64" usage="optional"/>    
   </mapping>
   <mapping abstract="true" type-name="SeriesType" class="org.nema.medical.mint.metadata.Series">
-    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
-    	<structure name="Attr" map-as="AttrType"/>
+    <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
+    	<structure name="attr" map-as="AttrType"/>
     </collection>
     <value style="attribute" name="seriesInstanceUID" field="seriesInstanceUID"/>
     <value style="attribute" name="instanceCount" get-method="getInstanceCount"/>
   </mapping>
   <mapping abstract="true" type-name="ItemType" class="org.nema.medical.mint.metadata.Item">
-    <collection name="Attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
-    	<structure name="Attr" map-as="AttrType"/>
+    <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
+    	<structure name="attr" map-as="AttrType"/>
     </collection>
   </mapping>
 </binding>

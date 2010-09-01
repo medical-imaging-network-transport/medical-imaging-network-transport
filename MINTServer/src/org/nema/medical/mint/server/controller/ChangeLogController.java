@@ -36,7 +36,6 @@ import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,21 +49,17 @@ public class ChangeLogController {
 	@Autowired
 	protected ChangeDAO changeDAO = null;
 
-	@ModelAttribute("changes")
-	public List<org.nema.medical.mint.changelog.Change> getChanges() {
-		return new LinkedList<org.nema.medical.mint.changelog.Change>();
-	}
-
-	@RequestMapping("/changelogXML")
+	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) String since,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
             @RequestParam(value = "pageNum", required = false) Integer pageNum,
-			@ModelAttribute("changes") final List<org.nema.medical.mint.changelog.Change> changes,
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException, JiBXException {
 
-        // TODO read pageSize from a config file
+		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
+
+		// TODO read pageSize from a config file
         if (pageSize == null) pageSize = 50;
         if (pageNum == null) pageNum = 1;
         int firstIndex = (pageNum-1)*pageSize;
@@ -75,7 +70,7 @@ public class ChangeLogController {
 
 			Date date = null;
 			try {
-				date = Utils.parseDate(since);
+				date = Utils.parseISO8601Basic(since);
 			} catch (ParseException e) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
 				return;
@@ -91,74 +86,40 @@ public class ChangeLogController {
 		
 		if (changesFound != null) {
 			for (Change change : changesFound) {
-				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime()));
+				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
 			}
 		}
 		ChangeSet changeSet = new ChangeSet(changes);
-		IBindingFactory bfact = BindingDirectory.getFactory(ChangeSet.class);
+		IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog",ChangeSet.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
 		mctx.marshalDocument(changeSet, "UTF-8", null, res.getOutputStream());
 	}
 	
-	@RequestMapping("/changelog")
-	public String changelog(
-            @RequestParam(value = "since", required = false) String since,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNum", required = false) Integer pageNum,
-			@ModelAttribute("changes") final List<Change> changes,
-			final HttpServletRequest req,
-			final HttpServletResponse res) throws IOException {
-
-        // TODO read pageSize from a config file
-        if (pageSize == null) pageSize = 50;
-        if (pageNum == null) pageNum = 1;
-        int firstIndex = (pageNum-1)*pageSize;
-        
-		if (since != null) {
-
-			Date date = null;
-			try {
-				date = Utils.parseDate(since);
-			} catch (ParseException e) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
-				return "error";
-			}
-			if (date.getTime() > System.currentTimeMillis()) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
-				return "error";
-			}
-			final List<Change> changesFound = changeDAO.findChanges(date, firstIndex, pageSize);
-			if (changesFound != null) {
-				changes.addAll(changesFound);
-			}
-		} else {
-			changes.addAll(changeDAO.findChanges(firstIndex, pageSize));
-		}
-
-		// this will render the studies list using studies.jsp
-		return "changelog";
-	}
-
 	@RequestMapping("/studies/{uuid}/changelog")
-    public String studyChangelog(final HttpServletResponse res,
-                                 @PathVariable("uuid") final String uuid,
-                                 @ModelAttribute("changes") final List<Change> changes)
-            throws IOException {
+    public void studyChangelog(@PathVariable("uuid") final String uuid,
+                               final HttpServletRequest req,
+                               final HttpServletResponse res) throws IOException, JiBXException {
 
-        if (StringUtils.isBlank(uuid)) {
+		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
+
+		if (StringUtils.isBlank(uuid)) {
             // Shouldn't happen...but could be +++, I suppose
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-            return "error";
+			return;
         }
 
         final List<Change> changesFound = changeDAO.findChanges(uuid);
-        if (changesFound != null) {
-            changes.addAll(changesFound);
-        }
-
-		// this will render the studies list using studies.jsp
-		return "changelog";
+		if (changesFound != null) {
+			for (Change change : changesFound) {
+				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
+			}
+		}
+		ChangeSet changeSet = new ChangeSet(uuid, changes);
+		IBindingFactory bfact = BindingDirectory.getFactory("studyChangelog",ChangeSet.class);
+		IMarshallingContext mctx = bfact.createMarshallingContext();
+		mctx.setIndent(2);
+		mctx.marshalDocument(changeSet, "UTF-8", null, res.getOutputStream());
 	}
 
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")

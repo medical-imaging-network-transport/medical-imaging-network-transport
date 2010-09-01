@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<binding xmlns:tns="http://medical.nema.org/mint" name="changelog" trim-whitespace="true" direction="output">
+<binding xmlns:tns="http://medical.nema.org/mint" name="serverChangelog" trim-whitespace="true" direction="output">
   <namespace uri="http://medical.nema.org/mint" default="elements"/>
   <mapping name="changelog" class="org.nema.medical.mint.changelog.ChangeSet">
     <collection iter-method="changeIterator" item-type="org.nema.medical.mint.changelog.Change"/>

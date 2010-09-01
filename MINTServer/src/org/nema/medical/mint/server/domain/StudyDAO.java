@@ -66,13 +66,13 @@ public class StudyDAO extends HibernateDaoSupport {
         studyDateTimeFrom(SearchKeyType.Date) {
 			@Override
 			Criterion getRestrictions(String value) throws ParseException {
-				return Restrictions.gt("dateTime", Utils.parseDate(value));
+				return Restrictions.gt("dateTime", Utils.parseISO8601Basic(value));
 			}
 		},
 		studyDateTimeTo(SearchKeyType.Date) {
 			@Override
 			Criterion getRestrictions(String value) throws ParseException {
-				return Restrictions.lt("dateTime", Utils.parseDate(value));
+				return Restrictions.lt("dateTime", Utils.parseISO8601Basic(value));
 			}
 		};
 

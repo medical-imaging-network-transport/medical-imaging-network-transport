@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<binding xmlns:tns="http://medical.nema.org/mint" name="studyChangelog" trim-whitespace="true" direction="output">
+  <namespace uri="http://medical.nema.org/mint" default="elements"/>
+  <mapping name="changelog" class="org.nema.medical.mint.changelog.ChangeSet">
+    <value style="attribute" name="studyUUID" get-method="getStudyUUID"/>
+    <collection iter-method="changeIterator" item-type="org.nema.medical.mint.changelog.Change"/>
+  </mapping>
+  <mapping name="change" class="org.nema.medical.mint.changelog.Change">
+    <value style="attribute" name="changeNumber" get-method="getChangeNumber"/>
+    <value style="attribute" name="type" get-method="getType"/>    
+    <value style="attribute" name="dateTime" get-method="getDateTime"/>    
+  </mapping>
+</binding>

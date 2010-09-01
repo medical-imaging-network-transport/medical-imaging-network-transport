@@ -15,7 +15,6 @@
  */
 package org.nema.medical.mint.common;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
