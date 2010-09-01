@@ -61,6 +61,7 @@ class MintDicomCompare():
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
        self.__bytesCompared = 0
+       self.__itemsCompared = 0
        self.__lazy= False
 
    def setVerbose(self, verbose):
@@ -91,6 +92,7 @@ class MintDicomCompare():
        if self.__verbose:
            print "%10d instance(s) compared." % (instancesCompared)
            print "%10d text tag(s) compared." % (self.__textTagsCompared)
+           print "%10d items(s) compared." % (self.__itemsCompared)
            print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
            print "%10d byte(s) compared." % (self.__bytesCompared)          
 
@@ -141,7 +143,7 @@ class MintDicomCompare():
        # ---
        # Check tags.
        # ---
-       numAttributes = instance.numAttributes()
+       numAttributes = instance.numAttributes()       
        for n in range(0, numAttributes):
            tag = instance.tag(n)
            self.__checkTag(instance, mint, tag)
@@ -165,28 +167,67 @@ class MintDicomCompare():
                        instance.seriesInstanceUID(), 
                        instance.sopInstanceUID())
        else:
-          dicomAttr = instance.attributeByTag(tag) 
-          if instance.isExplicit():
-             self.__check(tag+" VR",
-                          dicomAttr.vr(),
-                          attr.vr(),
-                          instance.seriesInstanceUID(), 
-                          instance.sopInstanceUID())
+          dicomAttr = instance.attributeByTag(tag)
+          self.__checkAttribute(dicomAttr, attr, instance.seriesInstanceUID(), instance.sopInstanceUID())
+             
+   def __checkAttribute(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+      
+       if dicomAttr.vr() != "":
+          self.__check(dicomAttr.tag()+" VR",
+                       dicomAttr.vr(),
+                       attr.vr(),
+                       seriesInstanceUID, 
+                       sopInstanceUID)
 
-          if dicomAttr.isBinary():
-             self.__checkBinary(instance, dicomAttr, mint, attr)
-             self.__binaryTagsCompared += 1
-          else:
-             self.__check(tag+" Value",
-                          dicomAttr.val(),
-                          attr.val(),
-                          instance.seriesInstanceUID(), 
-                          instance.sopInstanceUID())
-             self.__textTagsCompared += 1
+       # ---
+       # Check binary items and values.
+       # ---
+       if dicomAttr.isBinary():
+          self.__checkBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
+          self.__binaryTagsCompared += 1
+       else:
+          self.__check(dicomAttr.tag()+" Value",
+                       dicomAttr.val(),
+                       attr.val(),
+                       seriesInstanceUID, 
+                       sopInstanceUID)
+          self.__textTagsCompared += 1
+          
+       # ---
+       # Check number of items.
+       # ---
+       numItems1 = dicomAttr.numItems()
+       numItems2 = attr.numItems()
+       self.__check(dicomAttr.tag()+" Number of items",
+                    numItems1,
+                    numItems2)
+          
+       for i in range(0, numItems1):
+          
+           # ---
+           # Check items.
+           # ---
+           attributeList = dicomAttr.item(i)
+           numAttributes1 = dicomAttr.numItemAttributes(i)
+           numAttributes2 = attr.numItemAttributes(i)
+           self.__check(dicomAttr.tag()+" number of item attributes",
+                        numAttributes1,
+                        numAttributes2)
 
-   def __checkBinary(self, instance, dicomAttr, mint, attr):
+           # ---
+           # Check item attributes.
+           # ---
+           for j in range(0, numAttributes1):
+               itemAttribute1 = dicomAttr.itemAttribute(i, j)
+               itemAttribute2 = attr.itemAttribute(i, j)
+               self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
+           
+           self.__itemsCompared += 1
+           
+   def __checkBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
        binaryitem = attr.bid()
+       if binaryitem == None: return
        
        # ---
        # Check for MINT binary item.
@@ -205,8 +246,8 @@ class MintDicomCompare():
        self.__check(dicomAttr.tag()+" "+binaryitem+".dat size",
                     size1,
                     size2,
-                    instance.seriesInstanceUID(), 
-                    instance.sopInstanceUID())
+                    seriesInstanceUID, 
+                    sopInstanceUID)
 
        # ---
        # Check binary item byte for byte.
@@ -235,8 +276,8 @@ class MintDicomCompare():
                  self.__check(binaryitem+".dat byte "+str(block*bufsize+i),
                               val[b],
                               bytes[i],
-                              instance.seriesInstanceUID(), 
-                              instance.sopInstanceUID())
+                              seriesInstanceUID, 
+                              sopInstanceUID)
                  
                  if val[b] != bytes[i]:
                     diff = True
