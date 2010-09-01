@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,9 +155,12 @@ public class JobsController {
 		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
+		Principal principal = req.getUserPrincipal();
+		String principalName = (principal != null) ? principal.getName() : null;
+		
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
 				new File(studiesRoot, studyUUID), type, req.getRemoteUser(),
-				req.getRemoteHost(), req.getRemoteAddr(), jobInfoDAO, studyDAO,
+				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
 
@@ -259,9 +263,12 @@ public class JobsController {
 			return "error";
 		}
 
+		Principal principal = req.getUserPrincipal();
+		String principalName = (principal != null) ? principal.getName() : null;
+
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
 				studyFolder, type, req.getRemoteUser(), req.getRemoteHost(),
-				req.getRemoteAddr(), jobInfoDAO, studyDAO, updateDAO);
+				principalName, jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
 		// this will render the job info using jobinfo.jsp

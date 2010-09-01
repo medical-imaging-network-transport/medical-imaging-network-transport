@@ -52,13 +52,13 @@ public class Change {
 	private Timestamp dateTime = now();
 	
 	@Column
-	private String sourceUser;
+	private String remoteUser;
 	
 	@Column
-	private String sourceHost;
+	private String remoteHost;
 	
 	@Column
-	private String sourceAddress;
+	private String principal;
 
 	public String getId() {
 		return id;
@@ -108,28 +108,28 @@ public class Change {
 		return changeIndex;
 	}
 
-	public String getSourceUser() {
-		return sourceUser;
+	public String getRemoteUser() {
+		return remoteUser;
 	}
 
-	public void setSourceUser(String sourceUser) {
-		this.sourceUser = sourceUser;
+	public void setRemoteUser(String remoteUser) {
+		this.remoteUser = remoteUser;
 	}
 
-	public String getSourceHost() {
-		return sourceHost;
+	public String getRemoteHost() {
+		return remoteHost;
 	}
 
-	public void setSourceHost(String sourceHost) {
-		this.sourceHost = sourceHost;
+	public void setRemoteHost(String sourceHost) {
+		this.remoteHost = sourceHost;
 	}
 
-	public String getSourceAddress() {
-		return sourceAddress;
+	public String getPrincipal() {
+		return principal;
 	}
 
-	public void setSourceAddress(String sourceAddress) {
-		this.sourceAddress = sourceAddress;
+	public void setPrincipal(String principal) {
+		this.principal = principal;
 	}
 
 	

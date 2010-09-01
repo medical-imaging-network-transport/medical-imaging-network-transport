@@ -50,7 +50,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String type, sourceUser, sourceHost, sourceAddress;
+	private final String type, remoteUser, remoteHost, principal;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
@@ -63,13 +63,13 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, String sourceUser, String sourceHost, String sourceAddress, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, String remoteUser, String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;
-		this.sourceUser = sourceUser;
-		this.sourceHost = sourceHost;
-		this.sourceAddress = sourceAddress;
+		this.remoteUser = remoteUser;
+		this.remoteHost = remoteHost;
+		this.principal = principal;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -258,9 +258,9 @@ public class StudyUpdateProcessor extends TimerTask {
 				updateInfo.setId(UUID.randomUUID().toString());
 				updateInfo.setStudyID(studyUUID);
 				updateInfo.setType(type);
-				updateInfo.setSourceUser(sourceUser);
-				updateInfo.setSourceHost(sourceHost);
-				updateInfo.setSourceAddress(sourceAddress);
+				updateInfo.setRemoteUser(remoteUser);
+				updateInfo.setRemoteHost(remoteHost);
+				updateInfo.setPrincipal(principal);
 				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
 				updateDAO.saveChange(updateInfo);
 	
