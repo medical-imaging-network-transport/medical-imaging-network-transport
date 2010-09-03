@@ -32,15 +32,17 @@ import string
 import sys
 import traceback
 
-from org.nema.medical.mint.DicomInstance import DicomInstance
+from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomInstance  import DicomInstance
 
 # -----------------------------------------------------------------------------
 # DicomStudy
 # -----------------------------------------------------------------------------
 class DicomStudy():
-   def __init__(self, dcmDir):
+   def __init__(self, dcmDir, dataDictionaryUrl):
        self.__dcmDir = dcmDir
        self.__instances = []
+       self.__dataDictionary = DataDictionary(dataDictionaryUrl)
        self.__read()
 
    def studyInstanceUID(self):
@@ -55,17 +57,19 @@ class DicomStudy():
    def instances(self, n):
        return self.__instances[n]
        
-   def _print(self):
+   def __str__(self):
+       s = ""
        numInstances = self.numInstances()
        for n in range(0, numInstances):
-           instances = self.instances(n)
-           instances._print()
+           instance = self.instances(n)
+           s += str(instance)+"\n"
+       return s
        
    def __read(self):
        pattern = os.path.join(self.__dcmDir, "*.dcm")
        dcmNames = glob.glob(pattern)
        for dcmName in dcmNames:
-           instances = DicomInstance(dcmName)
+           instances = DicomInstance(dcmName, self.__dataDictionary)
            self.__instances.append(instances)
        
 # -----------------------------------------------------------------------------
@@ -76,16 +80,17 @@ def main():
     (options, args)=getopt.getopt(sys.argv[1:], "")
     
     try:
-       if len(args) != 1:
-          print "Usage", progName, "<dicom_dir>"
+       if len(args) != 2:
+          print "Usage", progName, "<dicom_dir> <data_dictionary_url>"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
        dcmDir = sys.argv[1];
-       study = DicomStudy(dcmDir)
-       study._print()
+       dataDictionaryUrl = args[1];
+       study = DicomStudy(dcmDir, dataDictionaryUrl)
+       print study
        
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

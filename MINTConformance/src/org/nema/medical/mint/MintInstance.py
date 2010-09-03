@@ -24,8 +24,9 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
-from org.nema.medical.mint.MintAttribute import MintAttribute
-from org.nema.medical.mint.XmlNode       import XmlNode
+from org.nema.medical.mint.DataDictionaryElement import DataDictionaryElement
+from org.nema.medical.mint.MintAttribute         import MintAttribute
+from org.nema.medical.mint.XmlNode               import XmlNode
 
 # -----------------------------------------------------------------------------
 # MintInstance
@@ -74,7 +75,9 @@ class MintInstance():
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           s += self.attribute(n).toString(indent)+'\n'
+           attr = self.attribute(n).toString(indent)
+           s += attr.encode(DataDictionaryElement.UNICODE)
+           if n != numAttributes-1: s += '\n'
        indent = indent[0:-1]
        
        return s

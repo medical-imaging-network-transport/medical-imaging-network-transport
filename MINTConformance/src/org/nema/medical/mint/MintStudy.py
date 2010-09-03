@@ -30,10 +30,11 @@ import os
 import sys
 import traceback
 
-from org.nema.medical.mint.MintAttribute import MintAttribute
-from org.nema.medical.mint.MintSeries    import MintSeries
-from org.nema.medical.mint.XmlDocument   import XmlDocument
-from org.nema.medical.mint.XmlNode       import XmlNode
+from org.nema.medical.mint.DataDictionaryElement import DataDictionaryElement
+from org.nema.medical.mint.MintAttribute         import MintAttribute
+from org.nema.medical.mint.MintSeries            import MintSeries
+from org.nema.medical.mint.XmlDocument           import XmlDocument
+from org.nema.medical.mint.XmlNode               import XmlNode
 
 # -----------------------------------------------------------------------------
 # MintStudy
@@ -137,7 +138,8 @@ class MintStudy():
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           s += self.attribute(n).toString(indent)+'\n'
+           attr = self.attribute(n).toString(indent) 
+           s += attr.encode(DataDictionaryElement.UNICODE)+'\n'
               
        s += indent+"- Series List\n"
        indent += " "

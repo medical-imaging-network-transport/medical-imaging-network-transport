@@ -24,7 +24,8 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
-from org.nema.medical.mint.XmlNode  import XmlNode
+from org.nema.medical.mint.DataDictionaryElement import DataDictionaryElement
+from org.nema.medical.mint.XmlNode               import XmlNode
 
 # -----------------------------------------------------------------------------
 # MintAttribute
@@ -32,7 +33,7 @@ from org.nema.medical.mint.XmlNode  import XmlNode
 class MintAttribute():
 
    binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
-   
+     
    def __init__(self, node):
        self.__tag   = node.attributeWithName("tag")
        self.__vr    = node.attributeWithName("vr")
@@ -68,6 +69,9 @@ class MintAttribute():
    
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
+   def __str__(self):
+       return self.toString().encode(DataDictionaryElement.UNICODE)
+
    def toString(self, indent=""):
        s = indent+"tag="+self.__tag+" vr="+self.__vr
        if self.__val != "":
@@ -84,8 +88,8 @@ class MintAttribute():
            s += indent+"- Attributes\n"
            indent += " "
            for j in range(0, numItemAttributes):
-               s += self.itemAttribute(i, j).toString(indent)+"\n"
-           #s += self.itemAttribute(i, numItemAttributes-1).toString(indent)
+               s += self.itemAttribute(i, j).toString(indent)
+               if s != numItemAttributes-1: s += '\n'
            indent = indent[0:-1]
            s += indent+"- Attributes\n"
            indent = indent[0:-1]
@@ -93,7 +97,3 @@ class MintAttribute():
            indent = indent[0:-1]
            
        return s
-
-   def __str__(self):
-       return self.toString()
-       
