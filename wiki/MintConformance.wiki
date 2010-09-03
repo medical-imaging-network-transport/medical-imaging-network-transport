@@ -169,13 +169,16 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    * Parse sequencing data elements (SQ) in DICOM 
    * Detect endianness, explicit VRs
    * Compare sequencing data elements (SQ) between DICOM and MINT
+   * Use data dictionary to find VRs
 
 *To Do*
 
+   * Read DCM4CHE data dictionary from URL
+   * Consider cases for multiple VRs
    * SAX parsing for large metadata files
+   * Store binary in temp files for large DICOMs
    * Provide support for inline binary
    * Provide support for bulk binary
-   * Use DCM4CHE data dictionary
    * Add flag for changing the floating point precision
    * Comparisons before and after updates
    * Support multi-frame DICOM
