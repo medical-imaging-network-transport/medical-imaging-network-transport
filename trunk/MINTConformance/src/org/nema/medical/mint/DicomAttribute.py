@@ -24,22 +24,25 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
-import sys 
-
 from struct import unpack
+
+from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomTransfer  import DicomTransfer
 
 # -----------------------------------------------------------------------------
 # DicomAttribute
 # -----------------------------------------------------------------------------
 class DicomAttribute():
+      
+   def __init__(self, dcm, dataDictionary, transferSyntax):
    
-   def __init__(self, dcm, explicit, endian):
-       self.__tag    = None
-       self.__vr     = ""
-       self.__vl     = -1
-       self.__val    = ""
-       self.__endian = endian
-       self.__items  = []
+       self.__tag   = None
+       self.__vr    = ""
+       self.__vl    = -1
+       self.__val   = ""
+       self.__items = []
+       
+       self.__transferSyntax = transferSyntax
        
        # ---
        # Read the next tag
@@ -56,7 +59,7 @@ class DicomAttribute():
        self.__vr=""
        if self.isItemStart() or self.isItemStop() or self.isSequenceStop():
           pass # no VR
-       elif explicit or self.isPart10Header():
+       elif transferSyntax.isExplicit() or self.isPart10Header():
           self.__vr=dcm.read(2)
                  
        # ---
@@ -65,33 +68,39 @@ class DicomAttribute():
        if self.__vr in self.reservedVRs: # Explicit with reserve
           dcm.read(2) # throw away reserve
           vl=dcm.read(4)
-          vl = unpack(endian+"L", vl)
+          self.__vl = transferSyntax.unpack("L", vl)
        elif self.__vr != "": # Explicit without reserve
           vl=dcm.read(2)
-          vl = unpack(endian+"h", vl)
+          self.__vl = transferSyntax.unpack("h", vl)
        else: # Implicit
-          if self.implicitVRs.has_key(self.__tag):
-             self.__vr=self.implicitVRs[self.__tag]
+          vrs = dataDictionary.vrs(self.__tag)
+          self.__vr=vrs[0] # TODO: What to do if multiple are present?
           vl=dcm.read(4)
-          vl = unpack(endian+"L", vl)
-       self.__vl=vl[0]
+          self.__vl = transferSyntax.unpack("L", vl)
 
        # ---
        # Read Sequence Data Elements
        # ---
        if self.__vr == "SQ":
-          item = DicomAttribute(dcm, True, endian)
+          item = DicomAttribute(dcm, dataDictionary, transferSyntax)
           while not item.isSequenceStop():
              attrs = []
              self.__items.append(attrs)
-             itemAttr = DicomAttribute(dcm, True, endian)
+             itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
              while not itemAttr.isItemStop():
                  attrs.append(itemAttr)
-                 itemAttr = DicomAttribute(dcm, True, endian)
-             item = DicomAttribute(dcm, True, endian)
+                 itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
+             item = DicomAttribute(dcm, dataDictionary, transferSyntax)
 
        # Read the val
-       self.__readVal(dcm, endian)
+       self.__readVal(dcm)
+ 
+       # ---
+       # Debug 
+       # 
+       # print "***", self.__tag, self.__vr, self.__vl, self.valstr(), '#', self.tagName(), "***"
+       # raw_input()
+       # ---
           
    def group(self)   : return self.__tag[0:4]
    def element(self) : return self.__tag[4:]
@@ -139,38 +148,7 @@ class DicomAttribute():
    def isSequencStart(self)   : return self.__ve == "SQ"
    def isSequenceStop(self)   : return self.__tag == self.SQ_DELIMITATION_TAG
 
-   def toString(self, indent=""):
-       s = "tag="+self.__tag+" vr="+self.__vr+" val= "
-
-       if self.__vr == "SQ":
-          indent += " "
-          numItems = self.numItems()
-          for i in range(0, numItems):
-              s += "\n"+indent+"- Item\n"
-              numItemAttributes = self.numItemAttributes(i)
-              indent += " "
-              s += indent+"- Attributes\n"
-              indent += " "
-              for j in range(0, numItemAttributes-1):
-                s += indent+"- "+self.itemAttribute(i, j).toString(indent)+"\n"
-              s += indent+"- "+self.itemAttribute(i, numItemAttributes-1).toString(indent)
-              indent = indent[0:-2]
-
-       elif self.__val != "":
-          if self.isPixelData():
-             s += "<Pixel Data>"
-          elif self.isBinary():
-             s += "<Binary Data>"
-          elif self.isUnknown():
-             s += "<Unknown>"
-          elif self.__val != "":
-             s += self.__val
-
-       s += " # "+self.tagName()
-       
-       return s
-       
-   def __readVal(self, dcm, endian):
+   def __readVal(self, dcm):
       
        # Check for undefined length
        if self.__vl == 0xffffffff: return
@@ -206,16 +184,15 @@ class DicomAttribute():
           self.__vl = len(self.__val) # reset length
 
    def __bin2str(self, b):
-       h = hex(b[0])
+       h = hex(b)
        s = str(h).replace("0x", "")
        for i in range(len(s),4):
            s = "0"+s
        return s
    
    def __getTag(self, group, element):
-       endian = self.__endian
-       g = unpack(endian+"H", group)
-       e = unpack(endian+"H", element)
+       g = self.__transferSyntax.unpack("H", group)
+       e = self.__transferSyntax.unpack("H", element)
        s = self.__bin2str(g) + self.__bin2str(e)
        s = s.lower()
        return s
@@ -225,23 +202,50 @@ class DicomAttribute():
        numVals = self.__vl / size
        for n in range(0, numVals):
            i = n * size
-           val = unpack(self.__endian+type, self.__val[i:i+size])[0]
+           val = self.__transferSyntax.unpack(type, self.__val[i:i+size])
            vals += str(format % val)+"\\"    
        return vals[0:-1]
    
    def __str__(self):
-       return self.toString()
+       return self.toString(DataDictionaryElement.UNICODE)
 
+   def toString(self, indent=""):
+       s = "tag="+self.__tag+" vr="+self.__vr+" val= "
+
+       if self.__vr == "SQ":
+          indent += " "
+          numItems = self.numItems()
+          for i in range(0, numItems):
+              s += "\n"+indent+"- Item\n"
+              numItemAttributes = self.numItemAttributes(i)
+              indent += " "
+              s += indent+"- Attributes\n"
+              indent += " "
+              for j in range(0, numItemAttributes-1):
+                s += indent+"- "+self.itemAttribute(i, j).toString(indent)+"\n"
+              s += indent+"- "+self.itemAttribute(i, numItemAttributes-1).toString(indent)
+              indent = indent[0:-2]
+
+       elif self.__val != "":
+          if self.isPixelData():
+             s += "<Pixel Data>"
+          elif self.isBinary():
+             s += "<Binary Data>"
+          elif self.isUnknown():
+             s += "<Unknown>"
+          elif self.__val != "":
+             s += self.__val
+
+       s += " # "+self.tagName()
+       
+       return s
+       
    TRANSFER_SYNTAX_UID_TAG = "00020010"
    PIXEL_DATA_TAG          = "7fe00010"
    ITEM_TAG                = "fffee000"
    ITEM_DELIMITATION_TAG   = "fffee00d"
    SQ_DELIMITATION_TAG     = "fffee0dd"
    
-   IMPLICIT_VR_LITTLE_ENDIAN = "1.2.840.10008.1.2"
-   EXPLICIT_VR_LITTLE_ENDIAN = "1.2.840.10008.1.2.1"
-   EXPLICIT_VR_BIG_ENDIAN    = "1.2.840.10008.1.2.2" 
-
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN")
 
@@ -354,18 +358,5 @@ class DicomAttribute():
       "00400275" : "Request Attribute Sequence",
       "00400280" : "Comments on the Performed Procedure Step",
       "7fe00010" : "Pixel Data"
-   } 
-
-   # TODO: Replace with DCM4CHE data dictionary
-   implicitVRs = {
-      "00280002" : "US",
-      "00280006" : "US",
-      "00280010" : "US",
-      "00280011" : "US",
-      "00280100" : "US",
-      "00280101" : "US",
-      "00280102" : "US",
-      "00280103" : "US",
-      "00080000" : "UL"
    }
-       
+   

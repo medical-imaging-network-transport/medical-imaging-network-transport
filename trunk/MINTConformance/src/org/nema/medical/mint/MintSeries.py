@@ -24,9 +24,10 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
-from org.nema.medical.mint.MintAttribute import MintAttribute
-from org.nema.medical.mint.MintInstance  import MintInstance
-from org.nema.medical.mint.XmlNode       import XmlNode
+from org.nema.medical.mint.DataDictionaryElement import DataDictionaryElement
+from org.nema.medical.mint.MintAttribute         import MintAttribute
+from org.nema.medical.mint.MintInstance          import MintInstance
+from org.nema.medical.mint.XmlNode               import XmlNode
 
 # -----------------------------------------------------------------------------
 # MintSeries
@@ -118,14 +119,19 @@ class MintSeries():
        s += indent+"- Attributes\n"       
        indent += " "
        numAttributes = self.numAttributes()
-       for n in range(0, numAttributes):
-           s += self.attribute(n).toString(indent)+'\n'
+       for n in range(0, numAttributes-1):
+           attr = self.attribute(n).toString(indent)
+           s += attr.encode(DataDictionaryElement.UNICODE)
+           if n != numAttributes-1: s += '\n'
 
        s += indent+"- Normalized Instance Attributes\n"
        indent += " "
        numNormalizedInstanceAttributes = self.numNormalizedInstanceAttributes()
        for n in range(0, numNormalizedInstanceAttributes):
-           s += self.normalizedInstanceAttribute(n).toString(indent)+'\n'
+           attr = self.normalizedInstanceAttribute(n).toString(indent)
+           s += attr.encode(DataDictionaryElement.UNICODE)
+           if n != numNormalizedInstanceAttributes-1: s += '\n'
+           
        s += indent+"- Instances\n"
        indent += " "
        numInstances = self.numInstances()

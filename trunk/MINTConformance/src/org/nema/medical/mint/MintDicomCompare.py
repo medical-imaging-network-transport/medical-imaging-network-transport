@@ -42,7 +42,7 @@ from org.nema.medical.mint.MintStudy     import MintStudy
 # -----------------------------------------------------------------------------
 class MintDicomCompare():
    
-   def __init__(self, dicomStudyDir, mintStudyXml):
+   def __init__(self, dicomStudyDir, mintStudyXml, dataDictionaryUrl):
        if not os.path.isdir(dicomStudyDir):
           print "Directory not found -", dicomStudyDir
           sys.exit(1)
@@ -51,7 +51,7 @@ class MintDicomCompare():
           print "File not found -", mintStudyXml
           sys.exit(1)
        
-       self.__dicom = DicomStudy(dicomStudyDir)
+       self.__dicom = DicomStudy(dicomStudyDir, dataDictionaryUrl)
        self.__studyInstanceUID = self.__dicom.studyInstanceUID()
        self.__mint = MintStudy(mintStudyXml)
        self.__binary = os.path.join(os.path.dirname(mintStudyXml), "binaryitems")
@@ -338,8 +338,9 @@ def main():
        # ---
        # Check usage.
        # ---
-       if help or len(args) != 2:
-          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study.xml>"
+       argc = len(args)
+       if help or argc < 2 or argc > 3:
+          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study.xml> <data_dictionary.xml>"
           print "  -v: verbose"
           print "  -l: lazy check (skips binary content)"
           print "  -h: displays usage"
@@ -350,7 +351,10 @@ def main():
        # ---
        dicomStudyDir = args[0];
        mintStudyXml = args[1];
-       studies = MintDicomCompare(dicomStudyDir, mintStudyXml)
+       dataDictionaryUrl = ""
+       if argc == 3:
+          dataDictionaryUrl = args[2];
+       studies = MintDicomCompare(dicomStudyDir, mintStudyXml, dataDictionaryUrl)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
 

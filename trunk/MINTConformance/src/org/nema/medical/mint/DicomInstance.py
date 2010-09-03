@@ -31,7 +31,9 @@ import string
 import sys
 import traceback
 
+from org.nema.medical.mint.DataDictionary import DataDictionary
 from org.nema.medical.mint.DicomAttribute import DicomAttribute
+from org.nema.medical.mint.DicomTransfer  import DicomTransfer
 
 STUDY_INSTANCE_UID_TAG  = "0020000d"
 SERIES_INSTANCE_UID_TAG = "0020000e" 
@@ -41,13 +43,13 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 # DicomInstance
 # -----------------------------------------------------------------------------
 class DicomInstance():
-   def __init__(self, dcmName):
+   def __init__(self, dcmName, dataDictionary):
      
        self.__dcmName = dcmName
        self.__attributes = {}
        self.__tags = []
-       self.__explicit = False
-       self.__endian = "<" # Default little endian
+       self.__transferSyntax = DicomTransfer()
+       self.__dataDictionary = dataDictionary
        
        self.__open()
        
@@ -62,9 +64,6 @@ class DicomInstance():
    def sopInstanceUID(self):
        attr = self.attributeByTag(SOP_INSTANCE_UID_TAG)
        return attr.val()
-       
-   def isExplicit(self):
-       return self.__explicit
                         
    def numAttributes(self):
        return len(self.__tags)
@@ -88,12 +87,15 @@ class DicomInstance():
        else:
           return None
    
-   def _print(self):
+   def __str__(self):
+       s = ""
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
            tag = self.tag(n)
            attr = self.attributeByTag(tag)
-           print attr
+           s += attr.toString()+"\n"
+       
+       return s
            
    def __open(self):
        dcm = open(self.__dcmName, "rb")
@@ -108,27 +110,16 @@ class DicomInstance():
        # ---
        # Read data elements
        # ---
-       attr = DicomAttribute(dcm, self.__explicit, self.__endian)
+       attr = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
        while attr.isValid():
           self.__attributes[attr.tag()] = attr
-          if attr.isTransferSyntax(): self.__setTransferSyntax(attr.val()) 
-          attr = DicomAttribute(dcm, self.__explicit, self.__endian)
+          if attr.isTransferSyntax(): self.__transferSyntax = DicomTransfer(attr.val()) 
+          attr = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
 
        dcm.close()
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
-   
-   def __setTransferSyntax(self, transferSyntax):
-       if transferSyntax == DicomAttribute.EXPLICIT_VR_LITTLE_ENDIAN:
-          self.__explicit = True    
-          self.__endian   = "<" 
-       elif transferSyntax == DicomAttribute.EXPLICIT_VR_BIG_ENDIAN:
-          self.__explicit = True    
-          self.__endian   = ">"
-       else:
-          self.__explicit = False
-          self.__endian   = "<"
-       
+          
    def __attr(self, tag, index):
        if self.__attrs.has_key(tag):
           attrs = self.__attrs[tag]
@@ -152,8 +143,8 @@ def main():
            help = True
     
     try:
-       if len(args) != 1 or help:
-          print "Usage", progName, "[options] <dicom_file>"
+       if len(args) != 2 or help:
+          print "Usage", progName, "[options] <dicom_file> <data_dictionary_url>"
           print "  -h: displays usage"
           sys.exit(1)
           
@@ -161,8 +152,10 @@ def main():
        # Read dicom.
        # ---
        dcmName = args[0];
-       instance = DicomInstance(dcmName)
-       instance._print()
+       dataDictionaryUrl = args[1];
+       dataDictionary = DataDictionary(dataDictionaryUrl)
+       instance = DicomInstance(dcmName, dataDictionary)
+       print instance
                         
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
