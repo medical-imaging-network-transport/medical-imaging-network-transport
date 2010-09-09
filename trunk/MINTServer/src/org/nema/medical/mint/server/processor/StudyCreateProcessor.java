@@ -131,6 +131,7 @@ public class StudyCreateProcessor extends TimerTask {
 			studyData.setAccessionNumber(study.getValueForAttribute(0x00080050));
 			studyData.setDateTime(org.nema.medical.mint.server.domain.Study
 					.now());
+			studyData.setStudyVersion(study.getVersion());
 			studyDAO.insertStudy(studyData);
 			// studyData.setStudyDateTime(study.getValueForAttribute(0x00080020));
 			

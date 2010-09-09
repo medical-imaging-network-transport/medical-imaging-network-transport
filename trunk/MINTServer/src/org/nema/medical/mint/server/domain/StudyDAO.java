@@ -74,6 +74,12 @@ public class StudyDAO extends HibernateDaoSupport {
 			Criterion getRestrictions(String value) throws ParseException {
 				return Restrictions.lt("dateTime", Utils.parseISO8601Basic(value));
 			}
+		},
+		studyVersion {
+			@Override
+			Criterion getRestrictions(String value) {
+				return Restrictions.eq("studyVersion", value);
+			}
 		};
 
         SearchKey() { this.field = null; this.type = SearchKeyType.String; }
