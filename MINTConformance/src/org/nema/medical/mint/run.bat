@@ -1,10 +1,10 @@
 @echo off
 
-REM --- 
-REM Configure 
 REM ---
-set PYTHON=\Python25\python.exe
-set MC_HOME=\sandbox\medical-imaging-network-transport
+REM Configure
+REM ---
+set PYTHON=C:\Python27\python.exe
+set MC_HOME=E:\VitalDev\workspace_mint_public
 
 set MC_SRC=MINTConformance\src\org\nema\medical\mint
 set MC_DICOM=MINTConformance\testdata\DICOM
