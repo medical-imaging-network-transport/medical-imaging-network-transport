@@ -131,6 +131,10 @@ public class Study implements Serializable {
 	// INDEXED
 	@Column(name="studyDateTime")
 	private Timestamp dateTime;
+	
+	// Current version of study.
+	@Column
+	private String studyVersion;
 
 	// DICOM StudyInstanceUID (0020,0010) T1
 	// Unique identifier for the Study.
@@ -186,6 +190,10 @@ public class Study implements Serializable {
 	public Timestamp getDateTime() {
 		return dateTime;
 	}
+	
+	public String getStudyVersion() {
+		return studyVersion;
+	}
 
 	public String getStudyInstanceUID() {
 		return studyInstanceUID;
@@ -226,6 +234,10 @@ public class Study implements Serializable {
 
 	public void setDateTime(final Timestamp dateTime) {
 		this.dateTime = dateTime;
+	}
+	
+	public void setStudyVersion(String studyVersion) {
+		this.studyVersion = studyVersion;
 	}
 
 	public void setStudyInstanceUID(final String studyInstanceUID) {

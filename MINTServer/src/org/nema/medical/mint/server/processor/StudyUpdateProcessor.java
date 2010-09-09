@@ -252,6 +252,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
 				studyData.setDateTime(org.nema.medical.mint.server.domain.Study
 						.now());
+				studyData.setStudyVersion(existingStudy.getVersion());
 				studyDAO.updateStudy(studyData);
 				// studyData.setDateTime(study.getValueForAttribute(0x00080020));
 				
