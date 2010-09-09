@@ -134,16 +134,15 @@ public class StudyUpdateProcessor extends TimerTask {
 				 */
 				Study newStudy = StudyIO.loadStudy(jobFolder);
 				
-				//TODO uncomment once studies query actually provides this version number and DICOM2MINT code is updated to use it
-//				/*
-//				 * If the study versions are not the same, then this
-//				 * update is for a version that is not the most recent and
-//				 * should not be applied.
-//				 */
-//				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
-//				{
-//					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
-//				}
+				/*
+				 * If the study versions are not the same, then this
+				 * update is for a version that is not the most recent and
+				 * should not be applied.
+				 */
+				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
+				{
+					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
+				}
 				
 				if(!StudyUtil.validateStudy(newStudy, jobFolder))
 				{

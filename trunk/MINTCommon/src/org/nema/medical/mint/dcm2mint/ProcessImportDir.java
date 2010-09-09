@@ -18,6 +18,7 @@ package org.nema.medical.mint.dcm2mint;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,7 +56,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -244,30 +244,31 @@ public final class ProcessImportDir {
             //Determine whether study exists and we need to perform an update
             final String studyInstanceUID = sendData.studyInstanceUID;
             LOG.info("Uploading study instance UID " + studyInstanceUID);
-            final String studyUUID;
+            final StudyQueryInfo studyQueryInfo;
             if (forceCreate) {
-                studyUUID = null;
+                studyQueryInfo = null;
             } else {
                 final long existQueryStart = System.currentTimeMillis();
-                studyUUID = doesStudyExist(studyInstanceUID, sendData.patientID);
+                studyQueryInfo = doesStudyExist(studyInstanceUID, sendData.patientID);
                 final long existQueryEnd = System.currentTimeMillis();
                 final StringBuilder msg =
                     new StringBuilder("Completed querying server for existing study for study instance UID "
                         + studyInstanceUID + " in "
                         + String.format("%.1f", (existQueryEnd - existQueryStart) / 1000.0f) + " seconds. ");
-                if (studyUUID == null) {
+                if (studyQueryInfo == null) {
                     msg.append("Study does not exist yet.");
                 } else {
-                    msg.append("Study exists, Study ID " + studyUUID);
+                    msg.append("Study exists, Study ID " + studyQueryInfo.studyUUID);
                 }
                 LOG.info(msg);
             }
 
             try {
                 final long uploadStart = System.currentTimeMillis();
-                final JobInfo jobInfo = send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
+                final JobInfo jobInfo = send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles,
+                        studyQueryInfo);
                 final long uploadEnd = System.currentTimeMillis();
-                assert studyUUID == null || studyUUID.equals(jobInfo.studyID);
+                assert studyQueryInfo == null || studyQueryInfo.studyUUID.equals(jobInfo.studyID);
                 LOG.info("Completed uploading MINT to server for study instance UID "
                         + studyInstanceUID + " (" + sendData.studyInstanceFiles.size() + " instances) in "
                         + String.format("%.1f", (uploadEnd - uploadStart) / 1000.0f) + " seconds, Job ID "
@@ -287,7 +288,7 @@ public final class ProcessImportDir {
         return studySendQueue.isEmpty() && jobIDInfo.isEmpty();
     }
 
-    private String doesStudyExist(final String studyInstanceUID, final String patientID) throws Exception {
+    private StudyQueryInfo doesStudyExist(final String studyInstanceUID, final String patientID) throws Exception {
         final List<NameValuePair> qparams = new ArrayList<NameValuePair>();
         qparams.add(new BasicNameValuePair("studyInstanceUID", studyInstanceUID));
         qparams.add(new BasicNameValuePair("patientID", patientID == null ? "" : patientID));
@@ -310,7 +311,10 @@ public final class ProcessImportDir {
             return null;
         case 1:
             final Node node = nodeList.item(0);
-            return node.getTextContent().trim();
+            final StudyQueryInfo studyQueryInfo = new StudyQueryInfo();
+            studyQueryInfo.studyUUID = node.getTextContent().trim();
+            studyQueryInfo.studyVersion = xPath.evaluate("../dd[@class='StudyVersion']", node).trim();
+            return studyQueryInfo;
         default:
             throw new Exception("Multiple matches for study UID " + studyInstanceUID);
         }
@@ -377,19 +381,38 @@ public final class ProcessImportDir {
     }
 
     private JobInfo send(final File metadataFile, final BinaryData binaryData, final Collection<File> studyFiles,
-            final String existingStudyUUID) throws IOException, SAXException {
-        final HttpPost httpPost = new HttpPost(existingStudyUUID == null ? createURI : updateURI);
+            final StudyQueryInfo studyQueryInfo) throws IOException, SAXException {
+        final HttpPost httpPost = new HttpPost(studyQueryInfo == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
         //Need to specify the 'type' of the data being sent
         entity.addPart("type", new StringBody("DICOM"));
-        if (existingStudyUUID != null) {
-            entity.addPart("studyUUID", new StringBody(existingStudyUUID));
+        if (studyQueryInfo != null) {
+            entity.addPart("studyUUID", new StringBody(studyQueryInfo.studyUUID));
         }
 
-        //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
-        entity.addPart(metadataFile.getName(),
-                new FileBody(metadataFile, useXMLNotGPB ? "text/xml" : "application/octet-stream"));
+        final Study study = useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
+        if (studyQueryInfo != null) {
+            study.setVersion(studyQueryInfo.studyVersion);
+        }
+
+        //Pretty significant in-memory operations, so scoping to get references released ASAP
+        {
+            final byte[] metaInBuffer;
+            {
+                final ByteArrayOutputStream metaOut = new ByteArrayOutputStream(10000);
+                if (useXMLNotGPB) {
+                    StudyIO.writeToXML(study, metaOut);
+                } else {
+                    StudyIO.writeToGPB(study, metaOut);
+                }
+                metaInBuffer = metaOut.toByteArray();
+            }
+            final ByteArrayInputStream metaIn = new ByteArrayInputStream(metaInBuffer);
+            //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
+            entity.addPart(metadataFile.getName(), new InputStreamBody(
+                    metaIn, useXMLNotGPB ? "text/xml" : "application/octet-stream", metadataFile.getName()));
+        }
 
         //We support only one type
         assert binaryData instanceof BinaryDcmData;
@@ -513,6 +536,11 @@ public final class ProcessImportDir {
         public final long getJobStartTime() {
             return jobStartTime;
         }
+    }
+
+    private static final class StudyQueryInfo {
+        public String studyUUID;
+        public String studyVersion;
     }
 
     private final Map<String, JobInfo> jobIDInfo =
