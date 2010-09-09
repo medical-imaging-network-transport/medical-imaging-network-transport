@@ -21,8 +21,11 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 
 /**
  * @author Scott DeJarnette
@@ -161,18 +164,18 @@ public class DCMImportMain {
                         break;
                     }
                 }
-            } catch( Exception e ) {
+            } catch(Exception e) {
                 System.err.println("An exception occurred while processing the files in the input directory.");
                 e.printStackTrace();
             }
         } else {
-            final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+            final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
             final Runnable checkResponsesTask = new Runnable() {
                 public void run() {
                     try {
                         importProcessor.handleResponses();
                         importProcessor.handleSends();
-                    } catch(final Exception e) {
+                    } catch(final Throwable e) {
                         System.err.println("An exception occurred while uploading to the server:");
                         e.printStackTrace();
                     }
@@ -182,7 +185,12 @@ public class DCMImportMain {
 
             final Runnable dirTraverseTask = new Runnable() {
                 public void run() {
-                    importProcessor.processDir();
+                    try {
+                        importProcessor.processDir();
+                    } catch(final Throwable e) {
+                        System.err.println("An exception occurred while processing files:");
+                        e.printStackTrace();
+                    }
                 }
             };
             executor.scheduleWithFixedDelay(dirTraverseTask, 0, 3, TimeUnit.SECONDS);

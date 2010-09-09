@@ -5,6 +5,7 @@
 	<projects>
 		<project>MINTCommon</project>
 		<project>MINTMetadata</project>
+		<project>MINTServer</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

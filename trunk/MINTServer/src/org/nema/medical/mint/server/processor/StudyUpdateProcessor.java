@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.server.domain.Change;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.Change;
-import org.nema.medical.mint.server.domain.ChangeDAO;
 
 /**
  * 
@@ -97,9 +97,9 @@ public class StudyUpdateProcessor extends TimerTask {
 		
 		if(lock.tryLock())
 		{
-			LOG.debug("Got lock, and starting process");
 			try
 			{
+	            LOG.debug("Got lock, and starting process");
 				File typeFolder = new File(studyFolder, type);
 				
 				//Not calling mkdir on this because they better already exist
@@ -134,15 +134,16 @@ public class StudyUpdateProcessor extends TimerTask {
 				 */
 				Study newStudy = StudyIO.loadStudy(jobFolder);
 				
-				/*
-				 * If the study versions are not the same, then this
-				 * update is for a version that is not the most recent and
-				 * should not be applied.
-				 */
-				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
-				{
-					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
-				}
+				//TODO uncomment once studies query actually provides this version number and DICOM2MINT code is updated to use it
+//				/*
+//				 * If the study versions are not the same, then this
+//				 * update is for a version that is not the most recent and
+//				 * should not be applied.
+//				 */
+//				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
+//				{
+//					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
+//				}
 				
 				if(!StudyUtil.validateStudy(newStudy, jobFolder))
 				{
@@ -271,8 +272,8 @@ public class StudyUpdateProcessor extends TimerTask {
 				jobInfo.setStatusDescription(e.getMessage());
 				LOG.error("unable to process job " + jobID, e);
 			}finally{
-				LOG.debug("Releasing lock and stopping.");
-				lock.unlock();
+                lock.unlock();
+				LOG.debug("Released lock and stopping.");
 			}
 		}else{
 			jobInfo.setStatus(JobStatus.FAILED);

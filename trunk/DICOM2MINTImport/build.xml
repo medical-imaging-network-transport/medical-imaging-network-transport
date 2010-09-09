@@ -33,7 +33,7 @@
         <property name="build.classpath" refid="build.classpath" />
 
         <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="no" includeantruntime="no">
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
             <compilerarg value="-Xlint:-path" />
         </javac>
     </target>
