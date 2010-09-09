@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package org.nema.medical.mint.dcmimport;
+package org.nema.medical.mint.dcm2mint;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -66,11 +67,6 @@ import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
-import org.nema.medical.mint.dcm2mint.BinaryData;
-import org.nema.medical.mint.dcm2mint.BinaryDcmData;
-import org.nema.medical.mint.dcm2mint.Dcm2MetaBuilder;
-import org.nema.medical.mint.dcm2mint.MetaBinaryPair;
-import org.nema.medical.mint.dcm2mint.MetaBinaryPairImpl;
 import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.util.Iter;
@@ -100,9 +96,12 @@ public final class ProcessImportDir {
     public void processDir() {
         System.err.println("Gathering files for allocation to studies...");
         final long fileGatherStart = System.currentTimeMillis();
+        //As items may be removed from the set of handled files concurrently,
+        //create a copy of a maximum set first; it won't hurt if it contains too many elements. 
+        final SortedSet<File> handledFilesCopy = new TreeSet<File>(handledFiles);
         final SortedSet<File> resultFiles = new TreeSet<File>();
         findPlainFilesRecursive(importDir, resultFiles);
-        resultFiles.removeAll(handledFiles);
+        resultFiles.removeAll(handledFilesCopy);
         handledFiles.addAll(resultFiles);
         final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
         for (final File plainFile: resultFiles) {
@@ -130,6 +129,7 @@ public final class ProcessImportDir {
             } catch (final IOException e) {
                 //Not a valid DICOM file?!
                 System.err.println("Skipping file: " + plainFile);
+                e.printStackTrace();
             }
         }
         final long fileGatherEnd = System.currentTimeMillis();
@@ -167,6 +167,7 @@ public final class ProcessImportDir {
                 } catch (final IOException e) {
                     //Not a valid DICOM file?!
                     System.err.println("Skipping file: " + instanceFile);
+                    e.printStackTrace();
                     instanceFileIter.remove();
                     continue;
                 } catch (final RuntimeException e) {
@@ -297,7 +298,8 @@ public final class ProcessImportDir {
         try {
             final Document responseDoc = documentBuilder.parse(
                     new ByteArrayInputStream(response.getBytes()));
-            nodeList = (NodeList) xPath.evaluate("/html/body/ol/li/dl/dd[@class='StudyUUID']", responseDoc, XPathConstants.NODESET);
+            nodeList = (NodeList) xPath.evaluate("/html/body/ol/li/dl/dd[@class='StudyUUID']",
+                    responseDoc, XPathConstants.NODESET);
         } catch(final Exception ex) {
             System.err.println("Querying for studyUID " + studyInstanceUID + ": unknown server response:");
             System.err.println(response);
@@ -441,11 +443,12 @@ public final class ProcessImportDir {
     }
 
     private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles) {
+        //Skip DICOM files which are not completely stored by dcmrcv yet.
+        if (targetFile.getName().endsWith(".part")) {
+            return;
+        }
         if (targetFile.isFile()) {
-            //Skip DICOM files which are not completely stored by dcmrcv yet.
-            if (!targetFile.getName().endsWith(".part")) {
-                resultFiles.add(targetFile);
-            }
+            resultFiles.add(targetFile);
         } else {
             assert targetFile.isDirectory();
             for (final File subFile: targetFile.listFiles()) {
@@ -486,7 +489,7 @@ public final class ProcessImportDir {
 
     private final HttpClient httpClient = new DefaultHttpClient();
     private final File importDir;
-    private final SortedSet<File> handledFiles = new TreeSet<File>();
+    private final SortedSet<File> handledFiles = new ConcurrentSkipListSet<File>();
     private final URI createURI;
     private final URI queryURI;
     private final URI updateURI;

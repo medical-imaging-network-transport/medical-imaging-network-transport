@@ -28,12 +28,12 @@
         <property name="build.classpath" refid="build.classpath" />
 
         <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="on" listfiles="false" classpathref="build.classpath" includeantruntime="no">
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="true" listfiles="false" classpathref="build.classpath" includeantruntime="no">
             <compilerarg value="-Xlint:-path" />
         </javac>
 
         <mkdir dir="${build.dir}/ant-test-classes" />
-        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="yes" includeantruntime="no">
+        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
             <classpath>
                 <pathelement path="${build.dir}/ant-test-classes" />
                 <pathelement path="${build.dir}/ant-classes" />
