@@ -201,7 +201,7 @@ public class ServerConfig {
 	protected Properties envSpecificProperties() {
 		if (properties == null) {
 			properties = new Properties();
-			final ClassPathResource classPathResource = new ClassPathResource("jdbc.properties");
+			final ClassPathResource classPathResource = new ClassPathResource("server.properties");
 			try {
 				properties.load(classPathResource.getInputStream());
 			} catch (final IOException e) {
