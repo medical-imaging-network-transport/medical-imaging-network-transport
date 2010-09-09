@@ -79,6 +79,7 @@ import org.xml.sax.SAXException;
  * @author Uli Bubenheimer
  */
 public final class ProcessImportDir {
+    private static final Logger LOG = Logger.getLogger(ProcessImportDir.class);
 
     public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB,
             final boolean deletePhysicalInstanceFiles, final boolean forceCreate,
@@ -94,10 +95,10 @@ public final class ProcessImportDir {
     }
 
     public void processDir() {
-        System.err.println("Gathering files for allocation to studies...");
+        LOG.info("Gathering files for allocation to studies.");
         final long fileGatherStart = System.currentTimeMillis();
         //As items may be removed from the set of handled files concurrently,
-        //create a copy of a maximum set first; it won't hurt if it contains too many elements. 
+        //create a copy of a maximum set first; it won't hurt if it contains too many elements.
         final SortedSet<File> handledFilesCopy = new TreeSet<File>(handledFiles);
         final SortedSet<File> resultFiles = new TreeSet<File>();
         findPlainFilesRecursive(importDir, resultFiles);
@@ -128,12 +129,12 @@ public final class ProcessImportDir {
                 dcmFileData.add(plainFile);
             } catch (final IOException e) {
                 //Not a valid DICOM file?!
-                System.err.println("Skipping file: " + plainFile);
+                LOG.warn("Skipping file: " + plainFile);
                 e.printStackTrace();
             }
         }
         final long fileGatherEnd = System.currentTimeMillis();
-        System.err.println("Gathering files and study allocation completed in "
+        LOG.info("Gathering files and study allocation completed in "
                 + String.format("%.1f", (fileGatherEnd - fileGatherStart) / 1000.0f) + " seconds.");
 
         outerLoop:
@@ -142,7 +143,7 @@ public final class ProcessImportDir {
             assert studyUID != null;
             final Collection<File> instanceFiles = studyFiles.getValue();
             final int instanceFileCount = instanceFiles.size();
-            System.err.println("Creating MINT for " + instanceFileCount + " instances of study instance UID " + studyUID + "...");
+            LOG.info("Creating MINT for " + instanceFileCount + " instances of study instance UID " + studyUID + ".");
             final long mintConvertStart = System.currentTimeMillis();
             final BinaryData binaryData = new BinaryDcmData();
             final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
@@ -166,25 +167,23 @@ public final class ProcessImportDir {
                     }
                 } catch (final IOException e) {
                     //Not a valid DICOM file?!
-                    System.err.println("Skipping file: " + instanceFile);
+                    LOG.warn("Skipping file: " + instanceFile);
                     e.printStackTrace();
                     instanceFileIter.remove();
                     continue;
                 } catch (final RuntimeException e) {
                     //Some near-catastrophic error
-                    System.err.println("Fatal error while processing file: " + instanceFile);
+                    LOG.error("Fatal error while processing file: " + instanceFile);
                     throw e;
                 } catch (final Error e) {
                     //Some catastrophic error
-                    System.err.println("Fatal error while processing file: " + instanceFile);
+                    LOG.fatal("Fatal error while processing file: " + instanceFile);
                     throw e;
                 }
                 try {
                     builder.accumulateFile(instanceFile, dcmObj, transferSyntax);
                 } catch (final UnsupportedOperationException e) {
-                    System.err.println("Skipping study " + studyUID + ": DICOM syntax error in file " + instanceFile + ":");
-                    System.err.println(e.getLocalizedMessage());
-                    e.printStackTrace();
+                    LOG.error("Skipping study " + studyUID + ": DICOM syntax error in file " + instanceFile + ":", e);
                     continue outerLoop;
                 }
             }
@@ -198,7 +197,7 @@ public final class ProcessImportDir {
             }
 
             final long mintConvertEnd = System.currentTimeMillis();
-            System.err.println("MINT creation for study instance UID " + studyUID + " ("
+            LOG.info("MINT creation for study instance UID " + studyUID + " ("
                     + instanceFileCount + " instances) completed in "
                     + String.format("%.1f", (mintConvertEnd - mintConvertStart) / 1000.0f) + " seconds.");
         }
@@ -244,7 +243,7 @@ public final class ProcessImportDir {
 
             //Determine whether study exists and we need to perform an update
             final String studyInstanceUID = sendData.studyInstanceUID;
-            System.err.println("Uploading study instance UID " + studyInstanceUID);
+            LOG.info("Uploading study instance UID " + studyInstanceUID);
             final String studyUUID;
             if (forceCreate) {
                 studyUUID = null;
@@ -252,14 +251,16 @@ public final class ProcessImportDir {
                 final long existQueryStart = System.currentTimeMillis();
                 studyUUID = doesStudyExist(studyInstanceUID, sendData.patientID);
                 final long existQueryEnd = System.currentTimeMillis();
-                System.err.print("Completed querying server for existing study for study instance UID "
+                final StringBuilder msg =
+                    new StringBuilder("Completed querying server for existing study for study instance UID "
                         + studyInstanceUID + " in "
                         + String.format("%.1f", (existQueryEnd - existQueryStart) / 1000.0f) + " seconds. ");
                 if (studyUUID == null) {
-                    System.err.println("Study does not exist yet.");
+                    msg.append("Study does not exist yet.");
                 } else {
-                    System.err.println("Study exists, Study ID " + studyUUID);
+                    msg.append("Study exists, Study ID " + studyUUID);
                 }
+                LOG.info(msg);
             }
 
             try {
@@ -267,16 +268,15 @@ public final class ProcessImportDir {
                 final JobInfo jobInfo = send(sendData.metadataFile, sendData.binaryData, sendData.studyInstanceFiles, studyUUID);
                 final long uploadEnd = System.currentTimeMillis();
                 assert studyUUID == null || studyUUID.equals(jobInfo.studyID);
-                System.err.println("Completed uploading MINT to server for study instance UID "
+                LOG.info("Completed uploading MINT to server for study instance UID "
                         + studyInstanceUID + " (" + sendData.studyInstanceFiles.size() + " instances) in "
                         + String.format("%.1f", (uploadEnd - uploadStart) / 1000.0f) + " seconds, Job ID "
                         + jobInfo.getJobID() + ", Study ID " + jobInfo.getStudyID());
             } catch (final IOException e) {
-                System.err.println("Skipping study " + studyInstanceUID + ": I/O error while uploading study to server:");
-                System.err.println(e.getLocalizedMessage());
-                e.printStackTrace();
+                LOG.error("Skipping study " + studyInstanceUID + ": I/O error while uploading study to server:", e);
             } catch (final SAXException e) {
-                System.err.println("Skipping study " + studyInstanceUID + ": error while parsing server response to study upload.");
+                LOG.error("Skipping study " + studyInstanceUID
+                        + ": error while parsing server response to study upload.");
             } finally {
                 sendData.metadataFile.delete();
             }
@@ -301,8 +301,7 @@ public final class ProcessImportDir {
             nodeList = (NodeList) xPath.evaluate("/html/body/ol/li/dl/dd[@class='StudyUUID']",
                     responseDoc, XPathConstants.NODESET);
         } catch(final Exception ex) {
-            System.err.println("Querying for studyUID " + studyInstanceUID + ": unknown server response:");
-            System.err.println(response);
+            LOG.error("Querying for studyUID " + studyInstanceUID + ": unknown server response:\n" + response);
             throw ex;
         }
         final int uuidCount = nodeList.getLength();
@@ -330,9 +329,7 @@ public final class ProcessImportDir {
             final HttpGet httpGet = new HttpGet(createURI + "/" + jobID);
             final String response = httpClient.execute(httpGet, responseHandler);
 
-            //Debugging only
-//            System.err.println("Server job status response:");
-//            System.err.println(response);
+            LOG.debug("Server job status response:\n" + response);
 
             final String statusStr;
             try {
@@ -340,8 +337,7 @@ public final class ProcessImportDir {
                         new ByteArrayInputStream(response.getBytes()));
                 statusStr = xPath.evaluate("/html/body/dl/dd[@class='JobStatus']/text()", responseDoc);
             } catch(final Exception ex) {
-                System.err.println("Querying job " + jobID + ": unknown server response:");
-                System.err.println(response);
+                LOG.error("Querying job " + jobID + ": unknown server response:\n" + response);
                 studyIter.remove();
                 continue;
             }
@@ -351,20 +347,18 @@ public final class ProcessImportDir {
             if (statusStr.equals("IN_PROGRESS")) {
                 continue;
             } else if (statusStr.equals("FAILED")) {
-                System.err.println("Querying job " + jobID + ": server processing failed:");
-                System.err.println(response);
+                LOG.error("Querying job " + jobID + ": server processing failed:\n" + response);
                 //Do not delete the study's files in case of failure
                 removeStudyFiles(studyFiles, false);
             } else if (statusStr.equals("SUCCESS")) {
                 final long approxJobEndTime = System.currentTimeMillis();
                 //Always round down the job processing time, as it's usually too high anyway
-                System.err.println("Querying job " + jobID + ": server processing completed in approximately "
+                LOG.info("Querying job " + jobID + ": server processing completed in approximately "
                         + ((approxJobEndTime - jobInfo.getJobStartTime()) / 1000) + " seconds for "
                         + studyFiles.size() + " instance files, Study ID " + jobInfo.getStudyID() + ".");
                 removeStudyFiles(studyFiles, true);
             } else {
-                System.err.println("Querying job " + jobID + ": unknown server response:");
-                System.err.println(response);
+                LOG.error("Querying job " + jobID + ": unknown server response:\n" + response);
                 //Do not delete the study's files in case of failure
                 removeStudyFiles(studyFiles, false);
             }
@@ -423,9 +417,7 @@ public final class ProcessImportDir {
         final String response = httpClient.execute(httpPost, new BasicResponseHandler());
         final long uploadEndTime = System.currentTimeMillis();
 
-        //Debugging only
-//        System.err.println("Server response:");
-//        System.err.println(response);
+        LOG.debug("Server response:" + response);
 
         final String jobID;
         final String studyID;
@@ -467,8 +459,8 @@ public final class ProcessImportDir {
             } finally {
                 stream.close();
             }
-        } catch(final IOException ex) {
-            Logger.getLogger(ProcessImportDir.class).error("Unable to read tags file", ex);
+        } catch(final IOException e) {
+            LOG.error("Unable to read tags file", e);
         }
         final Set<Integer> tagSet = new HashSet<Integer>();
         for (final Object tagStr: properties.keySet()) {
