@@ -1,0 +1,120 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * MINT2DICOM is working - bid at a time and bulk loading
+    * Working on an SDK that will help with reading data from MINT
+    * Used DVTK to verify they are correct - except for part 10 headers
+    * Working on performance testing
+    * Planning to work on single file implementation next week
+  * Tim Dawson
+    * Implemented new study summary - returns everything but instances
+    * Progress on changelog controller
+  * Rex Sargon
+    * Changelog has the type instead of description
+    * Get all binary items will no longer return excluded items
+      * Renames excluded binary items to .exclude
+    * Update now handles non dicom types
+      * Not tested because update page is hard coded to DICOM type
+  * Tim Culp
+    * Documented on MINT conformance page
+    * Part 10 headers will be now be verified
+    * Is finding differences with a DICOM file Fred provided
+    * Next:
+      * adding support for data dictionary
+      * adding support for bulk binary data
+      * would like to be involved in end to end test
+  * Jeremy 
+    * Added multi-frame support.  Would like help from others on loading different multi-frame images
+    * 
+= Decisions =
+  * use initLowerCamal xml style
+  * use XML datetime type for all non DICOM date/times (e.g. changelog date/time)
+  * use ISO 8601 standard datetime for URL query parameters minus the : and - for all non DICOM date/times (e.g. changelog date/time)
+  * Cancel next week's meeting (lots on vacation)
+
+= New Actions = 
+  * Document which binary values we convert to text in spec (Chris Hafey)
+  * Look at getting Vital resource to look at MINT multi-frame handling (Chris Hafey)
+
+= Old Actions =
+
+  * Get MINT DICOM data dictionary populated with current standard (Rex)
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Add support for multi-frame binary items to reference implementation (server and DICOM to MINT) (Jeremy)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Changelog and update XSD (Tim Dawson)
+    * Add XML element for application's user identity
+    * Add XML element for user identity
+    * Add XML element for remote IP Address
+  * Extract user identity from HTTP Header and stick in changelog (Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with baseline version implementation and data dictionary based normalization (Rex)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Modify DICOM2MINT for Part 10 headers (Tim Dawson)
+  * Modify MINT Create/Update for Part 10 headers (Tim Dawson)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Document how to build reference implementation + clear canvas plugin(Gorkem)
+  * Document how to install reference implementation from binary build (Gorkem)
+  * Document how to use reference 
+  * Contact clear canvas folks about adding native support for MINT (Chris)
+  * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
+  * Make sure Date/Time is UTC and using DICOM DT Format (Tim Dawson)
+  * Update study queries (Tim Dawson)
+    * Add support for accession number issuer
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+  * Changelog changes (Tim Dawson)
+    * add type
+    * remove reason
+  * Send email to MINT-user group saying if you want access to MINT server to email him (Gorkem)
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * CSTORE SCP -> MINT (Tim Dawson)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Target a MINT meeting at RSNA Sunday @ 5PM (Jim Philbin)
+  * look into a meeting room at RSNA for MINT meeting (Wayne Dejarnette)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Schedule follow-up meeting at JHU for October 18/19 (Jim Philbin)
+    * Gorkem to stand up a FTP server to distribute the data
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+    * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+    * Gorkem to run dvtk on original DICOM files vs regenerated files
+    * Define performance test environment (Jim Philbin)
+    * Setup Performance Test Environment (Jim Philbin)
+    * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+    * MINT Server Implementation - Phase 2 (Tim Dawson) 
+
+
+
+= Issues =
+  * Time zone support in general - need to discuss this further
+
+= Done =
+  * Remove study summary tags from data dictionary (Tim)
+  * Implement binary item exclusion on get all binary items (Rex)
+    * Create MINT2DICOM Converter (Gorkem)
+  * Investigate using SVN tags on source files like we have on conformance files (Tim Dawson) (eclipse may make this easy)
+
+
+= Future =
+  * GUI Tool to replace XHTML functionality / work with MINT server
