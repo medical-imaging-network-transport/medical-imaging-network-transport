@@ -297,9 +297,9 @@ public final class DICOMSend {
                                     + curFile);
                             LOG.error(
                                     "<prezcontext sopclassuid=\"" + sopClassUID
-                                    + "\" sopclassdesc=\"" + UIDDictionary.getDictionary().prompt(sopClassUID)
+                                    + "\" sopclassdesc=\"" + UIDDictionary.getDictionary().nameOf(sopClassUID)
                                     + "\" xfersyntaxuid=\"" + transferSyntaxUID
-                                    + "\" xfersyntaxdesc=\"" + UIDDictionary.getDictionary().prompt(transferSyntaxUID)
+                                    + "\" xfersyntaxdesc=\"" + UIDDictionary.getDictionary().nameOf(transferSyntaxUID)
                                     + "\"/>");
                             continue fileLoop;
                         } catch (final IllegalStateException e) {
