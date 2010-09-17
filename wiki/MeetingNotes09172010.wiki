@@ -1,0 +1,91 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Running performance tests, but is seeing weird numbers
+    * Need to rerun performance tests once cause variance is understood
+    * Refactoring MINT2DICOM
+    * Started implementing single file in reference impl
+      * Would be really helpful to have the size of the binary item in the metadata
+    * HTTP Chunk size configuration is only sticking when communicating over localhost, it is ignored when communicating over the LAN.
+      * Probably a Tomcat configuration issue? 
+  * Rex
+    * Not much progress, mainly catching up with things and bringing Dan up to speed
+    * Needs to move data dictionary to POJOs - currently assigned to Tim.  REx going to work with Dan to see if he can pick this up
+  * Tim Culp
+    * Not much progress, on vacation
+    * Updated conformance test to use data dictionary to use VRs/tag names
+    * Started working on Toshiba multi-frame image, cause some performance/memory issues - hope to finish next week
+  * Jeremey
+    * Not much progress, hope to work on unit testing next week
+  * Chris
+    * Started building our own performance test environment - focused on Gig/E
+    * Installed MINT on Apple XServe, found performance problems
+    * Is anyone trying to run MINT on non windows?  Yes - Gorkem is trying to get it working on Solaris, having some difficulty with environment variables.  Tim Culp is running the conformance test on Linux - no issues yet
+  * Tim Dawson
+    * Not much progress, but this should change next week
+
+= Decisions =
+  * Add size of binary item to the metadata
+
+
+= New Actions =
+  * Add size of binary item to the metadata (Gorkem)
+  * Post Vital's performance test plan (Chris)
+  * Post Harris' performance test plan (Tim)
+
+= Old Actions =
+
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Rex)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Contact clear canvas folks about adding native support for MINT (Chris)
+  * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Send email to MINT-user group saying if you want access to MINT server to email him (Gorkem)
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Target a MINT meeting at RSNA Sunday @ 5PM (Jim Philbin)
+  * look into a meeting room at RSNA for MINT meeting (Wayne Dejarnette)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Schedule follow-up meeting at JHU for October 18/19 (Jim Philbin)
+    * Gorkem to stand up a FTP server to distribute the data
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+  * Define performance test environment (Gorkem)
+  * Setup Performance Test Environment (Jim Philbin)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Completed Actions = 
+  * Run dvtk on original DICOM files vs regenerated files (Gorkem)
+
+= Issues =
+
+= Future =
+  * GUI Tool to replace XHTML functionality / work with MINT server
