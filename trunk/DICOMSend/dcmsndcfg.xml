@@ -18,4 +18,5 @@
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.12.1" sopclassdesc="X-Ray Angiographic Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.128" sopclassdesc="Positron Emission Tomography Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.128" sopclassdesc="Positron Emission Tomography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
 </dicomsend>
