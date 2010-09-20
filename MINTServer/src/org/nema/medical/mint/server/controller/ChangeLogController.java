@@ -52,8 +52,8 @@ public class ChangeLogController {
 	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) String since,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
-            @RequestParam(value = "pageNum", required = false) Integer pageNum,
+            @RequestParam(value = "limit", required = false) Integer pageSize,
+            @RequestParam(value = "offset", required = false) Integer pageNum,
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException, JiBXException {
 

@@ -25,11 +25,38 @@ import java.util.Date;
 
 public class Utils {
 
-    public static final Date parseDate(String dateStr) throws ParseException {
-    	String[] xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz","yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss.SSS","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd"};
+    /**
+     * Parses a string formatted according to the ISO8601 "extended" date format,
+     * the standard xsd:dateTime format used in XML.  This method isn't actually used
+     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
+     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing 
+     * due to special character issues. 
+     * @param dateStr formatted according to the ISO 8601 "extended" date format
+     * @return Date a the date represented by the provided string
+     * @throws ParseException if the date is not properly formatted
+     */
+    public static final Date parseISO8601Basic(String dateStr) throws ParseException {
+    	String[] xsdDateTime = new String[]{"yyyyMMdd'T'HHmmss.SSSZ","yyyyMMdd'T'HHmmssZ","yyyyMMdd'T'HHmmss.SSS","yyyyMMdd'T'HHmmss","yyyyMMdd"};
+        
+    	// fix issue where + is replace with ' ' in a URL 
+        dateStr = dateStr.replace(' ','+');       
+        //this is zero time so we need to add that TZ indicator for 
+        if ( dateStr.endsWith( "Z" ) ) {
+        	dateStr = dateStr.substring( 0, dateStr.length() - 1) + "+0000";
+        }
     	return parseDate(dateStr,xsdDateTime);
     }
     
+    /**
+     * Parses a string formatted according to the ISO8601 "extended" date format,
+     * the standard xsd:dateTime format used in XML.  This method isn't actually used
+     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
+     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing 
+     * due to special character issues. 
+     * @param dateStr formatted according to the ISO 8601 "extended" date format
+     * @return Date a the date represented by the provided string
+     * @throws ParseException if the date is not properly formatted
+     */
     public static final Date parseISO8601Extended(String dateStr) throws ParseException {
     	String[] xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz","yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss.SSS","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd"};
     	// fix issue where + is replace with ' ' in a URL
@@ -46,22 +73,13 @@ public class Utils {
                 String s0 = dateStr.substring( 0, signIndex);
                 String s1 = dateStr.substring( signIndex, dateStr.length() );
                 dateStr = s0 + "GMT" + s1;
+                System.out.println("dateStr = " + dateStr);
         	}
         }
     	return parseDate(dateStr,xsdDateTime);
     }
     
-    public static final Date parseISO8601Basic(String dateStr) throws ParseException {
-    	String[] xsdDateTime = new String[]{"yyyyMMdd'T'HHmmss.SSSZ","yyyyMMdd'T'HHmmssZ","yyyyMMdd'T'HHmmss.SSS","yyyyMMdd'T'HHmmss","yyyyMMdd"};
-        
-    	// fix issue where + is replace with ' ' in a URL 
-        dateStr = dateStr.replace(' ','+');       
-        //this is zero time so we need to add that TZ indicator for 
-        if ( dateStr.endsWith( "Z" ) ) {
-        	dateStr = dateStr.substring( 0, dateStr.length() - 1) + "+0000";
-        }
-    	return parseDate(dateStr,xsdDateTime);
-    }
+
     
     public static final Date parseDate(String dateStr, String[] formats) throws ParseException {
     	Date date = null;

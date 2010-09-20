@@ -64,36 +64,6 @@ public class Study implements Serializable {
 	private String issuerOfAccessionNumber;
 
 
-	// Patient's name (0010,0010) T2
-	// Patient's full name.
-	// The patient's name in DICOM VR PN (family name complex^given name
-	// complex^middle name^name prefix^name suffix). While this value
-	// is typically provided, it is not 100% reliable:
-	// - It can be an empty string
-	// - It may not conform to the PN formatting. The main case here is when it
-	// is manually typed in and the user
-	// types the whole name into the "first name field" on the scanner
-	// - A fake name may be used for patients whose identity is unknown (patient
-	// is unconscience, etc)
-	// - If a patient's name is changed (married, legal name change, etc) -
-	// older studies may exist with the old name
-	// - Other information systems may have different names for the same patient
-	// (e.g. Chris E. Hafey vs Christopher Edward Hafey)
-	// INDEXED
-	// We store whatever we get for (0010,0010) here so we can access it without
-	// opening the original DICOM instances. This field
-	// is frequently searched on. Users often try to find what they are looking
-	// for with the minimum amount of typing. Here are some
-	// possible search use cases
-	// - What studies exist for patient whose last name begins with "HAF".
-	// - What studies exist for patient whose last name exactly matches "HAFEY".
-	// - What studies exist for patient whose last name exactly matches "HAFEY"
-	// and first name begins with "C".
-	// - What studies exist for patient whose last name begins with "HAF" and
-	// first name begins with "C"
-	@Column
-	private String patientName;
-
 	// Patient ID (0010,0020) T2
 	// Primary hospital identification number or code for the patient.
 	// INDEXED
@@ -146,7 +116,7 @@ public class Study implements Serializable {
 	private String studyInstanceUID;
 
 	@Column
-	private Timestamp updateTime = now();
+	private Timestamp lastModified = now();
 
 	@Override
 	public boolean equals(final Object object) {
@@ -175,10 +145,6 @@ public class Study implements Serializable {
 		return issuerOfAccessionNumber;
 	}
 
-	public String getPatientName() {
-		return patientName;
-	}
-
 	public String getPatientID() {
 		return patientID;
 	}
@@ -199,8 +165,8 @@ public class Study implements Serializable {
 		return studyInstanceUID;
 	}
 
-	public Timestamp getUpdateTime() {
-		return updateTime;
+	public Timestamp getLastModified() {
+		return lastModified;
 	}
 
 	@Override
@@ -218,10 +184,6 @@ public class Study implements Serializable {
 
 	public void setIssuerOfAccessionNumber(String issuerOfAccessionNumber) {
 		this.issuerOfAccessionNumber = issuerOfAccessionNumber;
-	}
-
-	public void setPatientName(final String patientName) {
-		this.patientName = patientName;
 	}
 
 	public void setPatientID(final String patientID) {
@@ -244,8 +206,8 @@ public class Study implements Serializable {
 		this.studyInstanceUID = studyInstanceUID;
 	}
 
-	public void setUpdateTime(final Timestamp updateTime) {
-		this.updateTime = updateTime;
+	public void setLastModified(final Timestamp updateTime) {
+		this.lastModified = updateTime;
 	}
 
 	@Override
