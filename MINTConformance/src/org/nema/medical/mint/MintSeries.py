@@ -119,7 +119,7 @@ class MintSeries():
        s += indent+"- Attributes\n"       
        indent += " "
        numAttributes = self.numAttributes()
-       for n in range(0, numAttributes-1):
+       for n in range(0, numAttributes):
            attr = self.attribute(n).toString(indent)
            s += attr.encode(DataDictionaryElement.UNICODE)
            if n != numAttributes-1: s += '\n'

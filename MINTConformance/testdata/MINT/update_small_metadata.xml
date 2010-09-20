@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<StudyMeta xmlns="http://medical.nema.org/mint" studyInstanceUID="1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873">
-  <Attributes>
-    <Attr tag="00100010" vr="PN" val="UPDATED VALUE!!!!"/>
-    <Attr tag="00101010" vr="AS" val="073Y" exclude="remove"/>
-    <Attr tag="00100040" vr="CS" val="F" exclude="remove"/>
-  </Attributes>
-  <SeriesList/>
-</StudyMeta>

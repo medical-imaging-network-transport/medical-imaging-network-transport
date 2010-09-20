@@ -32,6 +32,8 @@ import string
 import sys
 import traceback
 
+from os.path import join
+
 from org.nema.medical.mint.DataDictionary import DataDictionary
 from org.nema.medical.mint.DicomInstance  import DicomInstance
 
@@ -44,6 +46,12 @@ class DicomStudy():
        self.__instances = []
        self.__dataDictionary = DataDictionary(dataDictionaryUrl)
        self.__read()
+
+   def tidy(self):
+       """
+       Removes tempory binary items.
+       """
+       for instance in self.__instances: instance.tidy()
 
    def studyInstanceUID(self):
        if self.numInstances() > 0:
@@ -66,8 +74,14 @@ class DicomStudy():
        return s
        
    def __read(self):
-       pattern = os.path.join(self.__dcmDir, "*.dcm")
-       dcmNames = glob.glob(pattern)
+
+       dcmNames = []
+       for root, dirs, files in os.walk(self.__dcmDir, topdown=False):
+           for name in files:
+               filename = join(root, name)
+               if DicomInstance.isDicom(filename):
+                  dcmNames.append(filename)
+
        for dcmName in dcmNames:
            instances = DicomInstance(dcmName, self.__dataDictionary)
            self.__instances.append(instances)
@@ -91,6 +105,7 @@ def main():
        dataDictionaryUrl = args[1];
        study = DicomStudy(dcmDir, dataDictionaryUrl)
        print study
+       study.tidy()
        
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

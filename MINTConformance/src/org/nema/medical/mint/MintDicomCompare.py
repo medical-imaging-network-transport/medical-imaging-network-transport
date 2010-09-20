@@ -226,24 +226,38 @@ class MintDicomCompare():
            
    def __checkBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
-       binaryitem = attr.bid()
-       if binaryitem == None: return
-       
+       # ---
+       # Check for DICOM binary item
+       # ---
+       dat1 = dicomAttr.dat()
+       if not os.access(dat1, os.F_OK):
+          self.__count += 1
+          print "File not found", ":", dat1
+          return
+
        # ---
        # Check for MINT binary item.
        # ---
-       dat = os.path.join(self.__binary, binaryitem+".dat")
-       if not os.access(dat, os.F_OK):
-          self.__count += 1
-          print "File not found", ":", dat
+       if attr.bid() == None:
+          self.__check(dicomAttr.tag()+" missing binary",
+                    dat1,
+                    "None",
+                    seriesInstanceUID, 
+                    sopInstanceUID)
           return
-           
+       
+       dat2 = os.path.join(self.__binary, attr.bid()+".dat")
+       if not os.access(dat2, os.F_OK):
+          self.__count += 1
+          print "File not found", ":", dat2
+          return
+
        # ---
        # Check binary item sizes.
        # ---
-       size1 = dicomAttr.vl()
-       size2 = os.path.getsize(dat)
-       self.__check(dicomAttr.tag()+" "+binaryitem+".dat size",
+       size1 = os.path.getsize(dat1)
+       size2 = os.path.getsize(dat2)
+       self.__check(dicomAttr.tag()+" binary sizes differ",
                     size1,
                     size2,
                     seriesInstanceUID, 
@@ -253,38 +267,39 @@ class MintDicomCompare():
        # Check binary item byte for byte.
        # ---
        if not self.__lazy and size1 == size2:
-          bid = open(dat, "rb")
-          val = dicomAttr.val()
-          assert size1 == len(val) # These better be equal
+          bid1 = open(dat1, "rb")
+          bid2 = open(dat2, "rb")
 
           # ---
           # Read in a block.
           # ---
           bufsize = 1024
           block = 0
-          buf = bid.read(bufsize)
-          bytes = unpack('B'*len(buf), buf)
-          n = len(bytes)
-          b = 0
-          while n > 0:          
+          buf1 = bid1.read(bufsize)
+          buf2 = bid2.read(bufsize)
+          
+          bytes1 = unpack('B'*len(buf1), buf1)
+          bytes2 = unpack('B'*len(buf2), buf2)
+          assert len(bytes1) == len(bytes2) # these better be equal
+          n = len(bytes1)
+          while n > 0:        
 
              # ---
              # Loop through block.
              # ---
              diff = False
              for i in range(0, n):
-                 self.__check(binaryitem+".dat byte "+str(block*bufsize+i),
-                              val[b],
-                              bytes[i],
+                 self.__check(attr.bid()+".dat byte "+str(block*bufsize+i),
+                              bytes1[i],
+                              bytes2[i],
                               seriesInstanceUID, 
                               sopInstanceUID)
                  
-                 if val[b] != bytes[i]:
+                 if bytes1[i] != bytes2[i]:
                     diff = True
                     break
                     
                  self.__bytesCompared += 1
-                 b += 1
 
              # ---
              # Skip to end if difference was found.
@@ -292,12 +307,55 @@ class MintDicomCompare():
              if diff:
                 n = -1
              else:
-                buf = bid.read(bufsize)
-                bytes = unpack('B'*len(buf), buf)
-                n = len(bytes)
+                buf1 = bid1.read(bufsize)
+                buf2 = bid2.read(bufsize)
+
+                bytes1 = unpack('B'*len(buf1), buf1)
+                bytes2 = unpack('B'*len(buf2), buf2)
+                assert len(bytes1) == len(bytes2) # these better be equal         
+                n = len(bytes1)
                 block += 1
              
-          bid.close()
+          bid1.close()
+          bid2.close()
+ 
+   def __checkInlineBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+           
+       # ---
+       # Check binary item sizes.
+       # ---
+       size1 = dicomAttr.vl()
+       # TODO: This needs to be decoded
+       size2 = len(attr.val())
+       self.__check(dicomAttr.tag()+" <Binary Data>",
+                    size1,
+                    size2,
+                    seriesInstanceUID, 
+                    sopInstanceUID)
+
+       # ---
+       # Check binary item byte for byte.
+       # ---
+       if not self.__lazy and size1 == size2:
+
+          buf1 = dicomAttr.val()
+          buf2 = attr.val()
+          
+          bytes1 = unpack('B'*len(buf1), buf1)
+          bytes2 = unpack('B'*len(buf2), buf2)
+          assert len(bytes1) == len(bytes2) # these better be equal
+          for i in range(0, n):
+              self.__check(dicomAttr.tag()+" <Binary Data> byte "+str(i),
+                           bytes1[i],
+                           bytes2[i],
+                           seriesInstanceUID, 
+                           sopInstanceUID)
+                 
+              if bytes1[i] != bytes2[i]:
+                 diff = True
+                 break
+                    
+              self.__bytesCompared += 1
  
 # -----------------------------------------------------------------------------
 # main
