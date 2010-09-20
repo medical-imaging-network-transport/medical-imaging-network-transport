@@ -104,7 +104,7 @@ public class StudyDAO extends HibernateDaoSupport {
 	public List<Study> findStudies(Map<SearchKey, String> searchParams, int pageNum, int pageSize) throws ParseException {
 
         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class);
-        detachedCriteria.addOrder(Order.desc("updateTime"));
+        detachedCriteria.addOrder(Order.desc("lastModified"));
         for (SearchKey key : searchParams.keySet()) {
 			detachedCriteria.add(key.getRestrictions(searchParams.get(key)));
         }
@@ -133,14 +133,14 @@ public class StudyDAO extends HibernateDaoSupport {
 		calendar.add(Calendar.SECOND, -between(1, MAXSECONDS, seconds));
 
 		final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class)
-				.add(Restrictions.ge("updateTime", calendar.getTime())).addOrder(Order.desc("updateTime"));
+				.add(Restrictions.ge("lastModified", calendar.getTime())).addOrder(Order.desc("lastModified"));
 		final List<Study> list = getHibernateTemplate().findByCriteria(detachedCriteria, 0, between(1, 50, max));
 		return list;
 	}
 
     public Study insertStudy(final Study study) {
         if (study != null) {
-            study.setUpdateTime(Study.now());
+            study.setLastModified(Study.now());
             getHibernateTemplate().save(study);
             getHibernateTemplate().flush();
             getHibernateTemplate().refresh(study);
@@ -150,7 +150,7 @@ public class StudyDAO extends HibernateDaoSupport {
 
     public Study updateStudy(final Study study) {
         if (study != null) {
-            study.setUpdateTime(Study.now());
+            study.setLastModified(Study.now());
             getHibernateTemplate().saveOrUpdate(study);
             getHibernateTemplate().flush();
             getHibernateTemplate().refresh(study);

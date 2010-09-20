@@ -13,6 +13,7 @@
 		<attribute name="type" type="string" use="optional"></attribute>
 		<attribute name="version" type="string" use="optional"></attribute>
 		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
+        <attribute name="updateDateTime" type="dateTime" use="optional"/>
 	</complexType>
 
 	<complexType name="AttributesType">

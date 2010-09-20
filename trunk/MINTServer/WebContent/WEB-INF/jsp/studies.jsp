@@ -21,12 +21,8 @@ dd { margin: 0 0 1em 0; padding: 0; }
 			<dl>
 				<dt>MINT Study UUID</dt>
 				<dd class='StudyUUID'>${study.id}</dd>
-				<dt>DICOM Study Instance UID</dt>
-				<dd class='StudyUID'>${study.studyInstanceUID}</dd>
-				<dt>DICOM AccessionNumber</dt>
-				<dd class='StudyAccessionNumber'>${study.accessionNumber}</dd>
-				<dt>DICOM StudyDate</dt>
-				<dd class='StudyDate'>${study.dateTime}</dd>
+				<dt>Last Modified</dt>
+				<dd class='LastModified'>${study.lastModified}</dd>
 				<dt>Study Version</dt>
 				<dd class='StudyVersion'>${study.studyVersion}</dd>
 				<dt>Links</dt>

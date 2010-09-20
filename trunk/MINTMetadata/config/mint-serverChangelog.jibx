@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<binding xmlns:tns="http://medical.nema.org/mint" name="serverChangelog" trim-whitespace="true" direction="output">
-  <namespace uri="http://medical.nema.org/mint" default="elements"/>
-  <mapping name="changelog" class="org.nema.medical.mint.changelog.ChangeSet">
-    <collection iter-method="changeIterator" item-type="org.nema.medical.mint.changelog.Change"/>
-  </mapping>
-  <mapping name="change" class="org.nema.medical.mint.changelog.Change">
-    <value style="attribute" name="studyUUID" get-method="getStudyUUID"/>
-    <value style="attribute" name="changeNumber" get-method="getChangeNumber"/>
-    <value style="attribute" name="type" get-method="getType"/>    
-    <value style="attribute" name="dateTime" get-method="getDateTime"/>    
-    <value style="attribute" name="remoteHost" get-method="getRemoteHost"/>    
-    <value style="attribute" name="remoteUser" get-method="getRemoteUser" usage="optional"/>    
-    <value style="attribute" name="principal" get-method="getPrincipal" usage="optional"/>    
-  </mapping>
+<binding xmlns:tns="http://medical.nema.org/mint" name="serverChangelog"
+	trim-whitespace="true" direction="output">
+	<namespace uri="http://medical.nema.org/mint" default="elements" />
+	<mapping name="changelog" class="org.nema.medical.mint.changelog.ChangeSet">
+		<collection iter-method="changeIterator"
+			item-type="org.nema.medical.mint.changelog.Change" />
+	</mapping>
+	<mapping name="change" class="org.nema.medical.mint.changelog.Change">
+		<value style="attribute" name="studyUUID" get-method="getStudyUUID" />
+		<value style="attribute" name="changeNumber" get-method="getChangeNumber" />
+		<value style="attribute" name="type" get-method="getType" />
+		<value style="attribute" name="dateTime" get-method="getDateTime" />
+		<value style="attribute" name="remoteHost" get-method="getRemoteHost" />
+		<value style="attribute" name="remoteUser" get-method="getRemoteUser"
+			usage="optional" />
+		<value style="attribute" name="principal" get-method="getPrincipal"
+			usage="optional" />
+	</mapping>
 </binding>

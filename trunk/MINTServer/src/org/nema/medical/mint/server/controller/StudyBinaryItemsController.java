@@ -75,7 +75,11 @@ public class StudyBinaryItemsController {
             LOG.error("Unable to locate binary items: " + seq + " or there are no binary items.");
             return;
         }
-
+        
+        LOG.info("output buffer size was " + res.getBufferSize());
+        int bufferSize = 1024*256;
+        res.setBufferSize(bufferSize);
+        LOG.info("output buffer size is now " + res.getBufferSize());
         final OutputStream out = res.getOutputStream();
         
         int i = itemList.next();
@@ -101,12 +105,14 @@ public class StudyBinaryItemsController {
             out.write("\nContent-Type: application/octet-stream\n".getBytes());
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
+            out.flush();
         } else {
         	res.setContentType("application/octet-stream");
         	res.setContentLength((int) file.length());
         }
         
-        streamBinaryItem(file,out);
+        out.flush();
+        streamBinaryItem(file,out, bufferSize);
         
         if(multipart)
         {
@@ -133,7 +139,7 @@ public class StudyBinaryItemsController {
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
 
-            streamBinaryItem(file,out);
+            streamBinaryItem(file,out, bufferSize);
             
             out.write(("\n--" + MP_BOUNDARY).getBytes());
         }
@@ -145,9 +151,9 @@ public class StudyBinaryItemsController {
         out.flush();
     }
 
-    private void streamBinaryItem(final File file, final OutputStream outputStream) throws IOException {
+    private void streamBinaryItem(final File file, final OutputStream outputStream, int bufferSize) throws IOException {
         final InputStream in = new FileInputStream(file);
-        final byte[] bytes = new byte[16 * 1024];
+        final byte[] bytes = new byte[bufferSize];
         try {
             while (true) {
                 final int amountRead = in.read(bytes);

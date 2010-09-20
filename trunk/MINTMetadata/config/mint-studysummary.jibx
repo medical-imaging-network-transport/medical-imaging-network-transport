@@ -15,6 +15,8 @@
     	<structure name="series" map-as="SeriesType"/>
     </collection> 
     <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID"/>
+    <value style="attribute" name="type" get-method="getType" set-method="setType" usage="optional"/>
+    <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
     <value style="attribute" name="instanceCount" pre-get="computeInstanceCount" get-method="getInstanceCount"/>
   </mapping>
   <mapping class="org.nema.medical.mint.metadata.Study" name="studyMeta">
