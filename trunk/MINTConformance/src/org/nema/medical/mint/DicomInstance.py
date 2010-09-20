@@ -52,7 +52,21 @@ class DicomInstance():
        self.__dataDictionary = dataDictionary
        
        self.__open()
-       
+
+   def tidy(self):
+       """
+       Removes tempory binary items.
+       """
+       numAttributes = self.numAttributes()
+       for n in range(0, numAttributes): self.attribute(n).tidy()
+
+   def isDicom(filename):
+       dcm = open(filename, "rb")
+       preamble=dcm.read(128)
+       dicm=dcm.read(4)
+       return (dicm == "DICM")
+   isDicom = staticmethod(isDicom)
+
    def studyInstanceUID(self):
        attr = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
        return attr.val()
@@ -93,7 +107,8 @@ class DicomInstance():
        for n in range(0, numAttributes):
            tag = self.tag(n)
            attr = self.attributeByTag(tag)
-           s += attr.toString()+"\n"
+           s += attr.toString()
+           if n != numAttributes-1: s += '\n'
        
        return s
            
@@ -156,6 +171,7 @@ def main():
        dataDictionary = DataDictionary(dataDictionaryUrl)
        instance = DicomInstance(dcmName, dataDictionary)
        print instance
+       instance.tidy()
                         
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
