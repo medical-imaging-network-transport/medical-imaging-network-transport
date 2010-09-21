@@ -8,6 +8,8 @@
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
 
+	<prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2.1" sopclassdesc="Enhanced CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
+    
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.57" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical (Process 14)"/>
