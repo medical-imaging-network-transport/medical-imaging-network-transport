@@ -293,7 +293,7 @@ public final class DICOMSend {
                             break;
                         } catch (final NoPresentationContextException e) {
                             LOG.error(
-                                    "Presentation Context not supported for file (consider adding the next line to the configuration): "
+                                    "Presentation Context not supported for file (consider adding the next line to the configuration file): "
                                     + curFile);
                             LOG.error(
                                     "<prezcontext sopclassuid=\"" + sopClassUID
