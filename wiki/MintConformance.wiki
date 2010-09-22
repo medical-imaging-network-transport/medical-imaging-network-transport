@@ -4,7 +4,7 @@
 
 = Setting up your environment =
 
-The MINT Conformance tools require [http://www.python.org Python2.6] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. The python application must also be in your *PATH*. For example, if *MC_PATH* is the path to your subversion trunk, then set your PYTHONPATH as follows:
+The MINT Conformance tools require [http://www.python.org Python2.6] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. The python application must also be in your *PATH*. For example, if *MC_HOME* is the path to your subversion trunk, then set your PYTHONPATH as follows:
 
 *Unix*
 {{{
@@ -40,14 +40,14 @@ Usage: MintStudyCompare.sh <mint_study1.xml> <mint_study2.xml>
 To test the tool, you can use the sample data located in the MINTConformance/testdata directory. In the example below, we run the tool with the identical MINT studies so no differences are found. As with most Unix applications, no news is good news. Therefore, no output means the metadata and binary files are exactly equal.
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
+> cd $MINT_HOME/testdata/MINT/Simple/DICOM
 > sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.xml metadata.xml
 }}}
 
 To see differences, we can compare an older MINT study to a newer one. The example below shows both metadata changes and binary differences.
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata/MINT
+> cd $MINT_HOME/testdata/MINT
 > sh $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.sh metadata.1.xml 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM/metadata.xml
 1,190c1,190
 < <?xml version="1.0" encoding="utf-8" ?>
@@ -70,7 +70,7 @@ Running the tool with no arguments displays the usage:
 
 {{{
 > python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py
-Usage: MintStudyCompare.py [options] <mint_study_dir> <mint_study_dir>
+Usage: MintStudyCompare.py [options] <old_mint_study_dir> <new_mint_study_dir>
   -v: verbose
   -l: lazy check (skips binary content)
   -h: displays usage
@@ -79,7 +79,7 @@ Usage: MintStudyCompare.py [options] <mint_study_dir> <mint_study_dir>
 The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata/MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM
+> cd $MINT_HOME/testdata/MINT/Simple/DICOM
 > python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py -v . .
         12 study attribute(s) compared.
          2 series compared.
@@ -94,8 +94,8 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
 To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata/MINT
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py 7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM .
+> cd $MINT_HOME/testdata/MINT
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py Simple/DICOM Simple/DICOM
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00080008 vr=CS val=ORIGINAL\PRIMARY\AXIAL != tag=00080008 vr=CS val=ORIGINAL
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200020 vr=CS val=L\P != tag=00200020 vr=CS val=L
 Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200037 vr=DS val=1.000000\0.000000\0.000000\0.000000\1.000000\0.000000 != tag=00200037 vr=DS val=1.000000
@@ -133,8 +133,8 @@ Usage: MintDicomCompare.py [options] <dicom_study_dir> <mint_study_dir> <data_di
 The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. The data dictionary is required for looking up implicit VRs based on the group-element tag.
 
 {{{
-> cd $MC_HOME/MINTConformance/testdata
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py -v DICOM MINT/7cc45edf-d5a6-4264-b8ae-1d24d857f04b/DICOM DICOMDictionary.xml
+> cd $MINT_HOME/testdata
+> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py -v DICOM MINT/Simple/DICOM DICOMDictionary.xml
 - Study Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873
  - Series Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350
   - SOP Instance UID 1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037
@@ -170,15 +170,15 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    * Detect endianness, explicit VRs
    * Compare sequencing data elements (SQ) between DICOM and MINT
    * Use data dictionary to find VRs
+   * Store binary in temp files for large DICOMs
+   * Provide support for inline binary
 
 *To Do*
 
+   * Provide support for bulk binary
    * Read DCM4CHE data dictionary from URL
    * Consider cases for multiple VRs
    * SAX parsing for large metadata files
-   * Store binary in temp files for large DICOMs
-   * Provide support for inline binary
-   * Provide support for bulk binary
    * Add flag for changing the floating point precision
    * Comparisons before and after updates
    * Support multi-frame DICOM
