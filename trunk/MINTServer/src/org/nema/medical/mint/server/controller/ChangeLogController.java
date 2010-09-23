@@ -49,6 +49,12 @@ public class ChangeLogController {
 	@Autowired
 	protected ChangeDAO changeDAO = null;
 
+	@Autowired
+	protected Integer fileResponseBufferSize;
+
+	@Autowired
+	protected Integer fileStreamBufferSize;
+
 	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) String since,
@@ -89,6 +95,7 @@ public class ChangeLogController {
 				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
 			}
 		}
+		res.setBufferSize(fileResponseBufferSize);
 		ChangeSet changeSet = new ChangeSet(changes);
 		IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog",ChangeSet.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
@@ -115,6 +122,7 @@ public class ChangeLogController {
 				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
 			}
 		}
+		res.setBufferSize(fileResponseBufferSize);
 		ChangeSet changeSet = new ChangeSet(uuid, changes);
 		IBindingFactory bfact = BindingDirectory.getFactory("studyChangelog",ChangeSet.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
@@ -190,13 +198,14 @@ public class ChangeLogController {
 			return;
 		}
 
+		res.setBufferSize(fileResponseBufferSize);
 		try {
 			final File file = new File(studiesRoot, uuid + "/changelog/" + sequence + "/metadata." + ext);
 			if (file.exists() && file.canRead()) {
 				final OutputStream out = res.getOutputStream();
 				res.setContentLength((int)file.length());
 				res.setContentType("text/xml");
-				Utils.streamFile(file, out);
+				Utils.streamFile(file, out, fileStreamBufferSize);
 			} else {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Not found");
 			}

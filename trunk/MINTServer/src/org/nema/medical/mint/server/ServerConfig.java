@@ -61,12 +61,12 @@ public class ServerConfig {
 	 * Common stuff
 	 */
 	private static final Logger LOG = Logger.getLogger(ServerConfig.class);
-	
+
 	protected static HibernateTransactionManager hibernateTransactionManager = null;
 	protected static SessionFactory sessionFactory = null;
 	protected Context envContext = null;
 	protected Properties properties = null;
-	
+
 	/*
 	 * MINTServer specific
 	 */
@@ -90,7 +90,11 @@ public class ServerConfig {
 	protected Integer binaryInlineThreshold = null;
     protected DICOMReceive dcmRcv = null;
     protected ScheduledExecutorService dcm2MintExecutor = null;
-	
+    protected Integer binaryItemStreamBufferSize = null;
+    protected Integer binaryItemResponseBufferSize = null;
+    protected Integer fileResponseBufferSize = null;
+    protected Integer fileStreamBufferSize = null;
+
     @PostConstruct
     public void postConstruct() {
         setUpCStoreSCP();
@@ -111,7 +115,7 @@ public class ServerConfig {
         dcmRcv.setAETitle(aeTitle());
         dcmRcv.setPort(port());
         dcmRcv.setReaperTimeout(reaperTimeoutMS());
-        
+
         try {
             dcmRcv.start();
         } catch (final IOException e) {
@@ -164,7 +168,7 @@ public class ServerConfig {
             dcmRcv.stop();
             dcmRcv = null;
         }
-        
+
         //Tear down DICOM-to-MINT
         if (dcm2MintExecutor != null) {
             dcm2MintExecutor.shutdown();
@@ -271,7 +275,7 @@ public class ServerConfig {
 				String url = getFromEnvironmentOrProperties("hibernate.connection.url");
 				url = url.replace("$MINT_HOME", mintHome().getPath());
 				dataSource.setUrl(url);
-				
+
 				dataSource.setUsername(getFromEnvironmentOrProperties("hibernate.connection.username"));
 				dataSource.setPassword(getFromEnvironmentOrProperties("hibernate.connection.password"));
 				annotationSessionFactoryBean.setDataSource(dataSource);
@@ -329,28 +333,28 @@ public class ServerConfig {
 		studiesRoot = new File(mintHome(), "studies");
 		return studiesRoot;
 	}
-	
+
 	@Bean(name = "typesRoot", autowire = Autowire.BY_NAME)
 	public File typesRoot() throws Exception {
 		typesRoot = new File(mintHome(), "types");
-		
+
 		if(!typesRoot.exists())
 		{
 			typesRoot.mkdirs();
 		}
-		
+
 		File dicomFile = new File(typesRoot, "DICOM.xml");
-		
+
 		if(!dicomFile.exists())
 		{
 			InputStream internalDicomFile = getDicomTypeDefStream();
-			
+
 			FileCopyUtils.copy(internalDicomFile, new FileOutputStream(dicomFile));
 		}
-		
+
 		return typesRoot;
 	}
-	
+
 	private InputStream getDicomTypeDefStream()
 	{
 		return ServerConfig.class.getClassLoader().getResourceAsStream("DICOM.xml");
@@ -365,7 +369,7 @@ public class ServerConfig {
 		}
 		return studyDAO;
 	}
-	
+
 	@Bean(name = "updateDAO", autowire = Autowire.BY_NAME)
 	public ChangeDAO updateDAO() throws Exception {
 		if (updateDAO == null) {
@@ -395,7 +399,7 @@ public class ServerConfig {
 		internalResourceViewResolver.setViewClass(JstlView.class);
 		return internalResourceViewResolver;
 	}
-	
+
     @Bean
     public Boolean enableSCP() {
         if (enableSCP == null) {
@@ -519,5 +523,49 @@ public class ServerConfig {
             }
         }
         return binaryInlineThreshold;
+    }
+
+    @Bean
+    public Integer binaryItemResponseBufferSize() {
+        if (binaryItemResponseBufferSize == null) {
+            final String prop = getFromEnvironmentOrProperties("binaryitem.response.bufsize");
+            if (prop != null) {
+                binaryItemResponseBufferSize = Integer.valueOf(prop);
+            }
+        }
+        return binaryItemResponseBufferSize;
+    }
+
+    @Bean
+    public Integer binaryItemStreamBufferSize() {
+        if (binaryItemStreamBufferSize == null) {
+            final String prop = getFromEnvironmentOrProperties("binaryitem.stream.bufsize");
+            if (prop != null) {
+                binaryItemStreamBufferSize = Integer.valueOf(prop);
+            }
+        }
+        return binaryItemStreamBufferSize;
+    }
+
+    @Bean
+    public Integer fileResponseBufferSize() {
+        if (fileResponseBufferSize == null) {
+            final String prop = getFromEnvironmentOrProperties("file.response.bufsize");
+            if (prop != null) {
+                fileResponseBufferSize = Integer.valueOf(prop);
+            }
+        }
+        return fileResponseBufferSize;
+    }
+
+    @Bean
+    public Integer fileStreamBufferSize() {
+        if (fileStreamBufferSize == null) {
+            final String prop = getFromEnvironmentOrProperties("file.stream.bufsize");
+            if (prop != null) {
+                fileStreamBufferSize = Integer.valueOf(prop);
+            }
+        }
+        return fileStreamBufferSize;
     }
 }

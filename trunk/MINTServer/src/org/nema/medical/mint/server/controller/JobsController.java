@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,11 +42,11 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
 import org.nema.medical.mint.server.domain.JobStatus;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +117,7 @@ public class JobsController {
 		}
 
 		try {
-			handleUpload(req, res, jobFolder, files, params);
+			handleUpload(req, jobFolder, files, params);
 		} catch (FileUploadException e) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "unable to parse multipart form data");
@@ -157,7 +157,7 @@ public class JobsController {
 
 		Principal principal = req.getUserPrincipal();
 		String principalName = (principal != null) ? principal.getName() : null;
-		
+
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
 				new File(studiesRoot, studyUUID), type, req.getRemoteUser(),
 				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
@@ -210,7 +210,7 @@ public class JobsController {
 		}
 
 		try {
-			handleUpload(req, res, jobFolder, files, params);
+			handleUpload(req, jobFolder, files, params);
 		} catch (FileUploadException e) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "unable to parse multipart form data");
@@ -253,9 +253,9 @@ public class JobsController {
 		map.addAttribute("job", jobInfo);
 		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
-		
+
 		File studyFolder = new File(studiesRoot, studyUUID);
-		
+
 		if(!studyFolder.exists())
 		{
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -288,9 +288,7 @@ public class JobsController {
 		return "jobinfo";
 	}
 
-	// returns false if a response.sendError() was discovered
-	public void handleUpload(HttpServletRequest request,
-			HttpServletResponse response, File jobFolder, List<File> files,
+	public void handleUpload(HttpServletRequest request, File jobFolder, List<File> files,
 			Map<String, String> params) throws IOException, FileUploadException {
 
 		byte buf[] = new byte[32 * 1024];

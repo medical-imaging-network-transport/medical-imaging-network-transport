@@ -100,8 +100,8 @@ public class Utils {
         return date;
     }
 
-    public static void streamFile(final File source, final OutputStream out) throws IOException {
-        final byte[] bytes = new byte[8 * 1024];
+    public static void streamFile(final File source, final OutputStream out, final int bufferSize) throws IOException {
+        final byte[] bytes = new byte[bufferSize];
         
         final FileInputStream in = new FileInputStream(source);
         try {

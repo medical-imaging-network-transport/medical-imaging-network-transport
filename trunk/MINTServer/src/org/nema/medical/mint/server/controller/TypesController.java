@@ -37,6 +37,12 @@ public class TypesController {
 	@Autowired
 	protected File typesRoot;
 	
+	@Autowired
+	protected Integer fileResponseBufferSize;
+
+	@Autowired
+	protected Integer fileStreamBufferSize;
+	
 	@ModelAttribute("types")
 	public List<String> getTypes() {
 		return new LinkedList<String>();
@@ -85,7 +91,8 @@ public class TypesController {
 			try {
 				res.setContentType("text/xml");
 				res.setContentLength(Long.valueOf(typeFile.length()).intValue());
-				Utils.streamFile(typeFile, res.getOutputStream());
+				res.setBufferSize(fileResponseBufferSize);
+				Utils.streamFile(typeFile, res.getOutputStream(), fileStreamBufferSize);
 			} catch (final IOException e) {
 				if (!res.isCommitted()) {
 					res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
