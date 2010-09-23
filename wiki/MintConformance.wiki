@@ -4,7 +4,7 @@
 
 = Setting up your environment =
 
-The MINT Conformance tools require [http://www.python.org Python2.6] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. The python application must also be in your *PATH*. For example, if *MC_HOME* is the path to your subversion trunk, then set your PYTHONPATH as follows:
+The MINT Conformance tools require [http://www.python.org Python2.6.2] or later. Currently the tools are run directly from the MINTConformance package in a subversion trunk (installation scripts will be provided later). In order to run the tools, the *PYTHONPATH* environment variable must be set to point to the python source code. The python application must also be in your *PATH*. For example, if *MC_HOME* is the path to your subversion trunk, then set your PYTHONPATH as follows:
 
 *Unix*
 {{{
