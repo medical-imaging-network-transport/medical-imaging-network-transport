@@ -152,7 +152,7 @@ public class JobsController {
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		Principal principal = req.getUserPrincipal();
@@ -163,20 +163,6 @@ public class JobsController {
 				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
-
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/createstudy/{uuid}")
-	public String getCreateStatus(HttpServletRequest req,
-			HttpServletResponse res, ModelMap map,
-			@PathVariable("uuid") final String uuid) throws IOException {
-
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/createstudy/"
-				+ jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";
@@ -251,7 +237,7 @@ public class JobsController {
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		File studyFolder = new File(studiesRoot, studyUUID);
@@ -275,14 +261,14 @@ public class JobsController {
 		return "jobinfo";
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy/{uuid}")
-	public String getUpdateStatus(HttpServletRequest req,
-			HttpServletResponse res, ModelMap map,
+	@RequestMapping(method = RequestMethod.GET, value = "/jobs/status/{uuid}")
+	public String getJobStatus(final HttpServletRequest req,
+			final HttpServletResponse res, final ModelMap map,
 			@PathVariable("uuid") final String uuid) throws IOException {
 
-		JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
+		final JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
 		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/updatestudy/" + jobInfo.getId());
+		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
 
 		// this will render the job info using jobinfo.jsp
 		return "jobinfo";

@@ -88,6 +88,7 @@ public final class ProcessImportDir {
         this.createURI = URI.create(serverURI + "/jobs/createstudy");
         this.queryURI = URI.create(serverURI + "/studies");
         this.updateURI = URI.create(serverURI + "/jobs/updatestudy");
+        this.jobStatusURI = URI.create(serverURI + "/jobs/status");
         this.useXMLNotGPB = useXMLNotGPB;
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
         this.forceCreate = forceCreate;
@@ -321,7 +322,6 @@ public final class ProcessImportDir {
     }
 
     /**
-     * @return true if responses for all uploaded studies are completed.
      * @throws IOException
      */
     public void handleResponses() throws IOException {
@@ -330,7 +330,7 @@ public final class ProcessImportDir {
         while (studyIter.hasNext()) {
             final Entry<String, JobInfo> studyEntry = studyIter.next();
             final String jobID = studyEntry.getKey();
-            final HttpGet httpGet = new HttpGet(createURI + "/" + jobID);
+            final HttpGet httpGet = new HttpGet(jobStatusURI + "/" + jobID);
             final String response = httpClient.execute(httpGet, responseHandler);
 
             LOG.debug("Server job status response:\n" + response);
@@ -508,6 +508,7 @@ public final class ProcessImportDir {
     private final URI createURI;
     private final URI queryURI;
     private final URI updateURI;
+	private final URI jobStatusURI;
     private final boolean useXMLNotGPB;
     private final Collection<MetaBinaryFiles> studySendQueue =
         new ConcurrentLinkedQueue<MetaBinaryFiles>();
