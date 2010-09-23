@@ -15,13 +15,21 @@
  */
 package org.nema.medical.mint.server;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +37,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.nema.medical.mint.dcm2mint.ProcessImportDir;
@@ -97,16 +104,18 @@ public class ServerConfig {
 
     @PostConstruct
     public void postConstruct() {
-        setUpCStoreSCP();
+        //@PostConstruct method cannot throw checked exception
         try {
+            setUpCStoreSCP();
             setUpDICOM2MINT();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         } catch (final URISyntaxException e) {
-            //@PostConstruct method cannot throw checked exception
             throw new RuntimeException(e);
         }
     }
 
-    private void setUpCStoreSCP() {
+    private void setUpCStoreSCP() throws IOException {
         if (!enableSCP()) {
             return;
         }
@@ -124,7 +133,7 @@ public class ServerConfig {
         }
     }
 
-    private void setUpDICOM2MINT() throws URISyntaxException {
+    private void setUpDICOM2MINT() throws IOException, URISyntaxException {
         if (!enableProcessor()) {
             return;
         }
@@ -188,68 +197,98 @@ public class ServerConfig {
     }
 
     @Bean(name = "mintHome", autowire = Autowire.BY_NAME)
-	public File mintHome() throws Exception {
-		String path = System.getenv("MINT_HOME");
-		if (path == null) {
-			path = System.getProperty("user.home") + "/MINT_HOME";
-			LOG.warn("MINT_HOME enviornment variable not found, using " + path);
-		}
-		mintHome = new File(path);
-		if (!mintHome.exists()) {
-			LOG.warn("MINT_HOME does not exist, creating");
-			mintHome.mkdirs();
-		}
+	public File mintHome() {
+    	if (mintHome == null) {
+			String path = System.getenv("MINT_HOME");
+			if (path == null) {
+				path = System.getProperty("user.home") + "/MINT_HOME";
+				LOG.warn("MINT_HOME enviornment variable not found, using " + path);
+			}
+			mintHome = new File(path);
+			if (!mintHome.exists()) {
+				LOG.warn("MINT_HOME does not exist, creating");
+				mintHome.mkdirs();
+			}
+    	}
 		return mintHome;
 	}
 
-	protected Properties envSpecificProperties() {
+	private Properties envSpecificProperties() throws IOException {
 		if (properties == null) {
-			properties = new Properties();
-			final ClassPathResource classPathResource = new ClassPathResource("server.properties");
-			try {
-				properties.load(classPathResource.getInputStream());
-			} catch (final IOException e) {
+			final ClassPathResource classPathResource = new ClassPathResource("default.config");
+			final Properties defaultProperties = new Properties();
+			defaultProperties.load(classPathResource.getInputStream());
+
+			final File mintHome = mintHome();
+			final File customConfigFile = new File(mintHome, "mint-server.config");
+			if (!customConfigFile.exists()) {
+				final Writer customConfigWriter = new BufferedWriter(new FileWriter(customConfigFile));
+				try {
+					defaultProperties.store(customConfigWriter, null);
+				} finally {
+					customConfigWriter.close();
+				}
 			}
+			final Properties customProperties = new Properties();
+			final Reader customConfigReader = new BufferedReader(new FileReader(customConfigFile));
+			try {
+				customProperties.load(customConfigReader);
+			} finally {
+				customConfigReader.close();
+			}
+			final Set<Object> defaultPropKeys = defaultProperties.keySet();
+			final Set<Object> customPropKeys = customProperties.keySet();
+			final Set<Object> defaultNotCustomKeys = new HashSet<Object>(defaultPropKeys);
+			defaultNotCustomKeys.removeAll(customPropKeys);
+			final Set<Object> customNotDefaultKeys = new HashSet<Object>(customPropKeys);
+			customNotDefaultKeys.removeAll(defaultPropKeys);
+			if (!customNotDefaultKeys.isEmpty()) {
+				final StringBuilder diffKeysText = new StringBuilder(
+						"The following properties exist in mint-server.config," +
+						" but not in default.config:");
+				for (final Object key: customNotDefaultKeys) {
+					diffKeysText.append(' ');
+					diffKeysText.append(key);
+				}
+				LOG.warn(diffKeysText);
+			}
+			if (!defaultNotCustomKeys.isEmpty()) {
+				final StringBuilder diffKeysText = new StringBuilder(
+						"The following properties exist in default.config," +
+						" but not in mint-server.config;" +
+						" default values (in parentheses) will be used:");
+				for (final Object key: defaultNotCustomKeys) {
+					final Object defaultPropValue = defaultProperties.get(key);
+
+					diffKeysText.append(' ');
+					diffKeysText.append(key);
+					diffKeysText.append(" (");
+					diffKeysText.append(defaultPropValue);
+					diffKeysText.append(')');
+
+					//Also add default property to custom properties
+					customProperties.put(key, defaultPropValue);
+				}
+				LOG.warn(diffKeysText);
+			}
+
+			properties = customProperties;
 		}
 		return properties;
 	}
 
-	protected String getFromContext(final String name) {
-		if (name != null) {
-			try {
-				if (envContext == null) {
-					envContext = (Context) new InitialContext().lookup("java:");
-				}
-				final Object object = envContext.lookup(name);
-				if (object != null) {
-					return object.toString();
-				}
-			} catch (final NamingException e) {
-			}
-		}
-		return null;
+	protected String getConfigString(final String key) throws IOException {
+		return envSpecificProperties().getProperty(key);
 	}
 
-	protected String getFromContextOrEnvironment(final String name) {
-		if (name == null) {
-			return null;
-		}
-		final String context = getFromContext(name);
-		if (context != null) {
-			return context;
-		}
-		return System.getenv(name);
+	protected Integer getConfigInt(final String key) throws IOException {
+		final String stringVal = getConfigString(key);
+		return StringUtils.isBlank(stringVal) ? null : Integer.valueOf(stringVal);
 	}
 
-	protected String getFromEnvironmentOrProperties(final String name) {
-		if (name == null) {
-			return null;
-		}
-		final String environment = getFromContextOrEnvironment(name);
-		if (environment != null) {
-			return environment;
-		}
-		return envSpecificProperties().getProperty(name);
+	protected Boolean getConfigBool(final String key) throws IOException {
+		final String stringVal = getConfigString(key);
+		return StringUtils.isBlank(stringVal) ? null : Boolean.valueOf(stringVal);
 	}
 
 	protected String[] getPackagesToScan() {
@@ -261,39 +300,39 @@ public class ServerConfig {
 		if (sessionFactory == null) {
 			final AnnotationSessionFactoryBean annotationSessionFactoryBean = new AnnotationSessionFactoryBean();
 
-			if (null != getFromEnvironmentOrProperties("hibernate.connection.datasource")) {
-				// Using a JNDI dataSource
-				final JndiObjectFactoryBean jndiObjectFactoryBean = new JndiObjectFactoryBean();
-				jndiObjectFactoryBean.setExpectedType(DataSource.class);
-				jndiObjectFactoryBean.setJndiName(getFromEnvironmentOrProperties("hibernate.connection.datasource"));
-				jndiObjectFactoryBean.afterPropertiesSet();
-				annotationSessionFactoryBean.setDataSource((DataSource) jndiObjectFactoryBean.getObject());
-			} else {
+			if (StringUtils.isBlank(getConfigString("hibernate.connection.datasource"))) {
 				// Not using JNDI data source
 				final BasicDataSource dataSource = new BasicDataSource();
-				dataSource.setDriverClassName(getFromEnvironmentOrProperties("hibernate.connection.driver_class"));
-				String url = getFromEnvironmentOrProperties("hibernate.connection.url");
+				dataSource.setDriverClassName(getConfigString("hibernate.connection.driver_class"));
+				String url = getConfigString("hibernate.connection.url");
 				url = url.replace("$MINT_HOME", mintHome().getPath());
 				dataSource.setUrl(url);
 
-				dataSource.setUsername(getFromEnvironmentOrProperties("hibernate.connection.username"));
-				dataSource.setPassword(getFromEnvironmentOrProperties("hibernate.connection.password"));
+				dataSource.setUsername(getConfigString("hibernate.connection.username"));
+				dataSource.setPassword(getConfigString("hibernate.connection.password"));
 				annotationSessionFactoryBean.setDataSource(dataSource);
+			} else {
+				// Using a JNDI dataSource
+				final JndiObjectFactoryBean jndiObjectFactoryBean = new JndiObjectFactoryBean();
+				jndiObjectFactoryBean.setExpectedType(DataSource.class);
+				jndiObjectFactoryBean.setJndiName(getConfigString("hibernate.connection.datasource"));
+				jndiObjectFactoryBean.afterPropertiesSet();
+				annotationSessionFactoryBean.setDataSource((DataSource) jndiObjectFactoryBean.getObject());
 			}
 
 			final Properties hibernateProperties = new Properties();
 			hibernateProperties.put("hibernate.connection.autocommit", Boolean.TRUE);
 
-			final String dialect = getFromEnvironmentOrProperties("hibernate.dialect");
-			if (null != dialect) {
+			final String dialect = getConfigString("hibernate.dialect");
+			if (StringUtils.isNotBlank(dialect)) {
 				hibernateProperties.put("hibernate.dialect", dialect);
 			}
 
-			final String hbm2dll = getFromEnvironmentOrProperties("hibernate.hbm2ddl.auto");
+			final String hbm2dll = getConfigString("hibernate.hbm2ddl.auto");
 			hibernateProperties.put("hibernate.hbm2ddl.auto", hbm2dll == null ? "verify" : hbm2dll);
 
 			hibernateProperties.put("hibernate.show_sql", "true"
-					.equalsIgnoreCase(getFromEnvironmentOrProperties("hibernate.show_sql")));
+					.equalsIgnoreCase(getConfigString("hibernate.show_sql")));
 
 			hibernateProperties.put("hibernate.c3p0.max_statement", 50);
 			hibernateProperties.put("hibernate.c3p0.maxPoolSize", 20);
@@ -401,21 +440,18 @@ public class ServerConfig {
 	}
 
     @Bean
-    public Boolean enableSCP() {
+    public Boolean enableSCP() throws IOException {
         if (enableSCP == null) {
-            final String prop = getFromEnvironmentOrProperties("scp.enable");
-            if (prop != null) {
-                enableSCP = Boolean.valueOf(prop);
-            }
+        	enableSCP = getConfigBool("scp.enable");
         }
         return enableSCP;
     }
 
 	@Bean
-	public File storageRootDir() {
+	public File storageRootDir() throws IOException {
 	    if (storageRootDir == null) {
-	        final String prop = getFromEnvironmentOrProperties("scp.storage.path");
-	        if (prop != null) {
+	        final String prop = getConfigString("scp.storage.path");
+	        if (StringUtils.isNotBlank(prop)) {
 	            storageRootDir = new File(prop);
 	            storageRootDir.mkdirs();
 	        }
@@ -424,57 +460,48 @@ public class ServerConfig {
 	}
 
     @Bean
-    public String aeTitle() {
+    public String aeTitle() throws IOException {
         if (aeTitle == null) {
-            final String prop = getFromEnvironmentOrProperties("scp.aetitle");
-            if (prop != null) {
-                aeTitle = prop;
-            } else {
+            final String prop = getConfigString("scp.aetitle");
+            if (StringUtils.isBlank(prop)) {
                 aeTitle = "";
+            } else {
+                aeTitle = prop;
             }
         }
         return aeTitle;
     }
 
     @Bean
-    public Integer port() {
+    public Integer port() throws IOException {
         if (port == null) {
-            final String prop = getFromEnvironmentOrProperties("scp.port");
-            if (prop != null) {
-                port = Integer.valueOf(prop);
-            }
+            port = getConfigInt("scp.port");
         }
         return port;
     }
 
     @Bean
-    public Integer reaperTimeoutMS() {
+    public Integer reaperTimeoutMS() throws IOException {
         if (reaperTimeoutMS == null) {
-            final String prop = getFromEnvironmentOrProperties("scp.reaper_timeout_ms");
-            if (prop != null) {
-                reaperTimeoutMS = Integer.valueOf(prop);
-            }
+        	reaperTimeoutMS = getConfigInt("scp.reaper_timeout_ms");
         }
         return reaperTimeoutMS;
     }
 
     @Bean
-    public Boolean enableProcessor() {
+    public Boolean enableProcessor() throws IOException {
         if (enableProcessor == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.enable");
-            if (prop != null) {
-                enableProcessor = Boolean.valueOf(prop);
-            }
+        	enableProcessor = getConfigBool("processor.enable");
         }
         return enableProcessor;
     }
 
     @Bean
-    public URI serverURI() throws URISyntaxException {
+    public URI serverURI() throws IOException, URISyntaxException {
         //TODO set this automatically from local information
         if (serverURI == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.server_uri");
-            if (prop != null) {
+            final String prop = getConfigString("processor.server_uri");
+            if (StringUtils.isNotBlank(prop)) {
                 serverURI = new URI(prop);
             }
         }
@@ -482,89 +509,65 @@ public class ServerConfig {
     }
 
     @Bean
-    public Boolean useXMLNotGPB() {
+    public Boolean useXMLNotGPB() throws IOException {
         if (useXMLNotGPB == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.use_xml_not_gpb");
-            if (prop != null) {
-                useXMLNotGPB = Boolean.valueOf(prop);
-            }
+        	useXMLNotGPB = getConfigBool("processor.use_xml_not_gpb");
         }
         return useXMLNotGPB;
     }
 
     @Bean
-    public Boolean deletePhysicalFiles() {
+    public Boolean deletePhysicalFiles() throws IOException {
         if (deletePhysicalFiles == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.delete_files");
-            if (prop != null) {
-                deletePhysicalFiles = Boolean.valueOf(prop);
-            }
+        	deletePhysicalFiles = getConfigBool("processor.delete_files");
         }
         return deletePhysicalFiles;
     }
 
     @Bean
-    public Boolean forceCreate() {
+    public Boolean forceCreate() throws IOException {
         if (forceCreate == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.force_create");
-            if (prop != null) {
-                forceCreate = Boolean.valueOf(prop);
-            }
+        	forceCreate = getConfigBool("processor.force_create");
         }
         return forceCreate;
     }
 
     @Bean
-    public Integer binaryInlineThreshold() {
+    public Integer binaryInlineThreshold() throws IOException {
         if (binaryInlineThreshold == null) {
-            final String prop = getFromEnvironmentOrProperties("processor.binary_inline_threshold");
-            if (prop != null) {
-                binaryInlineThreshold = Integer.valueOf(prop);
-            }
+        	binaryInlineThreshold = getConfigInt("processor.binary_inline_threshold");
         }
         return binaryInlineThreshold;
     }
 
     @Bean
-    public Integer binaryItemResponseBufferSize() {
+    public Integer binaryItemResponseBufferSize() throws IOException {
         if (binaryItemResponseBufferSize == null) {
-            final String prop = getFromEnvironmentOrProperties("binaryitem.response.bufsize");
-            if (prop != null) {
-                binaryItemResponseBufferSize = Integer.valueOf(prop);
-            }
+        	binaryItemResponseBufferSize = getConfigInt("binaryitem.response.bufsize");
         }
         return binaryItemResponseBufferSize;
     }
 
     @Bean
-    public Integer binaryItemStreamBufferSize() {
+    public Integer binaryItemStreamBufferSize() throws IOException {
         if (binaryItemStreamBufferSize == null) {
-            final String prop = getFromEnvironmentOrProperties("binaryitem.stream.bufsize");
-            if (prop != null) {
-                binaryItemStreamBufferSize = Integer.valueOf(prop);
-            }
+        	binaryItemStreamBufferSize = getConfigInt("binaryitem.stream.bufsize");
         }
         return binaryItemStreamBufferSize;
     }
 
     @Bean
-    public Integer fileResponseBufferSize() {
+    public Integer fileResponseBufferSize() throws IOException {
         if (fileResponseBufferSize == null) {
-            final String prop = getFromEnvironmentOrProperties("file.response.bufsize");
-            if (prop != null) {
-                fileResponseBufferSize = Integer.valueOf(prop);
-            }
+        	fileResponseBufferSize = getConfigInt("file.response.bufsize");
         }
         return fileResponseBufferSize;
     }
 
     @Bean
-    public Integer fileStreamBufferSize() {
+    public Integer fileStreamBufferSize() throws IOException {
         if (fileStreamBufferSize == null) {
-            final String prop = getFromEnvironmentOrProperties("file.stream.bufsize");
-            if (prop != null) {
-                fileStreamBufferSize = Integer.valueOf(prop);
-            }
+        	fileStreamBufferSize = getConfigInt("file.stream.bufsize");
         }
         return fileStreamBufferSize;
     }
