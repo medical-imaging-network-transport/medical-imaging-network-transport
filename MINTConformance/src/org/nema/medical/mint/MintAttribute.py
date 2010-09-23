@@ -33,33 +33,39 @@ from org.nema.medical.mint.XmlNode               import XmlNode
 class MintAttribute():
 
    binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
-     
+
    def __init__(self, node):
        self.__tag   = node.attributeWithName("tag")
        self.__vr    = node.attributeWithName("vr")
        self.__val   = node.attributeWithName("val")
        self.__bid   = node.attributeWithName("bid")
+       self.__bytes = node.attributeWithName("bytes")
        self.__items = []
        
        if self.__val == None:
           self.__val = ""
+       if self.__bid == None:
+          self.__bid = ""
+       if self.__bytes == None:
+          self.__bytes = ""
           
        if self.__vr == "SQ":
-          items = node.childrenWithName("Item")
+          items = node.childrenWithName("item")
           if items != None:
              for item in items:
                  attributeList = []
                  self.__items.append(attributeList)
-                 attributes = item.childWithName("Attributes")
+                 attributes = item.childWithName("attributes")
                  if attributes != None:
-                    attrs = attributes.childrenWithName("Attr")
+                    attrs = attributes.childrenWithName("attr")
                     for attr in attrs:
                         attributeList.append(MintAttribute(attr))
-                
-   def tag(self): return self.__tag;
-   def vr (self): return self.__vr;
-   def val(self): return self.__val;
-   def bid(self): return self.__bid;
+
+   def tag(self)  : return self.__tag
+   def vr (self)  : return self.__vr
+   def val(self)  : return self.__val
+   def bid(self)  : return self.__bid
+   def bytes(self): return self.__bytes
    
    def numItems(self): return len(self.__items)
    def item(self, i):  return self.__items[i]
@@ -70,30 +76,31 @@ class MintAttribute():
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
    def __str__(self):
-       return self.toString().encode(DataDictionaryElement.UNICODE)
+       return self.toString()
 
    def toString(self, indent=""):
        s = indent+"tag="+self.__tag+" vr="+self.__vr
        if self.__val != "":
-          s += " val="+self.__val
-       if self.__bid != None:
+          s += " val="+self.__val.encode('ascii', 'replace')
+       if self.__bid != "":
           s += " bid="+self.__bid
+       if self.__bytes != "":
+          s += " bytes="+self.__bytes
 
        numItems = self.numItems()
        for i in range(0, numItems):
            indent += " "
-           s += "\n"+indent+"- Item\n"
+           s += "\n"+indent+"- item\n"
            numItemAttributes = self.numItemAttributes(i)
            indent += " "
-           s += indent+"- Attributes\n"
+           s += indent+"- attributes\n"
            indent += " "
            for j in range(0, numItemAttributes):
-               s += self.itemAttribute(i, j).toString(indent)
-               if s != numItemAttributes-1: s += '\n'
+               s += self.itemAttribute(i, j).toString(indent)+"\n"
            indent = indent[0:-1]
-           s += indent+"- Attributes\n"
+           s += indent+"- attributes\n"
            indent = indent[0:-1]
-           s += indent+"- Item"
+           s += indent+"- item"
            indent = indent[0:-1]
            
        return s

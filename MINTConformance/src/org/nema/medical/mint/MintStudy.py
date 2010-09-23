@@ -43,7 +43,7 @@ class MintStudy():
    
    ROOT_TAG_NAME = "StudyMeta"
    
-   def __init__(self, metadataName):
+   def __init__(self, mintStudyDir):
        """
        Parses a MINT Study XML document.
        """
@@ -55,6 +55,7 @@ class MintStudy():
        self.__series = {}
        self.__seriesInstanceUIDs = []
 
+       metadataName = os.path.join(mintStudyDir, "metadata.xml")
        self.__readFromFile(metadataName)
 
    def xmlns(self): 
@@ -134,14 +135,15 @@ class MintStudy():
        s =  indent+"- Study Instance UID="+self.__studyInstanceUID+'\n'
        indent += " "
        s += indent+"- xmlns="+self.xmlns()+"\n"
-       s += indent+"- Attributes\n"
+       s += indent+"- attributes\n"
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           attr = self.attribute(n).toString(indent) 
-           s += attr.encode(DataDictionaryElement.UNICODE)+'\n'
-              
-       s += indent+"- Series List\n"
+           attr = self.attribute(n).toString(indent)+"\n"
+           s += attr
+       indent = indent[0:-1]
+             
+       s += indent+"- seriesList\n"
        indent += " "
        numSeries = self.numSeries()
        for n in range(0, numSeries):
@@ -159,9 +161,9 @@ class MintStudy():
        # ---
        # Read Attributes
        # ---
-       node = self.__xml.childWithName("Attributes")
+       node = self.__xml.childWithName("attributes")
        if node != None:
-          nodes = node.childrenWithName("Attr")
+          nodes = node.childrenWithName("attr")
           for node in nodes:
               attb = MintAttribute(node)
               self.__attributes[attb.tag()] = attb
@@ -171,9 +173,9 @@ class MintStudy():
        # ---
        # Read Series
        # ---
-       node = self.__xml.childWithName("SeriesList")
+       node = self.__xml.childWithName("seriesList")
        if node != None:
-          nodes = node.childrenWithName("Series")
+          nodes = node.childrenWithName("series")
           for node in nodes:
               series = MintSeries(node)
               self.__series[series.seriesInstanceUID()] = series
@@ -192,14 +194,14 @@ def main():
     
     try:
        if len(args) != 1:
-          print "Usage", progName, "<mint_metadata_xml>"
+          print "Usage", progName, "<mint_study_dir>"
           sys.exit(1)
           
        # ---
        # Read MINT metadata.
        # ---
-       metadataName = sys.argv[1];
-       mintStudy = MintStudy(metadataName)
+       mintStudyDir = sys.argv[1];
+       mintStudy = MintStudy(mintStudyDir)
        print mintStudy
        
     except Exception, exception:
