@@ -40,6 +40,12 @@ public class StudyMetadataController {
 	@Autowired
 	protected StudyDAO studyDAO = null;
 
+	@Autowired
+	protected Integer fileResponseBufferSize;
+
+	@Autowired
+	protected Integer fileStreamBufferSize;
+	
 	@RequestMapping("/studies/{uuid}/{type}/metadata")
 	public void studiesMetadata(final @PathVariable("uuid") String uuid, 
 								final @PathVariable("type") String type,
@@ -91,11 +97,12 @@ public class StudyMetadataController {
             final File file = new File(typeDir, filename);
             if (!file.exists()) {
                 Study study = StudyIO.loadStudy(typeDir);
-                StudyIO.writeFile(study,file);
+                StudyIO.writeFile(study, file);
             }
 
             res.setContentLength(Long.valueOf(file.length()).intValue());
-            Utils.streamFile(file, res.getOutputStream());
+            res.setBufferSize(fileResponseBufferSize);
+            Utils.streamFile(file, res.getOutputStream(), fileStreamBufferSize);
         } catch (final IOException e) {
             if (!res.isCommitted()) {
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

@@ -35,6 +35,12 @@ public class StudySummaryController {
 	@Autowired
 	protected File studiesRoot;
 	
+	@Autowired
+	protected Integer fileResponseBufferSize;
+
+	@Autowired
+	protected Integer fileStreamBufferSize;
+	
 	@RequestMapping("/studies/{uuid}/{type}/summary")
 	public void studiesSummary(@PathVariable("uuid") final String uuid,
 			@PathVariable("type") final String type, 
@@ -66,7 +72,8 @@ public class StudySummaryController {
 
 			res.setContentType("text/xml");
 			res.setContentLength(Long.valueOf(file.length()).intValue());
-			Utils.streamFile(file, res.getOutputStream());
+			res.setBufferSize(fileResponseBufferSize);
+			Utils.streamFile(file, res.getOutputStream(), fileStreamBufferSize);
 		} catch (final IOException e) {
 			if (!res.isCommitted()) {
 				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

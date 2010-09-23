@@ -43,6 +43,12 @@ public class StudyBinaryItemsController {
     @Autowired
     protected File studiesRoot;
 
+    @Autowired
+    protected Integer binaryItemResponseBufferSize;
+    
+    @Autowired
+    protected Integer binaryItemStreamBufferSize;
+
 	@RequestMapping("/studies/{uuid}/{type}/binaryitems/{seq}")
     public void studiesBinaryItems(final HttpServletResponse res, HttpServletRequest req,
                                    @PathVariable("uuid") final String uuid,
@@ -77,8 +83,7 @@ public class StudyBinaryItemsController {
         }
         
         LOG.info("output buffer size was " + res.getBufferSize());
-        int bufferSize = 1024*256;
-        res.setBufferSize(bufferSize);
+        res.setBufferSize(binaryItemResponseBufferSize);
         LOG.info("output buffer size is now " + res.getBufferSize());
         final OutputStream out = res.getOutputStream();
         
@@ -112,7 +117,7 @@ public class StudyBinaryItemsController {
         }
         
         out.flush();
-        streamBinaryItem(file,out, bufferSize);
+        streamBinaryItem(file, out, binaryItemStreamBufferSize);
         
         if(multipart)
         {
@@ -139,7 +144,7 @@ public class StudyBinaryItemsController {
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
 
-            streamBinaryItem(file,out, bufferSize);
+            streamBinaryItem(file, out, binaryItemStreamBufferSize);
             
             out.write(("\n--" + MP_BOUNDARY).getBytes());
         }
@@ -151,7 +156,7 @@ public class StudyBinaryItemsController {
         out.flush();
     }
 
-    private void streamBinaryItem(final File file, final OutputStream outputStream, int bufferSize) throws IOException {
+    private void streamBinaryItem(final File file, final OutputStream outputStream, final int bufferSize) throws IOException {
         final InputStream in = new FileInputStream(file);
         final byte[] bytes = new byte[bufferSize];
         try {
