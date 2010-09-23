@@ -40,23 +40,20 @@ from org.nema.medical.mint.MintStudy import MintStudy
 # -----------------------------------------------------------------------------
 class MintStudyCompare():
    
-   def __init__(self, study1, study2):
-       if not os.path.isfile(study1):
-          print "File not found -", study1
+   def __init__(self, refMintStudyDir, newMintStudyDir):
+       if not os.path.isdir(refMintStudyDir):
+          print "Directory not found -", refMintStudyDir
           sys.exit(1)
 
-       if not os.path.isfile(study2):
-          print "File not found -", study2
+       if not os.path.isdir(newMintStudyDir):
+          print "Directory not found -", newMintStudyDir
           sys.exit(1)
                 
-       self.__study1 = MintStudy(study1)
-       self.__study2 = MintStudy(study2)
+       self.__study1 = MintStudy(refMintStudyDir)
+       self.__study2 = MintStudy(newMintStudyDir)
 
-       studydir1 = os.path.dirname(study1)
-       studydir2 = os.path.dirname(study2)
-       
-       self.__binary1 = os.path.join(studydir1, "binaryitems")
-       self.__binary2 = os.path.join(studydir2, "binaryitems")
+       self.__binary1 = os.path.join(refMintStudyDir, "binaryitems")
+       self.__binary2 = os.path.join(newMintStudyDir, "binaryitems")
 
        self.__binaryitems = []
        
@@ -68,6 +65,7 @@ class MintStudyCompare():
        self.__normalizedInstanceAttributesCompared = 0
        self.__instancesCompared = 0
        self.__instanceAttributesCompared = 0
+       self.__inlineBinaryCompared = 0
        self.__binaryItemsCompared = 0
        self.__sequenceItemsCompared = 0
        self.__sequenceAttributesCompared = 0
@@ -131,6 +129,7 @@ class MintStudyCompare():
            print "%10d instance attribute(s) compared." % (self.__instanceAttributesCompared)
            print "%10d sequence items(s) compared." % (self.__sequenceItemsCompared)
            print "%10d sequence attributes(s) compared." % (self.__sequenceAttributesCompared)
+           print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
            print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
            print "%10d byte(s) compared." % (self.__bytesCompared)    
 
@@ -153,7 +152,7 @@ class MintStudyCompare():
        elif attr1.vr() == "SQ":
           self.__checkSequence(msg, attr1, attr2)
        else:
-          self.check(msg, attr1.toString(), attr2.toString())                 
+          self.check(msg, attr1.toString(), attr2.toString())
           self.__checkForBinary(attr1)
    
    def __checkSequence(self, msg, attr1, attr2):
@@ -200,7 +199,6 @@ class MintStudyCompare():
            attr1 = series1.attribute(n)
            attr2 = series2.attributeByTag(attr1.tag())
            self.__checkAttributes(series+" Attribute", attr1, attr2)
-           self.__checkForBinary(attr1)
            self.__seriesAttributesCompared += 1
 
        numNormalizedInstanceAttributes = series1.numNormalizedInstanceAttributes()
@@ -208,7 +206,6 @@ class MintStudyCompare():
            attr1 = series1.normalizedInstanceAttribute(n)
            attr2 = series2.normalizedInstanceAttributeByTag(attr1.tag())
            self.__checkAttributes(series+" Normalized Instance Attribute", attr1, attr2)       
-           self.__checkForBinary(attr1)
            self.__normalizedInstanceAttributesCompared += 1
 
        self.check("Number of "+series+" Instances",
@@ -246,15 +243,20 @@ class MintStudyCompare():
            attr1 = instance1.attribute(n)
            attr2 = instance2.attributeByTag(attr1.tag())
            self.__checkAttributes(instance+" Attribute", attr1, attr2)
-           self.__checkForBinary(attr1)
            self.__instanceAttributesCompared += 1
 
    def __checkForBinary(self, attr):
-       if attr.bid() != None and attr.isBinary() and attr.bid() not in self.__binaryitems:
+       # inline binary has already been checked
+       if attr.bytes() != "":
+          self.__inlineBinaryCompared += 1
+          return
+       
+       # Compare binary files later       
+       if attr.bid() != "" and attr.isBinary() and attr.bid() not in self.__binaryitems:
           self.__binaryitems.append(attr.bid())
        
    def __checkBinary(self):
-       
+
        # ---
        # Loop through each binary item.
        # ---
@@ -376,7 +378,7 @@ def main():
            
     try:
        if help or len(args) != 2:
-          print "Usage:", progName, "[options] <mint_study1.xml> <mint_study2.xml>"
+          print "Usage:", progName, "[options] <ref_mint_study_dir> <new_mint_study_dir>"
           print "  -v: verbose"
           print "  -l: lazy check (skips binary content)"
           print "  -h: displays usage"
@@ -385,9 +387,9 @@ def main():
        # ---
        # Read MINT metadata.
        # ---
-       study1 = args[0];
-       study2 = args[1];
-       studies = MintStudyCompare(study1, study2)
+       refMintStudyDir = args[0];
+       newMintStudyDir = args[1];
+       studies = MintStudyCompare(refMintStudyDir, newMintStudyDir)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
 

@@ -39,8 +39,7 @@ from org.nema.medical.mint.DicomTransfer         import DicomTransfer
 # -----------------------------------------------------------------------------
 class DicomAttribute():
 
-   # TODO: Set to 100 once you support inline binary
-   MAX_BINARY_LENGTH = -1
+   MAX_BINARY_LENGTH = 100
       
    def __init__(self, dcm, dataDictionary, transferSyntax):
           
@@ -209,6 +208,7 @@ class DicomAttribute():
              if len(self.__val) > 0 and not self.__val[-1].isalnum():
                 self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
              self.__val = self.__val.rstrip() # strip whitespace
+             self.__val = self.__val
              self.__vl = len(self.__val) # reset length
              
        # Binary
@@ -259,7 +259,7 @@ class DicomAttribute():
        return vals[0:-1]
    
    def __str__(self):
-       return self.toString(DataDictionaryElement.UNICODE)
+       return self.toString()
 
    def toString(self, indent=""):
        s = "tag="+self.__tag+" vr="+self.__vr+" val= "
@@ -286,7 +286,7 @@ class DicomAttribute():
           elif self.isUnknown():
              s += "<Unknown>"
           elif self.__val != "":
-             s += self.__val
+             s += self.__val.encode('ascii', 'replace')
 
        s += " # "+self.tagName()
        

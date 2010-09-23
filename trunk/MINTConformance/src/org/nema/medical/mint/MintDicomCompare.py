@@ -25,6 +25,7 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
+import base64
 import getopt
 import os
 import sys
@@ -42,22 +43,23 @@ from org.nema.medical.mint.MintStudy     import MintStudy
 # -----------------------------------------------------------------------------
 class MintDicomCompare():
    
-   def __init__(self, dicomStudyDir, mintStudyXml, dataDictionaryUrl):
+   def __init__(self, dicomStudyDir, mintStudyDir, dataDictionaryUrl):
        if not os.path.isdir(dicomStudyDir):
           print "Directory not found -", dicomStudyDir
           sys.exit(1)
 
-       if not os.path.isfile(mintStudyXml):
-          print "File not found -", mintStudyXml
+       if not os.path.isdir(mintStudyDir):
+          print "Directory not found -", mintStudyDir
           sys.exit(1)
        
        self.__dicom = DicomStudy(dicomStudyDir, dataDictionaryUrl)
        self.__studyInstanceUID = self.__dicom.studyInstanceUID()
-       self.__mint = MintStudy(mintStudyXml)
-       self.__binary = os.path.join(os.path.dirname(mintStudyXml), "binaryitems")
+       self.__mint = MintStudy(mintStudyDir)
+       self.__binary = os.path.join(mintStudyDir, "binaryitems")
        self.__binaryitems = []
        self.__count = 0
        self.__verbose = False
+       self.__inlineBinaryTagsCompared = 0
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
        self.__bytesCompared = 0
@@ -93,6 +95,7 @@ class MintDicomCompare():
            print "%10d instance(s) compared." % (instancesCompared)
            print "%10d text tag(s) compared." % (self.__textTagsCompared)
            print "%10d items(s) compared." % (self.__itemsCompared)
+           print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
            print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
            print "%10d byte(s) compared." % (self.__bytesCompared)          
 
@@ -184,7 +187,6 @@ class MintDicomCompare():
        # ---
        if dicomAttr.isBinary():
           self.__checkBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
-          self.__binaryTagsCompared += 1
        else:
           self.__check(dicomAttr.tag()+" Value",
                        dicomAttr.val(),
@@ -225,6 +227,10 @@ class MintDicomCompare():
            self.__itemsCompared += 1
            
    def __checkBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+
+       if dicomAttr.dat() == "":
+          self.__checkInlineBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
+          return
 
        # ---
        # Check for DICOM binary item
@@ -318,15 +324,21 @@ class MintDicomCompare():
              
           bid1.close()
           bid2.close()
- 
+          self.__binaryTagsCompared += 1
+
    def __checkInlineBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
-           
+
+       # Dedode inline binary
+       buf = base64.b64decode(attr.bytes())
+
+       bytes1 = dicomAttr.val()
+       bytes2 = unpack('B'*len(buf), buf)
+       
        # ---
        # Check binary item sizes.
        # ---
-       size1 = dicomAttr.vl()
-       # TODO: This needs to be decoded
-       size2 = len(attr.val())
+       size1 = len(bytes1)
+       size2 = len(bytes2)
        self.__check(dicomAttr.tag()+" <Binary Data>",
                     size1,
                     size2,
@@ -336,15 +348,8 @@ class MintDicomCompare():
        # ---
        # Check binary item byte for byte.
        # ---
-       if not self.__lazy and size1 == size2:
-
-          buf1 = dicomAttr.val()
-          buf2 = attr.val()
-          
-          bytes1 = unpack('B'*len(buf1), buf1)
-          bytes2 = unpack('B'*len(buf2), buf2)
-          assert len(bytes1) == len(bytes2) # these better be equal
-          for i in range(0, n):
+       if size1 == size2:
+          for i in range(0, size1):
               self.__check(dicomAttr.tag()+" <Binary Data> byte "+str(i),
                            bytes1[i],
                            bytes2[i],
@@ -352,10 +357,9 @@ class MintDicomCompare():
                            sopInstanceUID)
                  
               if bytes1[i] != bytes2[i]:
-                 diff = True
                  break
-                    
-              self.__bytesCompared += 1
+
+       self.__inlineBinaryTagsCompared += 1
  
 # -----------------------------------------------------------------------------
 # main
@@ -398,7 +402,7 @@ def main():
        # ---
        argc = len(args)
        if help or argc < 2 or argc > 3:
-          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study.xml> <data_dictionary.xml>"
+          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study_dir> <data_dictionary.xml>"
           print "  -v: verbose"
           print "  -l: lazy check (skips binary content)"
           print "  -h: displays usage"
@@ -408,11 +412,11 @@ def main():
        # Read MINT metadata.
        # ---
        dicomStudyDir = args[0];
-       mintStudyXml = args[1];
+       mintStudyDir = args[1];
        dataDictionaryUrl = ""
        if argc == 3:
           dataDictionaryUrl = args[2];
-       studies = MintDicomCompare(dicomStudyDir, mintStudyXml, dataDictionaryUrl)
+       studies = MintDicomCompare(dicomStudyDir, mintStudyDir, dataDictionaryUrl)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
 

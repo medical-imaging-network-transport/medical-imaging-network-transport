@@ -33,8 +33,6 @@ from org.nema.medical.mint.XmlNode import XmlNode
 # -----------------------------------------------------------------------------
 class DataDictionaryElement():
    
-   UNICODE = "iso-8859-1" # latin-1
-   
    def __init__(self, node):
        self.__tag     = string.upper(node.attributeWithName("tag"))
        self.__keyword = node.attributeWithName("keyword")
@@ -61,7 +59,6 @@ class DataDictionaryElement():
        s += "vr="+string.join(self.__vrs, "|")+", "
        s += "vm="+self.__vm+", "
        s += "ret="+self.__ret+", "
-       s += "name="+self.__name
+       s += "name="+self.__name.encode('ascii', 'replace')
                   
-       return s.encode(self.UNICODE)
-       
+       return s

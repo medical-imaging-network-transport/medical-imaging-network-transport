@@ -68,17 +68,16 @@ class MintInstance():
    def find(self, tag):
        return self.attributeByTag(tag)
        
-   def toString(self, indent=""):
-       s  = indent+"- SOP Instance UID="+self.sopInstanceUID()+'\n'       
-       s += indent+"- Transfer Syntax UID="+self.transferSyntaxUID()+"\n"       
-       s += indent+"- Attributes\n"
+   def toString(self, indent=""):       
+       s = indent+"- instance sopInstanceUID="+self.sopInstanceUID()+" transferSyntaxUID="+self.transferSyntaxUID()+"\n"
+       indent += " "
+       s += indent+"- attributes\n"
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
            attr = self.attribute(n).toString(indent)
-           s += attr.encode(DataDictionaryElement.UNICODE)
-           if n != numAttributes-1: s += '\n'
-       indent = indent[0:-1]
+           s += attr+"\n"
+       indent = indent[0:-2]
        
        return s
 
@@ -89,9 +88,9 @@ class MintInstance():
        # ---
        # Read Attributes
        # ---
-       node = root.childWithName("Attributes")
+       node = root.childWithName("attributes")
        if node != None:
-          nodes = node.childrenWithName("Attr")
+          nodes = node.childrenWithName("attr")
           for node in nodes:
               attb = MintAttribute(node)
               self.__attributes[attb.tag()] = attb
