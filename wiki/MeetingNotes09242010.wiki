@@ -1,0 +1,114 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Chris
+    * We were able to get high performance out of Windows using IIS + agp connector to tomcat
+    * In the process of writing up how to do this actual numbers
+    * Scheduled call with ClearCanvas on MINT next Wednesday
+    * Working on Jibx bindings for XML messages
+  * Gorkem
+    * Not much progress this week
+  * Jim
+    * Secured room at McCormick Place for RSNA in east building for Monday night 11/29 @ 5:00-7:30
+    * Working with Dejarnette on got mint marketing stuff
+  * Rex
+    * Ran a wide range of studies through MINT, found a problem with the large Toshiba Enchanced CT Multiframe.  Suggestion is to use 64 bit VM
+    * Setting up internal test environment
+  * Tim Culp
+    * Got Toshiba Enhanced CT image loading on conformance test
+    * Updated conformance test with latest MINT format
+    * Will be working on bulk binary format next week
+
+
+= Notes =
+  * A lot of frustration with building MINT from Eclipse 
+  * Vital Images is using IntelliJ internally because of problems with Eclipse building     
+  * Question?  Should we switch to free version of IntelliJ?
+    * Rex asks if free version of IntelliJ can debug into the server?  
+    * General consensus is to decouple MINT build from the IDE (eclipse)
+    * Developer should be able to pull down source and build from command line 
+  * MINT Meeting at JHU on October 18/19
+    * Room is already reserved
+    * Goal 
+      * Present performance numbers (raw HTTP and ClearCanvas loading, + any other numbers) vs DICOM
+      * Present version 1.0 spec + reference implementation
+      * RSNA Logistics 
+        * MINT Workgroup meeting
+        * Got MINT campaign
+          * URL to access live MINT server + ClearCanvas client download        
+        * Vendor interoperability
+      * Roadmap planning
+      * Presenting use cases & DeID proposal
+      * Get as much visibility / support across the industry?
+        * Probably wont be able to get enough support in time
+ 
+
+
+
+= Decisions =
+  * Decouple MINT build from Eclipse
+  * Focus October JHU meeting on technical issues
+
+= New Actions =
+  * Look into resource to create MINT style sheets (Jim Philbin)
+  * Look into resource to create MINT style sheets (Rex)
+  * Check in IntelliJ project files (Tim Dawson)
+  * Setup conference call between Gorkem and Vital Systems Engineers on MINT Performance testing (Chris) 
+
+= Old Actions =
+  * Add size of binary item to the metadata (Gorkem)
+  * Post Vital's performance test plan (Chris)
+  * Post Harris' performance test plan (Tim)
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Rex)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Contact clear canvas folks about adding native support for MINT (Chris)
+  * Contact clear canvas folks about how to create an installer for our MINT version (Chris + Gorkem)
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Set up a FTP/HTTP/SSH or something to distribute the data (Gorkem)
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Completed Actions = 
+  * Send email to MINT-user group saying if you want access to MINT server to email him (Gorkem)
+  * look into a meeting room at RSNA for MINT meeting (Wayne Dejarnette)
+  * Target a MINT meeting at RSNA Sunday @ 5PM (Jim Philbin)
+  * Schedule follow-up meeting at JHU for October 18/19 (Jim Philbin)
+  * Define performance test environment (Gorkem)
+  * Setup Performance Test Environment (Jim Philbin)
+
+
+= Issues =
+
+= Future =
+  * GUI Tool to replace XHTML functionality / work with MINT server
