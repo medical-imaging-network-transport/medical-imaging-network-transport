@@ -17,6 +17,7 @@
         <mkdir dir="${build.dir}/ant-classes" />
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}/ant-classes" includes="**/*" />
+            <fileset dir="${build.dir}/test-reports" includes="**/*" />
         </delete>
     </target>
 
@@ -42,6 +43,44 @@
                 <exclude name="**/*.java" />
             </fileset>
         </copy>
+
+        <mkdir dir="${build.dir}/ant-test-classes" />
+        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
+            <classpath>
+                <pathelement path="${build.dir}/ant-test-classes" />
+                <pathelement path="${build.dir}/ant-classes" />
+                <pathelement location="ant-lib/junit-4.8.1.jar" />
+            </classpath>
+            <compilerarg value="-Xlint:-path" />
+        </javac>
+    </target>
+
+    <target name="test" depends="build" description="run unit tests">
+        <mkdir dir="${build.dir}/test-reports" />
+        <junit printsummary="on" haltonfailure="no">
+            <classpath>
+                <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+                <pathelement path="${build.dir}/ant-classes" />
+                <pathelement path="${build.dir}/ant-test-classes" />
+                <path refid="build.classpath" />
+            </classpath>
+
+            <formatter type="plain" />
+            <formatter type="xml" />
+
+            <batchtest fork="no" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/ant-test-classes">
+                    <include name="**/*Test.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${build.dir}/test-reports">
+            <fileset dir="${build.dir}/test-reports">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${build.dir}/test-reports/html" />
+        </junitreport>
     </target>
 
     <target name="war" depends="build" description="Make WARs for deployment">
