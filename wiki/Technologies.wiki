@@ -3,6 +3,7 @@
 
 = Details =
 
+MINT Reference Implementation
   * Java
   * DCM4CHE - DICOM Library
   * Spring - Framework
@@ -11,4 +12,6 @@
   * JIBX - Object to XML Mapping
   * Google Protocol Buffers - Message 
   * JUnit - Unit Test Framework
-  * ROME - ATOM Framework
+
+Clear Canvas Plug-in
+  * C#
