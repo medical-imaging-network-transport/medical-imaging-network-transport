@@ -5,6 +5,7 @@
 	<property name="project.version" value="0.9.5" />
 
 	<target name="clean">
+        <mkdir dir="${build.dir}/ant-classes" />
 		<delete includeemptydirs="true">
 			<fileset dir="${build.dir}" includes="**/*" />
 		</delete>

@@ -42,6 +42,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
@@ -93,8 +97,8 @@ public class JobsController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/createstudy")
-	public String createStudy(HttpServletRequest req, HttpServletResponse res,
-			ModelMap map) throws IOException {
+	public void createStudy(HttpServletRequest req, HttpServletResponse res)
+							throws IOException {
 
 		String studyUUID = UUID.randomUUID().toString();
 		String jobID = UUID.randomUUID().toString();
@@ -111,39 +115,33 @@ public class JobsController {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "expected multipart form data");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "expected multipart form data");
+			return;
 		}
 
 		try {
 			handleUpload(req, jobFolder, files, params);
 		} catch (FileUploadException e) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "unable to parse multipart form data");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse multipart form data");
+			return;
 		}
 
 		Iterator<File> iterator = files.iterator();
 		if (!iterator.hasNext()) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg",
-					"at least one file (containing metadata) is required.");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "at least one file (containing metadata) is required.");
+			return;
 		}
 
 		if (!params.containsKey("type")) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "misser parameter 'type'");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
+			return;
 		}
 
 		String type = params.get("type");
 
 		if (StringUtils.isBlank(type)) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "misser parameter 'type'");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
+			return;
 		}
 
 		JobInfo jobInfo = new JobInfo();
@@ -151,8 +149,7 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
+		String joburi = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		Principal principal = req.getUserPrincipal();
@@ -164,8 +161,9 @@ public class JobsController {
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
 
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
+		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
+		res.setHeader("Location", joburi);
+
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
@@ -174,8 +172,8 @@ public class JobsController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/jobs/updatestudy")
-	public String updateStudy(HttpServletRequest req, HttpServletResponse res,
-			ModelMap map) throws IOException {
+	public void updateStudy(HttpServletRequest req, HttpServletResponse res)
+								throws IOException {
 
 		String jobID = UUID.randomUUID().toString();
 		File jobFolder = new File(jobTemp, jobID);
@@ -190,45 +188,38 @@ public class JobsController {
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "expected multipart form data");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "expected multipart form data");
+			return;
 		}
 
 		try {
 			handleUpload(req, jobFolder, files, params);
 		} catch (FileUploadException e) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "unable to parse multipart form data");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "unable to parse multipart form data");
+			return;
 		}
 
 		if (files.size() < 1) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg",
-					"at least one file (containing metadata) is required.");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "at least one file (containing metadata) is required.");
+			return;
 		}
 
 		if (!params.containsKey("studyUUID")) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "missing parameter studyUUID");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter studyUUID");
+			return;
 		}
 
 		if (!params.containsKey("type")) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "misser parameter 'type'");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
+			return;
 		}
 
 		String studyUUID = params.get("studyUUID");
 		String type = params.get("type");
 
 		if (StringUtils.isBlank(type)) {
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "misser parameter 'type'");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
+			return;
 		}
 
 		JobInfo jobInfo = new JobInfo();
@@ -236,17 +227,15 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
+		String joburi = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		File studyFolder = new File(studiesRoot, studyUUID);
 
 		if(!studyFolder.exists())
 		{
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			map.put("error_msg", "study with uuid " + studyUUID + " does not exists so cannot update");
-			return "error";
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "study with uuid " + studyUUID + " does not exists so cannot update");
+			return;
 		}
 
 		Principal principal = req.getUserPrincipal();
@@ -257,21 +246,27 @@ public class JobsController {
 				principalName, jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
+		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
+		res.setHeader("Location", joburi);
+		
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/status/{uuid}")
-	public String getJobStatus(final HttpServletRequest req,
-			final HttpServletResponse res, final ModelMap map,
-			@PathVariable("uuid") final String uuid) throws IOException {
+	public void getJobStatus(final HttpServletRequest req,
+			final HttpServletResponse res,
+			@PathVariable("uuid") final String uuid) throws IOException, JiBXException {
 
 		final JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		map.addAttribute("job", jobInfo);
-		map.addAttribute("joburi", req.getContextPath() + "/jobs/status/" + jobInfo.getId());
+		
+		org.nema.medical.mint.jobs.JobStatus jobStatus = new org.nema.medical.mint.jobs.JobStatus(
+				jobInfo.getId(), jobInfo.getStudyID(), jobInfo.getStatus().toString(),
+				jobInfo.getCreateTime(), jobInfo.getUpdateTime());
 
-		// this will render the job info using jobinfo.jsp
-		return "jobinfo";
+		IBindingFactory bfact = BindingDirectory.getFactory("jobStatus",org.nema.medical.mint.jobs.JobStatus.class);
+		IMarshallingContext mctx = bfact.createMarshallingContext();
+		mctx.setIndent(2);
+		mctx.marshalDocument(jobStatus, "UTF-8", null, res.getOutputStream());
+
 	}
 
 	public void handleUpload(HttpServletRequest request, File jobFolder, List<File> files,
