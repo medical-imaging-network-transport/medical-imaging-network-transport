@@ -124,7 +124,8 @@ public final class BinaryDcmData implements BinaryData {
         add(dcmFile, tagPath, dcmElem, -1, -1);
     }
 
-    public void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int offset, int length) {
+    public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem, final int offset,
+    		final int length) {
         final int[] newTagPath = new int[tagPath.length + 1];
         System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
         newTagPath[tagPath.length] = dcmElem.tag();

@@ -345,17 +345,17 @@ public final class Dcm2MetaBuilder {
              final Attribute attr = newAttr(elem);
              assert attr != null;
              
-             int numFrames = rootObj.getInt(Tag.NumberOfFrames, 1);
-             byte[] binaryData = elem.getBytes();
-             boolean isPixelData = elem.tag() == Tag.PixelData;
-             // cannot inline large data, or multiframe images, no matter how small
-             boolean isInlineable = (binaryData.length < binaryInlineThreshold)
+             final int numFrames = rootObj.getInt(Tag.NumberOfFrames, 1);
+             final byte[] binaryData = elem.getBytes();
+             final boolean isPixelData = elem.tag() == Tag.PixelData;
+             // cannot inline large data, or multi-frame images, no matter how small
+             final boolean isInlineable = (binaryData.length < binaryInlineThreshold)
                  && !(isPixelData && numFrames > 1);
              
              if (isInlineable) {
                  attr.setBytes(binaryData);
              } else if (!isPixelData) {
-                 // non pixel data, sinble external binary item
+                 // non-pixel data, simple external binary item
                  attr.setBid(metaBinaryPair.getBinaryData().size());
                  metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
              } else {
@@ -363,11 +363,11 @@ public final class Dcm2MetaBuilder {
                  attr.setBid(metaBinaryPair.getBinaryData().size());
                  attr.setFrameCount(numFrames);
                  
-                 int rows = rootObj.getInt(Tag.Rows, -1);
-                 int columns = rootObj.getInt(Tag.Columns, -1);
-                 int bitsAllocated = rootObj.getInt(Tag.BitsAllocated, -1);
-                 int samples = rootObj.getInt(Tag.SamplesPerPixel, -1);
-                 int frameLen;
+                 final int rows = rootObj.getInt(Tag.Rows, -1);
+                 final int columns = rootObj.getInt(Tag.Columns, -1);
+                 final int bitsAllocated = rootObj.getInt(Tag.BitsAllocated, -1);
+                 final int samples = rootObj.getInt(Tag.SamplesPerPixel, -1);
+                 final int frameLen;
                  if (rows > 0 && columns > 0 && bitsAllocated > 0 && samples > 0) {
                      // this may be an overly simplistic calculation
                      frameLen = rows * columns * samples * (bitsAllocated / 8);
@@ -376,7 +376,7 @@ public final class Dcm2MetaBuilder {
                      frameLen = binaryData.length / numFrames;
                  }
                  
-                 for (int i = 0; i < numFrames; i++) {
+                 for (int i = 0; i < numFrames; ++i) {
                      metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem,
                              i * frameLen, frameLen);
                  }
