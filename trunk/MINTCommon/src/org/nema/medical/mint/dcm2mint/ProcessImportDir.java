@@ -339,7 +339,7 @@ public final class ProcessImportDir {
             try {
                 final Document responseDoc = documentBuilder.parse(
                         new ByteArrayInputStream(response.getBytes()));
-                statusStr = xPath.evaluate("/html/body/dl/dd[@class='JobStatus']/text()", responseDoc);
+                statusStr = xPath.evaluate("/jobStatus/@jobStatus", responseDoc);
             } catch(final Exception ex) {
                 LOG.error("Querying job " + jobID + ": unknown server response:\n" + response);
                 studyIter.remove();
@@ -446,8 +446,8 @@ public final class ProcessImportDir {
         final String studyID;
         final Document responseDoc = documentBuilder.parse(new ByteArrayInputStream(response.getBytes()));
         try {
-            jobID = xPath.evaluate("/html/body/dl/dd[@class='JobID']/text()", responseDoc).trim();
-            studyID = xPath.evaluate("/html/body/dl/dd[@class='StudyID']/text()", responseDoc).trim();
+            jobID = xPath.evaluate("/jobStatus/@jobID", responseDoc).trim();
+            studyID = xPath.evaluate("/jobStatus/@studyUUID", responseDoc).trim();
         } catch(final XPathExpressionException e) {
             //This shouldn't happen
             throw new RuntimeException(e);
