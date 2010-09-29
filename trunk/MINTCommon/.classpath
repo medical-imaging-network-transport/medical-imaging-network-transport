@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="build/test-classes" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.5.jar" sourcepath="C:/Users/ububenheimer/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar">
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.5.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="../"/>
 		</attributes>
