@@ -71,6 +71,7 @@ import org.nema.medical.mint.metadata.Study;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.util.Iter;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -300,8 +301,7 @@ public final class ProcessImportDir {
         try {
             final Document responseDoc = documentBuilder.parse(
                     new ByteArrayInputStream(response.getBytes()));
-            nodeList = (NodeList) xPath.evaluate("/html/body/ol/li/dl/dd[@class='StudyUUID']",
-                    responseDoc, XPathConstants.NODESET);
+            nodeList = (NodeList) xPath.evaluate("/studySearchResults/study", responseDoc, XPathConstants.NODESET);
         } catch(final Exception ex) {
             LOG.error("Querying for studyUID " + studyInstanceUID + ": unknown server response:\n" + response);
             throw ex;
@@ -313,8 +313,9 @@ public final class ProcessImportDir {
         case 1:
             final Node node = nodeList.item(0);
             final StudyQueryInfo studyQueryInfo = new StudyQueryInfo();
-            studyQueryInfo.studyUUID = node.getTextContent().trim();
-            studyQueryInfo.studyVersion = xPath.evaluate("../dd[@class='StudyVersion']", node).trim();
+            final NamedNodeMap attrMap = node.getAttributes();
+            studyQueryInfo.studyUUID = attrMap.getNamedItem("studyUUID").getNodeValue();
+            studyQueryInfo.studyVersion = attrMap.getNamedItem("version").getNodeValue();
             return studyQueryInfo;
         default:
             throw new Exception("Multiple matches for study UID " + studyInstanceUID);
