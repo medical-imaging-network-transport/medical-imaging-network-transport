@@ -73,7 +73,6 @@ public class Utils {
                 String s0 = dateStr.substring( 0, signIndex);
                 String s1 = dateStr.substring( signIndex, dateStr.length() );
                 dateStr = s0 + "GMT" + s1;
-                System.out.println("dateStr = " + dateStr);
         	}
         }
     	return parseDate(dateStr,xsdDateTime);

@@ -110,7 +110,6 @@ public class StudyBinaryItemsController {
             out.write("\nContent-Type: application/octet-stream\n".getBytes());
             out.write(("Content-ID: <" + index + "@" + uuid + ">\n").getBytes());
             out.write(("Content-Length: " + itemsize + "\n\n").getBytes());
-            out.flush();
         } else {
         	res.setContentType("application/octet-stream");
         	res.setContentLength((int) file.length());

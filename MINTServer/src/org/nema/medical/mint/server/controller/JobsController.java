@@ -55,7 +55,6 @@ import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -132,14 +131,9 @@ public class JobsController {
 			return;
 		}
 
-		if (!params.containsKey("type")) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
-			return;
-		}
+		final String type;
 
-		String type = params.get("type");
-
-		if (StringUtils.isBlank(type)) {
+		if (!params.containsKey("type") || StringUtils.isBlank(type = params.get("type"))) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
 			return;
 		}
@@ -149,7 +143,7 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		String joburi = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
+		String jobURI = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		Principal principal = req.getUserPrincipal();
@@ -162,8 +156,7 @@ public class JobsController {
 		executor.execute(processor); // process immediately in the background
 
 		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
-		res.setHeader("Location", joburi);
-
+		res.setHeader("Location", jobURI);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
@@ -209,15 +202,10 @@ public class JobsController {
 			return;
 		}
 
-		if (!params.containsKey("type")) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
-			return;
-		}
-
 		String studyUUID = params.get("studyUUID");
-		String type = params.get("type");
 
-		if (StringUtils.isBlank(type)) {
+		final String type;
+		if (!params.containsKey("type") || StringUtils.isBlank(type = params.get("type"))) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
 			return;
 		}
@@ -227,7 +215,7 @@ public class JobsController {
 		jobInfo.setStudyID(studyUUID);
 		jobInfo.setStatus(JobStatus.IN_PROGRESS);
 		jobInfo.setStatusDescription("0% complete");
-		String joburi = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
+		String jobURI = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		File studyFolder = new File(studiesRoot, studyUUID);
@@ -247,7 +235,7 @@ public class JobsController {
 		executor.execute(processor); // process immediately in the background
 
 		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
-		res.setHeader("Location", joburi);
+		res.setHeader("Location", jobURI);
 		
 	}
 
