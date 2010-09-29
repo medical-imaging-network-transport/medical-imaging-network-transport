@@ -15,7 +15,6 @@ Server:
  * Dual Intel Xeon E5620 (2.40GHz, 2400Mhz, 4 Cores, 8 Logical Processors)
  * 12 GB Physical RAM
  * Intel 82574L Gigabit Network Interface.
-
 Client system was running Red Hat Enterprise Linux 5.5 (RHEL) and connected via crossover Ethernet directly to the server.  Curl was used to measure transport.  Curl redirected output to /dev/null to ensure client disk latency was not a factor. 
 
 Ex:<br>
@@ -24,7 +23,6 @@ Ex:<br>
 To configure the IIS AJP ISAPI redirector:
  * Generic how-to: http://tomcat.apache.org/connectors-doc/webserver_howto/iis.html
  * IIS 7.0 how-to: http://www.iisadmin.co.uk/?p=72
-
 ==Testing methodology==
 Server was loaded with Windows 2003 Standard R2 x64 SP2, Windows 2008 Enterprise R2 SP1, and Red Hat Enterprise Linux 5.5 (RHEL).<br/>
 For each test, 6 runs were performed, with the first one always being thrown out to ensure the data was cached in memory by the OS.<br/>
