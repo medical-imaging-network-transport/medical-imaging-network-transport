@@ -1,0 +1,64 @@
+#summary When using Windows, ensure HTTP is handled by the HTTP.sys kernel driver.
+
+====Contact information:====
+Adam J. Weigold<br>
+Software Engineer<br>
+Vital Images, Inc<br>
+aweigold@vitalimages.com
+----
+=MINT Performance Testing=
+==Summary==
+When running MINT on Windows ensure that HTTP requests are handled by the HTTP.sys kernel driver.  Serving HTTP without HTTP.sys causes significant latency due to user/kernel mode switching^1^.
+
+==Testing environment==
+Server:
+ * Dual Intel Xeon E5620 (2.40GHz, 2400Mhz, 4 Cores, 8 Logical Processors)
+ * 12 GB Physical RAM
+ * Intel 82574L Gigabit Network Interface.
+
+Client system was running Red Hat Enterprise Linux 5.5 (RHEL) and connected via crossover Ethernet directly to the server.  Curl was used to measure transport.  Curl redirected output to /dev/null to ensure client disk latency was not a factor. 
+
+Ex:<br>
+{{{curl -o /dev/null http://{ip}/MINT/studies/{uuid}/DICOM/binaryitems/all}}}
+
+To configure the IIS AJP ISAPI redirector:
+ * Generic how-to: http://tomcat.apache.org/connectors-doc/webserver_howto/iis.html
+ * IIS 7.0 how-to: http://www.iisadmin.co.uk/?p=72
+
+==Testing methodology==
+Server was loaded with Windows 2003 Standard R2 x64 SP2, Windows 2008 Enterprise R2 SP1, and Red Hat Enterprise Linux 5.5 (RHEL).<br/>
+For each test, 6 runs were performed, with the first one always being thrown out to ensure the data was cached in memory by the OS.<br/>
+The same study was used for all test runs, with a request of {{{http://{ip}/MINT/studies/{uuid}/DICOM/binaryitems/all}}}.  The study used represented 1090M of binary data.  For testing throughput on non-MINT transfers, the binary items were concatenated into a single file and served out.<br/>
+For Windows operating systems four tests were run:
+ * MINT get all binary items request served directly by Tomcat.
+ * Binaryitems file served by Apache httpd.
+ * Binaryitems file served by ftp via IIS.
+ * MINT get all binary items request served by IIS with an AJP ISAPI redirect to Tomcat.
+Windows 2003 tests ran IIS 6.0.  Windows 2008 tests ran IIS 7.0.  For IIS 6.0, there is a known performance issue with ISAPI redirects (http://support.microsoft.com/kb/906977/).  The testing was run with the change to {{{MaxBufferedSendBytes}}} as instructed by the kb article.<br/>
+For the RHEL operating system three tests were run:
+ * MINT get all binary items request served directly by Tomcat.
+ * Binaryitems file served by Apache httpd.
+ * Binaryitems file served by vsftp.
+==Test Results==
+The tests results show that when using MINT on a Windows operating system, you must ensure that HTTP is handled by HTTP.sys for maximum performance.<br/>
+http://chart.apis.google.com/chart?chxl=0:|Windows+2003|Windows+2008|RHEL+5.5|2:|Avg+M%2FSec|3:|Operating+System+(RHEL+shown+as+a+baseline+for+kernel+mode)&chxp=2,50|3,50&chxs=0,000000,10.5,0,l,676767|1,000000,11.5,0,l,676767|2,000000,11.5,0,l,676767|3,000000,11.5,0,l,676767&chxt=x,y,y,x&chbh=a,0,15&chs=800x300&cht=bvg&chco=4D89F9,C40000&chds=0,111,0,111&chd=t:66.74,35.62,111|111,111&chdl=MINT+served+directly+by+Tomcat+(not+using+HTTP.sys)|MINT+AJP+ISAPI+redirect+from+IIS+(using+HTTP.sys)&chtt=MINT+Comparison+-+Kernel+mode+(HTTP.sys)+vs.User+mode&chts=000000,16&graph.png
+<br/>
+The tests also show that MINT does not add a significant amount of overhead to the transfer of binary items.<br/>
+http://chart.apis.google.com/chart?chxl=0:|Windows+2003|Windows+2008|RHEL+5.5|2:|Avg+M%2FSec|3:|Operating+System+(RHEL+shown+as+a+baseline+for+kernel+mode)&chxp=2,50|3,50&chxs=0,000000,10.5,0,l,676767|1,000000,11.5,0,l,676767|2,000000,11.5,0,l,676767|3,000000,11.5,0,l,676767&chxt=x,y,y,x&chbh=a,0,15&chs=800x300&cht=bvg&chco=4D89F9,C40000&chds=0,111,0,111&chd=t:70.78,50.16,112|111.8,112,112&chdl=Binaryitems+file+served+by+Apache+httpd+(not+using+HTTP.sys)|Binaryitems+file+served+by+FTP+(using+HTTP.sys+on+Windows+via+IIS)&chtt=Binary+transfer+Comparison+-+Kernel+mode+(HTTP.sys)+vs.User+mode&chts=000000,16&graph.png
+==Data Table==
+Test data results are available below for reference.  All values for runs represent average MB/sec over the entire transfer, except for the Average column which represents the average value of all runs.<br/>
+|| || *Average* || *Run 1* || *Run 2* || *Run 3* || *Run 4* || *Run 5* ||
+|| *Windows 2003-MINT served directly by Tomcat* ||66.74||67.7||67.5||65.9||67.1||65.5||
+|| *Windows 2003-Binaryitems file served by Apache httpd* ||70.78||72.9||70.3||71.2||69.2||70.3||
+|| *Windows 2003-Binaryitems file served by IIS over FTP* ||111.8||111||112||112||112||112||
+|| *Windows 2003-MINT AJP ISAPI redirect from IIS* ||111||111||111||111||111||111||
+|| *Windows 2008-MINT served directly by Tomcat* ||35.62||35.4||35.8||35.7||35.6||35.6||
+|| *Windows 2008-Binaryitems file served by Apache httpd* ||50.16||50.1||49.8||50.5||49.6||50.8||
+|| *Windows 2008-Binaryitems file served by IIS over FTP* ||112||112||112||112||112||112||
+|| *Windows 2008-MINT AJP ISAPI redirect from IIS* ||111||111||111||111||111||111||
+|| *RHEL-Binaryitems file served by Apache httpd* ||112||112||112||112||112||112||
+|| *RHEL-Binaryitems file served by vsftp* ||112||112||112||112||112||112||
+|| *RHEL-MINT served directly by Tomcat* ||111||111||111||111||111||111||
+
+----
+^1^ For more details on user/kernel mode switching performance problems: [http://www.microsoft.com/technet/prodtechnol/WindowsServer2003/Library/IIS/a2a45c42-38bc-464c-a097-d7a202092a54.mspx?mfr=true HTTP Protocol Stack (IIS 6.0)]
