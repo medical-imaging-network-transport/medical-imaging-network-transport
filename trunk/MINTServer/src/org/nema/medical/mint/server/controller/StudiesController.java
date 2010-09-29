@@ -51,7 +51,7 @@ public class StudiesController {
 	protected StudyDAO studyDAO = null;
 
     @RequestMapping("/studies")
-    public void studies(HttpServletRequest req, final HttpServletResponse res, ModelMap map,
+    public void studies(HttpServletRequest req, final HttpServletResponse res,
     		@RequestParam(value = "studyInstanceUID", required = false) String studyInstanceUID,
     		@RequestParam(value = "accessionNumber", required = false) String accessionNumber,
     		@RequestParam(value = "issuerOfAccessionNumber", required = false) String issuerOfAccessionNumber,
@@ -121,7 +121,6 @@ public class StudiesController {
         		dateTo = new Timestamp(timeTo.getTime());
         	}
 	        List<Study> studies = studyDAO.findStudies(searchParams, offset, limit);
-            map.addAttribute("studies", studies);
 	                
         	SearchResults searchResults = new SearchResults(req.getParameter("studyInstanceUID"), 
         			req.getParameter("accessionNumber"), req.getParameter("issuerOfAccessionNumber"), 
