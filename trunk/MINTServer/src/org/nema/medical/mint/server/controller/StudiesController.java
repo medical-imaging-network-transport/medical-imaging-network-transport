@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jibx.runtime.BindingDirectory;
@@ -37,7 +36,6 @@ import org.nema.medical.mint.server.domain.StudyDAO.SearchKey;
 import org.nema.medical.mint.studies.SearchResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -51,7 +49,7 @@ public class StudiesController {
 	protected StudyDAO studyDAO = null;
 
     @RequestMapping("/studies")
-    public void studies(HttpServletRequest req, final HttpServletResponse res,
+    public void studies(final HttpServletResponse res,
     		@RequestParam(value = "studyInstanceUID", required = false) String studyInstanceUID,
     		@RequestParam(value = "accessionNumber", required = false) String accessionNumber,
     		@RequestParam(value = "issuerOfAccessionNumber", required = false) String issuerOfAccessionNumber,
@@ -67,7 +65,6 @@ public class StudiesController {
 		// TODO read limit from a config file
         if (limit == null) limit = 50;
         if (offset == null) offset = 1;
-        int firstIndex = (offset-1)*limit;
     	
         Map<StudyDAO.SearchKey, String> searchParams = new HashMap<StudyDAO.SearchKey, String>();
 
@@ -122,10 +119,9 @@ public class StudiesController {
         	}
 	        List<Study> studies = studyDAO.findStudies(searchParams, offset, limit);
 	                
-        	SearchResults searchResults = new SearchResults(req.getParameter("studyInstanceUID"), 
-        			req.getParameter("accessionNumber"), req.getParameter("issuerOfAccessionNumber"), 
-        			req.getParameter("patientID"), req.getParameter("issuerOfPatientID"), 
-        			dateFrom, dateTimeFrom,	dateTo, dateTimeTo, StudyDAO.GMT.getID(), offset, limit);
+        	SearchResults searchResults = new SearchResults(studyInstanceUID, accessionNumber, issuerOfAccessionNumber,
+        			patientID, issuerOfPatientID, dateFrom, dateTimeFrom, dateTo, dateTimeTo, StudyDAO.GMT.getID(),
+        			offset, limit);
         	for (Study foundStudy : studies){
         		Timestamp lastUpdated;
         		if (foundStudy.getLastModified() != null){

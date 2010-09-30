@@ -7,19 +7,23 @@ import java.util.List;
 
 public class SearchResults {
 
-    private final String studyInstanceUID;
-    private final String accessionNumber;
-    private final String issuerOfAccessionNumber;
-    private final String patientID;
-    private final String issuerOfPatientID;
-    private final Timestamp minStudyDate;
-    private final Timestamp minStudyDateTime;
-    private final Timestamp maxStudyDate;
-    private final Timestamp maxStudyDateTime;
-    private final String timeZone;
-    private final int offset;
-    private final int limit;
-	private List<Study> studies;
+    private String studyInstanceUID;
+    private String accessionNumber;
+    private String issuerOfAccessionNumber;
+    private String patientID;
+    private String issuerOfPatientID;
+    private Timestamp minStudyDate;
+    private Timestamp minStudyDateTime;
+    private Timestamp maxStudyDate;
+    private Timestamp maxStudyDateTime;
+    private String timeZone;
+    private int offset;
+    private int limit;
+	private final List<Study> studies = new ArrayList<Study>();
+
+	public SearchResults() {
+		//Default constructor for JiBX
+	}
 
     public SearchResults(String studyInstanceUID, String accessionNumber, String issuerOfAccessionNumber, String patientID, String issuerOfPatientID, Timestamp minStudyDate, Timestamp minStudyDateTime, Timestamp maxStudyDate, Timestamp maxStudyDateTime, String timeZone, int offset, int limit) {
         this.studyInstanceUID = studyInstanceUID;
@@ -34,10 +38,9 @@ public class SearchResults {
         this.timeZone = timeZone;
         this.offset = offset;
         this.limit = limit;
-        this.studies = new ArrayList<Study>();
     }
     
-    public String getStudyInstanceUID() {
+	public String getStudyInstanceUID() {
         return studyInstanceUID;
     }
 
@@ -92,4 +95,52 @@ public class SearchResults {
     public void addStudy(Study study) {
     	studies.add(study);
     }
+
+    public void setStudyInstanceUID(String studyInstanceUID) {
+		this.studyInstanceUID = studyInstanceUID;
+	}
+
+	public void setAccessionNumber(String accessionNumber) {
+		this.accessionNumber = accessionNumber;
+	}
+
+	public void setIssuerOfAccessionNumber(String issuerOfAccessionNumber) {
+		this.issuerOfAccessionNumber = issuerOfAccessionNumber;
+	}
+
+	public void setPatientID(String patientID) {
+		this.patientID = patientID;
+	}
+
+	public void setIssuerOfPatientID(String issuerOfPatientID) {
+		this.issuerOfPatientID = issuerOfPatientID;
+	}
+
+	public void setMinStudyDate(Timestamp minStudyDate) {
+		this.minStudyDate = minStudyDate;
+	}
+
+	public void setMinStudyDateTime(Timestamp minStudyDateTime) {
+		this.minStudyDateTime = minStudyDateTime;
+	}
+
+	public void setMaxStudyDate(Timestamp maxStudyDate) {
+		this.maxStudyDate = maxStudyDate;
+	}
+
+	public void setMaxStudyDateTime(Timestamp maxStudyDateTime) {
+		this.maxStudyDateTime = maxStudyDateTime;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
 }
