@@ -9,9 +9,13 @@ import java.sql.Timestamp;
  */
 public class Study {
 
-    private final String studyUUID;
-    private final Timestamp lastModified;
-    private final int version;
+    private String studyUUID;
+    private Timestamp lastModified;
+    private int version;
+
+    public Study() {
+    	//Default constructor for JiBX
+    }
 
     public Study(String studyUUID, Timestamp lastModified, int version) {
         this.version = version;
@@ -19,7 +23,19 @@ public class Study {
         this.studyUUID = studyUUID;
     }
 
-    public String getStudyUUID() {
+    public void setStudyUUID(String studyUUID) {
+		this.studyUUID = studyUUID;
+	}
+
+	public void setLastModified(Timestamp lastModified) {
+		this.lastModified = lastModified;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public String getStudyUUID() {
         return studyUUID;
     }
 
