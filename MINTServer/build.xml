@@ -1,6 +1,5 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="MINTServer">
-    <property file="build.properties" />
     <property name="build.dir" value="${basedir}/build" />
 
     <property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
@@ -95,6 +94,10 @@
             <lib dir="${common.project.basedir}/build" includes="*.jar" />
             <metainf dir="WebContent/META-INF" />
         </war>
+    </target>
+
+    <target name="explode" depends="war" description="Make WARs for deployment">
+        <unwar dest="${build.dir}/${ant.project.name}" src = "${build.dir}/${ant.project.name}.war"/>
     </target>
 
     <target name="doc" depends="war" description="Make JavaDoc archives">
