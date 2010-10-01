@@ -357,10 +357,12 @@ public final class Dcm2MetaBuilder {
              } else if (!isPixelData) {
                  // non-pixel data, simple external binary item
                  attr.setBid(metaBinaryPair.getBinaryData().size());
+                 attr.setBinarySize(binaryData.length);
                  metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
              } else {
                  // pixel data, in 1 or more frames
                  attr.setBid(metaBinaryPair.getBinaryData().size());
+                 attr.setBinarySize(binaryData.length);
                  attr.setFrameCount(numFrames);
                  
                  final int rows = rootObj.getInt(Tag.Rows, -1);
