@@ -37,6 +37,7 @@ import com.google.protobuf.ByteString;
  *   &lt;xs:attribute type="xs:string" use="required" name="vr"/>
  *   &lt;xs:attribute type="xs:string" use="optional" name="val"/>
  *   &lt;xs:attribute type="xs:string" use="optional" name="bid"/>
+ *   &lt;xs:attribute type="xs:string" use="optional" name="bsize"/>
  *   &lt;xs:attribute type="xs:string" use="optional" name="bytes"/>
  * &lt;/xs:complexType>
  * </pre>
@@ -48,6 +49,7 @@ public class Attribute
     private String vr;
     private String val;
     private int bid = -1; // index must be a positive integer
+    private int bsize = -1;
     private int frameCount = 1; // index must be a positive integer
     private byte[] bytes;
     private String exclude;
@@ -98,6 +100,15 @@ public class Attribute
      */
     public void setTag(int tag) {
         this.tag = tag;
+    }
+    
+    public int getBinarySize() {
+    	return bsize;
+    }
+    
+    public void setBinarySize(int size) {
+    	if (size < -1) size = -1;
+    	this.bsize = size;
     }
 
     /**
@@ -229,6 +240,7 @@ public class Attribute
         if (attrData.hasStringValue()) attr.setVal(attrData.getStringValue());
         if (attrData.hasExclude()) attr.setExclude(attrData.getStringValue());
         if (attrData.hasBinaryItemId()) { attr.setBid(attrData.getBinaryItemId()); }
+        if (attrData.hasBinaryItemSize()) { attr.setBinarySize(attrData.getBinaryItemSize()); }
         if (attrData.hasFrameCount()) { attr.setFrameCount(attrData.getFrameCount()); }
         if (attrData.hasBytes()) { attr.setBytes(attrData.getBytes().toByteArray()); }
         for (ItemData itemData : attrData.getItemsList()) {
@@ -241,6 +253,7 @@ public class Attribute
         AttributeData.Builder builder = AttributeData.newBuilder();
         builder.setTag(this.tag);
         if (this.bid >=0 ) builder.setBinaryItemId(this.bid);
+        if (this.bsize >= 0) builder.setBinaryItemSize(this.bsize);
         if (this.frameCount > 1) builder.setFrameCount(this.frameCount);
         if (this.vr != null) builder.setVr(this.vr);
         if (this.val != null) builder.setStringValue(this.val);

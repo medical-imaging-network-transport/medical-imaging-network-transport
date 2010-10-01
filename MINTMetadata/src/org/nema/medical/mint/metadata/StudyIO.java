@@ -221,6 +221,20 @@ public class StudyIO {
 	        return Integer.parseInt(bid);		
 		}
     }
+	
+	// used to convert Attribute.tag int to hex
+	static public String int2bsize(int tag) {
+        return (tag >= 0) ? String.format("%d", tag) : "";
+    }
+
+    // used to convert Attribute.tag hex to int
+	static public int bsize2int(String bsize) {
+		if (bsize == null || bsize.length() == 0) {
+			return -1;
+		} else {
+	        return Integer.parseInt(bsize);		
+		}
+    }
 
     // used to convert base64 to byte[]
 	static public byte[] base64decode(String string) {

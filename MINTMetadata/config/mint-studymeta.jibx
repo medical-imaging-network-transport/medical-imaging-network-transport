@@ -5,6 +5,8 @@
           deserializer="org.nema.medical.mint.metadata.StudyIO.hex2int"/>
   <format label="int.bid" type="int" serializer="org.nema.medical.mint.metadata.StudyIO.int2bid"
           deserializer="org.nema.medical.mint.metadata.StudyIO.bid2int"/>
+  <format label="int.bsize" type="int" serializer="org.nema.medical.mint.metadata.StudyIO.int2bsize"
+          deserializer="org.nema.medical.mint.metadata.StudyIO.bsize2int"/>
   <format label="base64" type="byte[]" serializer="org.nema.medical.mint.metadata.StudyIO.base64encode"
           deserializer="org.nema.medical.mint.metadata.StudyIO.base64decode"/>
   <mapping abstract="true" type-name="StudyMetaType" class="org.nema.medical.mint.metadata.Study">
@@ -30,6 +32,7 @@
     <value style="attribute" name="vr" get-method="getVr" set-method="setVr"/>
     <value style="attribute" name="val" get-method="getVal" set-method="setVal" usage="optional"/>
     <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>    
+    <value style="attribute" name="bsize" get-method="getBinarySize" set-method="setBinarySize" format="int.bsize" usage="optional" default="-1"/>    
     <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional" default="1"/>    
     <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>    
     <value style="attribute" name="exclude" field="exclude" usage="optional"/>
