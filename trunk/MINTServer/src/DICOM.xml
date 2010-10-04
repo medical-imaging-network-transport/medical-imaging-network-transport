@@ -1,5 +1,5 @@
 <!-- THIS FILE IS SUPPOSED TO REPRESENT THE DICOM STANDARD -->
-<metadata type="DICOM" version="1.0">
+<metadata type="DICOM" version="1.0" xmlns="http://medical.nema.org/mint">
 	<attributes unknown-attributes="include/ignore/reject?"> 
 		<element tag="00000000" keyword="CommandGroupLength" vr="UL" vm="1" ret="">Command Group Length</element> 
 		<element tag="00000001" keyword="CommandLengthToEnd" vr="UL" vm="1" ret="RET">Length to End</element> 
