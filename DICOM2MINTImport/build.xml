@@ -43,11 +43,11 @@
 			<fileset dir="${basedir}/src" excludes="**/*.java"/>
 			<fileset dir="${common.project.basedir}/build/ant-classes" />
 			<fileset dir="${metadata.project.basedir}/build/ant-classes" />
-			<zipfileset src="lib/apache-mime4j-0.6.jar"/>
-			<zipfileset src="lib/commons-logging-1.1.1.jar"/>
-			<zipfileset src="lib/httpclient-4.0.1.jar"/>
-			<zipfileset src="lib/httpcore-4.0.1.jar"/>
-			<zipfileset src="lib/httpmime-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/lib/apache-mime4j-0.6.jar"/>
+			<zipfileset src="${common.project.basedir}/lib/commons-logging-1.1.1.jar"/>
+			<zipfileset src="${common.project.basedir}/lib/httpclient-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/lib/httpcore-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/lib/httpmime-4.0.1.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/slf4j-api-1.6.0.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/slf4j-log4j12-1.6.0.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/commons-lang-2.5.jar"/>
