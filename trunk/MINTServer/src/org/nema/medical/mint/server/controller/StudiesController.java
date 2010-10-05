@@ -43,6 +43,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class StudiesController {
 
 	@Autowired
+	protected String xmlStylesheet;
+
+	@Autowired
 	protected File studiesRoot;
 	
 	@Autowired
@@ -139,6 +142,7 @@ public class StudiesController {
     		IMarshallingContext mctx = bfact.createMarshallingContext();
     		mctx.setIndent(2);
     		mctx.startDocument("UTF-8", null, res.getOutputStream());
+    		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
     		mctx.marshalDocument(searchResults);
     		mctx.endDocument();
 

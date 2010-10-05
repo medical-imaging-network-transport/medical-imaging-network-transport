@@ -42,6 +42,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class StudyRootController {
 
 	@Autowired
+	protected String xmlStylesheet;
+
+	@Autowired
 	protected StudyDAO studyDAO = null;
 
 	@Autowired
@@ -52,10 +55,6 @@ public class StudyRootController {
 	
 	@Autowired
 	protected Integer fileResponseBufferSize;
-
-	@Autowired
-	protected Integer fileStreamBufferSize;
-
 
 	@RequestMapping("/studies/{uuid}")
 	public void studyRoot(@PathVariable("uuid") final String uuid,
@@ -107,13 +106,14 @@ public class StudyRootController {
 		
 		StudyRoot studyRoot = new StudyRoot(study.getID(), lastUpdated,
 				Integer.parseInt(study.getStudyVersion()), studyTypeFileList);
-		
-		res.setBufferSize(fileResponseBufferSize);
+
 		IBindingFactory bfact = BindingDirectory.getFactory("studyRoot",StudyRoot.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
-		mctx.marshalDocument(studyRoot, "UTF-8", null, res.getOutputStream());
-
+		mctx.startDocument("UTF-8", null, res.getOutputStream());
+		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+		mctx.marshalDocument(studyRoot);
+		mctx.endDocument();
 		
 	}
 	private static final Logger LOG = Logger.getLogger(StudyRootController.class);

@@ -74,6 +74,9 @@ public class JobsController {
 	protected File studiesRoot;
 
 	@Autowired
+	protected String xmlStylesheet;
+
+	@Autowired
 	protected StudyDAO studyDAO = null;
 	@Autowired
 	protected JobInfoDAO jobInfoDAO = null;
@@ -253,7 +256,10 @@ public class JobsController {
 		IBindingFactory bfact = BindingDirectory.getFactory("jobStatus",org.nema.medical.mint.jobs.JobStatus.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
-		mctx.marshalDocument(jobStatus, "UTF-8", null, res.getOutputStream());
+		mctx.startDocument("UTF-8", null, res.getOutputStream());
+		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+		mctx.marshalDocument(jobStatus);
+		mctx.endDocument();
 
 	}
 
