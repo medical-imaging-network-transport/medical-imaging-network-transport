@@ -129,10 +129,15 @@ public class StudyIO {
 	
 	static public void writeToXML(Study study, OutputStream out) throws IOException {
 		try {
+			String xmlStylesheet = "type=\"text/xsl\" href=\"style.xsl\"";
+
 			IBindingFactory bfact = BindingDirectory.getFactory("metadata",Study.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
-			mctx.marshalDocument(study, "UTF-8", null, out);
+    		mctx.startDocument("UTF-8", null, out);
+    		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+    		mctx.marshalDocument(study);
+    		mctx.endDocument();
 		} catch (JiBXException e) {
 			throw new IOException("Exception while marshalling data.",e);
 		}		
@@ -152,10 +157,15 @@ public class StudyIO {
 	
 	static public void writeSummaryToXML(Study study, OutputStream out) throws IOException {
 		try {
+			String xmlStylesheet = "type=\"text/xsl\" href=\"style.xsl\"";
+
 			IBindingFactory bfact = BindingDirectory.getFactory("summary",Study.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
-			mctx.marshalDocument(study, "UTF-8", null, out);
+    		mctx.startDocument("UTF-8", null, out);
+    		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+    		mctx.marshalDocument(study);
+    		mctx.endDocument();
 		} catch (JiBXException e) {
 			throw new IOException("Exception while marshalling data.",e);
 		}		

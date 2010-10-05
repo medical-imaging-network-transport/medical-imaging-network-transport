@@ -52,6 +52,7 @@
 	<servlet-mapping>
 		<servlet-name>spring-mvc-dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>
+		<url-pattern>*.xsl</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

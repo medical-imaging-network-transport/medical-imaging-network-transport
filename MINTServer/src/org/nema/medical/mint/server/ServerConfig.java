@@ -77,6 +77,7 @@ public class ServerConfig {
 	/*
 	 * MINTServer specific
 	 */
+	protected String xmlStylesheet = null;
 	protected StudyDAO studyDAO = null;
 	protected ChangeDAO updateDAO = null;
 	protected JobInfoDAO jobInfoDAO = null;
@@ -571,4 +572,11 @@ public class ServerConfig {
         }
         return fileStreamBufferSize;
     }
+    
+    @Bean
+    public String xmlStylesheet() {
+    	return "type=\"text/xsl\" href=\"style.xsl\"";
+    }
+	
+
 }

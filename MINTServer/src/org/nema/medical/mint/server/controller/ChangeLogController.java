@@ -50,6 +50,9 @@ public class ChangeLogController {
 	protected ChangeDAO changeDAO = null;
 
 	@Autowired
+	protected String xmlStylesheet;
+
+	@Autowired
 	protected Integer fileResponseBufferSize;
 
 	@Autowired
@@ -95,12 +98,16 @@ public class ChangeLogController {
 				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
 			}
 		}
+
 		res.setBufferSize(fileResponseBufferSize);
 		ChangeSet changeSet = new ChangeSet(changes);
 		IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog",ChangeSet.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
-		mctx.marshalDocument(changeSet, "UTF-8", null, res.getOutputStream());
+		mctx.startDocument("UTF-8", null, res.getOutputStream());
+		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+		mctx.marshalDocument(changeSet);
+		mctx.endDocument();
 	}
 	
 	@RequestMapping("/studies/{uuid}/changelog")
@@ -122,12 +129,16 @@ public class ChangeLogController {
 				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
 			}
 		}
+
 		res.setBufferSize(fileResponseBufferSize);
 		ChangeSet changeSet = new ChangeSet(uuid, changes);
 		IBindingFactory bfact = BindingDirectory.getFactory("studyChangelog",ChangeSet.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
-		mctx.marshalDocument(changeSet, "UTF-8", null, res.getOutputStream());
+		mctx.startDocument("UTF-8", null, res.getOutputStream());
+		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
+		mctx.marshalDocument(changeSet);
+		mctx.endDocument();
 	}
 
 	@RequestMapping("/studies/{uuid}/changelog/{seq}")
