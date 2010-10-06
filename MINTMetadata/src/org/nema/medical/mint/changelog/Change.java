@@ -4,12 +4,18 @@ import java.sql.Timestamp;
 
 public class Change {
 
-	public Change(String studyUUID, int changeNumber, String type, Timestamp datetime, 
-			String remoteHost, String remoteUser, String principal) {
+    /**
+     * Default constructor for JiBX
+     */
+    public Change() {
+    }
+
+	public Change(final String studyUUID, final int changeNumber, final String type, final Timestamp dateTime,
+			final String remoteHost, final String remoteUser, final String principal) {
 		this.studyUUID = studyUUID;
 		this.changeNumber = changeNumber;
 		this.type = type;
-		this.datetime = datetime;
+		this.dateTime = dateTime;
 		this.remoteHost = remoteHost;
 		this.remoteUser = remoteUser;
 		this.principal = principal;
@@ -19,35 +25,63 @@ public class Change {
 		return studyUUID;
 	}
 
-	public int getChangeNumber() {
+    public void setStudyUUID(final String studyUUID) {
+        this.studyUUID = studyUUID;
+    }
+
+    public int getChangeNumber() {
 		return changeNumber;
 	}
 	
+    public void setChangeNumber(final int changeNumber) {
+        this.changeNumber = changeNumber;
+    }
+
 	public String getType() {
 		return type;
 	}
 	
+    public void setType(String type) {
+        this.type = type;
+    }
+
 	public Timestamp getDateTime() {
-		return datetime;
+		return dateTime;
 	}
+
+    public void setDateTime(final Timestamp dateTime) {
+        this.dateTime = dateTime;
+    }
 
 	public String getRemoteHost() {
 		return remoteHost;
 	}
 
+    public void setRemoteHost(final String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
 	public String getRemoteUser() {
 		return remoteUser;
 	}
+
+    public void setRemoteUser(final String remoteUser) {
+        this.remoteUser = remoteUser;
+    }
 
 	public String getPrincipal() {
 		return principal;
 	}
 
-	private final String studyUUID;
-	private final int changeNumber;
-	private final String type;
-	private final Timestamp datetime;
-	private final String remoteHost;
-	private final String remoteUser;
-	private final String principal;
+    public void setPrincipal(final String principal) {
+        this.principal = principal;
+    }
+
+	private String studyUUID;
+	private int changeNumber;
+	private String type;
+	private Timestamp dateTime;
+	private String remoteHost;
+	private String remoteUser;
+	private String principal;
 }

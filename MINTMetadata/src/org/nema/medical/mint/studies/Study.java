@@ -13,8 +13,10 @@ public class Study {
     private Timestamp lastModified;
     private int version;
 
+    /**
+     * Default constructor for JiBX
+     */
     public Study() {
-    	//Default constructor for JiBX
     }
 
     public Study(String studyUUID, Timestamp lastModified, int version) {

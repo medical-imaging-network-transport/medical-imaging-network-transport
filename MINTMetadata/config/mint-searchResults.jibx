@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<binding xmlns:tns="http://medical.nema.org/mint" name="studySearchResults"
-	trim-whitespace="true">
+<binding xmlns:tns="http://medical.nema.org/mint" name="studySearchResults"	trim-whitespace="true">
 	<namespace uri="http://medical.nema.org/mint" default="elements" />
 	<mapping name="studySearchResults" class="org.nema.medical.mint.studies.SearchResults">
 		<value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID" usage="optional"/>
