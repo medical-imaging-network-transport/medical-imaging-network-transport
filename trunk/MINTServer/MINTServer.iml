@@ -16,7 +16,6 @@
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="ant-lib" level="project" />
     <orderEntry type="library" name="lib2" level="project" />
-    <orderEntry type="module" module-name="mint-metadata" />
     <orderEntry type="module" module-name="MINTCommon" />
   </component>
 </module>
