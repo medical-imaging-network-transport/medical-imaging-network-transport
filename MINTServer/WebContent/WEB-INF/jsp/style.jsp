@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/xml; charset=utf-8"
 	pageEncoding="ISO-8859-1"%><%@ taglib prefix="c"
-	uri="http://java.sun.com/jsp/jstl/core"%>
-<?xml version="1.0" encoding="UTF-8"?>
+	uri="http://java.sun.com/jsp/jstl/core"%><?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mint="http://medical.nema.org/mint">
 
