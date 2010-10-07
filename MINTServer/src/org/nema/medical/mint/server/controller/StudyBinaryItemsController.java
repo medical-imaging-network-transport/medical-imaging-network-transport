@@ -82,9 +82,9 @@ public class StudyBinaryItemsController {
             return;
         }
         
-        LOG.info("output buffer size was " + res.getBufferSize());
+        LOG.debug("output buffer size was " + res.getBufferSize());
         res.setBufferSize(binaryItemResponseBufferSize);
-        LOG.info("output buffer size is now " + res.getBufferSize());
+        LOG.debug("output buffer size is now " + res.getBufferSize());
         final OutputStream out = res.getOutputStream();
         
         int i = itemList.next();
