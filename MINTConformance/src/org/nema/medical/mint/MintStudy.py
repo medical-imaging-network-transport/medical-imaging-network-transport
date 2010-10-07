@@ -50,6 +50,10 @@ class MintStudy():
        self.__xml = XmlDocument(MintStudy.ROOT_TAG_NAME)
        self.__xmlns = ""
        self.__studyInstanceUID = ""
+       self.__type = ""
+       self.__version = ""
+       self.__instanceCount = ""
+       
        self.__attributes = {}
        self.__tags = []
        self.__series = {}
@@ -59,10 +63,19 @@ class MintStudy():
        self.__readFromFile(metadataName)
 
    def xmlns(self): 
-       return self.__xmlns;
+       return self.__xmlns
        
    def studyInstanceUID(self): 
-       return self.__studyInstanceUID;
+       return self.__studyInstanceUID
+       
+   def type(self): 
+       return self.__type
+       
+   def version(self): 
+       return self.__version
+       
+   def instanceCount(self): 
+       return self.__instanceCount
        
    def numAttributes(self):
        return len(self.__tags)
@@ -131,32 +144,36 @@ class MintStudy():
              attr = series.find(tag, sopInstanceUID)
        return attr
        
-   def toString(self, indent=""):
-       s =  indent+"- Study Instance UID="+self.__studyInstanceUID+'\n'
+   def debug(self, indent=""):
+       print "- studyMeta xmlns", self.xmlns(), "studyInstanceUID", self.__studyInstanceUID, "type", self.__type, "version", self.__version, "instanceCount", self.__instanceCount
        indent += " "
-       s += indent+"- xmlns="+self.xmlns()+"\n"
-       s += indent+"- attributes\n"
+       print indent+"- attributes"
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           attr = self.attribute(n).toString(indent)+"\n"
-           s += attr
+           self.attribute(n).debug(indent)
        indent = indent[0:-1]
+       print indent+"- attributes"
              
-       s += indent+"- seriesList\n"
+       print indent+"- seriesList"
        indent += " "
        numSeries = self.numSeries()
        for n in range(0, numSeries):
-           s += self.series(n).toString(indent)
+           self.series(n).debug(indent)
        indent = indent[0:-1]
+       print indent+"- seriesList"
 
-       return s
+       indent = indent[0:-1]
+       print indent+"- studyMeta"
 
    def __readFromFile(self, metadataName):
        self.__xml.readFromFile(metadataName)
       
        self.__xmlns = self.__xml.attributeWithName("xmlns")
        self.__studyInstanceUID = self.__xml.attributeWithName("studyInstanceUID")
+       self.__type = self.__xml.attributeWithName("type")
+       self.__version = self.__xml.attributeWithName("version")
+       self.__instanceCount = self.__xml.attributeWithName("instanceCount")
      
        # ---
        # Read Attributes
@@ -182,9 +199,6 @@ class MintStudy():
           self.__seriesInstanceUIDs = self.__series.keys()
           self.__seriesInstanceUIDs.sort()
        
-   def __str__(self):
-       return self.toString()
-       
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
@@ -202,7 +216,7 @@ def main():
        # ---
        mintStudyDir = sys.argv[1];
        mintStudy = MintStudy(mintStudyDir)
-       print mintStudy
+       mintStudy.debug()
        
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

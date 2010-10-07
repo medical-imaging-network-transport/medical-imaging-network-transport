@@ -130,7 +130,7 @@ class DicomAttribute():
 
        # Read the val
        self.__readVal(dcm)
-
+       
    def tidy(self):
        """
        Removes a tempory binary item.
@@ -235,6 +235,42 @@ class DicomAttribute():
              self.__val = None    
              tmp.close()
              
+   def debug(self, indent=""):
+
+       print indent+"tag =", self.__tag, "vr =", self.__vr, "vl =", self.__vl,
+       if self.__val != "": print "val =", self.valstr(),
+
+       if self.__vr == "SQ":
+          print " # "+self.tagName().encode('ascii', 'replace')
+          indent += " "
+          numItems = self.numItems()
+          for i in range(0, numItems):
+              print indent+"- item"
+              numItemAttributes = self.numItemAttributes(i)
+              indent += " "
+              print indent+"- attributes"
+              indent += " "
+              for j in range(0, numItemAttributes):
+                  self.itemAttribute(i, j).debug(indent)
+              indent = indent[0:-1]
+              print indent+"- attributes"
+              indent = indent[0:-1]
+              print indent+"- item"
+              
+       elif self.__val != "":
+          if self.isPixelData():
+             print "<Pixel Data>",
+          elif self.isBinary():
+             print "<Binary Data>",
+          elif self.isUnknown():
+             print "<Unknown>",
+          elif self.__val != "":
+             print self.__val.encode('ascii', 'replace'),
+          print " # "+self.tagName().encode('ascii', 'replace')
+
+       else:
+          print " # "+self.tagName().encode('ascii', 'replace')
+       
    def __bin2str(self, b):
        h = hex(b)
        s = str(h).replace("0x", "")
@@ -258,40 +294,6 @@ class DicomAttribute():
            vals += str(format % val)+"\\"    
        return vals[0:-1]
    
-   def __str__(self):
-       return self.toString()
-
-   def toString(self, indent=""):
-       s = "tag="+self.__tag+" vr="+self.__vr+" val= "
-
-       if self.__vr == "SQ":
-          indent += " "
-          numItems = self.numItems()
-          for i in range(0, numItems):
-              s += "\n"+indent+"- Item\n"
-              numItemAttributes = self.numItemAttributes(i)
-              indent += " "
-              s += indent+"- Attributes\n"
-              indent += " "
-              for j in range(0, numItemAttributes):
-                s += indent+"- "+self.itemAttribute(i, j).toString(indent)
-                if j != numItemAttributes-1: s += '\n'
-              indent = indent[0:-2]
-
-       elif self.__val != "":
-          if self.isPixelData():
-             s += "<Pixel Data>"
-          elif self.isBinary():
-             s += "<Binary Data>"
-          elif self.isUnknown():
-             s += "<Unknown>"
-          elif self.__val != "":
-             s += self.__val.encode('ascii', 'replace')
-
-       s += " # "+self.tagName()
-       
-       return s
-       
    TRANSFER_SYNTAX_UID_TAG = "00020010"
    PIXEL_DATA_TAG          = "7fe00010"
    ITEM_TAG                = "fffee000"

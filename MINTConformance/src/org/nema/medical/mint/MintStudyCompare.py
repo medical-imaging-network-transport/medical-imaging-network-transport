@@ -26,6 +26,7 @@
 # -----------------------------------------------------------------------------
 
 import getopt
+import glob
 import os
 import sys
 import traceback
@@ -54,8 +55,7 @@ class MintStudyCompare():
 
        self.__binary1 = os.path.join(refMintStudyDir, "binaryitems")
        self.__binary2 = os.path.join(newMintStudyDir, "binaryitems")
-
-       self.__binaryitems = []
+       self.__binaryitems = glob.glob(os.path.join(self.__binary1, "*.dat"))
        
        self.__count = 0
        self.__verbose = False
@@ -92,6 +92,18 @@ class MintStudyCompare():
        self.check("Study Instance UID",
                   s1.studyInstanceUID(), 
                   s2.studyInstanceUID())
+                  
+       self.check("Study Type",
+                  s1.type(), 
+                  s2.type())
+                  
+       self.check("Study Version",
+                  s1.version(), 
+                  s2.version())
+                  
+       self.check("Study Instance Count",
+                  s1.instanceCount(), 
+                  s2.instanceCount())
                   
        self.check("Number of study attributes",
                   s1.numAttributes(), 
@@ -152,8 +164,8 @@ class MintStudyCompare():
        elif attr1.vr() == "SQ":
           self.__checkSequence(msg, attr1, attr2)
        else:
-          self.check(msg, attr1.toString(), attr2.toString())
-          self.__checkForBinary(attr1)
+          self.check(msg, str(attr1), str(attr2))
+          if attr1.bytes() != "": self.__inlineBinaryCompared += 1
    
    def __checkSequence(self, msg, attr1, attr2):
 
@@ -190,6 +202,10 @@ class MintStudyCompare():
                      "None")
           return
        
+       self.check(series+" instanceCount",
+                  series1.instanceCount(), 
+                  series2.instanceCount())
+                  
        self.check("Number of "+series+" attributes",
                   series1.numAttributes(), 
                   series2.numAttributes())
@@ -245,17 +261,9 @@ class MintStudyCompare():
            self.__checkAttributes(instance+" Attribute", attr1, attr2)
            self.__instanceAttributesCompared += 1
 
-   def __checkForBinary(self, attr):
-       # inline binary has already been checked
-       if attr.bytes() != "":
-          self.__inlineBinaryCompared += 1
-          return
-       
-       # Compare binary files later       
-       if attr.bid() != "" and attr.isBinary() and attr.bid() not in self.__binaryitems:
-          self.__binaryitems.append(attr.bid())
-       
    def __checkBinary(self):
+
+       if self.__lazy: return
 
        # ---
        # Loop through each binary item.
@@ -265,7 +273,7 @@ class MintStudyCompare():
            # ---
            # Check for binary item in study 1.
            # ---
-           dat1 = os.path.join(self.__binary1, binaryitem+".dat")
+           dat1 = binaryitem
            if not os.access(dat1, os.F_OK):
               self.__count += 1
               print "File not found", ":", dat1
@@ -274,7 +282,7 @@ class MintStudyCompare():
            # ---
            # Check for binary item in study 2.
            # ---
-           dat2 = os.path.join(self.__binary2, binaryitem+".dat")
+           dat2 = os.path.join(self.__binary2, os.path.basename(binaryitem))
            if not os.access(dat2, os.F_OK):
               self.__count += 1
               print "File not found", ":", dat2
@@ -288,57 +296,57 @@ class MintStudyCompare():
            self.check(binaryitem+".dat size",
                       size1,
                       size2)
+           
+           if size1 != size2: return
 
            # ---
            # Check binary item byte for byte.
            # ---
-           if not self.__lazy and size1 == size2:
-              bid1 = open(dat1, "rb")
-              bid2 = open(dat2, "rb")
+           bid1 = open(dat1, "rb")
+           bid2 = open(dat2, "rb")
            
-              # ---
-              # Read in a block.
-              # ---
-              bufsize = 1024
-              block = 0
-              buf1 = bid1.read(bufsize)
-              bytes1 = unpack('B'*len(buf1), buf1)
-              n1 = len(bytes1)
-              while n1 > 0:   
-                 buf2 = bid2.read(bufsize)
-                 bytes2 = unpack('B'*len(buf2), buf2)
-                 n2 = len(bytes2)
-                 assert n1 == n2 # These better be equal
+           # ---
+           # Read in a block.
+           # ---
+           bufsize = 1024
+           block = 0
+           buf1 = bid1.read(bufsize)
+           bytes1 = unpack('B'*len(buf1), buf1)
+           n1 = len(bytes1)
+           while n1 > 0:   
+              buf2 = bid2.read(bufsize)
+              bytes2 = unpack('B'*len(buf2), buf2)
+              n2 = len(bytes2)
+              assert n1 == n2 # These better be equal
                  
-                 # ---
-                 # Loop through block.
-                 # ---
-                 diff = False
-                 for i in range(0, n1):
+              # ---
+              # Loop through block.
+              # ---
+              diff = False
+              for i in range(0, n1):
+                  if bytes1[i] != bytes2[i]:
                      self.check(binaryitem+".dat byte "+str(block*bufsize+i),
                                 bytes1[i],
                                 bytes2[i])
                 
-                     if bytes1[i] != bytes2[i]:
-                        diff = True
-                        break
+                     diff = True
+                     break
                      
-                     self.__bytesCompared += 1
+                  self.__bytesCompared += 1
 
-                 # ---
-                 # Skip to end if difference was found.
-                 # ---
-                 if diff:
-                    n1 = -1
-                 else:
-                    buf1 = bid1.read(bufsize)
-                    bytes1 = unpack('B'*len(buf1), buf1)
-                    n1 = len(bytes1)
-                    block += 1
+              # ---
+              # Skip to end if difference was found.
+              # ---
+              if diff:
+                 n1 = -1
+              else:
+                 buf1 = bid1.read(bufsize)
+                 bytes1 = unpack('B'*len(buf1), buf1)
+                 n1 = len(bytes1)
+                 block += 1
 
-              bid1.close()
-              bid2.close()
-              
+           bid1.close()
+           bid2.close()   
            self.__binaryItemsCompared += 1
 
 # -----------------------------------------------------------------------------

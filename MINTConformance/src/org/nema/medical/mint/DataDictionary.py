@@ -105,17 +105,13 @@ class DataDictionary():
        self.__tags = self.__elements.keys()
        self.__tags.sort()
           
-   def __str__(self):
-       s = ""
+   def debug(self):
        numElements = self.numElements()
        for n in range(0, numElements):
            tag = self.tag(n)  
            element = self.elementByTag(tag)
-           if element != None:
-              s += str(element)+"\n"
-           
-       return s
-           
+           if element != None: element.debug()
+                      
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
@@ -133,7 +129,7 @@ def main():
        # ---
        dataDictionaryName = sys.argv[1];
        dataDictionary = DataDictionary(dataDictionaryName)
-       print dataDictionary
+       dataDictionary.debug()
 
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

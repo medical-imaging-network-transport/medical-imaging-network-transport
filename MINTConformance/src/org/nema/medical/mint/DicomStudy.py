@@ -65,13 +65,12 @@ class DicomStudy():
    def instances(self, n):
        return self.__instances[n]
        
-   def __str__(self):
-       s = ""
+   def debug(self):
+       print "> Study", self.studyInstanceUID()
        numInstances = self.numInstances()
        for n in range(0, numInstances):
            instance = self.instances(n)
-           s += str(instance)+"\n"
-       return s
+           instance.debug()
        
    def __read(self):
 
@@ -104,7 +103,7 @@ def main():
        dcmDir = sys.argv[1];
        dataDictionaryUrl = args[1];
        study = DicomStudy(dcmDir, dataDictionaryUrl)
-       print study
+       study.debug()
        study.tidy()
        
     except Exception, exception:
