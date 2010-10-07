@@ -68,18 +68,18 @@ class MintInstance():
    def find(self, tag):
        return self.attributeByTag(tag)
        
-   def toString(self, indent=""):       
-       s = indent+"- instance sopInstanceUID="+self.sopInstanceUID()+" transferSyntaxUID="+self.transferSyntaxUID()+"\n"
+   def debug(self, indent=""):       
+       print indent+"- instance sopInstanceUID", self.sopInstanceUID(), "transferSyntaxUID", self.transferSyntaxUID()
        indent += " "
-       s += indent+"- attributes\n"
+       print indent, "- attributes"
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           attr = self.attribute(n).toString(indent)
-           s += attr+"\n"
-       indent = indent[0:-2]
-       
-       return s
+           self.attribute(n).debug(indent)
+       indent = indent[0:-1]
+       print indent, "- attributes"
+       indent = indent[0:-1]
+       print indent, "- instance"
 
    def __read(self, root):
        self.__sopInstanceUID = root.attributeWithName("sopInstanceUID")
@@ -96,7 +96,3 @@ class MintInstance():
               self.__attributes[attb.tag()] = attb
           self.__tags = self.__attributes.keys()
           self.__tags.sort()
-       
-   def __str__(self):
-       return self.toString()
-       

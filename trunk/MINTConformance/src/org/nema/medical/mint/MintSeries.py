@@ -35,6 +35,7 @@ from org.nema.medical.mint.XmlNode               import XmlNode
 class MintSeries():
    
    def __init__(self, root):
+       self.__instanceCount = ""
        self.__attributes = {}
        self.__tags = []
        self.__normalizedInstanceAttributes = {}
@@ -45,6 +46,9 @@ class MintSeries():
        
    def seriesInstanceUID(self): 
        return self.__seriesInstanceUID;
+       
+   def instanceCount(self): 
+       return self.__instanceCount;
        
    def numAttributes(self):
        return len(self.__tags)
@@ -113,37 +117,36 @@ class MintSeries():
                 attr = instance.find(tag)           
        return attr
        
-   def toString(self, indent=""):
-       s  = indent+"- series seriesInstanceUID=" + self.__seriesInstanceUID + '\n'
+   def debug(self, indent=""):
+       print indent+"- series seriesInstanceUID", self.__seriesInstanceUID, "instanceCount", self.__instanceCount
        indent += " "
-       s += indent+"- attributes\n"       
+       print indent+"- attributes"
        indent += " "
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
-           attr = self.attribute(n).toString(indent)
-           s += attr+"\n"
+           self.attribute(n).debug(indent)
        indent = indent[0:-1]
+       print indent+"- attributes"
 
-       s += indent+"- normalizedInstanceAttributes\n"
+       print indent+"- normalizedInstanceAttributes"
        indent += " "
        numNormalizedInstanceAttributes = self.numNormalizedInstanceAttributes()
        for n in range(0, numNormalizedInstanceAttributes):
-           attr = self.normalizedInstanceAttribute(n).toString(indent)
-           s += attr+"\n"
+           self.normalizedInstanceAttribute(n).debug(indent)
        indent = indent[0:-1]
+       print indent+"- normalizedInstanceAttributes"
           
-       s += indent+"- instances\n"
+       print indent+"- instances"
        indent += " "
        numInstances = self.numInstances()
        for n in range(0, numInstances):
-           instance = self.instance(n)
-           s += instance.toString(indent) 
+           self.instance(n).debug(indent) 
        indent = indent[0:-1]
-       
-       return s
+       print indent+"- instances"
        
    def __read(self, root):
        self.__seriesInstanceUID = root.attributeWithName("seriesInstanceUID")
+       self.__instanceCount = root.attributeWithName("instanceCount")
 
        # ---
        # Read Attributes
@@ -180,6 +183,3 @@ class MintSeries():
               self.__instances[instance.sopInstanceUID()] = instance 
        self.__sopInstanceUIDs = self.__instances.keys()
        self.__sopInstanceUIDs.sort()
-
-   def __str__(self):
-       return self.toString()

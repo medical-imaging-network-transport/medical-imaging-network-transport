@@ -101,17 +101,14 @@ class DicomInstance():
        else:
           return None
    
-   def __str__(self):
-       s = ""
-       numAttributes = self.numAttributes()
-       for n in range(0, numAttributes):
-           tag = self.tag(n)
-           attr = self.attributeByTag(tag)
-           s += attr.toString()
-           if n != numAttributes-1: s += '\n'
-       
-       return s
-           
+   def debug(self):
+      print ">> Instance", self.sopInstanceUID()
+      numAttributes = self.numAttributes()
+      for n in range(0, numAttributes):
+          tag = self.tag(n)
+          attr = self.attributeByTag(tag)
+          attr.debug()
+
    def __open(self):
        dcm = open(self.__dcmName, "rb")
        
@@ -170,7 +167,7 @@ def main():
        dataDictionaryUrl = args[1];
        dataDictionary = DataDictionary(dataDictionaryUrl)
        instance = DicomInstance(dcmName, dataDictionary)
-       print instance
+       instance.debug()
        instance.tidy()
                         
     except Exception, exception:
@@ -181,4 +178,3 @@ def main():
        
 if __name__ == "__main__":
    main()
-

@@ -35,12 +35,14 @@ class MintAttribute():
    binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
 
    def __init__(self, node):
-       self.__tag   = node.attributeWithName("tag")
-       self.__vr    = node.attributeWithName("vr")
-       self.__val   = node.attributeWithName("val")
-       self.__bid   = node.attributeWithName("bid")
-       self.__bytes = node.attributeWithName("bytes")
-       self.__items = []
+       self.__tag     = node.attributeWithName("tag")
+       self.__vr      = node.attributeWithName("vr")
+       self.__val     = node.attributeWithName("val")
+       self.__bid     = node.attributeWithName("bid")
+       self.__bytes   = node.attributeWithName("bytes")
+       self.__bsize   = node.attributeWithName("bsize")
+       self.__boffset = node.attributeWithName("boffset")
+       self.__items   = []
        
        if self.__val == None:
           self.__val = ""
@@ -48,6 +50,10 @@ class MintAttribute():
           self.__bid = ""
        if self.__bytes == None:
           self.__bytes = ""
+       if self.__bsize == None:
+          self.__bsize = "0"
+       if self.__boffset == None:
+          self.__boffset = "0"
           
        if self.__vr == "SQ":
           items = node.childrenWithName("item")
@@ -61,11 +67,13 @@ class MintAttribute():
                     for attr in attrs:
                         attributeList.append(MintAttribute(attr))
 
-   def tag(self)  : return self.__tag
-   def vr (self)  : return self.__vr
-   def val(self)  : return self.__val
-   def bid(self)  : return self.__bid
-   def bytes(self): return self.__bytes
+   def tag(self)     : return self.__tag
+   def vr (self)     : return self.__vr
+   def val(self)     : return self.__val
+   def bid(self)     : return self.__bid
+   def bytes(self)   : return self.__bytes
+   def bsize(self)   : return self.__bsize
+   def boffset(self) : return int(self.__boffset)
    
    def numItems(self): return len(self.__items)
    def item(self, i):  return self.__items[i]
@@ -75,32 +83,40 @@ class MintAttribute():
    
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
        
-   def __str__(self):
-       return self.toString()
-
-   def toString(self, indent=""):
-       s = indent+"tag="+self.__tag+" vr="+self.__vr
+   def debug(self, indent=""):
+       print indent+"tag =", self.__tag, "vr =", self.__vr,
        if self.__val != "":
-          s += " val="+self.__val.encode('ascii', 'replace')
+          print "val =", self.__val.encode('ascii', 'replace'),
        if self.__bid != "":
-          s += " bid="+self.__bid
+          print "bid =", self.__bid,
        if self.__bytes != "":
-          s += " bytes="+self.__bytes
+          print "bytes =", self.__bytes,
+       if self.__bsize != 0:
+          print "bsize =", self.__bsize,
+       if self.__boffset != 0:
+          print "boffset =", self.__boffset,
+       print
 
        numItems = self.numItems()
        for i in range(0, numItems):
            indent += " "
-           s += "\n"+indent+"- item\n"
+           print indent, "- item"
            numItemAttributes = self.numItemAttributes(i)
            indent += " "
-           s += indent+"- attributes\n"
+           print indent, "- attributes"
            indent += " "
            for j in range(0, numItemAttributes):
-               s += self.itemAttribute(i, j).toString(indent)+"\n"
+               self.itemAttribute(i, j).debug(indent)
            indent = indent[0:-1]
-           s += indent+"- attributes\n"
+           print indent, "- attributes"
            indent = indent[0:-1]
-           s += indent+"- item"
+           print indent, "- item"
            indent = indent[0:-1]
-           
+
+   def __repr__(self):
+       if self.__vr == "SQ":
+          raise ValueError("No string representation for sequence attribute "+self.__tag)
+       s  = self.__tag+" "+self.__vr+" "+self.__val.encode('ascii', 'replace')+" "
+       s += self.__bid+" "+self.__bytes+" "+self.__bsize+" "+self.__boffset
+
        return s
