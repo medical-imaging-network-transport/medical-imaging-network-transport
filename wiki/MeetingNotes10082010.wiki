@@ -1,0 +1,86 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Single file implementation  - added support for create
+    * Working on C++ library
+    * Going to measure performance on CentOS
+  * Chris
+    * Update MINT Technical Overview
+    * IntelliJ projects uploaded
+    * All XML mappings implemented
+    * XSL stylesheets inserted
+    * JiBX bindings are no bidirectional, new metadata.jar file uploaded
+    * Gagan Maheshwari will be driving MINT specification 
+  * Dan
+    * Data dictionary jibx bindings - currently in its own project
+    * Started working on performance testing
+    * Has a wiki that outlines their performance testing plan
+    * Preliminary results confirm vital's performance numbers for server 2003 and server 2008 direct to tomcat
+    * Tim Culp checked in conformance test changes for single file
+  * Jim
+    * Received initial MINT marketing ides for RSNA
+    * Spoke with DICOM WG6 about MINT - thought it was a good idea to get on WG6 agenda.  Will contact Howard Clark about this.  May need to present at WG6 meeting thursday morning of RSNA
+    * Open logistical issue about if we can bring our laptops or need union guys to set them up
+    * Had discussions with Dejarnette and Vital about demonstrations at RSNA
+    * Meeting at 5PM on Monday in east hall
+    * Talking to Siemens and Merge about MINT support
+
+
+= Notes =
+
+
+= Decisions =
+
+
+= New Actions =
+
+= Old Actions =
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Completed Actions = 
+  * Look into resource to create MINT style sheets (Jim Philbin)
+  * Look into resource to create MINT style sheets (Rex)
+  * Check in IntelliJ project files (Tim Dawson)
+  * Add size of binary item to the metadata (Gorkem)
+  * Post Vital's performance test plan (Chris)
+  * Post Harris' performance test plan (Tim)
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+
+= Issues =
+
+= Future =
