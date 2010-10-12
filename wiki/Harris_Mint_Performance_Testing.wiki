@@ -35,7 +35,7 @@ Windows 2003 tests ran IIS 6.0. Windows 2008 tests ran IIS 7.0. For IIS 6.0, the
 
 Test data results are available below for reference.  All values for runs represent average MB/sec over the entire transfer, except for the Average column which represents the average value of all runs.<br/>
 || || *Average* || *Run 1* || *Run 2* || *Run 3* || *Run 4* || *Run 5* ||
-|| *Windows 2003-MINT served directly by Tomcat* ||39.7||40.3||40.5||41.4||39.3||38.7||
+|| *Windows 2003-MINT served directly by Tomcat* ||40.0||40.3||40.5||41.4||39.3||38.7||
 || *Windows 2003-Binaryitems file served by Apache httpd* ||X||X||X||X||X||X||
 || *Windows 2003-Binaryitems file served by IIS over FTP* ||X||X||X||X||X||X||
 || *Windows 2003-MINT AJP ISAPI redirect from IIS* ||X||X||X||X||X||X||
