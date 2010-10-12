@@ -39,7 +39,7 @@ Test data results are available below for reference.  All values for runs repres
 || *Windows 2003-Binaryitems file served by Apache httpd* ||X||X||X||X||X||X||
 || *Windows 2003-Binaryitems file served by IIS over FTP* ||X||X||X||X||X||X||
 || *Windows 2003-MINT AJP ISAPI redirect from IIS* ||X||X||X||X||X||X||
-|| *Windows 2008-MINT served directly by Tomcat* ||19.9||21.1||20.4||22.1||21.1||20.8||
+|| *Windows 2008-MINT served directly by Tomcat* ||21.1||21.1||20.4||22.1||21.1||20.8||
 || *Windows 2008-Binaryitems file served by Apache httpd* ||X||X||X||X||X||X||
 || *Windows 2008-Binaryitems file served by IIS over FTP* ||X||X||X||X||X||X||
 || *Windows 2008-MINT AJP ISAPI redirect from IIS* ||X||X||X||X||X||X||
