@@ -15,7 +15,7 @@ This independent performance test is intended to verify the initial findings fro
   * Client
    # Windows Server 2003 Standard Edition SP2, Intel Xeon CPU E5502 @ 1.87GHz, 2GB RAM
 
-Client system is connected to the servers via 1Gigabit intranet connection with <1ms ping response. Ping response was determined by doing a "ping `<server>` -n 20" to get average response time.Curl was used to measure transport. Curl redirected output to NUL(curl -o NUL <url>) to ensure client disk latency was not a factor.
+Client system is connected to the servers via 1Gigabit intranet connection with <1ms ping response. Ping response was determined by doing a "ping `<server>` -n 20" to get average response time.Curl was used to measure transport. Curl redirected output to NUL(curl -o NUL `<url>`) to ensure client disk latency was not a factor.
 
 = Testing methodology =
 For each test, 6 runs were performed, with the first one always being thrown out to ensure the data was cached in memory by the OS.
