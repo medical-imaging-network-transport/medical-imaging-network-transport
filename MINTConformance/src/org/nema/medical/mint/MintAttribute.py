@@ -41,7 +41,6 @@ class MintAttribute():
        self.__bid     = node.attributeWithName("bid")
        self.__bytes   = node.attributeWithName("bytes")
        self.__bsize   = node.attributeWithName("bsize")
-       self.__boffset = node.attributeWithName("boffset")
        self.__items   = []
        
        if self.__val == None:
@@ -52,8 +51,6 @@ class MintAttribute():
           self.__bytes = ""
        if self.__bsize == None:
           self.__bsize = "0"
-       if self.__boffset == None:
-          self.__boffset = "0"
           
        if self.__vr == "SQ":
           items = node.childrenWithName("item")
@@ -73,7 +70,6 @@ class MintAttribute():
    def bid(self)     : return self.__bid
    def bytes(self)   : return self.__bytes
    def bsize(self)   : return self.__bsize
-   def boffset(self) : return int(self.__boffset)
    
    def numItems(self): return len(self.__items)
    def item(self, i):  return self.__items[i]
@@ -93,8 +89,6 @@ class MintAttribute():
           print "bytes =", self.__bytes,
        if self.__bsize != 0:
           print "bsize =", self.__bsize,
-       if self.__boffset != 0:
-          print "boffset =", self.__boffset,
        print
 
        numItems = self.numItems()
@@ -117,6 +111,6 @@ class MintAttribute():
        if self.__vr == "SQ":
           raise ValueError("No string representation for sequence attribute "+self.__tag)
        s  = self.__tag+" "+self.__vr+" "+self.__val.encode('ascii', 'replace')+" "
-       s += self.__bid+" "+self.__bytes+" "+self.__bsize+" "+self.__boffset
+       s += self.__bid+" "+self.__bytes+" "+self.__bsize
 
        return s
