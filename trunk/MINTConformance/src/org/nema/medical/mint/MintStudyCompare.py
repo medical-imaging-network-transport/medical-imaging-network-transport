@@ -56,6 +56,8 @@ class MintStudyCompare():
        self.__binary1 = os.path.join(refMintStudyDir, "binaryitems")
        self.__binary2 = os.path.join(newMintStudyDir, "binaryitems")
        self.__binaryitems = glob.glob(os.path.join(self.__binary1, "*.dat"))
+       self.__offsets1 = {}
+       self.__offsets2 = {}
        
        self.__count = 0
        self.__verbose = False
@@ -67,10 +69,13 @@ class MintStudyCompare():
        self.__instanceAttributesCompared = 0
        self.__inlineBinaryCompared = 0
        self.__binaryItemsCompared = 0
+       self.__offsetsCompared = 0
        self.__sequenceItemsCompared = 0
        self.__sequenceAttributesCompared = 0
        self.__bytesCompared = 0
        self.__lazy= False
+
+       self.__readOffsets()
 
    def setVerbose(self, verbose):
        self.__verbose = verbose
@@ -127,6 +132,7 @@ class MintStudyCompare():
            self.__compareSeries(series1, series2)
            self.__seriesCompared += 1
            
+       self.__checkOffsets()
        self.__checkBinary()
 
        # ---
@@ -143,6 +149,7 @@ class MintStudyCompare():
            print "%10d sequence attributes(s) compared." % (self.__sequenceAttributesCompared)
            print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
            print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
+           print "%10d offset(s) compared." % (self.__offsetsCompared)    
            print "%10d byte(s) compared." % (self.__bytesCompared)    
 
        # ---
@@ -157,6 +164,26 @@ class MintStudyCompare():
        if obj1 != obj2:
           self.__count += 1
           print msg, ":", obj1, "!=", obj2
+
+   def __readOffsets(self):
+       offsets1 = os.path.join(self.__binary1, "offsets.dat")
+       if offsets1 in self.__binaryitems: self.__binaryitems.remove(offsets1)
+       if os.path.isfile(offsets1):
+          self.__readOffsetTable(offsets1, self.__offsets1)
+
+       offsets2 = os.path.join(self.__binary2, "offsets.dat")
+       if os.path.isfile(offsets2):
+          self.__readOffsetTable(offsets2, self.__offsets2)
+
+   def __readOffsetTable(self, offsetsName, offsets):
+       table = open(offsetsName, "r")
+       line = table.readline()
+       while line != "":
+          tokens = line.split()
+          assert len(tokens) == 2
+          offsets[tokens[0]] = tokens[1]
+          line = table.readline()
+       table.close()
 
    def __checkAttributes(self, msg, attr1, attr2):
        if attr2 == None:
@@ -349,6 +376,28 @@ class MintStudyCompare():
            bid2.close()   
            self.__binaryItemsCompared += 1
 
+   def __checkOffsets(self):
+
+       if self.__lazy: return
+
+       bids1 = self.__offsets1.keys()
+       bids2 = self.__offsets2.keys()
+       
+       if len(bids1) != len(bids2):
+          self.check("Number of bid offsets",
+                     len(bids1),
+                     len(bids2))
+          return
+
+       for bid in bids1:
+           offset1 = self.__offsets1[bid]
+           offset2 = self.__offsets2[bid]
+           if offset1 == offset2:
+              self.check("bid "+bid+" boffset",
+                         offset1,
+                         offset2)
+           self.__offsetsCompared += 1
+           
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------

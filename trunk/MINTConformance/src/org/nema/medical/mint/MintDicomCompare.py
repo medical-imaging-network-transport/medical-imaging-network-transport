@@ -57,7 +57,8 @@ class MintDicomCompare():
        self.__studyInstanceUID = self.__dicom.studyInstanceUID()
        self.__mint = MintStudy(mintStudyDir)
        self.__binary = os.path.join(mintStudyDir, "binaryitems")
-       self.__binaryitems = glob.glob(os.path.join(self.__binary, "*.dat"))
+       self.__binaryitems = glob.glob(os.path.join(self.__binary, "*.dat"))       
+       self.__offsets = {}          
        self.__count = 0
        self.__verbose = False
        self.__inlineBinaryTagsCompared = 0
@@ -66,6 +67,8 @@ class MintDicomCompare():
        self.__bytesCompared = 0
        self.__itemsCompared = 0
        self.__lazy= False
+
+       self.__readOffsets()
 
    def setVerbose(self, verbose):
        self.__verbose = verbose
@@ -106,7 +109,21 @@ class MintDicomCompare():
        if self.__count != 0:
           print "%10d difference(s) found." % (self.__count)
 
+       self.__dicom.tidy()
        return self.__count
+
+   def __readOffsets(self):
+       offsets = os.path.join(self.__binary, "offsets.dat")
+       if offsets in self.__binaryitems: self.__binaryitems.remove(offsets)       
+       if os.path.isfile(offsets):
+          table = open(offsets, "r")
+          line = table.readline()
+          while line != "":
+             tokens = line.split()
+             assert len(tokens) == 2
+             self.__offsets[tokens[0]] = tokens[1]
+             line = table.readline()
+          table.close()
 
    def __compareInstances(self, instance, mint): 
 
@@ -259,7 +276,7 @@ class MintDicomCompare():
        # Check to see if this is single file or multi-file binary.
        # ---
        dat2 = None
-       if len(self.__binaryitems) == 1:
+       if len(self.__offsets) > 0:
           dat2 = self.__binaryitems[0]
        else:
           dat2 = os.path.join(self.__binary, attr.bid()+".dat")
@@ -281,8 +298,15 @@ class MintDicomCompare():
        # ---
        bid1 = open(dat1, "rb")
        bid2 = open(dat2, "rb")
-       bid2.seek(attr.boffset())
-          
+
+       # ---
+       # Position the MINT binary file pointer.
+       # ---
+       boffset = 0
+       if len(self.__offsets):
+          boffset = int(self.__offsets[attr.bid()])
+       bid2.seek(boffset)
+       
        # ---
        # Read in a block.
        # ---
