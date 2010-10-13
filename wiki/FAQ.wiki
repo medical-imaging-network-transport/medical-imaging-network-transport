@@ -1,0 +1,21 @@
+#summary Frequently Asked Questions
+
+  * Q: Why doesn't MINT use an existing DICOM to XML mapping like Supplement 118?
+  * A: Performance is a key requirement for MINT and we found that the overly verbose schema in Supplement 118 to negatively impact performance.  The current MINT XML schema is concise which makes it faster to parse.
+
+  * Q: What exactly is metadata?
+  * A: In MINT, metadata is all data about a given type except for data that has been extracted into binary items.  For DICOM, this typically means that the metadata contains all attributes for all SOP Instances in a study except for the images which are extracted into binary items
+
+  * Q: What does normalization mean?
+  * A: It means that data items are not duplicated.  For example - a study belongs to a single patient so there should only be a single patient name.  
+
+  * Q: Why is the metadata normalized?
+  * A: We normalized the metadata in MINT to match the DICOM logical model.  
+
+  * Q: Why did you normalize the metadata instead of leaving it denormalized as it is found in DICOM P10 Instances?
+  * A: One of the key goals for MINT is to centralized QC logic.  Ensuring that data is normalized is one way we achieve this.  As it is in DICOM today, QC logic is distributed amongst all systems in the enterprise and each of them handle data validation in different ways.
+
+  * Q: What kind of data validation problems exist with DICOM denormalization
+  * A: Common problems include:
+    # SOP Instances in the same study have different patient names.  The worst case scenario is that the images are for two different patients.  This isn't always the case though - sometimes a name is spelled slightly different from two different systems.
+    # SOP Instances in the same study have different study dates.  Which one do you display in the worklist?
