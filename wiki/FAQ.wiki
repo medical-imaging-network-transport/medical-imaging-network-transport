@@ -1,7 +1,7 @@
 #summary Frequently Asked Questions
 
   * Q: Why doesn't MINT use an existing DICOM to XML mapping like Supplement 118?
-  * A: Performance is a key requirement for MINT and we found that the overly verbose schema in Supplement 118 to negatively impact performance.  The current MINT XML schema is concise which makes it faster to parse.
+  * A: Performance is a key requirement for MINT and we found that the verbose schema used by Supplement 118 to negatively impact performance.  The current MINT XML schema is more concise which makes it faster to parse.
 
   * Q: What exactly is metadata?
   * A: In MINT, metadata is all data about a given type except for data that has been extracted into binary items.  For DICOM, this typically means that the metadata contains all attributes for all SOP Instances in a study except for the images which are extracted into binary items
@@ -23,5 +23,35 @@
   * Q: Where does the validation and rule logic live in a MINT based architecture?
   * A: The MINT server performs basic validation on the structure of the metadata, it does not validate the actual data itself.  Data validation is expected to be performed by MINT clients (e.g. a PACS or VNA that has DICOM CSTORE SCP, storage commit and HL7 reconciliation capabilities)
 
-  * Q: Why does MINT use REST instead of WS*?
-  * A: One of the primary motivations for MINT was to provide the simplest abstraction possible on the underlying storage infrastructure.  Since storage subsystems are essentially CRUD based instead of process based, REST was a much better fit than WS.  While MINT is currently implemented with REST, it is certainly possible to create WS* mappings.
+  * Q: Why does MINT use REST instead of WS?
+  * A: One of the primary motivations for MINT was to provide the simplest abstraction possible on the underlying storage infrastructure.  Since storage subsystems are essentially CRUD based instead of process/workflow based, REST is a much better fit than WS.  While MINT is currently implemented with REST, it is certainly possible to create WS mappings.
+
+  * Q: How does REST map to CRUD?
+  * A: REST utilizes the standard HTTP verbs
+    * GET = READ
+    * POST = CREATE
+    * PUT = UPDATE
+    * DELETE = DELETE
+
+  * Q: How does MINT compare to WADO?
+  * A: 
+  Similarities:
+     * Both use HTTP
+     * Both provide access to the underlying DICOM data
+
+  Differences:
+     * WADO supports the generation of JPEG/PNG images, MINT does not
+     * MINT includes a query mechanism, WADO does not (you have to use CFIND or other)
+     * MINT includes a changelog mechanism that enables other systems to stay in sync with changes in the system, WADO does not
+     * MINT normalizes the metadata eliminating the need for common and problematic workflows, WADO does not address this
+     * MINT includes an extendability mechanism that supports storage of private data.  WADO may support this using DICOM private SOP classes
+     * MINT includes streaming and batch access mechanisms.  WADO's granularity is at the SOP Instance level
+     * MINT allows access to individual frames in a multi-frame instance, WADO does not
+     * MINT allows access to individual binary items in a SOP Instance, WADO does not
+
+  * Q: When will MINT add support for image rendering like WADO has?
+  * A: There are no plans to add WADO like image rendering to MINT.  WADO already provides this capability and it is straightforward to have WADO integrate with MINT. 
+
+  * Q: What are MINT extensions?
+  * A: Extensions are a mechanism to enable applications to store proprietary or non standard data along with a study
+
