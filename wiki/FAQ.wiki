@@ -19,3 +19,9 @@
   * A: Common problems include:
     # SOP Instances in the same study have different patient names.  The worst case scenario is that the images are for two different patients.  This isn't always the case though - sometimes a name is spelled slightly different from two different systems.
     # SOP Instances in the same study have different study dates.  Which one do you display in the worklist?
+
+  * Q: Where does the validation and rule logic live in a MINT based architecture?
+  * A: The MINT server performs basic validation on the structure of the metadata, it does not validate the actual data itself.  Data validation is expected to be performed by MINT clients (e.g. a PACS or VNA that has DICOM CSTORE SCP, storage commit and HL7 reconciliation capabilities)
+
+  * Q: Why does MINT use REST instead of WS*?
+  * A: One of the primary motivations for MINT was to provide the simplest abstraction possible on the underlying storage infrastructure.  Since storage subsystems are essentially CRUD based instead of process based, REST was a much better fit than WS.  While MINT is currently implemented with REST, it is certainly possible to create WS* mappings.
