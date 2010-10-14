@@ -1,13 +1,13 @@
 #summary Frequently Asked Questions
 
   * Q: Why doesn't MINT use an existing DICOM to XML mapping like Supplement 118?
-  * A: Performance is a key requirement for MINT and we found that the verbose schema used by Supplement 118 to negatively impact performance.  The current MINT XML schema is more concise which makes it faster to parse.
+  * A: Performance is a key requirement for MINT and we found the verbose schema used by Supplement 118 to negatively impact performance.  The current MINT XML schema is more concise which makes it faster to parse.
 
   * Q: What exactly is metadata?
-  * A: In MINT, metadata is all data about a given type except for data that has been extracted into binary items.  For DICOM, this typically means that the metadata contains all attributes for all SOP Instances in a study except for the images which are extracted into binary items
+  * A: In MINT, metadata is all data about a given type except for data that has been extracted into binary items.  For the DICOM type, this typically means that the metadata contains all attributes for all SOP Instances in a study except for the images which are extracted into binary items
 
   * Q: What does normalization mean?
-  * A: It means that data items are not duplicated.  For example - a study belongs to a single patient so there should only be a single patient name.  
+  * A: It means that data items are not duplicated.  For example - a study belongs to a single patient so there should only be a single patient name in the metadata.  
 
   * Q: Why is the metadata normalized?
   * A: We normalized the metadata in MINT to match the DICOM logical model.  
@@ -17,7 +17,7 @@
 
   * Q: What kind of data validation problems exist with DICOM denormalization
   * A: Common problems include:
-    # SOP Instances in the same study have different patient names.  The worst case scenario is that the images are for two different patients.  This isn't always the case though - sometimes a name is spelled slightly different from two different systems.
+    # SOP Instances in the same study have different patient names.  The worst case scenario is that the SOP Instances are for two different patients.  A common case is where SOP Instances for the same patient in have different patient names.  When a viewer detects this situatio - how does it know which case it is?
     # SOP Instances in the same study have different study dates.  Which one do you display in the worklist?
 
   * Q: Where does the validation and rule logic live in a MINT based architecture?
@@ -37,9 +37,9 @@
   * A: 
   Similarities:
      * Both use HTTP
-     * Both provide access to the underlying DICOM data
 
   Differences:
+     * WADO can return SOP Instances encoded as DICOM P10 instances, MINT cannot
      * WADO supports the generation of JPEG/PNG images, MINT does not
      * MINT includes a query mechanism, WADO does not (you have to use CFIND or other)
      * MINT includes a changelog mechanism that enables other systems to stay in sync with changes in the system, WADO does not
@@ -58,20 +58,20 @@
   * Q: Why don't you leverage private SOP classes for storing proprietary or non standard data?
   * A: MINT fully supports private SOP classes and its use is not discouraged.  MINT does provide an alternative to private SOP classes that is simpler and more flexible than the DICOM private SOP class mechanism - it is up to applications to determine which makes the most sense for their use cases
 
-  * Q: Doesn't DICOM P10 + a storage protocol like CFIS do the same thing as MINT?
+  * Q: Doesn't DICOM P10 + a storage protocol like CIFS do the same thing as MINT?
   * A: It does provide similar capabilities but MINTs normalization, XML encoding and HTTP based protocol provide significant benefits.
 
-  * Q: Are MINT service implementations requried to store data in DICOM P10 format?
+  * Q: Are MINT service implementations required to store data in DICOM P10 format?
   * A: No, MINT is a network protocol and does not specify implementation level details such as how the data is stored.
 
-  * Q: Why not specify implementaiton level details?
+  * Q: Why not specify implementation level details?
   * A: Technology continues to advance and we don't want to constrain innovation by specifying the implementation.  We also want to make it as easy as possible for existing architectures to add support for MINT
 
   * Q: Why are studies identified using a UUID instead of the DICOM Study Instance UID?
   * A: DICOM Study Instance UIDs are known to not be unique due to various issues in the real world.  Using a MINT server generated UUID is safer and simpler than having to deal with scenarios where identifiers are provided by external systems.  A UUID also allows MINT to be adopted by existing system architectures that ensure uniqueness of study uids as well as those that do not require them to be unique (both exist in the real world)
 
   * Q: Can MIME types be used to get metadata encoded in other formats besides XML?
-  * A: Yes, in fact the reference implemetnation provides an encoding based on google protocol buffers that provides performs much better than XML and is similar to native DICOM encoding.
+  * A: Yes, in fact the reference implementation provides an encoding based on google protocol buffers that provides performs much better than XML and is similar to native DICOM encoding.
   
   * Q: Why don't you include compression as a type of encoding?
   * A: Compression is a layer above the underlying encoding and is already handled as part of the HTTP mechanism (e.g. gzip)
@@ -81,3 +81,8 @@
 
   * Q: To synchronize with a MINT server, my system has to poll the changelog.  Isn't polling inefficient and not scalable?
   * A: Technically polling is less efficient but far simpler.  The web is built on polling and it has scaled quite well - MINT is based on the same principles so it can leverage the knowledge, technologies and mechanisms that are already well understood.
+
+  * Q: Why doesn't MINT have any support for transcoding (converting from one transfer syntax to another)?
+  * A: We wanted to keep MINT as simple as possible and transcoding adds a level of complexity that we wanted to avoid.  One could envision a gateway that implements the MINT interface but also provides transcoding functionality.  The different transfer syntax encodings could be dispatched via a URI mechanism (e.g. http://server/jpeg200/studies/... vs http://server/jpegls/studies/...)
+
+  * 
