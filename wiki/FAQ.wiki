@@ -138,3 +138,19 @@
  
   * Q: What is the algorithm MINT uses to determine whether or not to inline binary data or extract it into binary item ids
   * A: No algorithm is specified, this is really up to the implementation of the MINT server.  Clients should be prepared to handle both encodings (inline vs extraction) for any attribute including those in extensions.
+
+  * Q: Are binary items normalized?
+  * A: No, binary items vary in size and the benefit did not outweigh the added complexity it would add.
+
+  * Q: Are sequence items normalized?
+  * A: No, the benefit of normalizing sequence data did not outweigh the added complexity it would add.
+
+  * Q: What is the purpose of the data dictionary?
+  * A: It has a few uses:
+    # Define the normalization rules for each type
+    # Define default VRs for attributes.  This is needed because the VRs are not encoded in all DICOM transfer syntaxes
+    # Support definitions for proprietary types
+
+  * Q: How does MINT address the fact that the DICOM standard changes each year?
+  * A: This is not expected to be a problem since the changes to the DICOM standard are typically additive.  MINT does not perform any validation according to the data dictionary - this allows it to be incomplete and still function.  If a breaking change does occur in the DICOM standard, it is possible to create a new type (e.g DICOMV4) to handle this.
+
