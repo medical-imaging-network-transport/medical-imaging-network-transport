@@ -29,6 +29,13 @@ For Windows operating systems four tests were run:
 
 Windows 2003 tests ran IIS 6.0. Windows 2008 tests ran IIS 7.0. For IIS 6.0, there is a known performance issue with ISAPI redirects (http://support.microsoft.com/kb/906977/). The testing was run with the change to MaxBufferedSendBytes as instructed by the kb article.
 
+httpd on Windows 2008 required a modification to the httpd.conf to uncomment out the following entries
+
+  * #EnableMMAP off
+  * #EnableSendfile off
+
+Transfer speeds before this change were < 1MB/s, and ~17MB/s after the change
+
 == Test Results == 
 
 == Data Table == 
