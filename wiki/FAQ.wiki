@@ -46,7 +46,7 @@
      * Both use HTTP
 
   Differences:
-     * WADO can return SOP Instances encoded as DICOM P10 instances, MINT cannot
+     * WADO can return SOP Instances encoded as DICOM P10 instances, MINT cannot (although the reference implementation does include a tool to regenerate P10 from MINT)
      * WADO supports the generation of JPEG/PNG images, MINT does not
      * MINT includes a query mechanism, WADO does not (you have to use CFIND or other)
      * MINT includes a changelog mechanism that enables other systems to stay in sync with changes in the system, WADO does not
@@ -95,3 +95,6 @@
 
   * Q: Why does MINT expose individual image frames stored in DICOM Multiframe images?
   * A: There are several ways of encoding individual frames in DICOM multiframe depending upon whether or not they are compressed or fragmented.  With MINT, we wanted to both unify and simplify multiframe handling to make it easier for viewers to fully support multiframe encoding.  We also needed to break these down into individual frames to better support on demand loading scenarios.
+
+  * Q: How does MINT handle updates to patient demographics?
+  * A: MINT's normalization of metadata as well as support for updating individual attributes makes this very easy.  For example, updating the patient name is as simple as sending an update with the patient name tag with the new value.  Since it is normalized, this single update will apply to all SOP Instances in the study.
