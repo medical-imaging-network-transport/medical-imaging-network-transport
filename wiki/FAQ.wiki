@@ -16,6 +16,12 @@
   * Q: Why did you normalize the metadata instead of leaving it denormalized as it is found in DICOM P10 Instances?
   * A: One of the key goals for MINT is to centralized QC logic.  Ensuring that data is normalized is one way we achieve this.  As it is in DICOM today, QC logic is distributed amongst all systems in the enterprise and each of them handle data validation in different ways.
 
+  * Q: The DICOM logical model does not include normalization of attributes below the series level - why did you do this in MINT?
+  * A: There is a tremendous ammount of duplication of attributes below the series level and we wanted to make MINT as fast as possible.  
+
+  * Q: Doesn't multiframe solve the same problem?
+  * A: Yes it does, but much single frame data exists and new SOP classes are added which can benefit from this mechanism.
+
   * Q: What kind of data validation problems exist with DICOM denormalization
   * A: Common problems include:
     # SOP Instances in the same study have different patient names.  The worst case scenario is that the SOP Instances are for two different patients.  A common case is where SOP Instances for the same patient in have different patient names.  When a viewer detects this situatio - how does it know which case it is?
@@ -87,4 +93,5 @@
   * Q: Why doesn't MINT have any support for transcoding (converting from one transfer syntax to another)?
   * A: We wanted to keep MINT as simple as possible and transcoding adds a level of complexity that we wanted to avoid.  One could envision a gateway that implements the MINT interface but also provides transcoding functionality.  The different transfer syntax encodings could be dispatched via a URI mechanism (e.g. http://server/jpeg200/studies/... vs http://server/jpegls/studies/...)
 
-  * 
+  * Q: Why does MINT expose individual image frames stored in DICOM Multiframe images?
+  * A: There are several ways of encoding individual frames in DICOM multiframe depending upon whether or not they are compressed or fragmented.  With MINT, we wanted to both unify and simplify multiframe handling to make it easier for viewers to fully support multiframe encoding.  We also needed to break these down into individual frames to better support on demand loading scenarios.
