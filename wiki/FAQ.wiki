@@ -98,3 +98,19 @@
 
   * Q: How does MINT handle updates to patient demographics?
   * A: MINT's normalization of metadata as well as support for updating individual attributes makes this very easy.  For example, updating the patient name is as simple as sending an update with the patient name tag with the new value.  Since it is normalized, this single update will apply to all SOP Instances in the study.
+
+  * Q: What attribute can I search for studies with?
+  * A: Studies can be searched by using the following HTTP query string parameters
+    * studyInstanceUID 
+    * accessionNumber
+    * issuerOfAccessionNumber
+    * patientId
+    * issuerOfPatientId
+    * studyDateTimeFrom
+    * studyDateTimeTo
+    * studyVersion
+    * limit - maximum number of results to return (needed for paging)
+    * offset - index of first result to return in the result set (needed for paging) 
+
+  * Q: Why can't I search on XXX attribute?
+  * A: The MINT search mechanism is intended to be used to find a single study, a list of patient studies and data extraction (for ETL) use cases.  MINT is not intended to directly support end user workflow which typically requires more complex queries including filtering on values with low selectability.  One could envision building workflow solutions based on MINT integration.  MINT provides a highly efficient mechanism to access summary information about a study that includes patient/study and series level information.  It is expected that this summary information will meet the needs for many workflow scenarios.
