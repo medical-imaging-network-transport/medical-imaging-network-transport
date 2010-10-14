@@ -1,4 +1,5 @@
 #summary Frequently Asked Questions
+#labels Featured
 
   * Q: Why doesn't MINT use an existing DICOM to XML mapping like Supplement 118?
   * A: Performance is a key requirement for MINT and we found the verbose schema used by Supplement 118 to negatively impact performance.  The current MINT XML schema is more concise which makes it faster to parse.
