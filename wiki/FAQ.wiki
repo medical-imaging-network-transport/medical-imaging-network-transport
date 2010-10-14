@@ -43,11 +43,12 @@
      * WADO supports the generation of JPEG/PNG images, MINT does not
      * MINT includes a query mechanism, WADO does not (you have to use CFIND or other)
      * MINT includes a changelog mechanism that enables other systems to stay in sync with changes in the system, WADO does not
-     * MINT normalizes the metadata eliminating the need for common and problematic workflows, WADO does not address this
-     * MINT includes an extendability mechanism that supports storage of private data.  WADO may support this using DICOM private SOP classes
+     * MINT normalizes the metadata eliminating ambiguity inherit in DICOM P10 encoding, WADO does not 
+     * MINT includes an extendability mechanism that supports storage of private data as well as private SOP classes.  WADO only supports private SOP classes
      * MINT includes streaming and batch access mechanisms.  WADO's granularity is at the SOP Instance level
      * MINT allows access to individual frames in a multi-frame instance, WADO does not
      * MINT allows access to individual binary items in a SOP Instance, WADO does not
+     * MINT allows access to the entire metadata for a study without having to pull down the pixel data, WADO does not
 
   * Q: When will MINT add support for image rendering like WADO has?
   * A: There are no plans to add WADO like image rendering to MINT.  WADO already provides this capability and it is straightforward to have WADO integrate with MINT. 
