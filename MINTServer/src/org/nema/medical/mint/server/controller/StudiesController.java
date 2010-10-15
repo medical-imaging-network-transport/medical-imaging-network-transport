@@ -20,19 +20,17 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.server.domain.Study;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.StudyDAO.SearchKey;
 import org.nema.medical.mint.studies.SearchResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,12 +53,13 @@ public class StudiesController {
     public void studies(final HttpServletResponse res,
     		@RequestParam(value = "studyInstanceUID", required = false) String studyInstanceUID,
     		@RequestParam(value = "accessionNumber", required = false) String accessionNumber,
-    		@RequestParam(value = "issuerOfAccessionNumber", required = false) String issuerOfAccessionNumber,
+    		@RequestParam(value = "accessionNumberIssuer", required = false) String accessionNumberIssuer,
     		@RequestParam(value = "patientID", required = false) String patientID,
-    		@RequestParam(value = "issuerOfPatientID", required = false) String issuerOfPatientID,
-    		@RequestParam(value = "studyDateTimeFrom", required = false) String studyDateTimeFrom,
-    		@RequestParam(value = "studyDateTimeTo", required = false) String studyDateTimeTo,
-    		@RequestParam(value = "studyVersion", required = false) String studyVersion,
+    		@RequestParam(value = "patientIDIssuer", required = false) String patientIDIssuer,
+            @RequestParam(value = "minStudyDateTime", required = false) String minStudyDateTime,
+            @RequestParam(value = "minStudyDate", required = false) String minStudyDate,
+            @RequestParam(value = "maxStudyDateTime", required = false) String maxStudyDateTime,
+            @RequestParam(value = "maxStudyDate", required = false) String maxStudyDate,
     		@RequestParam(value = "limit", required = false) Integer limit,
     		@RequestParam(value = "offset", required = false) Integer offset)
             throws IOException, JiBXException {
@@ -69,62 +68,31 @@ public class StudiesController {
         if (limit == null) limit = 50;
         if (offset == null) offset = 1;
     	
-        Map<StudyDAO.SearchKey, String> searchParams = new HashMap<StudyDAO.SearchKey, String>();
-
-        // TODO change "studyDateTimeFrom" and "studyDateTimeTo" to
-        // "minStudyDate/minStudyDateTime/maxStudyDate/maxStudyDateTime".
-        // TODO rename "issuerOfAccessionNumber" and "issuerOfPatientID" to
-        // "accessionNumberIssuer" and "patientIDIssuer"
         // TODO return error if request parameter not supported is provided
-        if (studyInstanceUID != null) {
-        	searchParams.put(SearchKey.studyInstanceUID, studyInstanceUID);
-        }
-        if (accessionNumber != null) {
-        	searchParams.put(SearchKey.accessionNumber, accessionNumber);
-        }
-        if (issuerOfAccessionNumber != null) {
-        	searchParams.put(SearchKey.issuerOfAccessionNumber, issuerOfAccessionNumber);
-        }
-        if (patientID != null) {
-        	searchParams.put(SearchKey.patientID, patientID);
-        }
-        if (issuerOfPatientID != null) {
-        	searchParams.put(SearchKey.issuerOfPatientID, issuerOfPatientID);
-        }
-        if (studyDateTimeFrom != null) {
-        	searchParams.put(SearchKey.studyDateTimeFrom, studyDateTimeFrom);
-        }
-        if (studyDateTimeTo != null) {
-        	searchParams.put(SearchKey.studyDateTimeTo, studyDateTimeTo);
-        }
-        if (studyVersion != null) {
-        	searchParams.put(SearchKey.studyVersion, studyVersion);
-        }
-    	try {
 
-        	// TODO studyDAO.findStudies currently uses "studyDateTimeFrom"
-        	// and "studyDateTimeTo" the code block below needs to be updated
-        	// when that is changed to
-        	// "minStudyDate/minStudyDateTime/maxStudyDate/maxStudyDateTime".
+    	try {
         	Timestamp dateTimeFrom = null;
         	Timestamp dateTimeTo = null;
-        	Timestamp dateFrom = null;
-        	Timestamp dateTo = null;
-        	if (studyDateTimeFrom != null){
-        		Date timeFrom = Utils.parseISO8601Basic(studyDateTimeFrom);
-        		dateTimeFrom = new Timestamp(timeFrom.getTime());
-        		dateFrom = new Timestamp(timeFrom.getTime());
+            if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
+                Date testParse = Utils.parseISO8601Date(minStudyDate);
+            }
+        	if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
+        		dateTimeFrom = new Timestamp((Utils.parseISO8601(minStudyDateTime)).getTime());
         	}
-        	if (studyDateTimeTo != null){
-        		Date timeTo = Utils.parseISO8601Basic(studyDateTimeTo);
-        		dateTimeTo = new Timestamp(timeTo.getTime());
-        		dateTo = new Timestamp(timeTo.getTime());
-        	}
-	        List<Study> studies = studyDAO.findStudies(searchParams, offset, limit);
-	                
-        	SearchResults searchResults = new SearchResults(studyInstanceUID, accessionNumber, issuerOfAccessionNumber,
-        			patientID, issuerOfPatientID, dateFrom, dateTimeFrom, dateTo, dateTimeTo, StudyDAO.GMT.getID(),
+            if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
+                Date testParse = Utils.parseISO8601Date(maxStudyDate);
+            }
+            if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
+                dateTimeTo = new Timestamp(Utils.parseISO8601(maxStudyDateTime).getTime());
+            }
+	        List<Study> studies = studyDAO.findStudies(studyInstanceUID, accessionNumber,
+                    accessionNumberIssuer, patientID, patientIDIssuer, minStudyDateTime,
+                    minStudyDate, maxStudyDateTime, maxStudyDate, limit, offset);
+
+        	SearchResults searchResults = new SearchResults(studyInstanceUID, accessionNumber, accessionNumberIssuer,
+        			patientID, patientIDIssuer, minStudyDate, dateTimeFrom, maxStudyDate, dateTimeTo, StudyDAO.GMT.getID(),
         			offset, limit);
+            
         	for (Study foundStudy : studies){
         		Timestamp lastUpdated;
         		if (foundStudy.getLastModified() != null){

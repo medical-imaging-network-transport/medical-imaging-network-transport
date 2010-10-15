@@ -14,24 +14,145 @@
 
 <xsl:template match="mint:studySearchResults">
 	<h1>Studies</h1>
-	<ol>
-	<xsl:for-each select="mint:study">
-		<li>
-			<dl>
-				<dt>MINT Study UUID</dt>
-				<dd class='StudyUUID'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/></xsl:attribute><xsl:value-of select="./@studyUUID"/></a></dd>
-				<dt>Last Modified</dt>
-				<dd class='LastModified'><xsl:value-of select="./@lastModified"/></dd>
-				<dt>Study Version</dt>
-				<dd class='StudyVersion'><xsl:value-of select="./@version"/></dd>
-				<dt>Links</dt>
-				<dd class='StudySummary'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/DICOM/summary</xsl:attribute>Summary</a></dd>
-				<dd class='StudyMetadata'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/DICOM/metadata</xsl:attribute>Metadata</a></dd>
-				<dd class='StudyChangeLog'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/changelog</xsl:attribute>ChangeLog</a></dd>
-			</dl>
-		</li>
-	</xsl:for-each>
-	</ol>
+	<h2>Search Form</h2>
+	<form action="<%=request.getContextPath()%>/studies" method="get">
+	    <table border="0" cellpadding="2" cellspacing="0">
+            <tr>
+                <td>Study Instance UID:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">studyInstanceUID</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@studyInstanceUID"/></xsl:attribute>
+                    </input>
+                </td>
+                <td>Min Study Date and Time:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">minStudyDateTime</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@minStudyDateTime"/></xsl:attribute>
+                    </input>
+                </td>
+            </tr>
+            <tr>
+                <td>Accession Number:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">accessionNumber</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@accessionNumber"/></xsl:attribute>
+                    </input>
+                </td>
+                <td>Min Study Date:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">minStudyDate</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@minStudyDate"/></xsl:attribute>
+                    </input>
+                </td>
+            </tr>
+            <tr>
+                <td>Issuer of Accession Number:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">accessionNumberIssuer</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@accessionNumberIssuer"/></xsl:attribute>
+                    </input>
+                </td>
+                <td>Max Study Date and Time:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">maxStudyDateTime</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@maxStudyDateTime"/></xsl:attribute>
+                    </input>
+                </td>
+            </tr>
+            <tr>
+                <td>Patient ID:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">patientID</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@patientID"/></xsl:attribute>
+                    </input>
+                </td>
+                <td>Max Study Date:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">maxStudyDate</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@maxStudyDate"/></xsl:attribute>
+                    </input>
+                </td>
+            </tr>
+            <tr>
+                <td>Issuer Of Patient ID:</td>
+                <td>
+                    <input>
+                        <xsl:attribute name="type">text</xsl:attribute>
+                        <xsl:attribute name="name">patientIDIssuer</xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="./@patientIDIssuer"/></xsl:attribute>
+                    </input>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Submit" />
+	</form>
+	<xsl:if test="count(mint:study) > 0">
+        <hr/>
+        <h2>Search Results</h2>
+        <xsl:if test="./@offset">
+            <table border="0" cellpadding="2" cellspacing="0">
+            <tr>
+                <xsl:if test="./@offset > 1">
+                    <td>
+                        <a>
+                            <xsl:attribute name="href">
+                                <%=request.getContextPath()%>/studies?offset=<xsl:value-of select="./@offset - 1"/>&amp;studyInstanceUID=<xsl:value-of select="./@studyInstanceUID"/>&amp;accessionNumber=<xsl:value-of select="./@accessionNumber"/>&amp;accessionNumberIssuer=<xsl:value-of select="./@accessionNumberIssuer"/>&amp;patientID=<xsl:value-of select="./@patientID"/>&amp;patientIDIssuer=<xsl:value-of select="./@patientIDIssuer"/>&amp;minStudyDateTime=<xsl:value-of select="./@minStudyDateTime"/>&amp;minStudyDate=<xsl:value-of select="./@minStudyDate"/>&amp;maxStudyDateTime=<xsl:value-of select="./@maxStudyDateTime"/>&amp;maxStudyDate=<xsl:value-of select="./@maxStudyDate"/>&amp;limit=<xsl:value-of select="./@limit"/>
+                            </xsl:attribute>
+                            Previous page of results
+                        </a>
+                    </td>
+                </xsl:if>
+                <td>
+                     Page <xsl:value-of select="./@offset"/> of results
+                </td>
+                <xsl:if test="count(mint:study) = ./@limit">
+                    <td>
+                        <a>
+                            <xsl:attribute name="href">
+                                <%=request.getContextPath()%>/studies?offset=<xsl:value-of select="./@offset + 1"/>&amp;studyInstanceUID=<xsl:value-of select="./@studyInstanceUID"/>&amp;accessionNumber=<xsl:value-of select="./@accessionNumber"/>&amp;accessionNumberIssuer=<xsl:value-of select="./@accessionNumberIssuer"/>&amp;patientID=<xsl:value-of select="./@patientID"/>&amp;patientIDIssuer=<xsl:value-of select="./@patientIDIssuer"/>&amp;minStudyDateTime=<xsl:value-of select="./@minStudyDateTime"/>&amp;minStudyDate=<xsl:value-of select="./@minStudyDate"/>&amp;maxStudyDateTime=<xsl:value-of select="./@maxStudyDateTime"/>&amp;maxStudyDate=<xsl:value-of select="./@maxStudyDate"/>&amp;limit=<xsl:value-of select="./@limit"/>
+                            </xsl:attribute>
+                            Next page of results
+                        </a>
+                    </td>
+                </xsl:if>
+            </tr>
+            </table>
+        </xsl:if>
+        <ol>
+        <xsl:for-each select="mint:study">
+            <li>
+                <dl>
+                    <dt>MINT Study UUID</dt>
+                    <dd class='StudyUUID'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/></xsl:attribute><xsl:value-of select="./@studyUUID"/></a></dd>
+                    <dt>Last Modified</dt>
+                    <dd class='LastModified'><xsl:value-of select="./@lastModified"/></dd>
+                    <dt>Study Version</dt>
+                    <dd class='StudyVersion'><xsl:value-of select="./@version"/></dd>
+                    <dt>Links</dt>
+                    <dd class='StudySummary'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/DICOM/summary</xsl:attribute>Summary</a></dd>
+                    <dd class='StudyMetadata'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/DICOM/metadata</xsl:attribute>Metadata</a></dd>
+                    <dd class='StudyChangeLog'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/>/changelog</xsl:attribute>ChangeLog</a></dd>
+                </dl>
+            </li>
+        </xsl:for-each>
+        </ol>
+    </xsl:if>
 </xsl:template>
 
 <xsl:template match="mint:jobStatus">
@@ -64,7 +185,7 @@
 	<ul>
 	<xsl:for-each select="mint:type">
 		<li class='type'>
-    		<a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="../@studyUUID"/>/<xsl:value-of select="./@name"/>/summary</xsl:attribute><xsl:value-of select="./@name"/> Summary</a>
+    		<a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="../@studyUUID"/>/<xsl:value-of select="."/>/summary</xsl:attribute><xsl:value-of select="."/> Summary</a>
 		</li>
 	</xsl:for-each>
 	</ul>

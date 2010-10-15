@@ -72,7 +72,7 @@ public class UtilsTest {
 		assertEquals(59,calendar.get(Calendar.SECOND));
 		assertEquals(0,calendar.get(Calendar.MILLISECOND));
 		
-		calendar.setTime(Utils.parseISO8601Basic("20100819"));
+		calendar.setTime(Utils.parseISO8601Date("20100819"));
 		assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
 		assertEquals(0,calendar.get(Calendar.MINUTE));
 		assertEquals(0,calendar.get(Calendar.SECOND));
@@ -142,7 +142,7 @@ public class UtilsTest {
 		assertEquals(59,calendar.get(Calendar.SECOND));
 		assertEquals(0,calendar.get(Calendar.MILLISECOND));
 		
-		calendar.setTime(Utils.parseISO8601Extended("2010-08-19"));
+		calendar.setTime(Utils.parseISO8601Date("2010-08-19"));
 		assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
 		assertEquals(0,calendar.get(Calendar.MINUTE));
 		assertEquals(0,calendar.get(Calendar.SECOND));

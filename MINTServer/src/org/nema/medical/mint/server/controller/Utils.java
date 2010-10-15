@@ -36,7 +36,7 @@ public class Utils {
      * @throws ParseException if the date is not properly formatted
      */
     public static final Date parseISO8601Basic(String dateStr) throws ParseException {
-    	String[] xsdDateTime = new String[]{"yyyyMMdd'T'HHmmss.SSSZ","yyyyMMdd'T'HHmmssZ","yyyyMMdd'T'HHmmss.SSS","yyyyMMdd'T'HHmmss","yyyyMMdd"};
+    	String[] xsdDateTime = new String[]{"yyyyMMdd'T'HHmmss.SSSZ","yyyyMMdd'T'HHmmssZ","yyyyMMdd'T'HHmmss.SSS","yyyyMMdd'T'HHmmss"};
         
     	// fix issue where + is replace with ' ' in a URL 
         dateStr = dateStr.replace(' ','+');       
@@ -58,7 +58,7 @@ public class Utils {
      * @throws ParseException if the date is not properly formatted
      */
     public static final Date parseISO8601Extended(String dateStr) throws ParseException {
-    	String[] xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz","yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss.SSS","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd"};
+    	String[] xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz","yyyy-MM-dd'T'HH:mm:ssz","yyyy-MM-dd'T'HH:mm:ss.SSS","yyyy-MM-dd'T'HH:mm:ss"};
     	// fix issue where + is replace with ' ' in a URL
     	dateStr = dateStr.replace(' ','+'); // fix URL issue        
         //this is zero time so we need to add that TZ indicator for 
@@ -77,9 +77,37 @@ public class Utils {
         }
     	return parseDate(dateStr,xsdDateTime);
     }
-    
 
+    public static final Date parseISO8601(String dateStr) throws ParseException {
+        if (dateStr.contains("-")){
+            return parseISO8601Extended(dateStr);
+        }
+        else {
+            return parseISO8601Basic(dateStr);
+        }
+    }
     
+    public static final Date parseISO8601Date(String dateStr) throws ParseException {
+        String[] xsdDate;
+        if (dateStr.contains("-")){
+            if (dateStr.length() == 10){
+                xsdDate = new String[]{"yyyy-MM-dd"};
+            }
+            else {
+                throw new ParseException("Invalid date:" + dateStr, 0);
+            }
+        }
+        else {
+            if (dateStr.length() == 8){
+                xsdDate = new String[]{"yyyyMMdd"};
+            }
+            else {
+                throw new ParseException("Invalid date: " + dateStr, 0);
+            }
+        }
+        return parseDate(dateStr,xsdDate);
+    }
+
     public static final Date parseDate(String dateStr, String[] formats) throws ParseException {
     	Date date = null;
         ParseException ex = null;
