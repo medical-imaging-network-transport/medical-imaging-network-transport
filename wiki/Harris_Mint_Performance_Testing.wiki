@@ -8,12 +8,12 @@ This independent performance test is intended to verify the initial findings fro
 == Testing Environment ==
 
   * Servers
-   # (VM)Windows Server 2003 Standard Edition SP2, Intel Xeon CPU E5502 @ 1.87GHz, 2GB RAM 
-   # (VM)Windows Server 2008 R2 Standard Edition, Intel Xeon CPU dual core 1.87Ghz, 4GB RAM
+   # (VM) Windows Server 2003 Standard Edition SP2, Intel Xeon CPU E5502 @ 1.87GHz, 2GB RAM 
+   # (VM) Windows Server 2008 R2 Standard Edition, Intel Xeon CPU dual core 1.87Ghz, 4GB RAM
    # TBD linux 
 
   * Client
-   # (VM)Windows Server 2003 Standard Edition SP2, Intel Xeon CPU E5502 @ 1.87GHz, 2GB RAM
+   # (VM) Windows Server 2003 Standard Edition SP2, Intel Xeon CPU E5502 @ 1.87GHz, 2GB RAM
 
 Client system is connected to the servers via 1Gigabit intranet connection with <1ms ping response. Ping response was determined by doing a "ping `<server>` -n 20" to get average response time.Curl was used to measure transport. Curl redirected output to NUL(curl -o NUL `<url>`) to ensure client disk latency was not a factor.
 
