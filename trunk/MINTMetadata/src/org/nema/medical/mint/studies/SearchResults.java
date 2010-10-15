@@ -12,9 +12,9 @@ public class SearchResults {
     private String issuerOfAccessionNumber;
     private String patientID;
     private String issuerOfPatientID;
-    private Timestamp minStudyDate;
+    private String minStudyDate;
     private Timestamp minStudyDateTime;
-    private Timestamp maxStudyDate;
+    private String maxStudyDate;
     private Timestamp maxStudyDateTime;
     private String timeZone;
     private int offset;
@@ -25,7 +25,7 @@ public class SearchResults {
 		//Default constructor for JiBX
 	}
 
-    public SearchResults(String studyInstanceUID, String accessionNumber, String issuerOfAccessionNumber, String patientID, String issuerOfPatientID, Timestamp minStudyDate, Timestamp minStudyDateTime, Timestamp maxStudyDate, Timestamp maxStudyDateTime, String timeZone, int offset, int limit) {
+    public SearchResults(String studyInstanceUID, String accessionNumber, String issuerOfAccessionNumber, String patientID, String issuerOfPatientID, String minStudyDate, Timestamp minStudyDateTime, String maxStudyDate, Timestamp maxStudyDateTime, String timeZone, int offset, int limit) {
         this.studyInstanceUID = studyInstanceUID;
         this.accessionNumber = accessionNumber;
         this.issuerOfAccessionNumber = issuerOfAccessionNumber;
@@ -60,7 +60,7 @@ public class SearchResults {
         return issuerOfPatientID;
     }
 
-    public Timestamp getMinStudyDate() {
+    public String getMinStudyDate() {
         return minStudyDate;
     }
 
@@ -68,7 +68,7 @@ public class SearchResults {
         return minStudyDateTime;
     }
 
-    public Timestamp getMaxStudyDate() {
+    public String getMaxStudyDate() {
         return maxStudyDate;
     }
 
@@ -116,7 +116,7 @@ public class SearchResults {
 		this.issuerOfPatientID = issuerOfPatientID;
 	}
 
-	public void setMinStudyDate(Timestamp minStudyDate) {
+	public void setMinStudyDate(String minStudyDate) {
 		this.minStudyDate = minStudyDate;
 	}
 
@@ -124,7 +124,7 @@ public class SearchResults {
 		this.minStudyDateTime = minStudyDateTime;
 	}
 
-	public void setMaxStudyDate(Timestamp maxStudyDate) {
+	public void setMaxStudyDate(String maxStudyDate) {
 		this.maxStudyDate = maxStudyDate;
 	}
 

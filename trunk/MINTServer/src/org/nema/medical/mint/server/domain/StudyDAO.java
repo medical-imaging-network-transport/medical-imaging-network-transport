@@ -31,66 +31,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class StudyDAO extends HibernateDaoSupport {
 
-    public enum SearchKeyType { String, Date, Number }
-    public enum SearchKey {
-        studyInstanceUID {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("studyInstanceUID", value);
-			}
-		},
-        accessionNumber {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("accessionNumber", value);
-			}
-		}, 
-		issuerOfAccessionNumber {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("issuerOfAccessionNumber", value);
-			}
-		},
-        patientID {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("patientID", value);
-			}
-		},
-		issuerOfPatientID {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("issuerOfPatientID", value);
-			}
-		},
-        studyDateTimeFrom(SearchKeyType.Date) {
-			@Override
-			Criterion getRestrictions(String value) throws ParseException {
-				return Restrictions.gt("dateTime", Utils.parseISO8601Basic(value));
-			}
-		},
-		studyDateTimeTo(SearchKeyType.Date) {
-			@Override
-			Criterion getRestrictions(String value) throws ParseException {
-				return Restrictions.lt("dateTime", Utils.parseISO8601Basic(value));
-			}
-		},
-		studyVersion {
-			@Override
-			Criterion getRestrictions(String value) {
-				return Restrictions.eq("studyVersion", value);
-			}
-		};
-
-        SearchKey() { this.field = null; this.type = SearchKeyType.String; }
-        SearchKey(SearchKeyType type) { this.field = null; this.type = type; }
-        public final SearchKeyType type;
-        public final String field;
-        
-        abstract Criterion getRestrictions(String value) throws ParseException;
-    }
-
-	public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
 	private static int MAXSECONDS = 60 * 60 * 24;
 
@@ -101,16 +42,46 @@ public class StudyDAO extends HibernateDaoSupport {
 	}
 
     @SuppressWarnings("unchecked")
-	public List<Study> findStudies(Map<SearchKey, String> searchParams, int pageNum, int pageSize) throws ParseException {
+	public List<Study> findStudies(String studyInstanceUID, String accessionNumber,
+                                String accessionNumberIssuer, String patientID, String patientIDIssuer,
+                                String minStudyDateTime, String minStudyDate, String maxStudyDateTime,
+                                String maxStudyDate, int limit, int offset) throws ParseException {
 
         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class);
         detachedCriteria.addOrder(Order.desc("lastModified"));
-        for (SearchKey key : searchParams.keySet()) {
-			detachedCriteria.add(key.getRestrictions(searchParams.get(key)));
+        
+        if (studyInstanceUID != null && StringUtils.isNotBlank(studyInstanceUID)){
+            detachedCriteria.add(Restrictions.eq("studyInstanceUID", studyInstanceUID));
+        }
+        if (accessionNumber != null && StringUtils.isNotBlank(accessionNumber)){
+            detachedCriteria.add(Restrictions.eq("accessionNumber", accessionNumber));
+        }
+        if (accessionNumberIssuer != null && StringUtils.isNotBlank(accessionNumberIssuer)){
+            //TODO rename issuerOfAccessionNumber to accessionNumberIssuer
+            detachedCriteria.add(Restrictions.eq("issuerOfAccessionNumber", accessionNumberIssuer));
+        }
+        if (patientID != null && StringUtils.isNotBlank(patientID)){
+            detachedCriteria.add(Restrictions.eq("patientID", patientID));
+        }
+        if (patientIDIssuer != null && StringUtils.isNotBlank(patientIDIssuer)){
+            //TODO rename issuerOfPatientID to patientIDIssuer
+            detachedCriteria.add(Restrictions.eq("issuerOfPatientID", patientIDIssuer));
+        }
+        if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
+            detachedCriteria.add(Restrictions.ge("dateTime", Utils.parseISO8601(minStudyDateTime)));
+        }
+        if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
+            detachedCriteria.add(Restrictions.ge("dateTime", Utils.parseISO8601Date(minStudyDate)));
+        }
+        if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
+            detachedCriteria.add(Restrictions.le("dateTime", Utils.parseISO8601(maxStudyDateTime)));
+        }
+        if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
+            detachedCriteria.add(Restrictions.lt("dateTime", Utils.parseISO8601Date(maxStudyDate)));
         }
 
-        int firstResult = (pageNum-1) * pageSize;
-        final List<Study> list = (List<Study>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,pageSize);
+        int firstResult = (offset-1) * limit;
+        final List<Study> list = (List<Study>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,limit);
         return list;
     }
 
