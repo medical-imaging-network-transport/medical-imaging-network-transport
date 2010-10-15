@@ -1,0 +1,114 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Working on MINT C++ library
+      * Is generating XML
+      * Next step is to normalize data
+      * Vital suggested looking at Arabica for C++ XML handling
+    * Worked with Dan to determine clear canvas plugin is not functioning
+      * Thinks this is happening because the namespace was removed from the summary page
+      * Gorkem will work on this later but before RSNA
+    * Measured 110 MB/s over Gig/e on CentOS (tomcat)
+      * Measured Multi-part MIME vs blob and performance was very close
+      * Measured multi-part mime in single file vs multi-file and performance was very close
+  * Jim
+    * Connected with Howard Clark (Secretary of DICOM) to schedule a call on MINT
+  * Chris
+    * Posted a MINT FAQ
+    * Recommend new REST book "REST in Practice"
+    * Considering a talk for SIIM - build your own web based image viewer using MINT and WADO
+  * Tim Dawson
+    * Changes to stylesheets are pending
+      * Search form
+    * Did review Dan's data dictionary code
+      * Suggest we rename mintmetadata into mintsdk
+      * Will send out an email on this
+    * Believes all actions assigned to him is done
+  * Dan Chaffey
+    * Working on performance testing, numbers are now posted
+      * Server 2008 numbers only
+      * Still waiting on 2003 and linux
+      * Measured 70% performance boost using IIS and ISAPI
+      * Not getting same numbers as Vital, but similar percent speedup
+    * Not started on data dictionary based normalization
+    * Tim culp updated conformance test with Gorkem's single file
+  * Jeremy
+    * Nothing to report
+
+= Handling multi-frame = 
+  * MINT does not currently support encapsulated formats - needed when pixel data is compressed (e.g. via JPEG)
+  * Problem getting the binary item size for multiframe - requires a full read of the pixel data to figure this out (which is expensive compared to what we do today)
+  * If MINT specification requires the binary item size then all implementations will have to incur the full read cost to generate metadata
+  * Josh Coleman from Vital suggested that it is possible to get an estimate of the image size by calculating it based on other fields (rows, columns, bits per pixel, etc).  Says that IHE suggests this?
+  * Options to consider:
+    * Require bsize to be always be present
+    * Make bsize optional
+    * Make bsize required for everything but encapsulated formats
+    * Remove bsize
+    * Have two attributes - one is exactSize and another is noBiggerThanSize
+    * Change meaning to be "noBiggerThanSize" - actual bytes may be less but will not exceed
+  * Question about whether or not size is for a single item or for all items
+    * Suggest we make it for all items
+  * Possible problem if there are private tags after the pixel data
+    * Theoretically this is possible, but in practice does it happen?
+  * NOTE: MINT2DICOM will not generate a 100% identical original DICOM file with encapsulated formats are used due to fragments, etc unless we decide to store this data somehow.  We will generate semantically equivalent DICOM instances, but they will not be bit for bit equivalent
+ 
+= Notes =
+
+= Decisions =
+  * Binary items will have a required attribute named "noBiggerThanSize" which is either equal to the binary item size or greater than.  
+
+= New Actions =
+  * Post on comp.protocols.dicom to see if anyone has seen private tags following pixel data (chris)
+
+
+= Old Actions =
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Add unit test for all future changes (All)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Completed Actions = 
+  * Look into resource to create MINT style sheets (Jim Philbin)
+  * Look into resource to create MINT style sheets (Rex)
+  * Check in IntelliJ project files (Tim Dawson)
+  * Add size of binary item to the metadata (Gorkem)
+  * Post Vital's performance test plan (Chris)
+  * Post Harris' performance test plan (Tim)
+  * Connect with DICOM WG 6 about MINT - meet at RSNA (Jim)
+  * Add jibx bindings and java objects for data dictionary (Tim Dawson)
+
+= Issues =
+
+= Future =
