@@ -42,7 +42,7 @@
   * Update conformance test to support Multi-frame (Tim Culp)
   * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
   * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
-  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Study Update with data dictionary based normalization (Dan Chaffee)
   * Specify MINT standard on Wiki (Chris Hafey + All)
     * Error codes
     * URL
