@@ -16,16 +16,10 @@
 
 package org.nema.medical.mint.dcm2mint;
 
-import java.io.File;
-
-import org.dcm4che2.data.DicomElement;
-
 /**
  * @author Uli Bubenheimer
  */
 public interface BinaryData extends Iterable<byte[]> {
     byte[] getBinaryItem(int index);
     int size();
-    void add(File dcmFile, int[] tagPath, DicomElement dcmElem);
-    void add(File dcmFile, int[] tagPath, DicomElement dcmElem, int offset, int length);
 }

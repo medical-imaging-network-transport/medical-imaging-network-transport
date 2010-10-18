@@ -103,8 +103,7 @@ public final class ProcessImportDir {
         //create a copy of a maximum set first; it won't hurt if it contains too many elements.
         final SortedSet<File> handledFilesCopy = new TreeSet<File>(handledFiles);
         final SortedSet<File> resultFiles = new TreeSet<File>();
-        findPlainFilesRecursive(importDir, resultFiles);
-        resultFiles.removeAll(handledFilesCopy);
+        findPlainFilesRecursive(importDir, resultFiles, handledFilesCopy);
         handledFiles.addAll(resultFiles);
         final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
         for (final File plainFile: resultFiles) {
@@ -458,18 +457,26 @@ public final class ProcessImportDir {
         return jobInfo;
     }
 
-    private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles) {
+    private static void findPlainFilesRecursive(final File targetFile, final Collection<File> resultFiles,
+                                                final Collection<File> handledFiles) {
+        if (handledFiles.contains(targetFile)) {
+            //Need to check whether file has already been handled right away, as otherwise the file may get
+            //accessed or deleted by someone else while we're looking at it.
+            return;
+        }
         //Skip DICOM files which are not completely stored by dcmrcv yet.
         if (targetFile.getName().endsWith(".part")) {
             return;
         }
         if (targetFile.isFile()) {
             resultFiles.add(targetFile);
-        } else {
-            assert targetFile.isDirectory();
+        } else if (targetFile.isDirectory()) {
             for (final File subFile: targetFile.listFiles()) {
-                findPlainFilesRecursive(subFile, resultFiles);
+                findPlainFilesRecursive(subFile, resultFiles, handledFiles);
             }
+        } else {
+            throw new RuntimeException("File " + targetFile.getAbsolutePath()
+                    + " is not a normal file and not a directory");
         }
     }
 

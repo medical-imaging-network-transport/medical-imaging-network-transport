@@ -171,7 +171,7 @@ public class ServerConfig {
 
     @PreDestroy
     public void preDestroy() {
-        //TODO The tear-downs below could be done in parallel
+        //TODO The teardowns below could be done in parallel
 
         //Tear down CStore SCP
         if (dcmRcv != null) {

@@ -66,7 +66,7 @@ public final class BinaryDataTest {
             assertEquals(0, i);
         }
 
-        dcmData.add(dcmFile, new int[] {}, pixelDataDcmElem);
+        dcmData.addNative(dcmFile, new int[] {pixelDataDcmElem.tag()}, 0, pixelDataDcmElem.getBytes().length);
         {
             assertEquals(1, dcmData.size());
             int i = 0;
@@ -78,7 +78,7 @@ public final class BinaryDataTest {
             assertArrayEquals(bytes1, dcmData.getBinaryItem(0));
         }
 
-        dcmData.add(dcmFile, new int[] {}, varPixelDataDcmElem);
+        dcmData.addNative(dcmFile, new int[] {varPixelDataDcmElem.tag()}, 0, varPixelDataDcmElem.getBytes().length);
         {
             assertEquals(2, dcmData.size());
             int i = 0;
@@ -91,7 +91,7 @@ public final class BinaryDataTest {
             assertArrayEquals(bytes1, dcmData.getBinaryItem(1));
         }
 
-        dcmData.add(dcmFile, new int[] {}, overlayDataDcmElem);
+        dcmData.addNative(dcmFile, new int[] {overlayDataDcmElem.tag()}, 0, overlayDataDcmElem.getBytes().length);
         {
             assertEquals(3, dcmData.size());
             int i = 0;

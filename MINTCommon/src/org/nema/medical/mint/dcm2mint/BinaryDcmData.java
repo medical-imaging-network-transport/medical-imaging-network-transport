@@ -16,22 +16,18 @@
 
 package org.nema.medical.mint.dcm2mint;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.dcm4che2.data.DicomElement;
+import org.dcm4che2.data.DicomObject;
+import org.dcm4che2.io.DicomCodingException;
+import org.dcm4che2.io.DicomInputStream;
+
+import java.io.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import org.dcm4che2.data.DicomElement;
-import org.dcm4che2.data.DicomObject;
-import org.dcm4che2.io.DicomCodingException;
-import org.dcm4che2.io.DicomInputStream;
 
 /**
  * Not thread-safe, due to contained mutable cache objects.
@@ -40,32 +36,134 @@ import org.dcm4che2.io.DicomInputStream;
  *
  */
 public final class BinaryDcmData implements BinaryData {
-    private static final class FileTagpath {
-        public FileTagpath(File dcmFile, int[] tagPath, int offset, int len) {
+    private static abstract class FileTagpath {
+        public FileTagpath(final File dcmFile, final int[] tagPath) {
             this.dcmFile = dcmFile;
             this.tagPath = tagPath;
+        }
+
+        public abstract byte[] getBinaryData() throws IOException;
+
+        protected final DicomObject getRootDicomObject() throws IOException {
+            if (!dcmFile.equals(cachedRootDicomObjectFile)) {
+                final DicomObject newRootDicomObject;
+                final DicomInputStream stream = new DicomInputStream(
+                        new BufferedInputStream(new FileInputStream(dcmFile), 600000));
+                try {
+                    newRootDicomObject = stream.readDicomObject();
+                } finally {
+                    stream.close();
+                }
+
+                cachedRootDicomObject = newRootDicomObject;
+                cachedRootDicomObjectFile = dcmFile;
+            }
+            return cachedRootDicomObject;
+        }
+
+        private static DicomObject cachedRootDicomObject;
+        private static File cachedRootDicomObjectFile;
+
+        protected final File getDcmFile() {
+            return dcmFile;
+        }
+
+        protected final int[] getTagPath() {
+            return tagPath;
+        }
+
+        private final File dcmFile;
+        private final int[] tagPath;
+    }
+
+    private static final class NativeFileTagpath extends FileTagpath{
+        public NativeFileTagpath(final File dcmFile, final int[] tagPath, final int offset, final int size) {
+            super(dcmFile, tagPath);
             this.offset = offset;
-            this.len = len;
+            this.size = size;
+        }
+
+        @Override
+        public byte[] getBinaryData() throws IOException {
+            final DicomObject dcmObj = getRootDicomObject();
+            final byte[] binaryData = dcmObj.getBytes(getTagPath());
+            if (binaryData.length == size) {
+                // single-frame image
+                return binaryData;
+            } else {
+                // multi-frame image
+                final byte[] frame = new byte[size];
+                System.arraycopy(binaryData, offset, frame, 0, size);
+                return frame;
+            }
         }
 
         @Override
         public String toString() {
-            return "<" + dcmFile + "," + Arrays.toString(tagPath) + ">";
+            return "<" + getDcmFile() + "," + Arrays.toString(getTagPath()) + "," + offset + "," + size + ">";
         }
 
-        public final File dcmFile;
-        public final int[] tagPath;
-        /** Offset in PixelData at which to find image.  This can probably
-         * overflow an int, but System.arrayCopy doesn't take longs. */
-        public final int offset;
+        /** Offset in PixelData at which to find image.  This might
+         * overflow an int, but System.arrayCopy does not take longs. */
+        private final int offset;
         /** Length of image in PixelData */
-        public final int len;
+        private final int size;
+    }
+
+    private static final class EncapsulatedFileTagpath extends FileTagpath {
+        public EncapsulatedFileTagpath(final File dcmFile, final int[] tagPath, final int startingFragment,
+                                       final int fragmentCount) {
+            super(dcmFile, tagPath);
+            this.startingFragment = startingFragment;
+            this.fragmentCount = fragmentCount;
+        }
+
+        @Override
+        public byte[] getBinaryData() throws IOException {
+            final DicomObject dcmObj = getRootDicomObject();
+            final DicomElement binaryData = dcmObj.get(getTagPath());
+            if (fragmentCount == 1) {
+                return binaryData.getFragment(startingFragment);
+            } else {
+                assert fragmentCount > 1;
+                int fragmentIdx = startingFragment;
+
+                final int endFragment = startingFragment + fragmentCount;
+
+                //First determine frame size
+                int frameSize = 0;
+                do {
+                    final byte[] fragmentBytes = binaryData.getFragment(fragmentIdx++);
+                    frameSize += fragmentBytes.length;
+                } while (fragmentIdx < endFragment);
+
+                //Now assemble the actual frame data
+                fragmentIdx = startingFragment;
+                int frameByteIdx = 0;
+                final byte[] frameBytes = new byte[frameSize];
+                do {
+                    final byte[] fragmentBytes = binaryData.getFragment(fragmentIdx++);
+                    final int fragmentSize = fragmentBytes.length;
+                    System.arraycopy(fragmentBytes, 0, frameBytes, frameByteIdx, fragmentSize);
+                    frameByteIdx += fragmentSize;
+                } while (fragmentIdx < endFragment);
+
+                return frameBytes;
+            }
+        }
+
+        @Override
+        public String toString() {
+            //TODO
+            return "<" + getDcmFile() + "," + Arrays.toString(getTagPath()) + "," + startingFragment + ","
+                    + fragmentCount + ">";
+        }
+
+        private final int startingFragment;
+        private final int fragmentCount;
     }
 
     private final List<FileTagpath> binaryItems = new ArrayList<FileTagpath>();
-
-    private DicomObject cachedRootDicomObject;
-    private File cachedRootDicomObjectFile;
 
     private class BinaryItemStream extends InputStream {
         public BinaryItemStream(final FileTagpath fileTagPath) {
@@ -119,17 +217,22 @@ public final class BinaryDcmData implements BinaryData {
         private int pos = 0;
     }
 
-    @Override
-    public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem) {
-        add(dcmFile, tagPath, dcmElem, -1, -1);
+    public void addNative(final File dcmFile, final int[] tagPath, final int offset, final int length) {
+        assert dcmFile != null;
+        assert tagPath.length >= 1;
+        assert offset >= 0;
+        assert length >= 1;
+        final FileTagpath storeElem = new NativeFileTagpath(dcmFile, tagPath, offset, length);
+        binaryItems.add(storeElem);
     }
 
-    public void add(final File dcmFile, final int[] tagPath, final DicomElement dcmElem, final int offset,
-    		final int length) {
-        final int[] newTagPath = new int[tagPath.length + 1];
-        System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
-        newTagPath[tagPath.length] = dcmElem.tag();
-        final FileTagpath storeElem = new FileTagpath(dcmFile, newTagPath, offset, length);
+    public void addEncapsulated(final File dcmFile, final int[] tagPath, final int startingFragment,
+                                final int fragmentCount) {
+        assert dcmFile != null;
+        assert tagPath.length >= 1;
+        assert startingFragment >= 0;
+        assert fragmentCount >= 1;
+        final FileTagpath storeElem = new EncapsulatedFileTagpath(dcmFile, tagPath, startingFragment, fragmentCount);
         binaryItems.add(storeElem);
     }
 
@@ -201,34 +304,13 @@ public final class BinaryDcmData implements BinaryData {
     }
 
     private byte[] fileTagpathToFile(final FileTagpath binaryItemPath) throws IOException, DicomCodingException {
-        final File targetDcmFile = binaryItemPath.dcmFile;
-        if (!targetDcmFile.equals(cachedRootDicomObjectFile)) {
-            final DicomObject newRootDicomObject;
-            final DicomInputStream stream = new DicomInputStream(new BufferedInputStream(new FileInputStream(targetDcmFile), 600000));
-            try {
-                newRootDicomObject = stream.readDicomObject();
-            } finally {
-                stream.close();
-            }
-
-            cachedRootDicomObject = newRootDicomObject;
-            cachedRootDicomObjectFile = targetDcmFile;
-        }
-        byte[] binaryData;
         try {
-            binaryData = cachedRootDicomObject.getBytes(binaryItemPath.tagPath);
-            if (binaryItemPath.len > 0) {
-                // multi-frame image
-                byte[] slice = new byte[binaryItemPath.len];
-                System.arraycopy(binaryData, binaryItemPath.offset, slice, 0, binaryItemPath.len);
-                binaryData = slice;
-            }
+            return binaryItemPath.getBinaryData();
         } catch (final UnsupportedOperationException e) {
             //Something wrong with the DICOM format
             final DicomCodingException newEx = new DicomCodingException("DICOM syntax error at: " + binaryItemPath);
             newEx.initCause(e);
             throw newEx;
         }
-        return binaryData;
     }
 }
