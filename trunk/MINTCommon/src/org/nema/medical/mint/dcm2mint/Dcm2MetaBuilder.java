@@ -16,17 +16,10 @@
 package org.nema.medical.mint.dcm2mint;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.dcm4che2.data.DicomElement;
-import org.dcm4che2.data.DicomObject;
-import org.dcm4che2.data.SpecificCharacterSet;
-import org.dcm4che2.data.Tag;
-import org.dcm4che2.data.TransferSyntax;
-import org.dcm4che2.data.VR;
+import org.dcm4che2.data.*;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.AttributeStore;
 import org.nema.medical.mint.metadata.Instance;
@@ -79,6 +72,19 @@ behavior is deemed acceptable.
 @author Uli Bubenheimer
 */
 public final class Dcm2MetaBuilder {
+
+    private static final Collection<String> JPEG_TRANSFER_SYNTAXES = new HashSet<String>(Arrays.asList(
+            UID.JPEGBaseline1,
+            UID.JPEGExtended24,
+            UID.JPEGLosslessNonHierarchical14,
+            UID.JPEGLossless,
+            UID.JPEGLSLossless,
+            UID.JPEGLSLossyNearLossless,
+            UID.JPEG2000LosslessOnly,
+            UID.JPEG2000,
+            UID.JPEG2000Part2MulticomponentLosslessOnly,
+            UID.JPEG2000Part2Multicomponent
+    ));
 
     /**
    Create an instance of the class with the specified summary-level tag maps.
@@ -209,34 +215,32 @@ public final class Dcm2MetaBuilder {
          instance.setSOPInstanceUID(dcmObj.getString(Tag.SOPInstanceUID));
          series.putInstance(instance);
 
-         final SpecificCharacterSet charSet = dcmObj.getSpecificCharacterSet();
-
          // Now, iterate through all items in the object and store each appropriately.
          // This dispatches the Attribute storage to one of the study level, series level
          // or instance-level Attributes sets.
          if (p10Aware) {
              for (final DicomElement dcmElement: Iter.iter(dcmObj.fileMetaInfoIterator())) {
-                 handleTopElems(dcmPath, dcmObj, series, instance, charSet, dcmElement);
+                 handleTopElems(dcmPath, dcmObj, series, instance, dcmElement, transferSyntax);
              }
          }
          for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
-             handleTopElems(dcmPath, dcmObj, series, instance, charSet, dcmElement);
+             handleTopElems(dcmPath, dcmObj, series, instance, dcmElement, transferSyntax);
          }
      }
 
     private void handleTopElems(final File dcmPath, final DicomObject dcmObj, final Series series,
-            final Instance instance, final SpecificCharacterSet charSet, final DicomElement dcmElement) {
+            final Instance instance, final DicomElement dcmElement, final TransferSyntax transferSyntax) {
         final int tag = dcmElement.tag();
          if (studyLevelTags.contains(tag)) {
              if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
-                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                         metaBinaryPair.getMetadata(), null, emptyTagPath);
+                 handleDICOMElement(dcmPath, dcmElement, dcmObj, metaBinaryPair.getMetadata(), null, emptyTagPath,
+                                    transferSyntax);
              }
          }
          else if (seriesLevelTags.contains(tag)) {
              if (series.getAttribute(tag) == null) {
-                 handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                         series, null, emptyTagPath);
+                 handleDICOMElement(dcmPath, dcmElement, dcmObj,
+                         series, null, emptyTagPath, transferSyntax);
              }
          }
          else {
@@ -244,20 +248,20 @@ public final class Dcm2MetaBuilder {
              final Map<Integer, NormalizationCounter> seriesNormMap =
                  tagNormalizerTable.get(series.getSeriesInstanceUID());
              assert seriesNormMap != null;
-             handleDICOMElement(dcmPath, charSet, dcmElement, dcmObj,
-                     instance, seriesNormMap, emptyTagPath);
+             handleDICOMElement(dcmPath, dcmElement, dcmObj,
+                     instance, seriesNormMap, emptyTagPath, transferSyntax);
          }
     }
 
      private void handleDICOMElement(
              final File dcmPath,
-             final SpecificCharacterSet charSet,
              final DicomElement dcmElem,
-             final DicomObject rootDcmObj,
+             final DicomObject parentDcmObj,
              final AttributeStore attrs,
              final Map<Integer, NormalizationCounter> seriesNormMap,
-             final int[] tagPath) {
-         final Store store = new Store(dcmPath, charSet, attrs, seriesNormMap, tagPath, dcmElem, rootDcmObj);
+             final int[] tagPath,
+             final TransferSyntax transferSyntax) {
+         final Store store = new Store(dcmPath, attrs, seriesNormMap, tagPath, dcmElem, parentDcmObj, transferSyntax);
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
@@ -273,23 +277,24 @@ public final class Dcm2MetaBuilder {
      }
 
      private final class Store {
-         public Store(final File dcmPath, final SpecificCharacterSet charSet, final AttributeStore attrs,
+         public Store(final File dcmPath, final AttributeStore attrs,
                  final Map<Integer, NormalizationCounter> seriesNormMap, final int[] tagPath,
-                 final DicomElement elem, final DicomObject rootObj) {
+                 final DicomElement elem, final DicomObject parentDcmObj, final TransferSyntax transferSyntax) {
              this.dcmPath = dcmPath;
-             this.charSet = charSet;
              this.attrs = attrs;
              this.seriesNormMap = seriesNormMap;
              this.tagPath = tagPath;
              this.elem = elem;
-             this.rootObj = rootObj;
+             this.parentDcmObj = parentDcmObj;
+             this.transferSyntax = transferSyntax;
          }
 
          public void storePlain() {
              assert elem != null;
+             assert !elem.hasItems();
              Attribute attr = null;
              NormalizationCounter normCounter = null;
-             final String strVal = getStringValue(elem, charSet);
+             final String strVal = getStringValue(elem, parentDcmObj.getSpecificCharacterSet());
              if (seriesNormMap != null) {
                  normCounter = seriesNormMap.get(elem.tag());
                  if (normCounter != null) {
@@ -322,6 +327,8 @@ public final class Dcm2MetaBuilder {
          }
 
          public void storeSequence() {
+             assert elem != null;
+             assert elem.hasDicomObjects();
              final Attribute attr = newAttr(elem);
              attrs.putAttribute(attr);
              final int[] newTagPath = new int[tagPath.length + 2];
@@ -334,7 +341,7 @@ public final class Dcm2MetaBuilder {
                  attr.addItem(newItem);
                  for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
                      // Don't use tag normalization in sequence items...
-                     handleDICOMElement(dcmPath, charSet, dcmElement, rootObj, newItem, null, newTagPath);
+                     handleDICOMElement(dcmPath, dcmElement, dcmObj, newItem, null, newTagPath, transferSyntax);
                  }
              }
          }
@@ -344,55 +351,167 @@ public final class Dcm2MetaBuilder {
 
              final Attribute attr = newAttr(elem);
              assert attr != null;
-             
-             final int numFrames = rootObj.getInt(Tag.NumberOfFrames, 1);
-             final byte[] binaryData = elem.getBytes();
-             final boolean isPixelData = elem.tag() == Tag.PixelData;
-             // cannot inline large data, or multi-frame images, no matter how small
-             final boolean isInlineable = (binaryData.length < binaryInlineThreshold)
-                 && !(isPixelData && numFrames > 1);
-             
-             if (isInlineable) {
-                 attr.setBytes(binaryData);
-             } else if (!isPixelData) {
-                 // non-pixel data, simple external binary item
-                 attr.setBid(metaBinaryPair.getBinaryData().size());
-                 attr.setBinarySize(binaryData.length);
-                 metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem);
-             } else {
-                 // pixel data, in 1 or more frames
-                 attr.setBid(metaBinaryPair.getBinaryData().size());
-                 attr.setBinarySize(binaryData.length);
-                 attr.setFrameCount(numFrames);
-                 
-                 final int rows = rootObj.getInt(Tag.Rows, -1);
-                 final int columns = rootObj.getInt(Tag.Columns, -1);
-                 final int bitsAllocated = rootObj.getInt(Tag.BitsAllocated, -1);
-                 final int samples = rootObj.getInt(Tag.SamplesPerPixel, -1);
-                 final int frameLen;
-                 if (rows > 0 && columns > 0 && bitsAllocated > 0 && samples > 0) {
-                     // this may be an overly simplistic calculation
-                     frameLen = rows * columns * samples * (bitsAllocated / 8);
-                 } else {
-                     // without enough info, just assume that there's no padding
-                     frameLen = binaryData.length / numFrames;
+
+             final int[] newTagPath = new int[tagPath.length + 1];
+             System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
+             newTagPath[tagPath.length] = elem.tag();
+
+             final BinaryDcmData binaryDataStore = (BinaryDcmData) metaBinaryPair.getBinaryData();
+
+             if (elem.tag() == Tag.PixelData) {
+                 //Never inline pixel data - introduces pointless complexity for user,
+                 //as this would hardly ever happen in any case. Pixel data is a special case anyway.
+                 attr.setBid(binaryDataStore.size());
+                 int numFrames = parentDcmObj.getInt(Tag.NumberOfFrames, 1);
+                 if (numFrames == 0) {
+                     //Be lenient if SOP instance creator did not care about frames
+                     numFrames = 1;
                  }
-                 
-                 for (int i = 0; i < numFrames; ++i) {
-                     metaBinaryPair.getBinaryData().add(dcmPath, tagPath, elem,
-                             i * frameLen, frameLen);
+                 attr.setFrameCount(numFrames);
+                 if (elem.hasItems()) {
+                     //Compressed/encapsulated data
+                     assert elem.hasFragments();
+                     assert elem.vr().equals(VR.OB);
+
+                     //Find offset table if available
+                     final byte[] basicOffsetTableBytes = elem.getFragment(0);
+                     if (basicOffsetTableBytes.length != 0 && basicOffsetTableBytes.length != numFrames * 4) {
+                         throw new RuntimeException("Encapsulated pixel data Basic Offset Table length of "
+                         + basicOffsetTableBytes.length + " not matching declaration of " + numFrames + " frames");
+                     }
+                     final int[] basicOffsetTable;
+                     if (basicOffsetTableBytes.length == 0) {
+                         basicOffsetTable = null;
+                     } else {
+                         basicOffsetTable = new int[numFrames];
+                         int byteIdx = 0;
+                         for (int i = 0; i < numFrames; ++i) {
+                             //Assume Little-Endianness
+                             basicOffsetTable[i] =
+                                     basicOffsetTableBytes[byteIdx++]
+                                             | basicOffsetTableBytes[byteIdx++] << 8
+                                             | basicOffsetTableBytes[byteIdx++] << 16
+                                             | basicOffsetTableBytes[byteIdx++] << 24;
+                         }
+                     }
+
+                     final String transferSyntaxUID = transferSyntax.uid();
+                     if (transferSyntaxUID.equals(UID.MPEG2)
+                             || transferSyntaxUID.equals(UID.MPEG2MainProfileHighLevel)) {
+                         //DICOM standard says that in the case of MPEG the Basic Offset Table shall be null
+                         assert basicOffsetTable == null;
+                     }
+
+                     final int numFragments = elem.countItems();
+                     final boolean isJPEG = JPEG_TRANSFER_SYNTAXES.contains(transferSyntaxUID);
+                     final boolean singleFragmentPerFrame;
+                     if (numFragments == numFrames + 1) {
+                         singleFragmentPerFrame = true;
+                     } else if (isJPEG) {
+                         //Single or multiple fragments per frame
+                         singleFragmentPerFrame = false;
+                     } else if (transferSyntaxUID.equals(UID.RLELossless)
+                             || transferSyntaxUID.equals(UID.MPEG2)
+                             || transferSyntaxUID.equals(UID.MPEG2MainProfileHighLevel)) {
+                         throw new RuntimeException(
+                                 "RLE and MPEG image encoding require exactly one fragment per frame");
+                     } else {
+                         throw new RuntimeException("Unsupported encapsulated transfer syntax: " + transferSyntaxUID);
+                     }
+
+                     int fragmentIdx = 1;
+                     int fragmentByteIdx = 0;
+                     int binarySize = 0;
+                     for (int i = 0; i < numFrames; ++i) {
+                         final int curFrameStartFragment = fragmentIdx;
+                         boolean frameHasMoreFragments;
+                         do {
+                             final byte[] fragmentBytes = elem.getFragment(fragmentIdx++);
+                             final int fragmentByteCnt = fragmentBytes.length;
+                             binarySize += fragmentByteCnt;
+                             fragmentByteIdx += fragmentByteCnt + 8;
+                             if (!singleFragmentPerFrame && fragmentIdx + numFrames - i - 1 < numFragments) {
+                                 if (i + 1 == numFrames) {
+                                     frameHasMoreFragments = true;
+                                 } else if (basicOffsetTable != null) {
+                                     frameHasMoreFragments = (fragmentByteIdx < basicOffsetTable[i + 1]);
+                                 } else {
+                                     final byte[] nextFragmentBytes = elem.getFragment(fragmentIdx);
+                                     byte fragmentPeekByte = (byte) 0xFF;
+                                     for (int fragmentPeekIdx = 0;
+                                          fragmentPeekIdx < nextFragmentBytes.length
+                                                  && (fragmentPeekByte = nextFragmentBytes[fragmentPeekIdx++]) == 0xFF;);
+                                     switch (fragmentPeekByte) {
+                                         case (byte) 0xD8: //SOI
+                                         case (byte) 0x4F: //SOC (JPEG 2000)
+                                             frameHasMoreFragments = false;
+                                             break;
+                                         default:
+                                             frameHasMoreFragments = true;
+                                     }
+                                 }
+                             } else {
+                                 frameHasMoreFragments = false;
+                             }
+                         } while (frameHasMoreFragments);
+
+                         binaryDataStore.addEncapsulated(dcmPath, newTagPath, curFrameStartFragment,
+                                 fragmentIdx - curFrameStartFragment);
+                     }
+                     attr.setBinarySize(binarySize);
+                 } else {
+                     final byte[] binaryData = elem.getBytes();
+                     attr.setBinarySize(binaryData.length);
+                     final int rows = parentDcmObj.getInt(Tag.Rows, -1);
+                     final int columns = parentDcmObj.getInt(Tag.Columns, -1);
+                     final int bitsAllocated = parentDcmObj.getInt(Tag.BitsAllocated, -1);
+                     final int samples = parentDcmObj.getInt(Tag.SamplesPerPixel, -1);
+                     final int frameSize;
+                     if (rows > 0 && columns > 0 && bitsAllocated > 0 && samples > 0) {
+                         frameSize = rows * columns * samples * (bitsAllocated / 8);
+                     } else {
+                         throw new RuntimeException("Invalid image pixel macro attributes "
+                                 + "(rows, columns, bits allocated, samples): ("
+                                 + rows + ", " + columns + ", " + bitsAllocated + ", " + samples + ")");
+                     }
+
+                     int expectedLength = frameSize * numFrames;
+                     //binaryData may have one byte added to get it to an even length for DICOM
+                     expectedLength = (expectedLength & 1) == 1 ? expectedLength + 1 : expectedLength;
+                     if (expectedLength != binaryData.length) {
+                         throw new RuntimeException(
+                                 "Image pixel data size " + binaryData.length + " does not correspond to expected size "
+                                 + expectedLength + " based on image pixel macro attribute values: " +
+                                 "(rows, columns, bits allocated, samples) = (" +
+                                 rows + ", " + columns + ", " + bitsAllocated + ", " + samples + ")");
+                     }
+                     for (int i = 0; i < numFrames; ++i) {
+                         binaryDataStore.addNative(dcmPath, newTagPath, i * frameSize, frameSize);
+                     }
+                 }
+             } else {
+                 if (elem.hasItems()) {
+                     throw new RuntimeException("Cannot handle DICOM item fragments outside of PixelData tag");
+                 }
+                 final byte[] binaryData = elem.getBytes();
+                 if (binaryData.length < binaryInlineThreshold) {
+                     attr.setBytes(binaryData);
+                 } else {
+                     attr.setBid(binaryDataStore.size());
+                     attr.setBinarySize(binaryData.length);
+                     binaryDataStore.addNative(dcmPath, newTagPath, 0, binaryData.length);
                  }
              }
              attrs.putAttribute(attr);
          }
 
          private final File dcmPath;
-         private final SpecificCharacterSet charSet;
          private final AttributeStore attrs;
          private final Map<Integer, NormalizationCounter> seriesNormMap;
          private final int[] tagPath;
          private final DicomElement elem;
-         private final DicomObject rootObj;
+         private final DicomObject parentDcmObj;
+         private final TransferSyntax transferSyntax;
      }
 
      private static boolean areNonValueFieldsEqual(final Attribute a, final DicomElement obj) {
@@ -431,7 +550,7 @@ public final class Dcm2MetaBuilder {
      }
 
      private static final int[] emptyTagPath = new int[0];
-     
+
      private final Set<Integer> studyLevelTags;
      private final Set<Integer> seriesLevelTags;
      private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =

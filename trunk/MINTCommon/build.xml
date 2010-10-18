@@ -11,6 +11,7 @@
         <ant dir="${metadata.project.basedir}" target="clean" inheritall="false" />
 
         <mkdir dir="${build.dir}/ant-classes" />
+        <mkdir dir="${build.dir}/ant-test-classes" />
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}/ant-classes" includes="**/*" />
             <fileset dir="${build.dir}/ant-test-classes" includes="**/*" />
