@@ -172,10 +172,10 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
    * Use data dictionary to find VRs
    * Store binary in temp files for large DICOMs
    * Provide support for inline binary
+   * Provide support for bulk binary
 
 *To Do*
 
-   * Provide support for bulk binary
    * Read DCM4CHE data dictionary from URL
    * Consider cases for multiple VRs
    * SAX parsing for large metadata files
