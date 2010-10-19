@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.junit.Test;
 
@@ -11,8 +12,10 @@ public class UtilsTest {
 	
 	@Test
 	public void testBasic() throws ParseException {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
+
 		Calendar calendar = Calendar.getInstance();
-		
+
 		calendar.setTime(Utils.parseISO8601Basic("20100818T115959.999"));
 		assertEquals(2010,calendar.get(Calendar.YEAR));
 		assertEquals(7,calendar.get(Calendar.MONTH));
@@ -81,6 +84,8 @@ public class UtilsTest {
 
 	@Test
 	public void testExtended() throws ParseException {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
+
 		Calendar calendar = Calendar.getInstance();
 		
 		calendar.setTime(Utils.parseISO8601Extended("2010-08-18T11:59:59.999"));
