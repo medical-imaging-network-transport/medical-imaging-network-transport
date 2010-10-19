@@ -32,13 +32,21 @@ import org.jibx.runtime.JiBXException;
 
 public class DataDictionaryIO {
 
-	static public MetadataType parseFromXML(File file) throws IOException {
+	static public MetadataType parseFromXML(File file){
 		MetadataType dicomDocument = null;
-		InputStream in = new FileInputStream(file);
-		try {
-			dicomDocument = parseFromXML(in);
-		} finally {
-			in.close();
+		try
+		{
+			
+			InputStream in = new FileInputStream(file);
+			try {
+				dicomDocument = parseFromXML(in);
+			} finally {
+				in.close();
+			}
+		}
+		catch(IOException ex)
+		{
+			//TODO - log exception
 		}
 		return dicomDocument;
 	}
