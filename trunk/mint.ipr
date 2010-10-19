@@ -240,7 +240,6 @@
       <module fileurl="file://$PROJECT_DIR$/DICOMSend/DICOMSend.iml" filepath="$PROJECT_DIR$/DICOMSend/DICOMSend.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" filepath="$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTCommon/MINTCommon.iml" filepath="$PROJECT_DIR$/MINTCommon/MINTCommon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MINTDataDictionary/MINTDataDictionary.iml" filepath="$PROJECT_DIR$/MINTDataDictionary/MINTDataDictionary.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTMetadata/MINTMetadata.iml" filepath="$PROJECT_DIR$/MINTMetadata/MINTMetadata.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTServer/MINTServer.iml" filepath="$PROJECT_DIR$/MINTServer/MINTServer.iml" />
     </modules>
