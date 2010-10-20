@@ -44,14 +44,14 @@ public class StudyIO {
      * @return Study loaded
      * @throws IOException if unable to read files from the directory
      */
-    public static Study loadStudy(File directory) throws IOException {
+    public static StudyMetadata loadStudy(File directory) throws IOException {
         ArrayList<File> possibleFiles = new ArrayList<File>();
         possibleFiles.add(new File(directory, "metadata.gpb.gz"));
         possibleFiles.add(new File(directory, "metadata.gpb"));
         possibleFiles.add(new File(directory, "metadata.xml.gz"));
         possibleFiles.add(new File(directory, "metadata.xml"));
 
-        Study study = null;
+        StudyMetadata study = null;
         for (File file : possibleFiles) {
             if (file.exists()) {
                 study = StudyIO.parseFile(file);
@@ -66,7 +66,7 @@ public class StudyIO {
         return study;
     }
     
-    static public Study parseFile(File file) throws IOException {
+    static public StudyMetadata parseFile(File file) throws IOException {
 		String name = file.getName();
 		if (name.endsWith(".xml") || name.endsWith(".xml.gz")) {
 			return parseFromXML(file);
@@ -77,7 +77,7 @@ public class StudyIO {
 		else throw new IllegalArgumentException("unknown file type" + file);
 	}
 	
-	static public void writeFile(Study study, File file) throws IOException {
+	static public void writeFile(StudyMetadata study, File file) throws IOException {
 		String name = file.getName();
 		if (name.endsWith(".xml") || name.endsWith(".xml.gz")) {
 			writeToXML(study,file);
@@ -89,8 +89,8 @@ public class StudyIO {
 		
 	}
 	
-	static public Study parseFromXML(File file) throws IOException {
-		Study study = null;
+	static public StudyMetadata parseFromXML(File file) throws IOException {
+		StudyMetadata study = null;
 		InputStream in = new FileInputStream(file);
 		if (file.getName().endsWith(".gz")) {
 			in = new GZIPInputStream(in);
@@ -103,19 +103,19 @@ public class StudyIO {
 		return study;
 	}
 	
-	static public Study parseFromXML(InputStream in) throws IOException {
-		Study study = null;
+	static public StudyMetadata parseFromXML(InputStream in) throws IOException {
+		StudyMetadata study = null;
 		try {
-			IBindingFactory bfact = BindingDirectory.getFactory("metadata",Study.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("metadata", StudyMetadata.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			study = (Study)uctx.unmarshalDocument(in, null);
+			study = (StudyMetadata)uctx.unmarshalDocument(in, null);
 		} catch (JiBXException e) {
 			throw new IOException("Exception while unmarshalling data.",e);
 		}
 		return study;
 	}
 	
-	static public void writeToXML(Study study, File file) throws IOException {
+	static public void writeToXML(StudyMetadata study, File file) throws IOException {
 		OutputStream out = new FileOutputStream(file);
 		if (file.getName().endsWith(".gz")) {
 			out = new GZIPOutputStream(out);
@@ -127,11 +127,11 @@ public class StudyIO {
 		}		
 	}
 	
-	static public void writeToXML(Study study, OutputStream out) throws IOException {
+	static public void writeToXML(StudyMetadata study, OutputStream out) throws IOException {
 		try {
 			String xmlStylesheet = "type=\"text/xsl\" href=\"style.xsl\"";
 
-			IBindingFactory bfact = BindingDirectory.getFactory("metadata",Study.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("metadata", StudyMetadata.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
     		mctx.startDocument("UTF-8", null, out);
@@ -143,7 +143,7 @@ public class StudyIO {
 		}		
 	}
 	
-	static public void writeSummaryToXML(Study study, File file) throws IOException {
+	static public void writeSummaryToXML(StudyMetadata study, File file) throws IOException {
 		OutputStream out = new FileOutputStream(file);
 		if (file.getName().endsWith(".gz")) {
 			out = new GZIPOutputStream(out);
@@ -155,11 +155,11 @@ public class StudyIO {
 		}		
 	}
 	
-	static public void writeSummaryToXML(Study study, OutputStream out) throws IOException {
+	static public void writeSummaryToXML(StudyMetadata study, OutputStream out) throws IOException {
 		try {
 			String xmlStylesheet = "type=\"text/xsl\" href=\"style.xsl\"";
 
-			IBindingFactory bfact = BindingDirectory.getFactory("summary",Study.class);
+			IBindingFactory bfact = BindingDirectory.getFactory("summary", StudyMetadata.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
     		mctx.startDocument("UTF-8", null, out);
@@ -171,8 +171,8 @@ public class StudyIO {
 		}		
 	}
 	
-	static public Study parseFromGPB(File file) throws IOException {
-		Study study = null;
+	static public StudyMetadata parseFromGPB(File file) throws IOException {
+		StudyMetadata study = null;
 		InputStream in = new FileInputStream(file);
 		if (file.getName().endsWith(".gz")) {
 			in = new GZIPInputStream(in);
@@ -185,12 +185,12 @@ public class StudyIO {
 		return study;
 	}
 	
-	static public Study parseFromGPB(InputStream in) throws IOException {
+	static public StudyMetadata parseFromGPB(InputStream in) throws IOException {
 		StudyData data = StudyData.parseFrom(in);		
-		return Study.fromGPB(data);		
+		return StudyMetadata.fromGPB(data);
 	}
 	
-	static public void writeToGPB(Study study, File file) throws IOException {
+	static public void writeToGPB(StudyMetadata study, File file) throws IOException {
 		OutputStream out = new FileOutputStream(file);
 		if (file.getName().endsWith(".gz")) {
 			out = new GZIPOutputStream(out);
@@ -202,7 +202,7 @@ public class StudyIO {
 		}		
 	}
 	
-	static public void writeToGPB(Study study, OutputStream out) throws IOException {
+	static public void writeToGPB(StudyMetadata study, OutputStream out) throws IOException {
 		StudyData data = study.toGPB();
 		data.writeTo(out);
 	}

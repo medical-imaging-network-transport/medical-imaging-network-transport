@@ -21,14 +21,9 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.server.domain.JobInfo;
-import org.nema.medical.mint.server.domain.JobInfoDAO;
-import org.nema.medical.mint.server.domain.JobStatus;
-import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.server.domain.Change;
-import org.nema.medical.mint.server.domain.ChangeDAO;
+import org.nema.medical.mint.server.domain.*;
 
 public class StudyCreateProcessor extends TimerTask {
 
@@ -87,7 +82,7 @@ public class StudyCreateProcessor extends TimerTask {
 			changelogRoot.mkdirs();
 
 			//load study into memory
-			Study study = StudyIO.loadStudy(jobFolder);
+			StudyMetadata study = StudyIO.loadStudy(jobFolder);
 			LOG.info("job " + jobID + " loaded");
 			
 			if(!StudyUtil.validateStudy(study, jobFolder))
@@ -123,12 +118,12 @@ public class StudyCreateProcessor extends TimerTask {
 			StudyUtil.deleteFolder(jobFolder);
 
 			//update database
-			org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
+			MINTStudy studyData = new MINTStudy();
 			studyData.setID(studyUUID);
 			studyData.setStudyInstanceUID(study.getStudyInstanceUID());
 			studyData.setPatientID(study.getValueForAttribute(0x00100020));
 			studyData.setAccessionNumber(study.getValueForAttribute(0x00080050));
-			studyData.setDateTime(org.nema.medical.mint.server.domain.Study
+			studyData.setDateTime(MINTStudy
 					.now());
 			studyData.setStudyVersion(study.getVersion());
 			studyDAO.insertStudy(studyData);

@@ -37,7 +37,7 @@ import org.hibernate.annotations.GenericGenerator;
  * @Index(name = "studyIdIndex", columnNames = { "studyId" }),
  * @Index(name = "uidHashIndex", columnNames = { "uidHash" }) })
  */
-public class Study implements Serializable {
+public class MINTStudy implements Serializable {
 
 	private static final long serialVersionUID = 5002137289912160452L;
 
@@ -120,11 +120,11 @@ public class Study implements Serializable {
 
 	@Override
 	public boolean equals(final Object object) {
-		if (!(object instanceof Study)) {
+		if (!(object instanceof MINTStudy)) {
 			return false;
 		}
 
-		final Study study = (Study) object;
+		final MINTStudy study = (MINTStudy) object;
 		return id != null ? id.equals(study.id) : study.id == null;
 	}
 

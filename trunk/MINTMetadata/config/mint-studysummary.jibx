@@ -7,7 +7,7 @@
           deserializer="org.nema.medical.mint.metadata.StudyIO.bid2int"/>
   <format label="base64" type="byte[]" serializer="org.nema.medical.mint.metadata.StudyIO.base64encode"
           deserializer="org.nema.medical.mint.metadata.StudyIO.base64decode"/>
-  <mapping abstract="true" type-name="StudyMetaType" class="org.nema.medical.mint.metadata.Study">
+  <mapping abstract="true" type-name="StudyMetaType" class="org.nema.medical.mint.metadata.StudyMetadata">
     <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">
     	<structure name="attr" map-as="AttrType"/>
     </collection>
@@ -19,7 +19,7 @@
     <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
     <value style="attribute" name="instanceCount" pre-get="computeInstanceCount" get-method="getInstanceCount" set-method="setInstanceCount"/>
   </mapping>
-  <mapping class="org.nema.medical.mint.metadata.Study" name="studyMeta">
+  <mapping class="org.nema.medical.mint.metadata.StudyMetadata" name="studyMeta">
     <structure map-as="StudyMetaType"/>
   </mapping>
   <mapping abstract="true" type-name="AttrType" class="org.nema.medical.mint.metadata.Attribute">

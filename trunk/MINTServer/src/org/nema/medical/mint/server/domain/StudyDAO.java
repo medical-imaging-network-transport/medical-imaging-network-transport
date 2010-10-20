@@ -18,11 +18,9 @@ package org.nema.medical.mint.server.domain;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -42,12 +40,12 @@ public class StudyDAO extends HibernateDaoSupport {
 	}
 
     @SuppressWarnings("unchecked")
-	public List<Study> findStudies(String studyInstanceUID, String accessionNumber,
+	public List<MINTStudy> findStudies(String studyInstanceUID, String accessionNumber,
                                 String accessionNumberIssuer, String patientID, String patientIDIssuer,
                                 String minStudyDateTime, String minStudyDate, String maxStudyDateTime,
                                 String maxStudyDate, int limit, int offset) throws ParseException {
 
-        final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class);
+        final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class);
         detachedCriteria.addOrder(Order.desc("lastModified"));
         
         if (studyInstanceUID != null && StringUtils.isNotBlank(studyInstanceUID)){
@@ -81,16 +79,16 @@ public class StudyDAO extends HibernateDaoSupport {
         }
 
         int firstResult = (offset-1) * limit;
-        final List<Study> list = (List<Study>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,limit);
+        final List<MINTStudy> list = (List<MINTStudy>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,limit);
         return list;
     }
 
 	@SuppressWarnings("unchecked")
-	public Study findStudy(final String uuid) {
+	public MINTStudy findStudy(final String uuid) {
 		if (StringUtils.isNotBlank(uuid)) {
-			final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class).add(
+			final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class).add(
 					Restrictions.eq("id", uuid));
-			final List<Study> list = getHibernateTemplate().findByCriteria(detachedCriteria);
+			final List<MINTStudy> list = getHibernateTemplate().findByCriteria(detachedCriteria);
 			if (!list.isEmpty()) {
 				return list.get(0);
 			}
@@ -99,19 +97,19 @@ public class StudyDAO extends HibernateDaoSupport {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Study> getMostRecentStudies(final int max, final int seconds) {
+	public List<MINTStudy> getMostRecentStudies(final int max, final int seconds) {
 		final Calendar calendar = Calendar.getInstance(GMT);
 		calendar.add(Calendar.SECOND, -between(1, MAXSECONDS, seconds));
 
-		final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(Study.class)
+		final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class)
 				.add(Restrictions.ge("lastModified", calendar.getTime())).addOrder(Order.desc("lastModified"));
-		final List<Study> list = getHibernateTemplate().findByCriteria(detachedCriteria, 0, between(1, 50, max));
+		final List<MINTStudy> list = getHibernateTemplate().findByCriteria(detachedCriteria, 0, between(1, 50, max));
 		return list;
 	}
 
-    public Study insertStudy(final Study study) {
+    public MINTStudy insertStudy(final MINTStudy study) {
         if (study != null) {
-            study.setLastModified(Study.now());
+            study.setLastModified(MINTStudy.now());
             getHibernateTemplate().save(study);
             getHibernateTemplate().flush();
             getHibernateTemplate().refresh(study);
@@ -119,9 +117,9 @@ public class StudyDAO extends HibernateDaoSupport {
         return study;
     }
 
-    public Study updateStudy(final Study study) {
+    public MINTStudy updateStudy(final MINTStudy study) {
         if (study != null) {
-            study.setLastModified(Study.now());
+            study.setLastModified(MINTStudy.now());
             getHibernateTemplate().saveOrUpdate(study);
             getHibernateTemplate().flush();
             getHibernateTemplate().refresh(study);

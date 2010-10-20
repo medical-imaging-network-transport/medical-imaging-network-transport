@@ -16,7 +16,7 @@ import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 
 /**
@@ -112,7 +112,7 @@ public class MINT2DICOM
     	try 
         {
         	// Read metadata
-            Study mintData = StudyIO.parseFromXML(metaFile.openStream());
+            StudyMetadata mintData = StudyIO.parseFromXML(metaFile.openStream());
             Iterator<Series> seriesIter = mintData.seriesIterator();
             
             // Loop through the metadata.

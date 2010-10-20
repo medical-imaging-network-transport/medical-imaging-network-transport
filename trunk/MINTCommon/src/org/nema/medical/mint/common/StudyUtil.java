@@ -27,12 +27,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.Attribute;
-import org.nema.medical.mint.metadata.Instance;
-import org.nema.medical.mint.metadata.Item;
-import org.nema.medical.mint.metadata.Series;
-import org.nema.medical.mint.metadata.Study;
-import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.metadata.*;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.util.Iter;
 
 /**
@@ -90,7 +86,7 @@ public final class StudyUtil {
 
     /**
      * This method will shift all binary item IDs found in the binaryDirectory
-     * by the provided the shiftAmount and will also update the provided Study
+     * by the provided the shiftAmount and will also update the provided StudyMetadata
      * accordingly. It will return true if everything happened all right, false
      * if something weird happened. Depending on the type of failure, the data
      * may be left in an inconsistent state, there is not guarantee that this
@@ -101,7 +97,7 @@ public final class StudyUtil {
      * @param shiftAmount
      * @return true if successful
      */
-    public static boolean shiftItemIds(Study study, File binaryDirectory, int shiftAmount)
+    public static boolean shiftItemIds(StudyMetadata study, File binaryDirectory, int shiftAmount)
     {
     	if(shiftAmount == 0)
     	{
@@ -179,7 +175,7 @@ public final class StudyUtil {
      * @param shiftAmount
      * @return
      */
-    private static boolean shiftStudyBids(Study study, int shiftAmount)
+    private static boolean shiftStudyBids(StudyMetadata study, int shiftAmount)
     {
         for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
         {
@@ -227,7 +223,7 @@ public final class StudyUtil {
      *
      * @param sourceStudy
      */
-    public static void mergeStudy(Study destinationStudy, Study sourceStudy, Collection<Integer> excludedBinaryIds)
+    public static void mergeStudy(StudyMetadata destinationStudy, StudyMetadata sourceStudy, Collection<Integer> excludedBinaryIds)
     {
         //Merge study level attributes
         for(Iterator<Attribute> i = sourceStudy.attributeIterator(); i.hasNext();)
@@ -297,7 +293,7 @@ public final class StudyUtil {
      * @param excludeStudy
      * @return true
      */
-    public static boolean applyExcludes(Study currentStudy, Study excludeStudy, Collection<Integer> excludedBinaryIds)
+    public static boolean applyExcludes(StudyMetadata currentStudy, StudyMetadata excludeStudy, Collection<Integer> excludedBinaryIds)
     {
         //Remove study level attributes?
         for(Iterator<Attribute> i = excludeStudy.attributeIterator(); i.hasNext();)
@@ -478,7 +474,7 @@ public final class StudyUtil {
 	 * 
 	 * @param study
 	 */
-    public static void removeExcludes(Study study)
+    public static void removeExcludes(StudyMetadata study)
     {
     	//Remove study level attributes?
         for(Iterator<Attribute> i = study.attributeIterator(); i.hasNext();)
@@ -566,7 +562,7 @@ public final class StudyUtil {
      * @param study
      * @return true
      */
-    public static boolean denormalizeStudy(Study study)
+    public static boolean denormalizeStudy(StudyMetadata study)
     {
         for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
         {
@@ -591,14 +587,14 @@ public final class StudyUtil {
     }
 
     /**
-     * Performs a normalization algorithm on the provided Study.
+     * Performs a normalization algorithm on the provided StudyMetadata.
      * 
      * TODO make this algorithm normalize using information from a data dictionary.
      *
      * @param study
      * @return true
      */
-    public static boolean normalizeStudy(Study study)
+    public static boolean normalizeStudy(StudyMetadata study)
     {
         List<Attribute> list = new LinkedList<Attribute>();
 
@@ -699,7 +695,7 @@ public final class StudyUtil {
         return equal;
     }
 
-    public static void writeStudy(Study study, File studyFolder) throws IOException
+    public static void writeStudy(StudyMetadata study, File studyFolder) throws IOException
     {
         StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb"));
         StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml"));
@@ -785,7 +781,7 @@ public final class StudyUtil {
      * @param binaryFolder
      * @return
      */
-    public static boolean validateStudy(Study study, File binaryFolder)
+    public static boolean validateStudy(StudyMetadata study, File binaryFolder)
     {
         boolean result = true;
 
@@ -807,7 +803,7 @@ public final class StudyUtil {
      * @param binaryFolder
      * @return Returns true if no violations were detected.
      */
-    public static boolean validateBinaryItemsReferences(Study study, File binaryFolder)
+    public static boolean validateBinaryItemsReferences(StudyMetadata study, File binaryFolder)
     {
         Set<Integer> studyBids = new HashSet<Integer>(), binaryItemIds = new HashSet<Integer>();
 
@@ -830,7 +826,7 @@ public final class StudyUtil {
 		/*
 		 * Collect id from attributes
 		 * 
-		 * NOTE: Study has a method that does almost exactly this except that
+		 * NOTE: StudyMetadata has a method that does almost exactly this except that
 		 * this method detects repeated bids (which is not allowed). Do not just
 		 * replace the below with that method without first considering this
 		 * fact.

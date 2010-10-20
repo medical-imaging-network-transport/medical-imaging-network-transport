@@ -67,7 +67,7 @@ import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.util.Iter;
 import org.w3c.dom.Document;
@@ -206,7 +206,7 @@ public final class ProcessImportDir {
 
     private void addToSendQueue(final MetaBinaryPair studyData, final Collection<File> studyFiles) throws IOException {
         //Write metadata to disk so that we don't run out of memory while working on more studies
-        final Study study = studyData.getMetadata();
+        final StudyMetadata study = studyData.getMetadata();
         final File studyMetaFile = File.createTempFile("metadata", useXMLNotGPB ? ".xml" : ".gpb");
         studyMetaFile.deleteOnExit();
         final OutputStream outStream = new BufferedOutputStream(new FileOutputStream(studyMetaFile));
@@ -391,7 +391,7 @@ public final class ProcessImportDir {
             entity.addPart("studyUUID", new StringBody(studyQueryInfo.studyUUID));
         }
 
-        final Study study = useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
+        final StudyMetadata study = useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
         if (studyQueryInfo != null) {
             study.setVersion(studyQueryInfo.studyVersion);
         }

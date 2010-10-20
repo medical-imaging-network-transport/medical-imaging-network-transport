@@ -42,7 +42,7 @@ import org.nema.medical.mint.metadata.GPB.StudyData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Study implements AttributeStore, StudySummary
+public class StudyMetadata implements AttributeStore, StudySummary
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
@@ -255,8 +255,8 @@ public class Study implements AttributeStore, StudySummary
     //  Google Protocol Buffer support - package protection intentional
     //  Google Protocol Buffer support
     //
-    static Study fromGPB(StudyData studyData) {
-        Study study = new Study();
+    static StudyMetadata fromGPB(StudyData studyData) {
+        StudyMetadata study = new StudyMetadata();
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
         if (studyData.hasVersion()) study.setVersion(studyData.getVersion());

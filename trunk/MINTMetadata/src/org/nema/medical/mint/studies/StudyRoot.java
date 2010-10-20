@@ -1,12 +1,11 @@
 package org.nema.medical.mint.studies;
 
-import org.nema.medical.mint.studies.Study;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class StudyRoot extends Study {
+public class StudyRoot extends SearchResultStudy {
 
     /**
      * Default constructor for JiBX

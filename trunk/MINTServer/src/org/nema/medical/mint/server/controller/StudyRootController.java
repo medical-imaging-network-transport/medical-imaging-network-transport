@@ -30,8 +30,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.studies.StudyRoot;
-import org.nema.medical.mint.server.domain.Study;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -94,7 +94,7 @@ public class StudyRootController {
 			studyTypeFileList.add(studyTypeFile.getName());
 		}
 		
-		Study study = studyDAO.findStudy(uuid);
+		MINTStudy study = studyDAO.findStudy(uuid);
 		
 		Timestamp lastUpdated;
 		if (study.getLastModified() != null){

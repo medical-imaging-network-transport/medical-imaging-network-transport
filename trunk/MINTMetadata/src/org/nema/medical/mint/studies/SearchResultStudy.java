@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  * Date: Sep 18, 2010
  * Time: 2:24:01 PM
  */
-public class Study {
+public class SearchResultStudy {
 
     private String studyUUID;
     private Timestamp lastModified;
@@ -16,10 +16,10 @@ public class Study {
     /**
      * Default constructor for JiBX
      */
-    public Study() {
+    public SearchResultStudy() {
     }
 
-    public Study(String studyUUID, Timestamp lastModified, int version) {
+    public SearchResultStudy(String studyUUID, Timestamp lastModified, int version) {
         this.version = version;
         this.lastModified = lastModified;
         this.studyUUID = studyUUID;
