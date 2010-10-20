@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +96,7 @@ public class StudyMetadataController {
 
             final File file = new File(typeDir, filename);
             if (!file.exists()) {
-                Study study = StudyIO.loadStudy(typeDir);
+                StudyMetadata study = StudyIO.loadStudy(typeDir);
                 StudyIO.writeFile(study, file);
             }
 

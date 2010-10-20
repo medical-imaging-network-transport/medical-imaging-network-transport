@@ -19,7 +19,7 @@ public class SearchResults {
     private String timeZone;
     private int offset;
     private int limit;
-	private final List<Study> studies = new ArrayList<Study>();
+	private final List<SearchResultStudy> studies = new ArrayList<SearchResultStudy>();
 
 	public SearchResults() {
 		//Default constructor for JiBX
@@ -88,11 +88,11 @@ public class SearchResults {
         return limit;
     }
     
-    public Iterator<Study> resultsIterator() {
+    public Iterator<SearchResultStudy> resultsIterator() {
     	return studies.iterator();
     }
     
-    public void addStudy(Study study) {
+    public void addStudy(SearchResultStudy study) {
     	studies.add(study);
     }
 

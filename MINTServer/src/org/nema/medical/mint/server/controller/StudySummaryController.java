@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -66,7 +66,7 @@ public class StudySummaryController {
         try {			
 			final File file = new File(typeDir, "/summary.xml");
             if (!file.exists()) {
-                Study study = StudyIO.loadStudy(typeDir);
+                StudyMetadata study = StudyIO.loadStudy(typeDir);
                 StudyIO.writeSummaryToXML(study,file);
             }
 

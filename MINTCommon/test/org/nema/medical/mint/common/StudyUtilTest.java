@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 
 /**
@@ -48,7 +48,7 @@ public class StudyUtilTest {
 			LOG
 					.error("Could not find a study folder if run test on, test failed but will not JUnit fail because will assume this failure occured because there are not study folders on the machine this was run on.");
 		} else {
-			Study study = StudyIO.loadStudy(studyDicomDir);
+			StudyMetadata study = StudyIO.loadStudy(studyDicomDir);
 
 			assertNotNull(study);
 		}

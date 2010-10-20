@@ -24,12 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.junit.Test;
-import org.nema.medical.mint.metadata.Attribute;
-import org.nema.medical.mint.metadata.Instance;
-import org.nema.medical.mint.metadata.Item;
-import org.nema.medical.mint.metadata.Series;
-import org.nema.medical.mint.metadata.Study;
-import org.nema.medical.mint.metadata.StudyIO;
 
 public class StudyIOTest {
 
@@ -50,13 +44,13 @@ public class StudyIOTest {
 
 	@Test
 	public void testJibxUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromXML(jibxFile);
+		StudyMetadata study = StudyIO.parseFromXML(jibxFile);
 		assertNotNull(study);
 	}
 
 	@Test
 	public void testCompressedJibxUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromXML(compressedJibxFile);
+		StudyMetadata study = StudyIO.parseFromXML(compressedJibxFile);
 		assertNotNull(study);
 	}
 
@@ -72,13 +66,13 @@ public class StudyIOTest {
 	
 	@Test
 	public void testGpbUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromGPB(gpbFile);
+		StudyMetadata study = StudyIO.parseFromGPB(gpbFile);
 		assertNotNull(study);
 	}
 	
 	@Test
 	public void testCompressedGpbUnmarshal() throws Exception {
-		Study study = StudyIO.parseFromGPB(compressedGpbFile);
+		StudyMetadata study = StudyIO.parseFromGPB(compressedGpbFile);
 		assertNotNull(study);
 	}
 	
@@ -133,8 +127,8 @@ public class StudyIOTest {
 	}
 	
 
-	private Study getStudy() {
-		Study study = new Study();
+	private StudyMetadata getStudy() {
+		StudyMetadata study = new StudyMetadata();
 		ArrayList<Instance> instances = new ArrayList<Instance>();
 
 		study.setStudyInstanceUID("1");

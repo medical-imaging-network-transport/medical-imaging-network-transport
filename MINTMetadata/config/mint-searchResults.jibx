@@ -14,9 +14,9 @@
 		<value style="attribute" name="timeZone" get-method="getTimeZone" set-method="setTimeZone" usage="optional"/>
 		<value style="attribute" name="offset" get-method="getOffset" set-method="setOffset" usage="optional"/>
 		<value style="attribute" name="limit" get-method="getLimit" set-method="setLimit" usage="optional"/>
-		<collection add-method="addStudy" iter-method="resultsIterator" item-type="org.nema.medical.mint.studies.Study" />
+		<collection add-method="addStudy" iter-method="resultsIterator" item-type="org.nema.medical.mint.studies.SearchResultStudy" />
 	</mapping>
-	<mapping name="study" class="org.nema.medical.mint.studies.Study">
+	<mapping name="study" class="org.nema.medical.mint.studies.SearchResultStudy">
 		<value style="attribute" name="studyUUID" get-method="getStudyUUID" set-method="setStudyUUID" />
 		<value style="attribute" name="lastModified" get-method="getLastModified" set-method="setLastModified" />
 		<value style="attribute" name="version" get-method="getVersion" set-method="setVersion" />

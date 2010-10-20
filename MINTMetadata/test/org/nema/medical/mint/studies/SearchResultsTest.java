@@ -11,7 +11,6 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Test;
-import org.nema.medical.mint.studies.Study;
 
 public class SearchResultsTest {
 
@@ -33,7 +32,7 @@ public class SearchResultsTest {
 	private SearchResults getSearchResults(int numStudies) {
 		SearchResults sr = new SearchResults(null,"12345",null,null,null,null,null,null,null,null,0,0);
 		for (int i=0; i<numStudies; i++) {
-			Study study = new Study("uuid" + i, new Timestamp(System.currentTimeMillis()),i);
+			SearchResultStudy study = new SearchResultStudy("uuid" + i, new Timestamp(System.currentTimeMillis()),i);
 			sr.addStudy(study);
 		}
 		return sr;

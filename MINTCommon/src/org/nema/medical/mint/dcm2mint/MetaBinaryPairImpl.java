@@ -16,7 +16,7 @@
 
 package org.nema.medical.mint.dcm2mint;
 
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 
 
 /**
@@ -28,13 +28,13 @@ This is returned by Dcm2MetaBuilder::finish().
 */
 public final class MetaBinaryPairImpl implements MetaBinaryPair {
     /** The study's metadata */
-    public final Study metadata = new Study();
+    public final StudyMetadata metadata = new StudyMetadata();
 
     /** The study's binary data */
     public BinaryData binaryData;
 
     @Override
-    public Study getMetadata() {
+    public StudyMetadata getMetadata() {
         return metadata;
     }
 

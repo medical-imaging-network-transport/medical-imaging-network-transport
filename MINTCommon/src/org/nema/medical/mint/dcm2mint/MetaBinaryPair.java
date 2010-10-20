@@ -15,12 +15,12 @@
  */
 package org.nema.medical.mint.dcm2mint;
 
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 
 /**
  * @author Uli Bubenheimer
  */
 public interface MetaBinaryPair {
-    Study getMetadata();
+    StudyMetadata getMetadata();
     BinaryData getBinaryData();
 }

@@ -28,14 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.common.StudyUtil;
-import org.nema.medical.mint.metadata.Study;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.server.domain.Change;
-import org.nema.medical.mint.server.domain.ChangeDAO;
-import org.nema.medical.mint.server.domain.JobInfo;
-import org.nema.medical.mint.server.domain.JobInfoDAO;
-import org.nema.medical.mint.server.domain.JobStatus;
-import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.*;
 
 /**
  * 
@@ -113,7 +108,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				File existingBinaryFolder = new File(typeFolder, "binaryitems");
 				existingBinaryFolder.mkdirs();
 				
-				Study existingStudy;
+				StudyMetadata existingStudy;
 				
 				try
 				{
@@ -132,7 +127,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				/*
 				 * Need to load new study information
 				 */
-				Study newStudy = StudyIO.loadStudy(jobFolder);
+				StudyMetadata newStudy = StudyIO.loadStudy(jobFolder);
 				
 				/*
 				 * If the study versions are not the same, then this
@@ -243,12 +238,12 @@ public class StudyUpdateProcessor extends TimerTask {
 				/*
 				 * Update the Job DAO and Study DAO
 				 */
-				org.nema.medical.mint.server.domain.Study studyData = new org.nema.medical.mint.server.domain.Study();
+				MINTStudy studyData = new MINTStudy();
 				studyData.setID(studyUUID);
 				studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
 				studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
 				studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
-				studyData.setDateTime(org.nema.medical.mint.server.domain.Study
+				studyData.setDateTime(MINTStudy
 						.now());
 				studyData.setStudyVersion(existingStudy.getVersion());
 				studyDAO.updateStudy(studyData);
