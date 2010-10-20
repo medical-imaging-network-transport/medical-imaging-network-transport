@@ -4,7 +4,7 @@
     <groupId>org.nema.medical.mint</groupId>
     <artifactId>MINTServer.war</artifactId>
     <packaging>war</packaging>
-    <version>0.9.9</version>
+    <version>0.9.10</version>
     <name>MINTServer</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
