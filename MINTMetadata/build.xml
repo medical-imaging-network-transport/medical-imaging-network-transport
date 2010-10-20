@@ -2,7 +2,7 @@
 <project basedir="." default="doc" name="mint-metadata">
 	<property file="build.properties" />
 	<property name="build.dir" value="${basedir}/build" />
-	<property name="project.version" value="0.9.8" />
+	<property name="project.version" value="0.9.9" />
 
 	<target name="clean">
         <mkdir dir="${build.dir}/ant-classes" />
