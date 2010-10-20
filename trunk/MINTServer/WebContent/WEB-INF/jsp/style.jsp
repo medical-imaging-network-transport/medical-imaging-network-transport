@@ -249,8 +249,26 @@
 						</table>
 					</dd>
 				</xsl:for-each>
+				<br />
+				<xsl:for-each select="mint:normalizedInstanceAttributes">
+					<dt>Normalized Instance Attributes</dt>
+					<dd>
+						<table border="1" cellpadding="2" cellspacing="0">
+							<tr>
+								<th>Attribute Tag</th>
+								<th>VR</th>
+								<th>Value</th>
+								<th>Bid</th>
+								<th>Frame count</th>
+								<th>Bytes</th>
+							</tr>
+							<xsl:apply-templates/>
+						</table>
+					</dd>
+				</xsl:for-each>
 			</dl>
 		</li>
+		<br />
 	</xsl:for-each>
 	</ol>
 	</xsl:for-each>
