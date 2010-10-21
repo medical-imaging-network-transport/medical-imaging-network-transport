@@ -23,7 +23,6 @@
 		<ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
 		<path id="build.classpath">
-			<fileset dir="${basedir}/lib" includes="*.jar" />
 			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
 			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
 			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
