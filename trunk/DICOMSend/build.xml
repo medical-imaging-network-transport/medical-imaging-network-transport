@@ -1,19 +1,10 @@
 <!DOCTYPE project>
 <project basedir="." default="jar" name="DICOMSend">
-    <property name="build.dir" value="${basedir}/build" />
-
     <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
     <available file="${common.project.basedir}" type="dir" property="common.project.available" />
     <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
 
-    <target name="clean">
-        <ant dir="${common.project.basedir}" target="clean" inheritall="false" />
-
-        <mkdir dir="${build.dir}/ant-classes" />
-        <delete includeemptydirs="true">
-            <fileset dir="${build.dir}" includes="**/*" />
-        </delete>
-    </target>
+    <import file="../build-common.xml" />
 
     <target name="build" description="Compile the Java files">
         <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
