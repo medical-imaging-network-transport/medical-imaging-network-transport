@@ -1,22 +1,12 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="MINTCommon">
     <property file="build.properties" />
-    <property name="build.dir" value="${basedir}/build" />
 
     <property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
     <available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
     <fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
 
-    <target name="clean">
-        <ant dir="${metadata.project.basedir}" target="clean" inheritall="false" />
-
-        <mkdir dir="${build.dir}/ant-classes" />
-        <mkdir dir="${build.dir}/ant-test-classes" />
-        <delete includeemptydirs="true">
-            <fileset dir="${build.dir}/ant-classes" includes="**/*" />
-            <fileset dir="${build.dir}/ant-test-classes" includes="**/*" />
-        </delete>
-    </target>
+    <import file="../build-common.xml" />
 
     <target name="build" description="Compile the Java files">
         <ant dir="${metadata.project.basedir}" target="jar" inheritall="false" />

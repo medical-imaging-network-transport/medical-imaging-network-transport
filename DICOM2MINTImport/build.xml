@@ -1,7 +1,5 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="DICOM2MINTImport">
-	<property name="build.dir" value="${basedir}/build" />
-
 	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
 	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
 	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
@@ -10,14 +8,7 @@
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
 	<fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
 
-	<target name="clean">
-		<ant dir="${common.project.basedir}" target="clean" inheritall="false" />
-
-		<mkdir dir="${build.dir}/ant-classes" />
-		<delete includeemptydirs="true">
-			<fileset dir="${build.dir}/ant-classes" includes="**/*" />
-		</delete>
-	</target>
+    <import file="../build-common.xml" />
 
 	<target name="build" description="Compile the Java files">
 		<ant dir="${common.project.basedir}" target="jar" inheritall="false" />

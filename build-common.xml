@@ -1,0 +1,17 @@
+<!-- 
+Tasks common to all java projects.
+Include like this, out side of any targets:
+
+<import file="../build-common.xml" />
+
+See http://ant.apache.org/manual/Tasks/import.html for details.
+-->
+<project>
+    <!-- Common directory layout.  You can override these by 
+         setting the properties *before* importing this file. -->
+    <property name="build.dir" value="${basedir}/build" />
+
+    <target name="clean" description="Delete the build directory">
+        <delete dir="${build.dir}" />
+    </target>
+</project>

@@ -1,16 +1,9 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="mint-metadata">
 	<property file="build.properties" />
-	<property name="build.dir" value="${basedir}/build" />
 	<property name="project.version" value="0.9.10" />
 
-	<target name="clean">
-        <mkdir dir="${build.dir}/ant-classes" />
-		<delete includeemptydirs="true">
-			<fileset dir="${build.dir}" includes="**/*" />
-		</delete>
-		<mkdir dir="${build.dir}/ant-classes" />
-	</target>
+    <import file="../build-common.xml" />
 
 	<target name="build" depends="clean" description="Compile the Java files">
 		<path id="build.classpath">
