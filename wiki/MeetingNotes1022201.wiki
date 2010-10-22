@@ -1,0 +1,88 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Working on DICOM2MINT C++ implementation - functional
+    * Working with Fred to use CURL to send metadata + binary items over to MINT server
+    * Using STL for map, iterators, etc
+    * Using GDCM to parse DICOM in C++
+  * Jim
+    * Call with RSNA leadership (Chair WG6/WG10/Secretary)
+      * Very good meeting 
+      * WG27 meeting Monday of RSNA (Nov 29) from 9-5 in room M128 
+      * Presenting to the DICOM standards committee on Thursday Dec 2nd at RSNA
+    * Made progress on MINT marketing 
+      * Tim sent out poster mockup to list
+      * Looking into putting "gotmint.org" stickers on york peppermint patties
+  * Tim Dawson
+    * Worked on MINT poster
+    * Planning on SDK
+    * Going to restructure the source code repository over weekend
+  * Dan Chafee
+    * Refactored data dictionary so it is in metadata project
+    * Started working on normalization using the data dictionary for DICOM2MINT
+    * Working with Gorkem and Tim Culp on updating ClearCanvas plugin to work with XML instead of XHTML.  Will continue to work on this next week
+  * Jeremey
+    * Started refactoring build process
+    * Checked in common build file and clean task
+    * Working on compile and test tasks now
+  * Chris Hafey
+    * Met with Philips to discuss MINT
+      * Suggest we add more info about chagelog for notification to technical overview
+      * Wondering why we had such limited query capability
+  
+  
+= Notes =
+  * Jim suggested that we look at how MINT can fulfill WG27 NADO and QIDO functionality
+  * Chris proposed that we make the binary item size exact, not max size and include all attributes past pixel data.  There is evidence that tags are used past 7fe0,0010 and it is better to be safe here.
+  
+= Decisions =
+  * MINT will include tags past 7FE0,0010
+  * MINT will specify the exact size of the binary item (bsize)
+
+
+= New Actions =
+  * Update Oct 15 meeting notes to reflect reversal in decision regarding tags past 7fe0,0010 & exact size (Chris Hafey)
+
+= Old Actions =
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Gorkem)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+
+
+= Completed Actions = 
+  * Post on comp.protocols.dicom to see if anyone has seen private tags following pixel data (chris)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Issues =
+
+= Future =
