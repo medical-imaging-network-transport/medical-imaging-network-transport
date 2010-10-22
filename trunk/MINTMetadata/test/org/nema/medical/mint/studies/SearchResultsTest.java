@@ -18,8 +18,8 @@ public class SearchResultsTest {
 	public void testOutput() throws Exception {
 		SearchResults sr = getSearchResults(4);		
 		try {
-//			Writer writer = new StringWriter();
-			Writer writer = new FileWriter("C:/out.txt");
+			Writer writer = new StringWriter();
+//			Writer writer = new FileWriter("C:/out.txt");
 			IBindingFactory bfact = BindingDirectory.getFactory(SearchResults.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			mctx.setIndent(2);
