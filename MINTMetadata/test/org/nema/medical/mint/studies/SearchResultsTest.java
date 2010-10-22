@@ -1,9 +1,9 @@
 package org.nema.medical.mint.studies;
 
 import java.io.IOException;
-//import java.io.StringWriter;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.io.FileWriter;
+//import java.io.FileWriter;
 import java.sql.Timestamp;
 
 import org.jibx.runtime.BindingDirectory;
