@@ -57,7 +57,7 @@
 = Notes =
 
 = Decisions =
-  * Binary items will have a required attribute named "noBiggerThanSize" which is either equal to the binary item size or greater than.  
+  * _Binary items will have a required attribute named "noBiggerThanSize" which is either equal to the binary item size or greater than._  *NOTE - This was decision was overruled during the 10222010 meeting*
 
 = New Actions =
   * Post on comp.protocols.dicom to see if anyone has seen private tags following pixel data (chris)
