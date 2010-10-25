@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.nema.medical.mint.server.controller.Utils;
+import org.nema.medical.mint.utils.DateUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class StudyDAO extends HibernateDaoSupport {
@@ -66,16 +66,16 @@ public class StudyDAO extends HibernateDaoSupport {
             detachedCriteria.add(Restrictions.eq("issuerOfPatientID", patientIDIssuer));
         }
         if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-            detachedCriteria.add(Restrictions.ge("dateTime", Utils.parseISO8601(minStudyDateTime)));
+            detachedCriteria.add(Restrictions.ge("dateTime", DateUtils.parseISO8601(minStudyDateTime)));
         }
         if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-            detachedCriteria.add(Restrictions.ge("dateTime", Utils.parseISO8601Date(minStudyDate)));
+            detachedCriteria.add(Restrictions.ge("dateTime", DateUtils.parseISO8601Date(minStudyDate)));
         }
         if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-            detachedCriteria.add(Restrictions.le("dateTime", Utils.parseISO8601(maxStudyDateTime)));
+            detachedCriteria.add(Restrictions.le("dateTime", DateUtils.parseISO8601(maxStudyDateTime)));
         }
         if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-            detachedCriteria.add(Restrictions.lt("dateTime", Utils.parseISO8601Date(maxStudyDate)));
+            detachedCriteria.add(Restrictions.lt("dateTime", DateUtils.parseISO8601Date(maxStudyDate)));
         }
 
         int firstResult = (offset-1) * limit;

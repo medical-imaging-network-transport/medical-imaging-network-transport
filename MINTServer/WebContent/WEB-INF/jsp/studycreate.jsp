@@ -2,7 +2,7 @@
 
 <%@page import="org.apache.commons.lang.StringUtils"%><html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <title>Create Study</title>
 </head>
 <body>

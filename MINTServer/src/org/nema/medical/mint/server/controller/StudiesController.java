@@ -24,6 +24,7 @@ import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.studies.SearchResultStudy;
 import org.nema.medical.mint.studies.SearchResults;
+import org.nema.medical.mint.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,16 +75,16 @@ public class StudiesController {
         	Timestamp dateTimeFrom = null;
         	Timestamp dateTimeTo = null;
             if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-                Date testParse = Utils.parseISO8601Date(minStudyDate);
+                Date testParse = DateUtils.parseISO8601Date(minStudyDate);
             }
         	if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-        		dateTimeFrom = new Timestamp((Utils.parseISO8601(minStudyDateTime)).getTime());
+                dateTimeFrom = new Timestamp((DateUtils.parseISO8601(minStudyDateTime)).getTime());
         	}
             if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-                Date testParse = Utils.parseISO8601Date(maxStudyDate);
+                Date testParse = DateUtils.parseISO8601Date(maxStudyDate);
             }
             if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-                dateTimeTo = new Timestamp(Utils.parseISO8601(maxStudyDateTime).getTime());
+                dateTimeTo = new Timestamp(DateUtils.parseISO8601(maxStudyDateTime).getTime());
             }
 	        List<MINTStudy> studies = studyDAO.findStudies(studyInstanceUID, accessionNumber,
                     accessionNumberIssuer, patientID, patientIDIssuer, minStudyDateTime,

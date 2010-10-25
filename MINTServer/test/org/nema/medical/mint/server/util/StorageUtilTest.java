@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.nema.medical.mint.common;
+package org.nema.medical.mint.server.util;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,13 +26,14 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.utils.StudyUtils;
 
 /**
  * @author Rex
  * 
  */
-public class StudyUtilTest {
-	static final Logger LOG = Logger.getLogger(StudyUtilTest.class);
+public class StorageUtilTest {
+	static final Logger LOG = Logger.getLogger(StorageUtilTest.class);
 
 	/**
 	 * Test the ability to load a study. Requires there to be at least one study
@@ -71,7 +72,7 @@ public class StudyUtilTest {
 
 			assertTrue(binaryItems.exists());
 
-			int highestItem = StudyUtil
+			int highestItem = StorageUtil
 					.getHighestNumberedBinaryItem(binaryItems);
 
 			String[] binaryItemNames = binaryItems.list();
@@ -89,23 +90,23 @@ public class StudyUtilTest {
 	}
 
 	/**
-	 * Tests the version methods in StudyUtil.
+	 * Tests the version methods in StudyUtils.
 	 */
 	@Test
 	public void testVersion() {
-		String version = StudyUtil.getBaseVersion();
+        String version = StudyUtils.getBaseVersion();
 
 		assertTrue(StringUtils.isNotBlank(version));
 
 		LOG.info("1st version is: " + version);
 
-		version = StudyUtil.getNextVersion(version);
+        version = StudyUtils.getNextVersion(version);
 
 		assertTrue(StringUtils.isNotBlank(version));
 
 		LOG.info("2nd version is: " + version);
 
-		version = StudyUtil.getNextVersion(version);
+        version = StudyUtils.getNextVersion(version);
 
 		assertTrue(StringUtils.isNotBlank(version));
 

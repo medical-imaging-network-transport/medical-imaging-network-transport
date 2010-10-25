@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.common.StudyUtil;
+import org.nema.medical.mint.server.util.StorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,9 +88,9 @@ public class StudyBinaryItemsController {
         final OutputStream out = res.getOutputStream();
         
         int i = itemList.next();
-        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.BINARY_FILE_EXTENSION);
+        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.BINARY_FILE_EXTENSION);
         if (!file.exists() || !file.canRead()) {
-        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
         }
         
         if (!file.exists() || !file.canRead()) {
@@ -126,9 +126,9 @@ public class StudyBinaryItemsController {
         for (;itemList.hasNext();) {
         	i = itemList.next();
         	
-        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.BINARY_FILE_EXTENSION);
+        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.BINARY_FILE_EXTENSION);
             if (!file.exists() || !file.canRead()) {
-            	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StudyUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+            	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
             }
             
             if (!file.exists() || !file.canRead()) {
@@ -224,9 +224,9 @@ public class StudyBinaryItemsController {
 						do
 						{
 							next = binaryNames.next();
-						}while(!next.endsWith(StudyUtil.BINARY_FILE_EXTENSION) && binaryNames.hasNext());
+						}while(!next.endsWith(StorageUtil.BINARY_FILE_EXTENSION) && binaryNames.hasNext());
 						
-						if(!next.endsWith(StudyUtil.BINARY_FILE_EXTENSION))
+						if(!next.endsWith(StorageUtil.BINARY_FILE_EXTENSION))
 						{
 							next = null;
 						}

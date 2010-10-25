@@ -69,7 +69,7 @@ import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.util.Iter;
+import org.nema.medical.mint.utils.Iter;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
