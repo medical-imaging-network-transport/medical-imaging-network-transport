@@ -34,6 +34,7 @@ import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.changelog.ChangeSet;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
+import org.nema.medical.mint.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -79,7 +80,7 @@ public class ChangeLogController {
 
 			Date date = null;
 			try {
-				date = Utils.parseISO8601Basic(since);
+                date = DateUtils.parseISO8601Basic(since);
 			} catch (ParseException e) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
 				return;

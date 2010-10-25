@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package org.nema.medical.mint.util;
+package org.nema.medical.mint.utils;
 
 import java.util.Iterator;
 

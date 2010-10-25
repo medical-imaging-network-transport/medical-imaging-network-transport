@@ -25,7 +25,7 @@ import org.nema.medical.mint.metadata.AttributeStore;
 import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Item;
 import org.nema.medical.mint.metadata.Series;
-import org.nema.medical.mint.util.Iter;
+import org.nema.medical.mint.utils.Iter;
 
 /**
 \brief Class used to build up a StudyMeta message from a set of DICOM instances.

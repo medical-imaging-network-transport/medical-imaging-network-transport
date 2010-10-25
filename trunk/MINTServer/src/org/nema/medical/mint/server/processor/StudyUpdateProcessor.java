@@ -27,10 +27,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.common.StudyUtil;
+import org.nema.medical.mint.server.util.StorageUtil;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.*;
+import org.nema.medical.mint.utils.StudyUtils;
 
 /**
  * 
@@ -139,7 +140,7 @@ public class StudyUpdateProcessor extends TimerTask {
 					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
 				}
 				
-				if(!StudyUtil.validateStudy(newStudy, jobFolder))
+				if(!StorageUtil.validateStudy(newStudy, jobFolder))
 				{
 					throw new RuntimeException("Validation of the jobs study failed");
 				}
@@ -149,8 +150,8 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * with existing data files when merging. This also means updating
 				 * the new study document.
 				 */
-				int maxExistingItemNumber = StudyUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
-				if(!StudyUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
+				int maxExistingItemNumber = StorageUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
+				if(!StorageUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
 				{
 					//Shift Item Ids failed!
 					throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
@@ -159,9 +160,9 @@ public class StudyUpdateProcessor extends TimerTask {
 				/*
 				 * Write metadata update message to change log folder.
 				 */
-		        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
+		        File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
 		        
-		        StudyUtil.writeStudy(newStudy, changelogFolder);
+		        StorageUtil.writeStudy(newStudy, changelogFolder);
 				
 		        Collection<Integer> excludedBids = new HashSet<Integer>();
 		        if(existingStudy != null)
@@ -170,7 +171,7 @@ public class StudyUpdateProcessor extends TimerTask {
 					 * Need to move through the new study and look for things to exclude
 					 * and exclude them from the existing study.
 					 */
-					if(!StudyUtil.applyExcludes(existingStudy, newStudy, excludedBids))
+                    if(!StudyUtils.applyExcludes(existingStudy, newStudy, excludedBids))
 					{
 						//Applying Excludes failed!
 						throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
@@ -181,29 +182,29 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * Clean out excludes because excludes should not be left in
 				 * the newStudy.
 				 */
-	        	StudyUtil.removeExcludes(newStudy);
-				
-				/*
-				 * Need to merge the study documents and renormalize the result.
-				 * This means first denormalize, then merge, then normalize the
-				 * result
-				 */
-		        if(!StudyUtil.denormalizeStudy(newStudy))
+                StudyUtils.removeExcludes(newStudy);
+
+                /*
+                     * Need to merge the study documents and renormalize the result.
+                     * This means first denormalize, then merge, then normalize the
+                     * result
+                     */
+                if(!StudyUtils.denormalizeStudy(newStudy))
 				{
 					throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
 				}
 		        
 		        if(existingStudy != null)
 		        {
-					if(!StudyUtil.denormalizeStudy(existingStudy))
+                    if(!StudyUtils.denormalizeStudy(existingStudy))
 					{
 						throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
 					}
-					
-					StudyUtil.mergeStudy(existingStudy, newStudy, excludedBids);
-					
-					// Get next version number
-					existingStudy.setVersion(StudyUtil.getNextVersion(existingStudy.getVersion()));
+
+                    StudyUtils.mergeStudy(existingStudy, newStudy, excludedBids);
+
+                    // Get next version number
+                    existingStudy.setVersion(StudyUtils.getNextVersion(existingStudy.getVersion()));
 		        }else{
 					/*
 					 * If no existing study, new study becomes the existing
@@ -213,14 +214,14 @@ public class StudyUpdateProcessor extends TimerTask {
 		        	existingStudy = newStudy;
 		        	
 		        	// Set to base level version
-		        	existingStudy.setVersion(StudyUtil.getBaseVersion());
+                    existingStudy.setVersion(StudyUtils.getBaseVersion());
 		        	existingStudy.setType(type);
 		        }
 		        
 		        //Rename all excluded binary files to have .exclude
-				StudyUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
-				
-				if(!StudyUtil.normalizeStudy(existingStudy))
+				StorageUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
+
+                if(!StudyUtils.normalizeStudy(existingStudy))
 				{
 					throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
 				}
@@ -229,11 +230,11 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * Need to copy into the Study folder the new study document and
 				 * binary data files.
 				 */
-				StudyUtil.writeStudy(existingStudy, typeFolder);
+				StorageUtil.writeStudy(existingStudy, typeFolder);
 				
-				StudyUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
+				StorageUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
 				
-				StudyUtil.deleteFolder(jobFolder);
+				StorageUtil.deleteFolder(jobFolder);
 				
 				/*
 				 * Update the Job DAO and Study DAO

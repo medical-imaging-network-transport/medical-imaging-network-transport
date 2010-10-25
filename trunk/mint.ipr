@@ -43,6 +43,25 @@
       <properties />
     </buildFile>
   </component>
+  <component name="ArtifactManager">
+    <artifact type="war" name="MINTServer:war">
+      <output-path>$PROJECT_DIR$/MINTServer/target</output-path>
+      <root id="archive" name="MINTServer.war-0.9.10.war">
+        <element id="artifact" artifact-name="MINTServer:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" name="MINTServer:war exploded">
+      <output-path>$PROJECT_DIR$/MINTServer/target/MINTServer.war-0.9.10</output-path>
+      <root id="root">
+        <element id="javaee-facet-resources" facet="MINTServer/web/Web" />
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="MINTServer" />
+          </element>
+        </element>
+      </root>
+    </artifact>
+  </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions>
@@ -70,6 +89,16 @@
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="web">
+        <modules>
+          <module name="MINTServer" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
+  <component name="IdProvider" IDEtalkID="F9D8179BDA4D0A5FF1B8798AB13FFBD1" />
   <component name="InspectionProjectProfileManager">
     <profiles>
       <profile version="1.0" is_locked="false">
@@ -317,6 +346,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
   </component>
+  <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="libraryTable">
     <library name="ant-lib">
       <CLASSES>

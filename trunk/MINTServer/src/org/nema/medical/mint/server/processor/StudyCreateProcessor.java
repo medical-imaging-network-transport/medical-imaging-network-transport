@@ -20,10 +20,11 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.common.StudyUtil;
+import org.nema.medical.mint.server.util.StorageUtil;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.server.domain.*;
+import org.nema.medical.mint.utils.StudyUtils;
 
 public class StudyCreateProcessor extends TimerTask {
 
@@ -85,25 +86,25 @@ public class StudyCreateProcessor extends TimerTask {
 			StudyMetadata study = StudyIO.loadStudy(jobFolder);
 			LOG.info("job " + jobID + " loaded");
 			
-			if(!StudyUtil.validateStudy(study, jobFolder))
+			if(!StorageUtil.validateStudy(study, jobFolder))
 			{
 				throw new RuntimeException("Validation of the new study failed");
 			}
 			LOG.info("job " + jobID + " validated");
 			
 			// Set to base level version
-	        study.setVersion(StudyUtil.getBaseVersion());
+            study.setVersion(StudyUtils.getBaseVersion());
 	        study.setType(type);
 			
 			//write study into type folder
-			StudyUtil.writeStudy(study, typeFolder);
+			StorageUtil.writeStudy(study, typeFolder);
 			LOG.info("study metadata for " + jobID + " written");
 	        
 	        //Write metadata to change log
-	        File changelogFolder = StudyUtil.getNextChangelogDir(changelogRoot);
+	        File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
 	        
 	        // TODO copy the previous file, unmarshalling again is too time consuming
-	        StudyUtil.writeStudy(study, changelogFolder);
+	        StorageUtil.writeStudy(study, changelogFolder);
 			LOG.info("study changelog for " + jobID + " written");
 
 	        //Copy binary data into binaryitems folder
@@ -111,11 +112,11 @@ public class StudyCreateProcessor extends TimerTask {
 			binaryRoot.mkdirs();
 
 			LOG.info("moving binary items for " + jobID + " ");
-			StudyUtil.moveBinaryItems(jobFolder, binaryRoot);
+			StorageUtil.moveBinaryItems(jobFolder, binaryRoot);
 			LOG.info("moving binary items for " + jobID + " complete");
 			
 			//delete job folder
-			StudyUtil.deleteFolder(jobFolder);
+			StorageUtil.deleteFolder(jobFolder);
 
 			//update database
 			MINTStudy studyData = new MINTStudy();
