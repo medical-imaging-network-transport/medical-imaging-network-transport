@@ -1,5 +1,5 @@
 <!DOCTYPE project>
-<project basedir="." default="doc" name="mint-metadata">
+<project basedir="." default="doc" name="mint">
 	<property file="build.properties" />
 	<property name="project.version" value="0.9.10" />
 
@@ -31,7 +31,7 @@
 		<exec executable="protoc" failonerror="true">
 			<arg value="--proto_path=config" />
 			<arg value="--java_out=src" />
-			<arg value="config/mint-metadata.proto" />
+			<arg value="config/mint.proto" />
 		</exec>
 	</target>
 
@@ -93,11 +93,11 @@
 		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
 			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
 			<classpath refid="build.classpath" />
-			<doctitle>MINTMetadata</doctitle>
+			<doctitle>MINTJavaSDK</doctitle>
 		</javadoc>
 		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
 		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-sources.jar" basedir="${basedir}/src" includes="**" />
-		<copy file="config/mint-metadata.pom" tofile="${build.dir}/mint-metadata-${project.version}.pom"/>
+		<copy file="config/mint.pom" tofile="${build.dir}/mint-${project.version}.pom"/>
 	</target>
 
 	<!-- task definitions -->

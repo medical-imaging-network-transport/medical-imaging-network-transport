@@ -10,7 +10,7 @@
 			<attribute name="owner.project.facets" value="jst.java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/MINTMetadata"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MINTJavaSDK"/>
 	<classpathentry kind="lib" path="ant-lib/servlet-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/h2-1.2.138.jar"/>

@@ -3,11 +3,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>nema-medical</groupId>
-  <artifactId>mint-metadata</artifactId>
+  <artifactId>mint</artifactId>
   <name>log4j</name>
   <version>0.9.10</version>
   <url>http://code.google.com/p/medical-imaging-network-transport/</url>
-  <description>Medical Imaging Network Transport metadata</description>
+  <description>Medical Imaging Network Transport Java SDK</description>
   <licenses>
    <license>
      <name>apache-2.0</name>
@@ -15,7 +15,7 @@
    </license>
   </licenses>    
   <scm>
-    <url>https://medical-imaging-network-transport.googlecode.com/svn/trunk/MINTMetadata</url>
+    <url>https://medical-imaging-network-transport.googlecode.com/svn/trunk/MINTJavaSDK</url>
   </scm>
   <dependencies>
 	<dependency>

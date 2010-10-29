@@ -1,8 +1,8 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="MINTServer">
-    <property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
-    <available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
-    <fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
+    <property name="javasdk.project.basedir" value="${basedir}/../MINTJavaSDK" />
+    <available file="${javasdk.project.basedir}" type="dir" property="javasdk.project.available" />
+    <fail message="Must have the MINTJavaSDK project in the same parent folder as this project" unless="javasdk.project.available" />
 
     <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
     <available file="${common.project.basedir}" type="dir" property="common.project.available" />
@@ -16,8 +16,8 @@
         <path id="build.classpath">
             <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
             <fileset dir="${basedir}/ant-lib" includes="*.jar" />
-            <fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
-            <fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
+            <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
             <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
             <fileset dir="${common.project.basedir}/build" includes="*.jar" />
         </path>
@@ -78,8 +78,8 @@
             <fileset dir="${basedir}/WebContent">
                 <exclude name="META-INF" />
             </fileset>
-            <lib dir="${metadata.project.basedir}/lib" includes="*.jar" />
-            <lib dir="${metadata.project.basedir}/build" includes="*.jar" />
+            <lib dir="${javasdk.project.basedir}/lib" includes="*.jar" />
+            <lib dir="${javasdk.project.basedir}/build" includes="*.jar" />
             <lib dir="${common.project.basedir}/lib" includes="*.jar" />
             <lib dir="${common.project.basedir}/build" includes="*.jar" />
             <metainf dir="WebContent/META-INF" />

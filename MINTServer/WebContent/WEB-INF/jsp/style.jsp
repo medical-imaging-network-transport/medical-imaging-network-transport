@@ -191,7 +191,7 @@
 	</ul>
 </xsl:template>
 
-<xsl:template match="mint:studyMeta">
+<xsl:template match="mint:study">
 	<h1>Study Metadata</h1>
 	<dl>
 		<dt>Study Instance UID</dt>
