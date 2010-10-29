@@ -91,5 +91,5 @@
 		<attribute name="exclude" type="string" use="optional"></attribute>
 	</complexType>
 
-	<element name="StudyMeta" type="tns:StudyMetaType"></element>
+	<element name="Study" type="tns:StudyMetaType"></element>
 </schema>

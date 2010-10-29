@@ -11,7 +11,7 @@
     <orderEntry type="library" name="ant-lib1" level="project" />
     <orderEntry type="library" name="lib1" level="project" />
     <orderEntry type="library" name="ant-lib" level="project" />
-    <orderEntry type="module" module-name="MINTMetadata" />
+    <orderEntry type="module" module-name="MINTJavaSDK" />
   </component>
 </module>
 

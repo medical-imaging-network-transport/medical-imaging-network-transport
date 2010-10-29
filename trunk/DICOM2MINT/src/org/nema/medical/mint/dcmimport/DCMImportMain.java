@@ -208,7 +208,7 @@ public class DCMImportMain {
     }
 
     private static void printUsage() {
-        System.err.println("Usage: DICOM2MINTImport once|daemon xml|gpb {DIRECTORY} {URL} [binThreshold] [nodelete] [forcecreate]");
+        System.err.println("Usage: DICOM2MINT once|daemon xml|gpb {DIRECTORY} {URL} [binThreshold] [nodelete] [forcecreate]");
         System.err.println("Converts any and all DICOM files in the specified directory into the MINT standard");
         System.err.println("format and sends Create Study messages for each study found in the directory");
         System.err.println("to the MINTServer defined by the input URL.");

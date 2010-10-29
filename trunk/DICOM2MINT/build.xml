@@ -1,8 +1,8 @@
 <!DOCTYPE project>
-<project basedir="." default="doc" name="DICOM2MINTImport">
-	<property name="metadata.project.basedir" value="${basedir}/../MINTMetadata" />
-	<available file="${metadata.project.basedir}" type="dir" property="metadata.project.available" />
-	<fail message="Must have the MINTMetadata project in the same parent folder as this project" unless="metadata.project.available" />
+<project basedir="." default="doc" name="DICOM2MINT">
+	<property name="javasdk.project.basedir" value="${basedir}/../MINTJavaSDK" />
+	<available file="${javasdk.project.basedir}" type="dir" property="javasdk.project.available" />
+	<fail message="Must have the MINTJavaSDK project in the same parent folder as this project" unless="javasdk.project.available" />
 
 	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
@@ -14,8 +14,8 @@
 		<ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
 		<path id="build.classpath">
-			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
+			<fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
+			<fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
 			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
 			<fileset dir="${common.project.basedir}/build" includes="*.jar" />
 		</path>
@@ -32,7 +32,7 @@
 			<fileset dir="${build.dir}/ant-classes" />
 			<fileset dir="${basedir}/src" excludes="**/*.java"/>
 			<fileset dir="${common.project.basedir}/build/ant-classes" />
-			<fileset dir="${metadata.project.basedir}/build/ant-classes" />
+			<fileset dir="${javasdk.project.basedir}/build/ant-classes" />
 			<zipfileset src="${common.project.basedir}/lib/apache-mime4j-0.6.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/commons-logging-1.1.1.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/httpclient-4.0.1.jar"/>
@@ -44,9 +44,9 @@
 			<zipfileset src="${common.project.basedir}/lib/log4j-1.2.16.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/dcm4che-core-2.0.23.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/commons-lang-2.5.jar"/>
-			<zipfileset src="${metadata.project.basedir}/lib/commons-codec-1.3.jar"/>
-			<zipfileset src="${metadata.project.basedir}/lib/jibx-run-1.2.2.jar"/>
-			<zipfileset src="${metadata.project.basedir}/lib/protobuf-java-2.3.0.jar"/>
+			<zipfileset src="${javasdk.project.basedir}/lib/commons-codec-1.3.jar"/>
+			<zipfileset src="${javasdk.project.basedir}/lib/jibx-run-1.2.2.jar"/>
+			<zipfileset src="${javasdk.project.basedir}/lib/protobuf-java-2.3.0.jar"/>
 
 			<manifest>
 				<attribute name="Main-Class" value="org.nema.medical.mint.dcmimport.DCMImportMain" />
@@ -59,7 +59,7 @@
 		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
 			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
 			<classpath refid="build.classpath" />
-			<doctitle>DICOM2MINTImport</doctitle>
+			<doctitle>DICOM2MINT</doctitle>
 		</javadoc>
 		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
 		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />

@@ -10,7 +10,7 @@
       <maximumStackSize value="2" />
       <properties />
     </buildFile>
-    <buildFile url="file://$PROJECT_DIR$/MINTMetadata/build.xml">
+    <buildFile url="file://$PROJECT_DIR$/MINTJavaSDK/build.xml">
       <additionalClassPath />
       <antReference projectDefault="true" />
       <customJdkName value="" />
@@ -18,7 +18,7 @@
       <maximumStackSize value="2" />
       <properties />
     </buildFile>
-    <buildFile url="file://$PROJECT_DIR$/DICOM2MINTImport/build.xml">
+    <buildFile url="file://$PROJECT_DIR$/DICOM2MINT/build.xml">
       <additionalClassPath />
       <antReference projectDefault="true" />
       <customJdkName value="" />
@@ -269,7 +269,7 @@
       <module fileurl="file://$PROJECT_DIR$/DICOMSend/DICOMSend.iml" filepath="$PROJECT_DIR$/DICOMSend/DICOMSend.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" filepath="$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTCommon/MINTCommon.iml" filepath="$PROJECT_DIR$/MINTCommon/MINTCommon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MINTMetadata/MINTMetadata.iml" filepath="$PROJECT_DIR$/MINTMetadata/MINTMetadata.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTServer/MINTServer.iml" filepath="$PROJECT_DIR$/MINTServer/MINTServer.iml" />
     </modules>
   </component>
@@ -302,7 +302,7 @@
             </option>
             <option name="runMavenInBackground" value="true" />
             <option name="skipTests" value="false" />
-            <option name="vmOptions" value="" />
+            <option name="vmOptions" value="-ea" />
           </MavenRunnerSettings>
         </option>
         <option name="myRunnerParameters">
@@ -320,7 +320,7 @@
         </option>
       </MavenSettings>
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="62141" />
+        <option name="DEBUG_PORT" value="15303" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>

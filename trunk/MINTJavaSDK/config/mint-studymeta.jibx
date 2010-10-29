@@ -21,7 +21,7 @@
     <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
     <value style="attribute" name="instanceCount" pre-get="computeInstanceCount" get-method="getInstanceCount" set-method="setInstanceCount"/>
   </mapping>
-  <mapping class="org.nema.medical.mint.metadata.StudyMetadata" name="studyMeta">
+  <mapping class="org.nema.medical.mint.metadata.StudyMetadata" name="study">
     <structure map-as="StudyMetaType"/>
   </mapping>
   <mapping abstract="true" type-name="AttrType" class="org.nema.medical.mint.metadata.Attribute">
