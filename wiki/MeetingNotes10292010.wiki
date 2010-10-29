@@ -1,0 +1,105 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Chris Hafey
+    * Working on a IOS MINT Viewer
+    * Working with Vital Legal to have it released on behalf of Chris Hafey instead of Vital to support the MINT Marketing activities
+  * Tim Dawson 
+    * Got feedback from vital marketing on the got mint campaign.  They suggested to take a picture of the IOS MINT Viewer to catch peoples eyes
+    * Will send out an updated poster once Vital Legal approves
+    * Worked on SDK last weekend and got code moved around, but still not done yet
+    * Ready to do the major package removing, going to move mint-common into dicom2mint importer.  
+    * Implementing MINT support in C# for our VIMS product
+    * VIMS team continues to document the MINT Spec
+    * VIMS team identified an issue that there is no MINT changelog support for deleting studies
+  * Gorkem
+    * Seeing slowness in the JHU DMZ server
+      * Going to test further
+      * Reconfigured JHU DMZ server to use IIS for faster performance
+      * Has another physical machine setup
+      * Going to move the current DMZ server's IP to the physical machine 
+      * May have found a bug in the java normalization code - still investigating
+    * Working on the C++ SDK Code
+      * Using Microsoft API to convert from mb to wide string
+      * DICOM to MINT conversion is functioning
+      * Working on the MINT to DICOM part
+      * Planning to add google protocol bufs
+  * Jim Philbin
+     * Working on the MINT meeting at RSNA
+     * Working on the agenda for the WG27 meeting at RSNA
+     * Need to figure out the story of how MINT fits in with IHE (XDS, MIMA)
+     * Wanted to make sure MINT search supported paitnetIssuer - it does!
+     * Wants to discuss how volumes are stored in MINT
+     * Wants to discuss how MINT would support storage commit type functionality
+  * Tim Culp
+     * Working with Gorkem to get the clear canvas plugin operational
+     * Able to get CC plugin working again
+     * Some posts on the list about issues with clear canvas plugin
+     * Going to upload some servers to JHU DMZ server
+     * Experiencing performance issues with JHU DMZ server, only 500K/Second
+     * Will be out next week for Astrom, no progress expected
+  * Dan Chafee
+     * Planned to work on data dictionary normalization, but put it on hold to help with clear canvas plugin
+     * Old XHTML study response used to have study uid, but it no longer does
+     * Had to make an extra request to server to get the study summary 
+       * Some discussion that this is the right thing to do - adding other fields to support workflow is a slipper slope.  MINT does not directly support workflow
+   * Jeremy
+     * Continuing to work on java build tools
+     * Refactored out building the unit tests
+     * This week will continue working on the packaging step and documentation jars
+   * Jaron
+     * Will do some internal investigation about XDS, etc
+ 
+= Notes =
+
+= Decisions =
+  * Change the "studymeta" element in the study metadata to "study" 
+
+= New Actions =
+  * Modify DICOM2MINT to validate transfer syntaxes are correct, abort if they are not and log (Tim Culp)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+  * Change "studymeta" element in the study metadata to "study" (Tim Dawson)
+  * Send out a proposal to handle study deletion with MINT (Tim Dawson)
+
+= Old Actions =
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+
+
+= Completed Actions = 
+  * Post on comp.protocols.dicom to see if anyone has seen private tags following pixel data (chris)
+  * Convert XHTML to XML and define XSDs (Tim Dawson + Jeremey + Rex)
+  * Update study queries (Tim Dawson)
+    * Add support for studyDateTimeFrom + studyDateTimeTo
+    * Various date/time logic (see ppt)
+    * Search results to just include
+      * Study UUID
+      * dateTime of last change
+    * Blocked on data model change
+  * Drive "GOT MINT?" marketing message/poster for RSNA (Wayne Dejanette)
+  * Iteration 3 rev2 (sequencing data elements, bulk loading, inline binary encoding) Conformance Test (Tim Culp) - See wiki page for outstanding tasks
+
+= Issues =
+
+= Future =
