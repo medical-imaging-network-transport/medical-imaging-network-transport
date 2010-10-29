@@ -6,12 +6,76 @@ Include like this, out side of any targets:
 
 See http://ant.apache.org/manual/Tasks/import.html for details.
 -->
-<project>
+<project name="build-common">
     <!-- Common directory layout.  You can override these by 
          setting the properties *before* importing this file. -->
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="test.src.dir" value="${basedir}/test" />
+    <available file="${test.src.dir}" type="dir" property="tests.exist" />
+    <!-- override to skip running unit tests -->
+    <property name="skip.tests" value="false" />
+    <property name="lib.dir" value="${basedir}/lib" />
     <property name="build.dir" value="${basedir}/build" />
+    <property name="build.classes.dir" value="${build.dir}/classes" />
+    <property name="build.test.classes.dir" value="${build.dir}/test-classes" />
+    <property name="build.test.reports.dir" value="${build.dir}/test-reports" />
+
+    <!-- Other common properties that may be overridden -->
+    <property name="compile.debug" value="true" />
+    <property name="test.haltonfailure" value="true" />
+
+    <!-- Default compile classpath includes jars in lib dir if they exist -->
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar" erroronmissingdir="false" />
+    </path>
+
+    <!-- Default test compile classpath includes this project's compiled classes,
+         this projects compile classpath and junit -->
+    <path id="test.compile.classpath">
+        <path refid="compile.classpath" />
+        <pathelement location="${build.classes.dir}" />
+        <pathelement location="${basedir}/ant-lib/junit-4.8.1.jar" />
+    </path>
 
     <target name="clean" description="Delete the build directory">
         <delete dir="${build.dir}" />
+    </target>
+
+    <target name="compile" depends="clean" description="Compile java sources">
+        <mkdir dir="${build.classes.dir}" />
+        <javac srcdir="${src.dir}"
+               destdir="${build.classes.dir}"
+               debug="${compile.debug}"
+               includeantruntime="false">
+            <classpath refid="compile.classpath" />
+        </javac>
+    </target>
+
+    <target name="test-compile" depends="compile" description="Compile unit tests" if="tests.exist" unless="${skip.tests}">
+        <mkdir dir="${build.test.classes.dir}" />
+        <javac srcdir="${test.src.dir}"
+               destdir="${build.test.classes.dir}"
+               debug="true"
+               includeantruntime="no">
+            <classpath refid="test.compile.classpath" />
+        </javac>
+    </target>
+
+    <target name="test" depends="test-compile" description="Run unit tests" if="tests.exist" unless="${skip.tests}">
+        <mkdir dir="${build.test.reports.dir}" />
+        <junit printsummary="yes" haltonfailure="${test.haltonfailure}">
+            <classpath>
+                <path refid="test.compile.classpath" />
+                <pathelement location="${build.test.classes.dir}" />
+            </classpath>
+
+            <formatter type="plain" />
+
+            <batchtest fork="no" todir="${build.test.reports.dir}">
+                <fileset dir="${build.test.classes.dir}">
+                    <include name="**/*Test.class" />
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 </project>
