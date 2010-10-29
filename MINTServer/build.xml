@@ -10,29 +10,73 @@
 
     <import file="../build-common.xml" />
 
-    <path id="compile.classpath">
-        <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
-        <fileset dir="${basedir}/ant-lib" includes="*.jar" />
-        <fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
-        <fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
-    </path>
-
-    <target name="compile">
+    <target name="build" description="Compile the Java files">
         <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
-    
-        <antcall target="build-common.compile" />
+
+        <path id="build.classpath">
+            <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" id="lib.files" />
+            <fileset dir="${basedir}/ant-lib" includes="*.jar" />
+            <fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
+            <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+        </path>
+        <property name="build.classpath" refid="build.classpath" />
+
+        <mkdir dir="${build.dir}/ant-classes" />
+        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
+            <compilerarg value="-Xlint:-path" />
+        </javac>
+        <copy todir="${build.dir}/ant-classes">
+            <fileset dir="${basedir}/src">
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+
+        <mkdir dir="${build.dir}/ant-test-classes" />
+        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
+            <classpath>
+                <pathelement path="${build.dir}/ant-test-classes" />
+                <pathelement path="${build.dir}/ant-classes" />
+                <pathelement location="ant-lib/junit-4.8.1.jar" />
+            </classpath>
+            <compilerarg value="-Xlint:-path" />
+        </javac>
     </target>
 
-    <target name="war" depends="compile" description="Make WARs for deployment">
+    <target name="test" depends="build" description="run unit tests">
+        <mkdir dir="${build.dir}/test-reports" />
+        <junit printsummary="on" haltonfailure="no">
+            <classpath>
+                <fileset dir="${basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+                <pathelement path="${build.dir}/ant-classes" />
+                <pathelement path="${build.dir}/ant-test-classes" />
+                <path refid="build.classpath" />
+            </classpath>
+
+            <formatter type="plain" />
+            <formatter type="xml" />
+
+            <batchtest fork="no" todir="${build.dir}/test-reports">
+                <fileset dir="${build.dir}/ant-test-classes">
+                    <include name="**/*Test.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${build.dir}/test-reports">
+            <fileset dir="${build.dir}/test-reports">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${build.dir}/test-reports/html" />
+        </junitreport>
+    </target>
+
+    <target name="war" depends="build" description="Make WARs for deployment">
         <war destfile="${build.dir}/${ant.project.name}.war" webxml="WebContent/WEB-INF/web.xml">
-            <classes dir="${build.classes.dir}" />
+            <classes dir="${build.dir}/ant-classes" />
             <fileset dir="${basedir}/WebContent">
                 <exclude name="META-INF" />
-            </fileset>
-            <fileset dir="${src.dir}">
-                <exclude name="**/*.java" />
             </fileset>
             <lib dir="${metadata.project.basedir}/lib" includes="*.jar" />
             <lib dir="${metadata.project.basedir}/build" includes="*.jar" />
@@ -48,12 +92,12 @@
 
     <target name="doc" depends="war" description="Make JavaDoc archives">
         <mkdir dir="${build.dir}/doc" />
-        <javadoc sourcepath="${src.dir}" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+        <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
             <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-            <classpath refid="compile.classpath" />
+            <classpath refid="build.classpath" />
             <doctitle>MINTServer</doctitle>
         </javadoc>
         <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
-        <jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${src.dir}" includes="**" />
+        <jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
     </target>
 </project>
