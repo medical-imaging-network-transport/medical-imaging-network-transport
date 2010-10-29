@@ -6,23 +6,21 @@
 
     <import file="../build-common.xml" />
 
-    <target name="build" description="Compile the Java files">
+    <path id="compile.classpath">
+        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+    </path>
+
+    <target name="compile">
         <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
-        <path id="build.classpath">
-            <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-            <fileset dir="${common.project.basedir}/build" includes="*.jar" />
-        </path>
-        <property name="build.classpath" refid="build.classpath" />
-        <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="yes" includeantruntime="no">
-        </javac>
-        <copy file="${basedir}/src/log4j.properties" todir="${build.dir}/ant-classes"/>
+        <antcall target="build-common.compile" />
     </target>
 
-    <target name="jar" depends="build" description="Make JAR of compiled classes">
+    <target name="jar" depends="compile" description="Make JAR of compiled classes">
+        <copy file="${src.dir}/log4j.properties" todir="${build.classes.dir}"/>
         <jar destfile="${build.dir}/${ant.project.name}.jar">
-            <fileset dir="${build.dir}/ant-classes" />
+            <fileset dir="${build.classes.dir}" />
         </jar>
     </target>
 
@@ -30,7 +28,7 @@
         <mkdir dir="${build.dir}/doc" />
         <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
             <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-            <classpath refid="build.classpath" />
+            <classpath refid="compile.classpath" />
             <doctitle>DICOMSend</doctitle>
         </javadoc>
         <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />

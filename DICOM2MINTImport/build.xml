@@ -10,29 +10,25 @@
 
     <import file="../build-common.xml" />
 
-	<target name="build" description="Compile the Java files">
-		<ant dir="${common.project.basedir}" target="jar" inheritall="false" />
+    <path id="compile.classpath">
+        <fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
+        <fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+    </path>
 
-		<path id="build.classpath">
-			<fileset dir="${metadata.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${metadata.project.basedir}/build" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-			<fileset dir="${common.project.basedir}/build" includes="*.jar" />
-		</path>
-		<property name="build.classpath" refid="build.classpath" />
+    <target name="compile">
+        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
 
-        <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
-            <compilerarg value="-Xlint:-path" />
-        </javac>
+        <antcall target="build-common.compile" />
     </target>
 
-	<target name="jar" depends="build" description="Make JAR of compiled classes">
+	<target name="jar" depends="compile" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}.jar">
-			<fileset dir="${build.dir}/ant-classes" />
-			<fileset dir="${basedir}/src" excludes="**/*.java"/>
-			<fileset dir="${common.project.basedir}/build/ant-classes" />
-			<fileset dir="${metadata.project.basedir}/build/ant-classes" />
+			<fileset dir="${build.classes.dir}" />
+			<fileset dir="${src.dir}" excludes="**/*.java"/>
+			<fileset dir="${common.project.basedir}/build/classes" />
+			<fileset dir="${metadata.project.basedir}/build/classes" />
 			<zipfileset src="${common.project.basedir}/lib/apache-mime4j-0.6.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/commons-logging-1.1.1.jar"/>
 			<zipfileset src="${common.project.basedir}/lib/httpclient-4.0.1.jar"/>
@@ -58,10 +54,10 @@
 		<mkdir dir="${build.dir}/doc" />
 		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
 			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-			<classpath refid="build.classpath" />
+			<classpath refid="compile.classpath" />
 			<doctitle>DICOM2MINTImport</doctitle>
 		</javadoc>
 		<jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
-		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${src.dir}" includes="**" />
 	</target>
 </project>
