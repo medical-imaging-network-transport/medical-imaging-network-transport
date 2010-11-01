@@ -5,29 +5,7 @@
 
     <import file="../build-common.xml" />
 
-	<target name="build" depends="clean" description="Compile the Java files">
-		<path id="build.classpath">
-			<fileset dir="${basedir}/lib" includes="*.jar" />
-		</path>
-		<property name="build.classpath" refid="build.classpath" />
-
-		<mkdir dir="${build.dir}/ant-classes" />
-		<javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" listfiles="false" debug="true" classpathref="build.classpath" includeantruntime="no">
-			<compilerarg value="-Xlint:-path" />
-		</javac>
-
-		<mkdir dir="${build.dir}/ant-test-classes" />
-		<javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" debug="true" classpathref="build.classpath" includeantruntime="no">
-			<classpath>
-				<pathelement path="${build.dir}/ant-test-classes" />
-				<pathelement path="${build.dir}/ant-classes" />
-				<pathelement location="ant-lib/junit-4.8.1.jar" />
-			</classpath>
-			<compilerarg value="-Xlint:-path" />
-		</javac>
-	</target>
-
-	<target name="protoc" depends="build" description="generates protobuf class">
+	<target name="protoc" depends="compile" description="generates protobuf class">
 		<exec executable="protoc" failonerror="true">
 			<arg value="--proto_path=config" />
 			<arg value="--java_out=src" />
@@ -35,54 +13,25 @@
 		</exec>
 	</target>
 
-	<target name="test" depends="jibx">
-		<mkdir dir="${build.dir}/test-reports" />
-		<junit printsummary="yes" haltonfailure="yes">
-			<classpath>
-				<fileset dir="${basedir}/lib" includes="*.jar" />
-				<pathelement path="${build.dir}/ant-classes" />
-				<pathelement path="${build.dir}/ant-test-classes" />
-				<pathelement location="ant-lib/junit-4.8.1.jar" />
-			</classpath>
+    <!-- Override common to add jibx-generation -->
+    <target name="compile">
+        <antcall target="build-common.compile" />
 
-			<formatter type="plain" />
-
-			<batchtest fork="no" todir="${build.dir}/test-reports">
-				<fileset dir="${build.dir}/ant-test-classes">
-					<include name="**/*Test.class" />
-				</fileset>
-			</batchtest>
-		</junit>
-	</target>
-
-	<target name="jibx" depends="build">
-		<mkdir dir="${build.dir}/classes" />
-		<delete>
-			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
-		</delete>
-		<jibx-bind verbose="true" load="true">
+		<jibx-bind load="true">
 			<bindingfileset dir="${basedir}/config" casesensitive="yes">
 			  <include name="**/*.jibx"/>
 			</bindingfileset>
 			<classpath>
-				<pathelement path="${build.dir}/ant-classes" />
+				<pathelement path="${build.classes.dir}" />
 				<pathelement location="lib/jibx-run.jar" />
 			</classpath>
-		</jibx-bind>
-		<!-- <jibx-bind verbose="true" load="true" binding="${basedir}/config/mint-changelog.jibx"> -->
-		<delete>
-			<fileset dir="${build.dir}/classes" includes="**/JiBX_*.class" />
-		</delete>
-		<copy todir="${build.dir}/classes" overwrite="true">
-			<fileset dir="${build.dir}/ant-classes" includes="**/JiBX_*.class" />
-			<fileset dir="${build.dir}/ant-classes" includes="org/nema/medical/mint/**/*.class" />
-		</copy>
-	</target>
+        </jibx-bind>
+    </target>
 
-	<target name="jar" depends="build,jibx" description="Make JAR of compiled classes">
+	<target name="jar" depends="compile" description="Make JAR of compiled classes">
 		<jar destfile="${build.dir}/${ant.project.name}-${project.version}.jar">
-			<fileset dir="${build.dir}/ant-classes" />
-			<fileset dir="${basedir}/src">
+			<fileset dir="${build.classes.dir}" />
+			<fileset dir="${src.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
 		</jar>
@@ -90,21 +39,21 @@
 
 	<target name="doc" depends="jar" description="Make JavaDoc archives">
 		<mkdir dir="${build.dir}/doc" />
-		<javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+		<javadoc sourcepath="${src.dir}" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
 			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-			<classpath refid="build.classpath" />
+			<classpath refid="compile.classpath" />
 			<doctitle>MINTJavaSDK</doctitle>
 		</javadoc>
 		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
-		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-sources.jar" basedir="${basedir}/src" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-sources.jar" basedir="${src.dir}" includes="**" />
 		<copy file="config/mint.pom" tofile="${build.dir}/mint-${project.version}.pom"/>
 	</target>
 
 	<!-- task definitions -->
 	<taskdef name="jibx-bind" classname="org.jibx.binding.ant.CompileTask">
 		<classpath>
-			<fileset dir="lib" includes="*.jar" />
-			<fileset dir="ant-lib" includes="*.jar" />
+            <fileset dir="lib" includes="*.jar" />
+            <fileset dir="ant-lib" includes="*.jar" />
 		</classpath>
 	</taskdef>
 </project>
