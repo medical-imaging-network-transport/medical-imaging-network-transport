@@ -8,57 +8,23 @@
 
     <import file="../build-common.xml" />
 
-    <target name="build" description="Compile the Java files">
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar" />
+        <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
+        <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
+    </path>
+
+    <!-- Override to first build sdk project -->
+    <target name="compile">
         <ant dir="${javasdk.project.basedir}" target="jar" inheritall="false" />
 
-        <path id="build.classpath">
-            <fileset dir="${basedir}/lib" includes="*.jar" />
-            <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
-            <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
-        </path>
-        <property name="build.classpath" refid="build.classpath" />
-
-        <mkdir dir="${build.dir}/ant-classes" />
-        <javac srcdir="${basedir}/src" destdir="${build.dir}/ant-classes" debug="true" listfiles="false" classpathref="build.classpath" includeantruntime="no">
-            <compilerarg value="-Xlint:-path" />
-        </javac>
-
-        <mkdir dir="${build.dir}/ant-test-classes" />
-        <javac srcdir="${basedir}/test" destdir="${build.dir}/ant-test-classes" listfiles="false" classpathref="build.classpath" debug="true" includeantruntime="no">
-            <classpath>
-                <pathelement path="${build.dir}/ant-test-classes" />
-                <pathelement path="${build.dir}/ant-classes" />
-                <pathelement location="ant-lib/junit-4.8.1.jar" />
-            </classpath>
-            <compilerarg value="-Xlint:-path" />
-        </javac>
+        <antcall target="build-common.compile" />
     </target>
 
-    <target name="test" depends="build">
-    	<mkdir dir="${build.dir}/test-reports" />
-        <junit printsummary="yes" haltonfailure="yes">
-            <classpath>
-                <fileset dir="${basedir}/lib" includes="*.jar" />
-                <pathelement path="${build.dir}/ant-classes" />
-                <pathelement path="${build.dir}/ant-test-classes" />
-                <pathelement location="ant-lib/junit-4.8.1.jar" />
-            	<path refid="build.classpath" />
-            </classpath>
-
-            <formatter type="plain" />
-
-            <batchtest fork="no" todir="${build.dir}/test-reports">
-                <fileset dir="${build.dir}/ant-test-classes">
-                    <include name="**/*Test.class" />
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
-    <target name="jar" depends="build" description="Make JAR of compiled classes">
+    <target name="jar" depends="compile" description="Make JAR of compiled classes">
         <jar destfile="${build.dir}/${ant.project.name}.jar">
-            <fileset dir="${build.dir}/ant-classes" />
-            <fileset dir="${basedir}/src">
+            <fileset dir="${build.classes.dir}" />
+            <fileset dir="${src.dir}">
                 <exclude name="**/*.java" />
             </fileset>
         </jar>
@@ -68,7 +34,7 @@
         <mkdir dir="${build.dir}/doc" />
         <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
             <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
-            <classpath refid="build.classpath" />
+            <classpath refid="compile.classpath" />
             <doctitle>MINTCommon</doctitle>
         </javadoc>
         <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
