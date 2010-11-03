@@ -175,7 +175,7 @@
 	<h1>MINT Study</h1>
 	<dl>
 		<dt>MINT Study UUID</dt>
-		<dd class='StudyUUID'><a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="./@studyUUID"/></xsl:attribute><xsl:value-of select="./@studyUUID"/></a></dd>
+		<dd class='StudyUUID'><xsl:value-of select="./@studyUUID"/></dd>
 		<dt>Last Modified</dt>
 		<dd class='LastModified'><xsl:value-of select="./@lastUpdate"/></dd>
 		<dt>Study Version</dt>
@@ -217,6 +217,7 @@
 					<th>Bid</th>
 					<th>Frame count</th>
 					<th>Bytes</th>
+					<th>bsize</th>
 				</tr>
 				<xsl:apply-templates/>
 			</table>
@@ -244,6 +245,7 @@
 								<th>Bid</th>
 								<th>Frame count</th>
 								<th>Bytes</th>
+								<th>bsize</th>
 							</tr>
 							<xsl:apply-templates/>
 						</table>
@@ -261,10 +263,39 @@
 								<th>Bid</th>
 								<th>Frame count</th>
 								<th>Bytes</th>
+								<th>bsize</th>
 							</tr>
 							<xsl:apply-templates/>
 						</table>
 					</dd>
+				</xsl:for-each>
+				<xsl:for-each select="mint:instances">
+				    <dt>Instances</dt>
+                    <ol>
+                        <xsl:for-each select="mint:instance">
+                            <li>
+                                <dt>SOP Instance UID</dt>
+                                <dd class='sopInstanceUID'><xsl:value-of select="./@sopInstanceUID"/></dd>
+                                <dt>Transfer Syntax UID</dt>
+                                <dd class='transferSyntaxUID'><xsl:value-of select="./@transferSyntaxUID"/></dd>
+                                <dt>Attributes</dt>
+                                <dd>
+                                    <table border="1" cellpadding="2" cellspacing="0">
+                                        <tr>
+                                            <th>Attribute Tag</th>
+                                            <th>VR</th>
+                                            <th>Value</th>
+                                            <th>Bid</th>
+                                            <th>Frame count</th>
+                                            <th>Bytes</th>
+                                            <th>bsize</th>
+                                        </tr>
+                                        <xsl:apply-templates/>
+                                    </table>
+                                </dd>
+                            </li>
+                        </xsl:for-each>
+                    </ol>
 				</xsl:for-each>
 			</dl>
 		</li>
@@ -296,6 +327,11 @@
 		<td class='Bytes'>
 			<xsl:if test="./@bytes">
 				<xsl:value-of select="./@bytes"/>
+			</xsl:if>
+		</td>
+		<td class='bsize'>
+			<xsl:if test="./@bsize">
+				<xsl:value-of select="./@bsize"/>
 			</xsl:if>
 		</td>
 	</tr>
