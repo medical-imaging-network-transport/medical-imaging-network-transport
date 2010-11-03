@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -67,6 +66,11 @@ import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
+import org.nema.medical.mint.datadictionary.AttributeType;
+import org.nema.medical.mint.datadictionary.MetadataType;
+import org.nema.medical.mint.datadictionary.SeriesAttributesType;
+import org.nema.medical.mint.datadictionary.StudyAttributesType;
+import org.nema.medical.mint.datadictionary.DataDictionaryIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.utils.Iter;
@@ -80,11 +84,38 @@ import org.xml.sax.SAXException;
  * @author Uli Bubenheimer
  */
 public final class ProcessImportDir {
-    private static final Logger LOG = Logger.getLogger(ProcessImportDir.class);
-
+    private static final Logger LOG = Logger.getLogger(ProcessImportDir.class);   
+    
+    private final Map<String, JobInfo> jobIDInfo =
+        Collections.synchronizedMap(new HashMap<String, JobInfo>());
+    private final boolean deletePhysicalInstanceFiles;
+    private final boolean forceCreate;
+    private final int binaryInlineThreshold;
+    
+    private final MetadataType metadataType; 
+    private final Set<Integer> STUDY_LEVEL_TAGS;
+    private final Set<Integer> SERIES_LEVEL_TAGS;
+    private static final XPath xPath = XPathFactory.newInstance().newXPath();
+    private static final DocumentBuilder documentBuilder;
+    static {
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setCoalescing(true);
+        documentBuilderFactory.setNamespaceAware(false);
+        documentBuilderFactory.setValidating(false);
+        try {
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (final ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    
+    
+    
     public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB,
             final boolean deletePhysicalInstanceFiles, final boolean forceCreate,
-            final int binaryInlineThreshold) {
+            final int binaryInlineThreshold) throws IOException {
         this.importDir = importDir;
         this.createURI = URI.create(serverURI + "/jobs/createstudy");
         this.queryURI = URI.create(serverURI + "/studies");
@@ -94,6 +125,9 @@ public final class ProcessImportDir {
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
         this.forceCreate = forceCreate;
         this.binaryInlineThreshold = binaryInlineThreshold;
+        this.metadataType = DataDictionaryIO.parseFromXML(ProcessImportDir.class.getClassLoader().getResourceAsStream("DICOM.xml"));
+        this.STUDY_LEVEL_TAGS = getStudyTags(metadataType);
+        this.SERIES_LEVEL_TAGS = getSeriesTags(metadataType);   	
     }
 
     public void processDir() {
@@ -479,29 +513,34 @@ public final class ProcessImportDir {
                     + " is not a normal file and not a directory");
         }
     }
-
-    private static Set<Integer> getTags(final String resource) {
-        final ClassLoader loader = ProcessImportDir.class.getClassLoader();
-        final Properties properties = new Properties();
-        try {
-            InputStream stream = loader.getResourceAsStream(resource);
-            try {
-                properties.load(stream);
-            } finally {
-                stream.close();
-            }
-        } catch(final IOException e) {
-            LOG.error("Unable to read tags file", e);
-        }
-        final Set<Integer> tagSet = new HashSet<Integer>();
-        for (final Object tagStr: properties.keySet()) {
-            //Go to long as int is unsigned and insufficient here
-            final int intTag = (int)Long.parseLong(tagStr.toString(), 16);
-            tagSet.add(intTag);
-        }
-        return tagSet;
+    private static Set<Integer> getSeriesTags(MetadataType mt)
+    {    	
+    	final Set<Integer> tagSet = new HashSet<Integer>();
+    	 	
+		SeriesAttributesType seriesAttsParent = mt.getSeriesAttributes();
+		List<AttributeType> seriesAtts = seriesAttsParent.getAttributes();
+		for(int x = 0; x < seriesAtts.size(); x++)
+		{
+			AttributeType att = seriesAtts.get(x);
+			final int intTag = (int)Long.parseLong(att.getTag(), 16);
+            tagSet.add(intTag);	
+		}     	
+    	return tagSet;
+    }   
+    private static Set<Integer> getStudyTags(MetadataType mt)
+    {
+    	final Set<Integer> tagSet = new HashSet<Integer>();
+    	
+		StudyAttributesType studyAttsParent = mt.getStudyAttributes();
+		List<AttributeType> studyAtts = studyAttsParent.getAttributes();
+		for(int x = 0; x < studyAtts.size(); x++)
+		{
+			AttributeType att = studyAtts.get(x);
+			final int intTag = (int)Long.parseLong(att.getTag(), 16);
+            tagSet.add(intTag);	
+		}   		
+    	return tagSet;
     }
-
     private static class MetaBinaryFiles {
         public String studyInstanceUID;
         public String patientID;
@@ -550,28 +589,5 @@ public final class ProcessImportDir {
     private static final class StudyQueryInfo {
         public String studyUUID;
         public String studyVersion;
-    }
-
-    private final Map<String, JobInfo> jobIDInfo =
-        Collections.synchronizedMap(new HashMap<String, JobInfo>());
-    private final boolean deletePhysicalInstanceFiles;
-    private final boolean forceCreate;
-    private final int binaryInlineThreshold;
-
-    private static final Set<Integer> STUDY_LEVEL_TAGS = getTags("StudyTags.txt");
-    private static final Set<Integer> SERIES_LEVEL_TAGS = getTags("SeriesTags.txt");
-    private static final XPath xPath = XPathFactory.newInstance().newXPath();
-    private static final DocumentBuilder documentBuilder;
-    static {
-        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setCoalescing(true);
-        documentBuilderFactory.setNamespaceAware(false);
-        documentBuilderFactory.setValidating(false);
-        try {
-            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (final ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

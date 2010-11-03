@@ -17,6 +17,7 @@
 package org.nema.medical.mint.dcmimport;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,7 +35,7 @@ import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 public class DCMImportMain {
 
     private static final int DEFAULT_BINARY_INLINE_THRESHOLD = 256;
-
+    private static ProcessImportDir importProcessor; 
     public static void main(final String[] args) {
         //Validate inputs before doing any processing
         //Make sure we have arguments and someone isn't looking for usage
@@ -143,11 +144,19 @@ public class DCMImportMain {
             System.err.println("Invalid server URL \"" + serverURL + "\": " + e.toString());
             return;
         }
-
+        
+        
         //Finished validating inputs, call the actual processing code
         //Create an instance of the Directory Processing Class
-        final ProcessImportDir importProcessor = new ProcessImportDir(inputDir, serverURI, useXMLNotGPB, deletePhysicalFiles, forceCreate, binaryInlineThreshold);
-
+        try
+        {
+        	importProcessor = new ProcessImportDir(inputDir, serverURI, useXMLNotGPB, deletePhysicalFiles, forceCreate, binaryInlineThreshold);
+        }
+        catch(IOException e)
+        {
+        	System.err.println("Error reading from or writing to the processing directory " + inputDir + ". " + e.toString());
+            return;
+        }
         if (runOnceOnly) {
             try {
                 //Run the importing process against the specified directory
