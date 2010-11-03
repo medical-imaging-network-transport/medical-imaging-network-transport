@@ -102,6 +102,8 @@ public class ReceiverDaemon {
         if (!enableProcessor) {
             return;
         }
+        try
+        {
         dcm2MintExecutor = Executors.newScheduledThreadPool(2);
         //Create an instance of the Directory Processing Class
         final ProcessImportDir importProcessor = new ProcessImportDir(
@@ -131,6 +133,12 @@ public class ReceiverDaemon {
             }
         };
         dcm2MintExecutor.scheduleWithFixedDelay(dirTraverseTask, 0, 3, TimeUnit.SECONDS);
+        }
+        catch(IOException e)
+        {
+        	LOG.error("Error reading or writing to DICOM processing directory." + e.getMessage());
+        	throw new RuntimeException(e);
+        }
     }
 
     @PreDestroy
