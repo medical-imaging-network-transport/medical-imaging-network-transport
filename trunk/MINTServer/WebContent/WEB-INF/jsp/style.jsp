@@ -6,6 +6,13 @@
 
 <xsl:template match="/">
 	<html>
+	    <head>
+	        <script type="text/JavaScript">
+	                function timedRefresh (timeoutPeriod) {
+	                    setTimeout("location.reload(true);", timeoutPeriod);
+                    }
+	        </script>
+	    </head>
 		<body>
 			<xsl:apply-templates/>
 		</body>
@@ -156,6 +163,9 @@
 </xsl:template>
 
 <xsl:template match="mint:jobStatus">
+    <script type = "text/javascript">
+        timedRefresh(5000);    
+    </script>
 	<h1>Job Information</h1>
 	<dl>
 		<dt>JobID</dt>
