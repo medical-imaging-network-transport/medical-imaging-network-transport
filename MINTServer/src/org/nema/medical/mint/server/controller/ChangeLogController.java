@@ -62,17 +62,17 @@ public class ChangeLogController {
 	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) String since,
-            @RequestParam(value = "limit", required = false) Integer pageSize,
-            @RequestParam(value = "offset", required = false) Integer pageNum,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset,
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException, JiBXException {
 
 		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
 
-		// TODO read pageSize from a config file
-        if (pageSize == null) pageSize = 50;
-        if (pageNum == null) pageNum = 1;
-        int firstIndex = (pageNum-1)*pageSize;
+		// TODO read limit from a config file
+        if (limit == null) limit = 50;
+        if (offset == null) offset = 0;
+        int firstIndex = offset*limit;
         
         final List<Change> changesFound;
         
@@ -89,9 +89,9 @@ public class ChangeLogController {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
 				return;
 			}
-			changesFound = changeDAO.findChanges(date, firstIndex, pageSize);
+			changesFound = changeDAO.findChanges(date, firstIndex, limit);
 		} else {
-			changesFound = changeDAO.findChanges(firstIndex, pageSize);
+			changesFound = changeDAO.findChanges(firstIndex, limit);
 		}
 		
 		if (changesFound != null) {
