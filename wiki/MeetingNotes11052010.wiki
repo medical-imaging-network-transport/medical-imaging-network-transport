@@ -1,0 +1,109 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Still working on MINT to DICOM in C++
+  * Jim Philbin
+    * Waiting to here back from Howard about format for WG27 meeting
+  * Tim Dawson
+    * Not much activity this week
+    * No changelog event for study deletion
+  * Chris Hafey
+    * Vital is not able to allow MINT IOS Viewer to be released
+    * Sent email to Howard Clark about when MINT would be presented to DICOM Standard committee
+    * presented MINT to Vital Sales team this week and they were very excited about it
+  * Dan Chafee
+    * Modified DICOM to MINT importer to use data dictionary
+    * Still more work to do on server side for validation
+    * Started working on transfer syntax validation for DICOM Importer
+  * Tim Culp
+    * No updates this week
+    * Plan to check in clear canvas updates that were made last week
+    * After that will work on multi-frame and integration tests
+  * Jeremy
+    * Broke stuff while making changes to directory structure
+    * Working on integration testing - maybe using Jetty
+
+= Notes =
+  * Notification of changelog on study delete
+    * Two approaches
+      * Don't change XML
+        * Kind of hacky 
+        * set version to "-1"
+      * Add status to XML
+        * Online/Offline/Deleted
+     * Another approach
+       * Add a special "Deleted" attribute to the XML just for the deleted use case
+  * Import/Export utility - how to store the C++ and Java versions in source control
+    * Do we need both C++ and Java code in our reference implementation?
+      * Jim suggests making RI just java and move other languages to separate projects
+      * Tim Culp / Tim Dawson agreed
+    * Where do we put the C++ code?
+      * See decision below
+  * Locking down version 1.0
+    * When can we do a functionality lockdown?
+      * Tim Culp - Yes by next week
+      * Dan Chafee - Will try to commit one of the two by end of next week
+    * Asses where we are at next weeks meeting
+
+= Decisions =
+  * Move deletion handling to version 1.1 / backlog
+  * Proposed Directory Structure:
+    * ReferenceImpl
+      * SDK
+      * MINTServer
+      * DICOMImport
+      * DICOMExport
+    * Conformance
+    * OtherImpls
+      * CPP
+        * SDK
+        * DICOMImport
+        * DICOMExport
+    * Viewers
+        * ClearCanvas
+
+
+= New Actions =
+  * Provide feedback on directory structure (all)
+  * Propose agenda for RSNA meeting (Jim + Chris)
+  * Schedule a meeting to discuss data dict normalization with Uli + Dan (Chris Hafey)
+
+= Old Actions =
+  * Modify DICOM2MINT to validate transfer syntaxes are correct, abort if they are not and log (Dan Chafee)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+
+
+= Completed Actions = 
+  * Change "studymeta" element in the study metadata to "study" (Tim Dawson)
+
+= Backlog Items = 
+  * Send out a proposal to handle study deletion with MINT (Tim Dawson)
+
+
+= Issues =
+
+= Future =
