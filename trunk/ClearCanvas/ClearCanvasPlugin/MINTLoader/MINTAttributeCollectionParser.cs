@@ -65,7 +65,7 @@ namespace MINTLoader
                 {
                     continue;
                 }
-                if (!attrElem.Name.Equals("Attr"))
+                if (!attrElem.Name.Equals("attr"))
                 {
                     continue;
                 }
@@ -80,7 +80,7 @@ namespace MINTLoader
                         var itemElem = itemNode as XmlElement;
                         if (itemElem != null)
                         {
-                            if (itemElem.Name.Equals("Item"))
+                            if (itemElem.Name.Equals("item"))
                             {
                                 var subResult = new ParseResult();
                                 var subSequence = new DicomSequenceItem();
@@ -101,13 +101,24 @@ namespace MINTLoader
                     }
                     else if (attrElem.Attributes["bid"] != null)
                     {
-                        // This tag's value is binary. We're not interested in binary items other
+                        // TODO: This tag's value is binary. We're not interested in binary items other
                         // than the pixel data so we ignore them -- they will be added to the
                         // sequence but they will not have any value set.
                         if (attr.Tag.TagValue == DicomTags.PixelData)
                         {
                             result.PixelDataBid = attrElem.Attributes["bid"].Value;
                         }
+                    }
+                    else if (attrElem.Attributes["bytes"] != null)
+                    {
+                        // TODO: This tag's value is binary. We're not interested in binary items other
+                        // than the pixel data so we ignore them -- they will be added to the
+                        // sequence but they will not have any value set.
+                        ;
+                    }
+                    else if (attrElem.Attributes["bsize"] != null)
+                    {
+                        // TODO: Bulk binary loading can use this.
                     }
                     else
                     {

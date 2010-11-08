@@ -120,12 +120,12 @@ namespace MINTLoader
 
             // There should be one root node.
             var rootNode = theDocument.DocumentElement;
-            if (!rootNode.Name.Equals("StudyMeta"))
+            if (!rootNode.Name.Equals("studyMeta"))
             {
-                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Document root element name must be 'StudyMeta'");
+                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Document root element name must be 'studyMeta'");
             }
             _studyAttributes = MINTAttributeCollectionParser.ParseAttributes(_studyLoaderArgs, metaUri,
-                (XmlElement)rootNode, "Attributes").Attributes;
+                (XmlElement)rootNode, "attributes").Attributes;
             foreach (var node in rootNode)
             {
                 var elem = node as XmlElement;
@@ -134,12 +134,12 @@ namespace MINTLoader
                     continue;
                 }
                 // Just search for the first study node, parse it, then break
-                if (elem.Name.Equals("SeriesList"))
+                if (elem.Name.Equals("seriesList"))
                 {
                     if (_studyAttributes == null)
                     {
                         throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid,
-                            "Malformed StudyMeta XML document: 'SeriesList' found before 'Attributes'");
+                            "Malformed StudyMeta XML document: 'seriesList' found before 'attributes'");
                     }
 
                     foreach (var subNode in elem)

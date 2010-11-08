@@ -155,16 +155,9 @@ namespace MINTLoader
 		private string BuildImageUrl(string serverAE, string studyInstanceUid, string seriesInstanceUid, string sopInstanceUid)
 		{
 			Platform.CheckForEmptyString(serverAE, "serverAE");
-			Platform.CheckForEmptyString(studyInstanceUid, "studyInstanceUid");
-			Platform.CheckForEmptyString(seriesInstanceUid, "seriesInstanceUid");
-			Platform.CheckForEmptyString(sopInstanceUid, "sopInstanceUid");
-
-
-            Console.WriteLine("URI At this point: " + _baseUri);
-            Console.WriteLine("serverAE: " + serverAE);
-            Console.WriteLine("Study instance uid: " + studyInstanceUid);
-            Console.WriteLine("Series instance uid: " + seriesInstanceUid);
-            Console.WriteLine("sopInstanceUID: " + sopInstanceUid);
+			Platform.CheckForEmptyString(studyInstanceUid, "studyInstanceUID");
+			Platform.CheckForEmptyString(seriesInstanceUid, "seriesInstanceUID");
+			Platform.CheckForEmptyString(sopInstanceUid, "sopInstanceUID");
 
 			StringBuilder url = new StringBuilder();
 			if (_baseUri.ToString().EndsWith("/"))
@@ -184,7 +177,7 @@ namespace MINTLoader
 
 		private static DicomCompressedPixelData CreateCompressedPixelData(HttpWebResponse response, byte[] pixelDataBuffer)
 		{
-			string transferSyntaxUid = response.Headers["TransferSyntaxUid"];
+			string transferSyntaxUid = response.Headers["transferSyntaxUID"];
 			TransferSyntax transferSyntax = TransferSyntax.GetTransferSyntax(transferSyntaxUid);
 			ushort bitsAllocated = ushort.Parse(response.Headers["BitsAllocated"]);
 			ushort bitsStored = ushort.Parse(response.Headers["BitsStored"]);

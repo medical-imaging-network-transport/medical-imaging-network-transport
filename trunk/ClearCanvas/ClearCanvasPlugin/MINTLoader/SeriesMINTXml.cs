@@ -51,19 +51,19 @@ namespace MINTLoader
         {
             _seriesAttributes =
                 MINTAttributeCollectionParser.ParseAttributes(studyLoaderArgs, metaUri, seriesElem,
-                    "Attributes").Attributes;
+                    "attributes").Attributes;
             var normalizedInstanceAttributes =
                 MINTAttributeCollectionParser.ParseAttributes(studyLoaderArgs, metaUri, seriesElem,
-                    "NormalizedInstanceAttributes").Attributes;
+                    "normalizedInstanceAttributes").Attributes;
             foreach (var subNode in seriesElem)
             {
                 var subElem = subNode as XmlElement;
-                if ((subElem != null) && subElem.Name.Equals("Instances"))
+                if ((subElem != null) && subElem.Name.Equals("instances"))
                 {
                     foreach (var instanceNode in subElem)
                     {
                         var instanceElem = instanceNode as XmlElement;
-                        if ((instanceElem != null) && instanceElem.Name.Equals("Instance"))
+                        if ((instanceElem != null) && instanceElem.Name.Equals("instance"))
                         {
                             _instances.Add(new InstanceMINTXml(studyLoaderArgs, metaUri, instanceElem, studyAttributes,
                                 _seriesAttributes, normalizedInstanceAttributes));
