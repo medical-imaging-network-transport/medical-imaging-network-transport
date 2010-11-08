@@ -6,6 +6,7 @@ using System.IO;
 using System.Net;
 using ClearCanvas.Common;
 using ClearCanvas.Common.Utilities;
+using ClearCanvas.ImageViewer;
 using ClearCanvas.ImageViewer.StudyManagement;
 using ClearCanvas.Dicom.Iod;
 using System.Globalization;
@@ -51,48 +52,73 @@ namespace MINTLoader
 
         public static IEnumerable<StudyKey> ParseStudiesResponse(string serviceUri, Stream xmlStream)
         {
-            XmlNamespaceManager nsMan = null;
-            var doc = ReadDocFromStream(xmlStream, out nsMan);
+            var doc = ReadDocFromStream(xmlStream);
 
             var keys = new List<StudyKey>();
             foreach (XmlNode child in doc.ChildNodes)
             {
-                var studyUidNodes = child.SelectNodes("//ns:li/ns:dl", nsMan);
-                if (studyUidNodes == null)
+                if (child.Name == "studySearchResults")
                 {
-                    continue;
-                }
 
-                foreach (XmlNode node in studyUidNodes)
-                {
-                    // The DICOM study instance UID, not the MINT UUID.
-                    var uidNode = node.SelectSingleNode("ns:dd[@class='StudyUID']", nsMan);
-                    if (uidNode == null)
-                    {
-                        continue;
-                    }
-                    string studyUid = uidNode.InnerText;
-                    if (string.IsNullOrEmpty(studyUid))
-                    {
-                        continue;
-                    }
-                    string metaUri = GetHref(node, "StudyMetadata", nsMan);
-                    if (string.IsNullOrEmpty(metaUri))
+                    var studyUIDNodes = child.ChildNodes;
+                    if (studyUIDNodes == null)
                     {
                         continue;
                     }
 
-                    string summaryUri = GetHref(node, "StudySummary", nsMan);
-                    if (string.IsNullOrEmpty(metaUri))
+                    foreach (XmlNode node in studyUIDNodes)
                     {
-                        continue;
-                    }
+                        // Get MINT UID.
+                        var studyUUID = node.Attributes.GetNamedItem("studyUUID");
+                        if (studyUUID == null)
+                        {
+                            throw new LoadStudyException("Unknown", "MINT studyUUID is null");
+                        }
 
-                    keys.Add(new StudyKey(serviceUri, studyUid, metaUri, summaryUri));
+                        string metaUri = "/MINTServer/studies/" + studyUUID.Value + "/DICOM/metadata";
+                        string summaryUri = "/MINTServer/studies/" + studyUUID.Value + "/DICOM/summary";
+
+                        // Get the DICOM UID
+                        string studyInstanceUID = MINTApi.GetStudyInstanceUID(serviceUri, studyUUID.Value);
+                        if (studyInstanceUID == null)
+                        {
+                            throw new LoadStudyException(studyUUID.Value, "Study Instance UID attribute missing in summary");
+                        }
+
+                        keys.Add(new StudyKey(serviceUri, studyInstanceUID, metaUri, summaryUri));
+                    }
                 }
             }
 
             return keys;
+        }
+        
+        public static string GetStudyInstanceUID(string serviceUri, string studyUUID)
+        {
+            string summaryUri = serviceUri + "/studies/" + studyUUID + "/DICOM/summary";
+            HttpWebResponse rep = CallService(summaryUri);
+
+            XmlDocument doc = new XmlDocument();
+
+            using (var reader = XmlReader.Create(rep.GetResponseStream()))
+            {
+                doc.Load(reader);
+            }
+
+            foreach (XmlNode child in doc.ChildNodes)
+            {
+                if (child.Name == "studyMeta")
+                {
+                    XmlAttributeCollection attributes = child.Attributes;
+                    if (attributes == null) return null;
+
+                    XmlNode studyInstanceUID = attributes.GetNamedItem("studyInstanceUID");
+                    if (studyInstanceUID == null) return null;
+                    return studyInstanceUID.Value;
+                }
+            }
+
+            return null;
         }
 
         public static IEnumerable<StudyKey> GetStudies(string serviceUri)
@@ -166,73 +192,90 @@ namespace MINTLoader
 
         public static void FullStudyItemFromXml(StudyItem item, Stream xmlStream)
         {
-            XmlNamespaceManager nsMan = null;
-            var doc = ReadDocFromStream(xmlStream, out nsMan);
+            var doc = ReadDocFromStream(xmlStream);
 
-            var docElem = doc.DocumentElement;
-
-            //var topLevelUlNodes = docElem.SelectNodes("//ns:ul/ns:li/ns:ul", nsMan);
-            var topLevelUlNodes = docElem.SelectNodes("//li/ul");
-            if (topLevelUlNodes == null)
+            foreach (XmlNode child in doc.ChildNodes)
             {
-                return;
-            }
-
-            foreach (XmlNode topLevelUlNode in topLevelUlNodes)
-            {
-                //string tag = GetVal(topLevelUlNode, "tag", nsMan);
-                string tag = topLevelUlNode.SelectSingleNode(string.Format("li[@class='tag']")).InnerText;
-                if (string.IsNullOrEmpty(tag))
+                if (child.Name == "studyMeta")
                 {
-                    continue;
-                }
 
-                //string value = GetVal(topLevelUlNode, "value", nsMan);
-                string value = topLevelUlNode.SelectSingleNode(string.Format("li[@class='value']")).InnerText;
-                switch (tag)
-                {
-                    case "00080020":
-                        item.StudyDate = value;
-                        break;
-                    case "00080030":
-                        item.StudyTime = value;
-                        break;
-                    case "00080050":
-                        item.AccessionNumber = value;
-                        break;
-                    case "00080090":
-                        item.ReferringPhysiciansName = new PersonName(value);
-                        break;
-                    case "00081030":
-                        item.StudyDescription = value;
-                        break;
-                    case "00100010":
-                        item.PatientsName = new PersonName(value);
-                        break;
-                    case "00100020":
-                        item.PatientId = value;
-                        break;
-                    case "00100030":
-                        item.PatientsBirthDate = value;
-                        break;
-                    case "00100040":
-                        item.PatientsSex = value;
-                        break;
-                    case "00200010":
-                        item.StudyId = value;
-                        break;
-                    default:
-                        break;
-                }
+                    var studyMetaChildren = child.ChildNodes;
+                    if (studyMetaChildren == null)
+                    {
+                        continue;
+                    }
 
+                    foreach (XmlNode metaNode in studyMetaChildren)
+                    {
+                        if (metaNode.Name == "attributes")
+                        {
+                            var attributeNodes = metaNode.ChildNodes;
+                            if (attributeNodes == null)
+                            {
+                                continue;
+                            }
+                            foreach (XmlNode node in attributeNodes)
+                            {
+                                // The DICOM study instance UID, not the MINT UUID.
+
+                                var xmlNodeAttr = node.Attributes.GetNamedItem("tag");
+                                if (string.IsNullOrEmpty(xmlNodeAttr.Value))
+                                {
+                                    continue;
+                                }
+                                var valueNode = node.Attributes.GetNamedItem("val");
+                                string value = "";
+                                if (valueNode != null)
+                                {
+                                    value = valueNode.Value;
+                                }
+                                switch (xmlNodeAttr.Value)
+                                {
+                                    case "00080020":
+                                        item.StudyDate = value;
+                                        break;
+                                    case "00080030":
+                                        item.StudyTime = value;
+                                        break;
+                                    case "00080050":
+                                        item.AccessionNumber = value;
+                                        break;
+                                    case "00080090":
+                                        item.ReferringPhysiciansName = new PersonName(value);
+                                        break;
+                                    case "00081030":
+                                        item.StudyDescription = value;
+                                        break;
+                                    case "00100010":
+                                        item.PatientsName = new PersonName(value);
+                                        break;
+                                    case "00100020":
+                                        item.PatientId = value;
+                                        break;
+                                    case "00100030":
+                                        item.PatientsBirthDate = value;
+                                        break;
+                                    case "00100040":
+                                        item.PatientsSex = value;
+                                        break;
+                                    case "00200010":
+                                        item.StudyId = value;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                   
+                }
             }
         }
 
         private static string GetVal(XmlNode topLevelUlNode, string p, XmlNamespaceManager nsMan)
         {
-            //var liNode = topLevelUlNode.SelectSingleNode(string.Format("li[@class='{0}']", p));
-            //return liNode == null ? "" : liNode.InnerText;
-            return null;
+            var liNode = topLevelUlNode.SelectSingleNode(string.Format("li[@class='{0}']", p));
+            return liNode == null ? "" : liNode.InnerText;
         }
 
         private static string AllStudiesUri(string serviceUri)
@@ -267,9 +310,8 @@ namespace MINTLoader
             return href == null ? null : href.Value;
         }
 
-        private static XmlDocument ReadDocFromStream(Stream strm, out XmlNamespaceManager nsMan)
+        private static XmlDocument ReadDocFromStream(Stream strm)
         {
-            nsMan = null;
             XmlDocument doc = new XmlDocument();
 
             XmlReaderSettings settings = new XmlReaderSettings();
@@ -280,8 +322,6 @@ namespace MINTLoader
                 doc.Load(reader);
             }
 
-            nsMan = new XmlNamespaceManager(doc.NameTable);
-            nsMan.AddNamespace("ns", "http://www.w3.org/1999/xhtml");
             return doc;
         }
     }

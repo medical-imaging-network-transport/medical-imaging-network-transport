@@ -197,7 +197,7 @@ namespace MINTLoader
 			{
                 BaseUrl = source.Parent.BinaryUri;
 
-				StudyInstanceUid = source.Parent.StudyInstanceUid;
+                StudyInstanceUid = source.Parent.StudyInstanceUid;
 				SeriesInstanceUid = source.Parent.SeriesInstanceUid;
 				SopInstanceUid = source.Parent.SopInstanceUid;
 				FrameNumber = source.FrameNumber;

@@ -43,7 +43,7 @@ namespace MINTLoader
 
                 loadedInstances.AddInstance(patientId, patientsName, studyInstanceUid);
 
-                UseBulkLoading = true;
+                UseBulkLoading = false;
                 if (UseBulkLoading)
                 {
                     binaryStream = new MINTBinaryStream();
@@ -55,8 +55,8 @@ namespace MINTLoader
             }
             catch(Exception e)
             {
-                Console.WriteLine("EXCEPTION" + e.Message);
-                //result = EventResult.MajorFailure;
+                Console.WriteLine("EXCEPTION: " + e.Message);
+                result = EventResult.MajorFailure;
                 throw;
             }
             finally

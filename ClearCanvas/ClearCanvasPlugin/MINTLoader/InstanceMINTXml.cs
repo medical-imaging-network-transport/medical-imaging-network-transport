@@ -131,7 +131,7 @@ namespace MINTLoader
                 : TransferSyntax.ExplicitVrLittleEndian;
 
             var result = MINTAttributeCollectionParser.ParseAttributes(studyLoaderArgs, metaUri,
-                instanceElem, "Attributes");
+                instanceElem, "attributes");
 
             _collection = result.Attributes;
 
