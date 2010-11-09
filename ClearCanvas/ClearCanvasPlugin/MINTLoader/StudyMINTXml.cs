@@ -115,14 +115,14 @@ namespace MINTLoader
         {
             if (!theDocument.HasChildNodes)
             {
-                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Empty StudyMeta XML document");
+                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Empty Study XML document");
             }
 
             // There should be one root node.
             var rootNode = theDocument.DocumentElement;
-            if (!rootNode.Name.Equals("studyMeta"))
+            if (!rootNode.Name.Equals(MINTApi.RootTag))
             {
-                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Document root element name must be 'studyMeta'");
+                throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid, "Document root element name must be '"+MINTApi.RootTag+"'");
             }
             _studyAttributes = MINTAttributeCollectionParser.ParseAttributes(_studyLoaderArgs, metaUri,
                 (XmlElement)rootNode, "attributes").Attributes;
@@ -139,7 +139,7 @@ namespace MINTLoader
                     if (_studyAttributes == null)
                     {
                         throw new LoadStudyException(_studyLoaderArgs.StudyInstanceUid,
-                            "Malformed StudyMeta XML document: 'seriesList' found before 'attributes'");
+                            "Malformed Study XML document: 'seriesList' found before 'attributes'");
                     }
 
                     foreach (var subNode in elem)

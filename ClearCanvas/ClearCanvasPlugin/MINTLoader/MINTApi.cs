@@ -17,6 +17,7 @@ namespace MINTLoader
     {
         public static readonly string LoaderName = "MINT";
         public static readonly string FinderName = "MINT";
+        public static readonly string RootTag = "study";
 
         public class StudyKey
         {
@@ -107,7 +108,7 @@ namespace MINTLoader
 
             foreach (XmlNode child in doc.ChildNodes)
             {
-                if (child.Name == "studyMeta")
+                if (child.Name == RootTag)
                 {
                     XmlAttributeCollection attributes = child.Attributes;
                     if (attributes == null) return null;
@@ -196,7 +197,7 @@ namespace MINTLoader
 
             foreach (XmlNode child in doc.ChildNodes)
             {
-                if (child.Name == "studyMeta")
+                if (child.Name == RootTag)
                 {
 
                     var studyMetaChildren = child.ChildNodes;
