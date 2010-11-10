@@ -27,7 +27,7 @@ import java.util.*;
 public final class StudyUtils {
 
     public static final String INITIAL_VERSION = "0";
-
+    
     /**
      * This method should pull all data from the provided study into 'this'
      * study and overwrite any existing values in 'this' study.
@@ -488,6 +488,60 @@ public final class StudyUtils {
         jobFolder.delete();
     }
 
+    public static boolean validateStudyMetadata(StudyMetadata study)
+    {
+    	boolean result = true;
+    	result = result && validateTransferSyntax(study);
+    	return result;
+    }
+    
+    /*
+     * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
+     * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
+     */
+    private static boolean validateTransferSyntax(StudyMetadata study)
+    {
+    	boolean returnValue = true;
+    	//loop over each series
+    	for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
+    		//loop over the instances 
+    		Series s = i.next();
+    		Attribute att = s.getNormalizedInstanceAttribute(0x00020010);
+    		String normalizedTransferSyntax = (att != null) ? att.getVal() : null;
+    		boolean transferSyntaxNormalized = false;
+    		if(normalizedTransferSyntax != null)
+    		{
+    			transferSyntaxNormalized = true;
+    		}
+    		
+    		for (Iterator<Instance> ii = s.instanceIterator(); ii.hasNext();) 
+    		{
+    			//This is the instance level transfer syntax element attribute
+    			//<instance sopInstanceUID="123" transferSyntaxUID="456" >
+    			Instance instance = ii.next();
+    			String instanceTransferSyntax = instance.getTransferSyntaxUID();
+    			//This is the dicom tag attribute for transfer syntax
+    			//<attr tag="00020010" vr="UI" val="456">
+    			String instanceAttributeTransferSyntax = normalizedTransferSyntax;
+    			if(!transferSyntaxNormalized)
+    			{
+    				instanceAttributeTransferSyntax = instance.getValueForAttribute(0x00020010);
+    			}
+    			//The two different transfersyntax must be equal in every case or the entire study is invalid.
+    			if(!instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax))
+    			{
+    				returnValue = false;   				
+    				break;
+    			}    			
+    		}
+    		if(!returnValue)
+    		{
+    			break;
+    		}
+    	}
+    	return returnValue;
+    }
+    
     /**
      * This method will return true if the given study has passed all
      * implemented validation checks. This is validation for studies that are
@@ -502,6 +556,7 @@ public final class StudyUtils {
         boolean result = true;
 
         result = result && validateBinaryItemsReferences(study, binaryFolder);
+        result = result && validateStudyMetadata(study);
         //add other validation here and && it with result
 
         return result;

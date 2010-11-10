@@ -74,6 +74,7 @@ import org.nema.medical.mint.datadictionary.DataDictionaryIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.utils.Iter;
+import org.nema.medical.mint.utils.StudyUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -225,7 +226,14 @@ public final class ProcessImportDir {
             builder.finish();
 
             try {
-                addToSendQueue(metaBinaryPair, instanceFiles);
+            	if(StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata()))
+            	{
+            		addToSendQueue(metaBinaryPair, instanceFiles);
+            	}
+            	else
+            	{
+            		LOG.error("Skipping study " + studyUID + ": DICOM syntax error in study metadata");
+            	}
             } catch (final IOException e) {
                 //Catastrophic error
                 throw new RuntimeException(e);
