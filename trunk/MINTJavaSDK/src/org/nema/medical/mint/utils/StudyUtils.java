@@ -15,6 +15,9 @@
  */
 package org.nema.medical.mint.utils;
 
+import org.nema.medical.mint.datadictionary.AttributeType;
+import org.nema.medical.mint.datadictionary.DataDictionaryIO;
+import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.*;
 
 import java.io.File;
@@ -348,29 +351,43 @@ public final class StudyUtils {
     }
 
     /**
-     * Performs a normalization algorithm on the provided StudyMetadata.
+     * Performs a normalization algorithm on the provided StudyMetadata. Currently this is
+     * a very forgiving normalization. We allow study level attributes to come in as instance
+     * level attributes and we then normalize them up to the study level using the data dictionary.
+     * Ideally this should be changed to force validation before it even gets to this point.
+     * 
+     * //TODO validate where the attributes are and what attributes are present before even getting
+     * to the normalization portion.
      * <p/>
-     * TODO make this algorithm normalize using information from a data dictionary.
      *
      * @param study
      * @return true
      */
-    public static boolean normalizeStudy(StudyMetadata study) {
-        List<Attribute> list = new LinkedList<Attribute>();
-
+    public static boolean normalizeStudy(StudyMetadata study) throws IOException {
+    	MetadataType metadata = null;
+    	
+    	metadata = DataDictionaryIO.parseFromXML(StudyUtils.class.getClassLoader().getResourceAsStream(study.getType() + ".xml"));
+    	
+    	List<AttributeType> seriesAttributes = metadata.getSeriesAttributes().getAttributes();
+    	List<AttributeType> studyAttributes = metadata.getStudyAttributes().getAttributes();
+    	
+    	List<Attribute> tempNormalizedStudyAttributeList = new LinkedList<Attribute>();
+    	List<Attribute> tempNormalizedInstanceAttributeList = new LinkedList<Attribute>();
+               
         //For each series
         for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
             Series s = i.next();
 
-            list.clear();
+            tempNormalizedInstanceAttributeList.clear();
 
-            if (s.instanceCount() > 1) {
+            if (s.instanceCount() > 1) 
+            {
                 //For each Instance in the series
 
                 //Prime list by loading all attributes in from first instance
                 Iterator<Instance> ii = s.instanceIterator();
                 for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
-                    list.add(iii.next());
+                	tempNormalizedInstanceAttributeList.add(iii.next());
                 }
 
                 //Loop over the rest of the attributes
@@ -378,7 +395,7 @@ public final class StudyUtils {
                     Instance inst = ii.next();
 
                     //For each attribute in the instance
-                    for (Iterator<Attribute> iii = list.iterator(); iii.hasNext();) {
+                    for (Iterator<Attribute> iii = tempNormalizedInstanceAttributeList.iterator(); iii.hasNext();) {
                         Attribute normalA = iii.next();
                         Attribute a = inst.getAttribute(normalA.getTag());
 
@@ -391,17 +408,83 @@ public final class StudyUtils {
                  * All attributes left in the list were found in all instances
                  * for this series.
                  */
-                for (Attribute a : list) {
-                    // Move the attribute to the normalized section...
-                    s.putNormalizedInstanceAttribute(a);
+                for (Attribute a : tempNormalizedInstanceAttributeList) {
+                	
+                	//If the normalized attribute should exist at the series level then we will put it
+                	//there, otherwise it will go to the normalized instance attribute section.
+                	boolean putInSeries = false;
+                	for(AttributeType at : seriesAttributes)
+                	{
+                		if(StudyIO.hex2int(at.getTag()) == a.getTag())
+                		{
+                			putInSeries = true;
+                		}
+                	}
+                	
+                	if(putInSeries)
+                	{
+                		s.putAttribute(a);
+                	}
+                	else
+                	{
+                		s.putNormalizedInstanceAttribute(a);
+                	}
 
                     for (final Instance instanceMeta : Iter.iter(s.instanceIterator())) {
                         instanceMeta.removeAttribute(a.getTag());
-                    }
+                    }                
                 }
             }
         }
-
+        
+        //Whatever is left in the normalized attribute section of each series needs to be checked
+        //to see if it should live at the study level. Every series normalized instance attribute section must 
+        //contain that same identical attribute for it to get moved to the study level and then only if 
+        //the data dictionary says it belongs at that level.
+        Iterator<Series> seriesIter = study.seriesIterator();
+        if(seriesIter.hasNext())
+        {
+        	//Get the first series and prime the tempNormalizedStudyAttributeList with any normalized instance
+        	//attributes that should be normalized even further up to that level.
+        	Series s = seriesIter.next();
+        	 for(Iterator<Attribute> attributeIter = s.normalizedInstanceAttributeIterator(); attributeIter.hasNext();)
+             {
+             	Attribute a = attributeIter.next();
+            	for(AttributeType at : studyAttributes)
+             	{
+             		if(a.getTag() == StudyIO.hex2int(at.getTag()))
+             		{
+             			tempNormalizedStudyAttributeList.add(a);
+             		}
+             	}    
+             }
+        	 
+        	 //Now for the rest of the series, see if any of the normalized study attributes
+        	 //from the first series DONT exist exactly the same in their normalized instance attributes. 
+        	 //If series doesn't have the attribute exactly the same as it is in the normalized  
+        	 //study attributes list it gets removed from the study normalized list since it has to occur the same in
+        	 //every series to be a candidate for normalization.
+        	 while(seriesIter.hasNext())
+        	 {
+        		Series ss = seriesIter.next();
+        		for(Iterator<Attribute> i = tempNormalizedStudyAttributeList.iterator(); i.hasNext();)
+        		{
+        			Attribute a = i.next();
+        			if(!equalAttributes(a, ss.getNormalizedInstanceAttribute(a.getTag())))
+        			{
+        				tempNormalizedStudyAttributeList.remove(a);
+        			}
+        		}        	
+        	 }   	 
+        	 
+        	 for(Attribute a : tempNormalizedStudyAttributeList)
+        	 {
+        		 study.putAttribute(a);
+        		 for (final Series instanceMeta : Iter.iter(study.seriesIterator())) {
+                     instanceMeta.removeNormalizedInstanceAttribute(a.getTag());
+                 } 
+        	 }         	     
+        }
         return true;
     }
 
