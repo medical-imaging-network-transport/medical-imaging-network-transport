@@ -1,0 +1,114 @@
+#summary One-sentence summary of this page.
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Dealing with JHU DMZ Server issues - hoping to have it resolved next week
+      * Seeing poor performance
+      * Server went offline on Thursday
+      * Plan is to switch to using a Linux machine
+        * Just need to have external IP remapped to linux machines IP
+    * Dealing with C++ MINT Implementation
+      * Ran into issues during error checking
+      * Can now successfully convert to and from DICOM/MINT
+      * Working on sending the study over to the server using LIBCURL, will checkin after that is working
+    * Wanted to run performance tests, but hardware is not available
+      * Hopes to work on this next week  
+  * Jim
+    * All set for RSNA meeting (room, pizza ordered)
+    * Started working on a white paper, will send out early next week
+    * Had conversation with Damien Evans about adding MINT to DCM4CHE
+    * Had conversation with CareStream about MINT
+    * Will be sending the announce email a few more times
+    * Norman Young from ClearCanvas said he would attend the MINT meeting at RSNA
+    * Other open source viewers that might be interested in MINT:
+      * WEASIS
+      * Oviyam 
+      * MAYAM
+  * Tim Culp
+    * Checked in clear canvas plugin changes, should work with latest RI
+    * Working with Gorkem on performance testing between RI in cloud server
+      * 100 MB CT study was opening slow in ClearCanvas
+        * contained an RTSTRUCT with lots of metadata
+        * Removing RTSTRUCT sped up the loading quite a bit
+      * Bandwidth isn't so good - 10 Mb/s - getting 1MB/s load speed
+      * Turning on bulk loading increases time to first image
+   * Dan Chaffe 
+     * Added transfer syntax validation to common import code (DICOM2MINT uses this)
+       * Rejects instances if P10 header transfer syntax does not match the transfer syntax in the SOP Instance
+     * Added study update normalization
+       * Server will renormalize the entire study based on the update and data dictionary
+       * Will work with any type!! YEAH
+       * Ran into issue with mint server validation and normalization - should it do this?
+       * Sent email asking for feedback on this
+   * Jeremy
+     * No update
+   * Chris Hafey
+     * Good news - should be able to release the MINT IOS Viewer
+       * Going to try and get this submitted to apple app store this weekend
+     * Posted MINT announcement on Auntminnie PACS Forum and comp.protocols.dicom 
+       * Reply on Auntminnie forum asking about what vendors support it
+     * Still don't have MINT poster ready  
+       * Been on hold as we finalize MINT IOS Details
+     * Sent out a bunch of emails about MINT (vendors, partners, etc)
+     * Vital sales is talking up MINT, creating awareness
+  
+= Notes =
+  * Discuss how mint server should handle updates that do not match the normalization rules for that type in the data dictionary
+    * DICOM2MINT should be using the MINT server data dictionary
+      * Currently it is using dicom.xml on the file system
+    * MINT Server should validate that the metadata matches the data dictionary, if it does match, fail the job.
+      * Not enough time to do this for 1.0, push to backlog
+
+  * Plan to coordinate MINT meeting on Sunday evening
+
+= Decisions =
+  * Label source as version 1.0 RC once Dan completes his changes
+
+= New Actions =
+  * Modify C++ DICOM2MINT to use data dictionary (Gorkem)
+  * Modify Java DICOM2MINT to use data dictionary (Dan)
+  * Add code comment saying we should validate instance level tags (Dan)
+  * Send out email to coordinate RSNA demo on Sunday evening (Chris)
+
+= Old Actions =
+  * Provide feedback on directory structure (all)
+  * Propose agenda for RSNA meeting (Jim + Chris)
+  * Schedule a meeting to discuss data dict normalization with Uli + Dan (Chris Hafey)
+  * Modify DICOM2MINT to validate transfer syntaxes are correct, abort if they are not and log (Dan Chafee)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Study Update with data dictionary based normalization (Dan Chaffey)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Contact other industry leaders about MINT (Jim Philbin)
+  * Look into getting an RSNA session for MINT (Jim Philbin)
+  * Package up MINT Compatible Clear Canvas as a ZIP and post (Gorkem)
+
+
+= Completed Actions = 
+
+= Backlog Items = 
+  * Look at QC workflow in more detail - specifically about metadata validation errors (does not conform to data dictionary)
+  * Add mint server validation 
+
+
+
+= Issues =
+
+= Future =
