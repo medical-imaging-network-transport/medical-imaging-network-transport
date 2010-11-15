@@ -166,7 +166,7 @@ public class ServerConfig {
                 }
             }
         };
-        dcm2MintExecutor.scheduleWithFixedDelay(dirTraverseTask, 0, 3, TimeUnit.SECONDS);
+        dcm2MintExecutor.scheduleWithFixedDelay(dirTraverseTask, 20, 3, TimeUnit.SECONDS);
     }
 
     @PreDestroy

@@ -92,10 +92,9 @@ public final class ProcessImportDir {
     private final boolean deletePhysicalInstanceFiles;
     private final boolean forceCreate;
     private final int binaryInlineThreshold;
-    
-    private final MetadataType metadataType; 
-    private final Set<Integer> STUDY_LEVEL_TAGS;
-    private final Set<Integer> SERIES_LEVEL_TAGS;
+    private MetadataType metadataType = null; 
+    private Set<Integer> STUDY_LEVEL_TAGS;
+    private Set<Integer> SERIES_LEVEL_TAGS;
     private static final XPath xPath = XPathFactory.newInstance().newXPath();
     private static final DocumentBuilder documentBuilder;
     static {
@@ -122,16 +121,27 @@ public final class ProcessImportDir {
         this.queryURI = URI.create(serverURI + "/studies");
         this.updateURI = URI.create(serverURI + "/jobs/updatestudy");
         this.jobStatusURI = URI.create(serverURI + "/jobs/status");
+        this.dicomDatadictionaryURI = URI.create(serverURI + "/types/DICOM");
         this.useXMLNotGPB = useXMLNotGPB;
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
         this.forceCreate = forceCreate;
         this.binaryInlineThreshold = binaryInlineThreshold;
-        this.metadataType = DataDictionaryIO.parseFromXML(ProcessImportDir.class.getClassLoader().getResourceAsStream("DICOM.xml"));
-        this.STUDY_LEVEL_TAGS = getStudyTags(metadataType);
-        this.SERIES_LEVEL_TAGS = getSeriesTags(metadataType);   	
     }
 
-    public void processDir() {
+    public void processDir() throws IOException{
+    	//only re-initialize this if it hasn't been initialized.
+    	//Initialization cannot take place in the constructor because this
+    	//depends on the server to be already up and running. The server
+    	//startup creates this class so it would be a catch22.
+    	if(metadataType == null)
+    	{
+    		HttpGet httpGet = new HttpGet(dicomDatadictionaryURI);
+    		String response = httpClient.execute(httpGet, new BasicResponseHandler());
+        	InputStream in = new ByteArrayInputStream(response.getBytes());
+        	this.metadataType = DataDictionaryIO.parseFromXML(in);
+        	this.STUDY_LEVEL_TAGS = getStudyTags(metadataType);
+        	this.SERIES_LEVEL_TAGS = getSeriesTags(metadataType); 
+    	}
         LOG.info("Gathering files for allocation to studies.");
         final long fileGatherStart = System.currentTimeMillis();
         //As items may be removed from the set of handled files concurrently,
@@ -563,6 +573,7 @@ public final class ProcessImportDir {
     private final URI createURI;
     private final URI queryURI;
     private final URI updateURI;
+    private final URI dicomDatadictionaryURI;
 	private final URI jobStatusURI;
     private final boolean useXMLNotGPB;
     private final Collection<MetaBinaryFiles> studySendQueue =
