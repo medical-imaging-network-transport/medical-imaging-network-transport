@@ -1,0 +1,80 @@
+#summary One-sentence summary of this page.
+
+= Attendees =
+* Tim Dawson
+* Tim Culp
+* Gorkem Sevinc
+* Jeremy Huiskamp
+* Chris Hafey
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * Working with C++ implementation
+    * Modified C++ DICOM2MINT to use data dictionary
+    * DICOM2MINT and MINT2DICOM both functional & fast
+    * Getting a physical server for MINT Reference Impl
+    * Waiting for network setup to get performance numbers
+    * Expect to be able to work on this next week
+  * Tim Culp
+    * Dan finished outstanding tasks for 1.0
+    * Planning to do performance tests next week
+  * Jeremy
+    * Working on integration tests, hope to check in next week
+  * Chris Hafey
+    * Too short on time to get MINT IOS Viewer available via appstore for RSNA
+    * Will be available by directly contacting Chris
+    * Vital will not have GotMint? poster due to time constraints    
+    * Vital should be able to provide some MINT documentation for the DICOM meeting @ RSNA
+  * Tim Dawson
+    * No progress due to other projects
+    * Plan to work on this 1st week in December
+  
+= Notes =
+  * Meeting @ RSNA November 29
+
+= Decisions =
+  * No call next week due to Thanksgiving
+  * No call the following week due to RSNA
+  * Next call December 10
+
+= New Actions =
+  * Label source as version 1.0 RC (Tim D)
+
+= Old Actions =
+  * Send out email to coordinate RSNA demo on Sunday evening (Chris)
+  * Provide feedback on directory structure (all)
+  * Propose agenda for RSNA meeting November 29 (Jim + Chris)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Post to ClearCanvas forums, get help with packaging (Gorkem)
+
+
+= Completed Actions = 
+
+= Backlog Items = 
+  * Look at QC workflow in more detail - specifically about metadata validation errors (does not conform to data dictionary)
+  * Add mint server validation 
+
+
+
+= Issues =
+
+= Future =
