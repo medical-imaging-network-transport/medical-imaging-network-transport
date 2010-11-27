@@ -45,6 +45,12 @@ public class MINTBinaryStreamReader
 		binaryItems = new Hashtable<Integer, byte[]>();
 	}
 	
+	/**
+	 * SetAddress function, sets the address to open an input stream from.
+	 * @param binaryAddress
+	 * @throws MalformedURLException
+	 */
+	
 	public void SetAddress(URL binaryAddress) throws MalformedURLException
 	{
 		BinaryAddress = new URL(binaryAddress, "all");
@@ -112,6 +118,9 @@ public class MINTBinaryStreamReader
 	 */
 	public byte[] readBinaryData(InputStream inputStream, int contentLength) throws IOException
 	{
+
+		//System.out.println("maxmem: " + Runtime.getRuntime().maxMemory());
+		//System.out.println("Contentlength: " + contentLength);
 		final byte[] binaryData = new byte[contentLength];
 
 		// Try to read contentLength many bytes
