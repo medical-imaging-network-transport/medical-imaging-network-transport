@@ -30,6 +30,12 @@ import org.nema.medical.mint.metadata.StudyIO;
 public class MINT2DICOM 
 {
 	static MINTBinaryStreamReader binaryReader;
+	
+	/**
+	 * getVR function converts a vrString to a VR object.
+	 * @param vrString
+	 * @return VR Object corresponding to the given vrString
+	 */
     private static VR getVR(String vrString)
     {
         return VR.valueOf(256*(vrString.toUpperCase().charAt(0)) + (vrString.toUpperCase().charAt(1)));
@@ -45,7 +51,7 @@ public class MINT2DICOM
      */
     private static void insertAttribute(DicomObject currentObject, Attribute newAttribute, URL binaryRoot, boolean useBulkLoading) throws IOException
     {
-        if(newAttribute.hasSequenceItems())
+        if(newAttribute.hasSequenceItems() || newAttribute.getVr().equalsIgnoreCase("SQ"))
         {
             //Loop through a sequence, get atrributes and recurse -- bad design on Jack's part but does not recurse more than 2 or 3 times. Need to rewrite.
             DicomElement sequenceObject = currentObject.putSequence(newAttribute.getTag());
@@ -112,50 +118,69 @@ public class MINT2DICOM
     	try 
         {
         	// Read metadata
-            StudyMetadata mintData = StudyIO.parseFromXML(metaFile.openStream());
+            StudyMetadata mintData = StudyIO.parseFromGPB(metaFile.openStream());
             Iterator<Series> seriesIter = mintData.seriesIterator();
+            Iterator<Attribute> studyAttributeIter;
+            Iterator<Instance> instanceIter;
+            Iterator<Attribute> seriesAttributeIter;
+            Iterator<Attribute> seriesNormalizedAttributeIter;
+            Iterator<Attribute> instanceAttributeIter;
             
+            Series currentSeries;
+            Instance nextInstance;
+            BasicDicomObject dicomReconstruction;
+            DicomOutputStream dcmFileStream;
+            
+            String filePath = outputDir + "/" + mintData.getStudyInstanceUID();
+            File dcmDir = new File(filePath);
+            if(!dcmDir.exists())
+            {
+            	dcmDir.mkdir();
+            }
+            
+            File dcmFile;
             // Loop through the metadata.
             for(int i = 0; seriesIter.hasNext(); i++)
             {
-                BasicDicomObject dicomReconstruction = new org.dcm4che2.data.BasicDicomObject();
+                dicomReconstruction = new org.dcm4che2.data.BasicDicomObject();
                 
-                Iterator<Attribute> studyAttributeIter = mintData.attributeIterator();
+                studyAttributeIter = mintData.attributeIterator();
                 while(studyAttributeIter.hasNext())
                 {
-                    MINT2DICOM.insertAttribute(dicomReconstruction, studyAttributeIter.next(), binaryDir, useBulkLoading);
+                    insertAttribute(dicomReconstruction, studyAttributeIter.next(), binaryDir, useBulkLoading);
                 }
-                Series currentSeries = seriesIter.next();
+                currentSeries = seriesIter.next();
                 
-                Iterator<Instance> instanceIter = currentSeries.instanceIterator();
-                Iterator<Attribute> seriesAttributeIter = currentSeries.attributeIterator();
+                instanceIter = currentSeries.instanceIterator();
+                seriesAttributeIter = currentSeries.attributeIterator();
                 while(seriesAttributeIter.hasNext())
                 {
-                    MINT2DICOM.insertAttribute(dicomReconstruction, seriesAttributeIter.next(), binaryDir, useBulkLoading);
+                    insertAttribute(dicomReconstruction, seriesAttributeIter.next(), binaryDir, useBulkLoading);
                 }
                 
-                Iterator<Attribute> seriesNormalizedAttributeIter = currentSeries.normalizedInstanceAttributeIterator();
+                seriesNormalizedAttributeIter = currentSeries.normalizedInstanceAttributeIterator();
                 while(seriesNormalizedAttributeIter.hasNext())
                 {
-                    MINT2DICOM.insertAttribute(dicomReconstruction, seriesNormalizedAttributeIter.next(), binaryDir, useBulkLoading);
+                    insertAttribute(dicomReconstruction, seriesNormalizedAttributeIter.next(), binaryDir, useBulkLoading);
                 }
                 
                 while(instanceIter.hasNext())
                 {
-                    Instance tempInstance = instanceIter.next();
+                    nextInstance = instanceIter.next();
                     
                     //get transfer syntax uid
-                    dicomReconstruction.putString(131088, VR.UI, tempInstance.getTransferSyntaxUID());
-                    Iterator<Attribute> attributeIter = tempInstance.attributeIterator();
+                    dicomReconstruction.putString(131088, VR.UI, nextInstance.getTransferSyntaxUID());
+                    instanceAttributeIter = nextInstance.attributeIterator();
                     
-                    while(attributeIter.hasNext())
+                    while(instanceAttributeIter.hasNext())
                     {
-                        MINT2DICOM.insertAttribute(dicomReconstruction, attributeIter.next(), binaryDir, useBulkLoading);
+                        insertAttribute(dicomReconstruction, instanceAttributeIter.next(), binaryDir, useBulkLoading);
                     }
                     
+                    
                     //Create dicom file
-                    File dcmFile = new File(outputDir, i + ".dcm");
-                    DicomOutputStream dcmFileStream = new DicomOutputStream(dcmFile);
+                    dcmFile = new File(filePath, i + ".dcm");
+                    dcmFileStream = new DicomOutputStream(dcmFile);
                    
                     //Write to dicom file
                     dcmFileStream.writeDicomFile(dicomReconstruction);
@@ -190,7 +215,7 @@ public class MINT2DICOM
     		printUsage();
     		return;
     	}
-        // TODO Auto-generated method stub
+    	
         URL root = new URL(args[0]);
         URL binaryDirectory = new URL(args[0] + "binaryitems/");
         URL metadataFile = new URL(root,"metadata.gpb");
