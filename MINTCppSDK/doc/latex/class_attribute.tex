@@ -1,0 +1,379 @@
+\hypertarget{class_attribute}{
+\section{Attribute Class Reference}
+\label{class_attribute}\index{Attribute@{Attribute}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_attribute_a8ba4e5a507aef352563e1e56f1930e66}{
+\hyperlink{class_attribute_a8ba4e5a507aef352563e1e56f1930e66}{Attribute} ()}
+\label{class_attribute_a8ba4e5a507aef352563e1e56f1930e66}
+
+\begin{DoxyCompactList}\small\item\em The default constructor for the \hyperlink{class_attribute}{Attribute} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute_a6adf65411544dced1686f79c407e96cc}{Attribute} (std::string tag, std::string vr)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_attribute}{Attribute} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute_adb7379d955891772438972c8115cd9be}{Attribute} (std::string tag, std::string vr, std::string val)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_attribute}{Attribute} class. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_a7594af81a1d1ff8255df881868d745f1}{SetTag} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to set the tag of the attribute. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_attribute_a104ebad6ecf44626b5f9274baed3d372}{GetTag} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the tag of the attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_a16a59367271d516785c18248f7f72669}{SetBid} (int bid)
+\begin{DoxyCompactList}\small\item\em Function to set the bid of the attribute. \item\end{DoxyCompactList}\item 
+int \hyperlink{class_attribute_a9532cbf8e10e2e6d7c1ad28502e2138e}{GetBid} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the bid of the attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_a40f7c11646c5b6a50daf7982a630f55a}{SetBSize} (int bSize)
+\begin{DoxyCompactList}\small\item\em Function to set the binary item size of the attribute. \item\end{DoxyCompactList}\item 
+int \hyperlink{class_attribute_aa9399fc850d16e9f910be70a9a7805fc}{GetBSize} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the binary item size of the attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_a6af6ca72eaae551aa0f44e0e7cccac9d}{SetVR} (std::string vr)
+\begin{DoxyCompactList}\small\item\em Function to set the VR of the attribute. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_attribute_a7c58e62a7401a3ab1271019f8ed8bfdf}{GetVR} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the VR of the attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_abdf349cbe232df3425181294b3a3c419}{SetVal} (std::string val)
+\begin{DoxyCompactList}\small\item\em Function to set the value of the attribute. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_attribute_a0bea8bb481e523bfde4a393dddd1caa0}{GetVal} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the value of the attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_ab1a4438bd71ef096edce9bf1347b1952}{SetBytes} (const gdcm::ByteValue $\ast$bytes)
+\begin{DoxyCompactList}\small\item\em Function to set the inline bytes of the attribute. \item\end{DoxyCompactList}\item 
+const gdcm::ByteValue $\ast$ \hyperlink{class_attribute_abf120cf96ec103bdb558b3e40cffa9a0}{GetBytes} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the inline bytes of the attribute. \item\end{DoxyCompactList}\item 
+std::vector$<$ \hyperlink{class_item}{Item} $>$ \hyperlink{class_attribute_a4bf23c4440b4270e822c21dff30eefb6}{GetItems} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the items of the attribute (used in sequences) \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_aab36b0fa29276c9f03058a7ff7d8ffbe}{AddItem} (\hyperlink{class_item}{Item} item)
+\begin{DoxyCompactList}\small\item\em Function to add an item to the item list. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_attribute_a24ac04f4f0c3c2aafd1288990c58351b}{RemoveItem} (\hyperlink{class_item}{Item} item)
+\begin{DoxyCompactList}\small\item\em Function to remove an item from the item list. \item\end{DoxyCompactList}\item 
+bool \hyperlink{class_attribute_af84e5debc9137854dc4d1f40bc0014fe}{HasSequenceItems} ()
+\begin{DoxyCompactList}\small\item\em Function to check if the attribute has sequence items. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_attribute_a6adf65411544dced1686f79c407e96cc}{
+\index{Attribute@{Attribute}!Attribute@{Attribute}}
+\index{Attribute@{Attribute}!Attribute@{Attribute}}
+\subsubsection[{Attribute}]{\setlength{\rightskip}{0pt plus 5cm}Attribute::Attribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag, }
+\item[{std::string}]{ vr}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a6adf65411544dced1686f79c407e96cc}
+
+
+Overloaded constructor for the \hyperlink{class_attribute}{Attribute} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute \\
+\hline
+{\em vr} & The VR of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_adb7379d955891772438972c8115cd9be}{
+\index{Attribute@{Attribute}!Attribute@{Attribute}}
+\index{Attribute@{Attribute}!Attribute@{Attribute}}
+\subsubsection[{Attribute}]{\setlength{\rightskip}{0pt plus 5cm}Attribute::Attribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag, }
+\item[{std::string}]{ vr, }
+\item[{std::string}]{ val}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_adb7379d955891772438972c8115cd9be}
+
+
+Overloaded constructor for the \hyperlink{class_attribute}{Attribute} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute \\
+\hline
+{\em vr} & The VR of the attribute \\
+\hline
+{\em val} & The val of the attribute \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_attribute_aab36b0fa29276c9f03058a7ff7d8ffbe}{
+\index{Attribute@{Attribute}!AddItem@{AddItem}}
+\index{AddItem@{AddItem}!Attribute@{Attribute}}
+\subsubsection[{AddItem}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::AddItem (
+\begin{DoxyParamCaption}
+\item[{{\bf Item}}]{ item}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_aab36b0fa29276c9f03058a7ff7d8ffbe}
+
+
+Function to add an item to the item list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & The item to be added \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_a9532cbf8e10e2e6d7c1ad28502e2138e}{
+\index{Attribute@{Attribute}!GetBid@{GetBid}}
+\index{GetBid@{GetBid}!Attribute@{Attribute}}
+\subsubsection[{GetBid}]{\setlength{\rightskip}{0pt plus 5cm}int Attribute::GetBid (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a9532cbf8e10e2e6d7c1ad28502e2138e}
+
+
+Function to get the bid of the attribute. 
+
+\begin{DoxyReturn}{Returns}
+bid The bid of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_aa9399fc850d16e9f910be70a9a7805fc}{
+\index{Attribute@{Attribute}!GetBSize@{GetBSize}}
+\index{GetBSize@{GetBSize}!Attribute@{Attribute}}
+\subsubsection[{GetBSize}]{\setlength{\rightskip}{0pt plus 5cm}int Attribute::GetBSize (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_aa9399fc850d16e9f910be70a9a7805fc}
+
+
+Function to get the binary item size of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bSize} & The binary item size of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_abf120cf96ec103bdb558b3e40cffa9a0}{
+\index{Attribute@{Attribute}!GetBytes@{GetBytes}}
+\index{GetBytes@{GetBytes}!Attribute@{Attribute}}
+\subsubsection[{GetBytes}]{\setlength{\rightskip}{0pt plus 5cm}const gdcm::ByteValue $\ast$ Attribute::GetBytes (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_abf120cf96ec103bdb558b3e40cffa9a0}
+
+
+Function to get the inline bytes of the attribute. 
+
+\begin{DoxyReturn}{Returns}
+bytes The inline bytes of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_a4bf23c4440b4270e822c21dff30eefb6}{
+\index{Attribute@{Attribute}!GetItems@{GetItems}}
+\index{GetItems@{GetItems}!Attribute@{Attribute}}
+\subsubsection[{GetItems}]{\setlength{\rightskip}{0pt plus 5cm}std::vector$<$ {\bf Item} $>$ Attribute::GetItems (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a4bf23c4440b4270e822c21dff30eefb6}
+
+
+Function to get the items of the attribute (used in sequences) 
+
+\begin{DoxyReturn}{Returns}
+items The items of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_a104ebad6ecf44626b5f9274baed3d372}{
+\index{Attribute@{Attribute}!GetTag@{GetTag}}
+\index{GetTag@{GetTag}!Attribute@{Attribute}}
+\subsubsection[{GetTag}]{\setlength{\rightskip}{0pt plus 5cm}std::string Attribute::GetTag (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a104ebad6ecf44626b5f9274baed3d372}
+
+
+Function to get the tag of the attribute. 
+
+\begin{DoxyReturn}{Returns}
+tag The tag of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_a0bea8bb481e523bfde4a393dddd1caa0}{
+\index{Attribute@{Attribute}!GetVal@{GetVal}}
+\index{GetVal@{GetVal}!Attribute@{Attribute}}
+\subsubsection[{GetVal}]{\setlength{\rightskip}{0pt plus 5cm}std::string Attribute::GetVal (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a0bea8bb481e523bfde4a393dddd1caa0}
+
+
+Function to get the value of the attribute. 
+
+\begin{DoxyReturn}{Returns}
+val The value of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_a7c58e62a7401a3ab1271019f8ed8bfdf}{
+\index{Attribute@{Attribute}!GetVR@{GetVR}}
+\index{GetVR@{GetVR}!Attribute@{Attribute}}
+\subsubsection[{GetVR}]{\setlength{\rightskip}{0pt plus 5cm}std::string Attribute::GetVR (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a7c58e62a7401a3ab1271019f8ed8bfdf}
+
+
+Function to get the VR of the attribute. 
+
+\begin{DoxyReturn}{Returns}
+vr The VR of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_attribute_af84e5debc9137854dc4d1f40bc0014fe}{
+\index{Attribute@{Attribute}!HasSequenceItems@{HasSequenceItems}}
+\index{HasSequenceItems@{HasSequenceItems}!Attribute@{Attribute}}
+\subsubsection[{HasSequenceItems}]{\setlength{\rightskip}{0pt plus 5cm}bool Attribute::HasSequenceItems (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_af84e5debc9137854dc4d1f40bc0014fe}
+
+
+Function to check if the attribute has sequence items. 
+
+\begin{DoxyReturn}{Returns}
+hasSequenceItems Boolean indicating whether the attribute has sequence items 
+\end{DoxyReturn}
+\hypertarget{class_attribute_a24ac04f4f0c3c2aafd1288990c58351b}{
+\index{Attribute@{Attribute}!RemoveItem@{RemoveItem}}
+\index{RemoveItem@{RemoveItem}!Attribute@{Attribute}}
+\subsubsection[{RemoveItem}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::RemoveItem (
+\begin{DoxyParamCaption}
+\item[{{\bf Item}}]{ item}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a24ac04f4f0c3c2aafd1288990c58351b}
+
+
+Function to remove an item from the item list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em item} & The item to be removed \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_a16a59367271d516785c18248f7f72669}{
+\index{Attribute@{Attribute}!SetBid@{SetBid}}
+\index{SetBid@{SetBid}!Attribute@{Attribute}}
+\subsubsection[{SetBid}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetBid (
+\begin{DoxyParamCaption}
+\item[{int}]{ bid}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a16a59367271d516785c18248f7f72669}
+
+
+Function to set the bid of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bid} & The bid of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_a40f7c11646c5b6a50daf7982a630f55a}{
+\index{Attribute@{Attribute}!SetBSize@{SetBSize}}
+\index{SetBSize@{SetBSize}!Attribute@{Attribute}}
+\subsubsection[{SetBSize}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetBSize (
+\begin{DoxyParamCaption}
+\item[{int}]{ bSize}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a40f7c11646c5b6a50daf7982a630f55a}
+
+
+Function to set the binary item size of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bSize} & The binary item size of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_ab1a4438bd71ef096edce9bf1347b1952}{
+\index{Attribute@{Attribute}!SetBytes@{SetBytes}}
+\index{SetBytes@{SetBytes}!Attribute@{Attribute}}
+\subsubsection[{SetBytes}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetBytes (
+\begin{DoxyParamCaption}
+\item[{const gdcm::ByteValue $\ast$}]{ bytes}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_ab1a4438bd71ef096edce9bf1347b1952}
+
+
+Function to set the inline bytes of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bytes} & The inline bytes of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_a7594af81a1d1ff8255df881868d745f1}{
+\index{Attribute@{Attribute}!SetTag@{SetTag}}
+\index{SetTag@{SetTag}!Attribute@{Attribute}}
+\subsubsection[{SetTag}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetTag (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a7594af81a1d1ff8255df881868d745f1}
+
+
+Function to set the tag of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_abdf349cbe232df3425181294b3a3c419}{
+\index{Attribute@{Attribute}!SetVal@{SetVal}}
+\index{SetVal@{SetVal}!Attribute@{Attribute}}
+\subsubsection[{SetVal}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetVal (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ val}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_abdf349cbe232df3425181294b3a3c419}
+
+
+Function to set the value of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & The value of the attribute \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_attribute_a6af6ca72eaae551aa0f44e0e7cccac9d}{
+\index{Attribute@{Attribute}!SetVR@{SetVR}}
+\index{SetVR@{SetVR}!Attribute@{Attribute}}
+\subsubsection[{SetVR}]{\setlength{\rightskip}{0pt plus 5cm}void Attribute::SetVR (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ vr}
+\end{DoxyParamCaption}
+)}}
+\label{class_attribute_a6af6ca72eaae551aa0f44e0e7cccac9d}
+
+
+Function to set the VR of the attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vr} & The VR of the attribute \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+mintcpp/branches/development/MINTMetadata/Attribute.h\item 
+mintcpp/branches/development/MINTMetadata/Attribute.cpp\end{DoxyCompactItemize}
