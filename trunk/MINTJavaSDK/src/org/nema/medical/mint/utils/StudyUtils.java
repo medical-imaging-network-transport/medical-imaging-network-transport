@@ -313,10 +313,8 @@ public final class StudyUtils {
     }
 
     /**
-     * Determines if the provided string is a valid "exclude" string.
-     *
      * @param exclude
-     * @return
+     * @return true iff the provided string is a valid "exclude" string
      */
     public static boolean isExclude(String exclude) {
         return exclude != null;
@@ -633,7 +631,7 @@ public final class StudyUtils {
      *
      * @param study
      * @param binaryFolder
-     * @return
+     * @return true iff the given study has passed all implemented validation checks
      */
     public static boolean validateStudy(StudyMetadata study, File binaryFolder) {
         boolean result = true;
@@ -720,9 +718,7 @@ public final class StudyUtils {
     }
 
     /**
-     * Returns the version to set a study to on creation.
-     *
-     * @return
+     * @return the version to set a study to on creation
      */
     public static String getBaseVersion() {
         return INITIAL_VERSION;
@@ -732,7 +728,7 @@ public final class StudyUtils {
      * Generates the next version string after the provided string.  An example of this for a 0 based index version system would be to pass in "3" and get back "4".  Values don't need to be sequential but the 'next' value should at least be bigger than the current.
      *
      * @param current
-     * @return
+     * @return the next version string
      */
     public static String getNextVersion(String current) {
         String result = null;

@@ -1,18 +1,18 @@
 <!DOCTYPE project>
 <project basedir="." default="jar" name="DICOMSend">
-    <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
+    <property name="common.project.basedir" value="${basedir}/../MINTServer" />
     <available file="${common.project.basedir}" type="dir" property="common.project.available" />
-    <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
+    <fail message="Must have the MINTServer project in the same parent folder as this project" unless="common.project.available" />
 
     <import file="../build-common.xml" />
 
     <path id="compile.classpath">
-        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+        <pathelement location="${common.project.basedir}/build/classes" />
     </path>
 
     <target name="compile">
-        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
+        <ant dir="${common.project.basedir}" target="compile" inheritall="false" />
 
         <antcall target="build-common.compile" />
     </target>

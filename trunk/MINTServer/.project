@@ -3,9 +3,7 @@
 	<name>MINTServer</name>
 	<comment></comment>
 	<projects>
-		<project>MINTCommon</project>
 		<project>MINTJavaSDK</project>
-		<project>MINTServer</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

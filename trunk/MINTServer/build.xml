@@ -4,10 +4,6 @@
     <available file="${javasdk.project.basedir}" type="dir" property="javasdk.project.available" />
     <fail message="Must have the MINTJavaSDK project in the same parent folder as this project" unless="javasdk.project.available" />
 
-    <property name="common.project.basedir" value="${basedir}/../MINTCommon" />
-    <available file="${common.project.basedir}" type="dir" property="common.project.available" />
-    <fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
-
     <import file="../build-common.xml" />
 
     <path id="compile.classpath">
@@ -15,14 +11,15 @@
         <fileset dir="${basedir}/ant-lib" includes="*.jar" />
         <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
         <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
     </path>
 
     <target name="compile">
-        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
-
         <antcall target="build-common.compile" />
+        <copy  todir="${build.classes.dir}">
+            <fileset dir="${src.dir}">
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
     </target>
 
     <target name="war" depends="compile" description="Make WARs for deployment">
@@ -36,8 +33,6 @@
             </classes>
             <lib dir="${javasdk.project.basedir}/lib" includes="*.jar" />
             <lib dir="${javasdk.project.basedir}/build" includes="*.jar" />
-            <lib dir="${common.project.basedir}/lib" includes="*.jar" />
-            <lib dir="${common.project.basedir}/build" includes="*.jar" />
             <metainf dir="WebContent/META-INF" />
         </war>
     </target>
