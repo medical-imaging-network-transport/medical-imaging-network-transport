@@ -4,21 +4,21 @@
 	<available file="${javasdk.project.basedir}" type="dir" property="javasdk.project.available" />
 	<fail message="Must have the MINTJavaSDK project in the same parent folder as this project" unless="javasdk.project.available" />
 
-	<property name="common.project.basedir" value="${basedir}/../MINTCommon" />
+	<property name="common.project.basedir" value="${basedir}/../MINTServer" />
 	<available file="${common.project.basedir}" type="dir" property="common.project.available" />
-	<fail message="Must have the MINTCommon project in the same parent folder as this project" unless="common.project.available" />
+	<fail message="Must have the MINTServer project in the same parent folder as this project" unless="common.project.available" />
 
     <import file="../build-common.xml" />
 
     <path id="compile.classpath">
         <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
         <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/lib" includes="*.jar" />
-        <fileset dir="${common.project.basedir}/build" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+        <pathelement location="${common.project.basedir}/build/classes" />
     </path>
 
     <target name="compile">
-        <ant dir="${common.project.basedir}" target="jar" inheritall="false" />
+        <ant dir="${common.project.basedir}" target="compile" inheritall="false" />
 
         <antcall target="build-common.compile" />
     </target>
@@ -29,17 +29,17 @@
 			<fileset dir="${src.dir}" excludes="**/*.java"/>
 			<fileset dir="${common.project.basedir}/build/classes" />
 			<fileset dir="${javasdk.project.basedir}/build/classes" />
-			<zipfileset src="${common.project.basedir}/lib/apache-mime4j-0.6.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/commons-logging-1.1.1.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/httpclient-4.0.1.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/httpcore-4.0.1.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/httpmime-4.0.1.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/slf4j-api-1.6.0.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/slf4j-log4j12-1.6.0.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/commons-lang-2.5.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/log4j-1.2.16.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/dcm4che-core-2.0.23.jar"/>
-			<zipfileset src="${common.project.basedir}/lib/commons-lang-2.5.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/apache-mime4j-0.6.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/httpclient-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/httpcore-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/httpmime-4.0.1.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/commons-lang-2.5.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/dcm4che-core-2.0.23.jar"/>
+			<zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/commons-lang-2.5.jar"/>
 			<zipfileset src="${javasdk.project.basedir}/lib/commons-codec-1.3.jar"/>
 			<zipfileset src="${javasdk.project.basedir}/lib/jibx-run-1.2.2.jar"/>
 			<zipfileset src="${javasdk.project.basedir}/lib/protobuf-java-2.3.0.jar"/>

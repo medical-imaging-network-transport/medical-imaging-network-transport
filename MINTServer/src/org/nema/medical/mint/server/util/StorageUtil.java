@@ -265,7 +265,7 @@ public final class StorageUtil {
      * mkdirs on the file to return before returning it.
      *
      * @param changelogRoot
-     * @return
+     * @return a file to root/'the largest int + 1'
      */
     public static File getNextChangelogDir(File changelogRoot)
     {
@@ -299,7 +299,7 @@ public final class StorageUtil {
      *
      * @param study
      * @param binaryFolder
-     * @return
+     * @return true iff the given study has passed all implemented validation checks
      */
     public static boolean validateStudy(StudyMetadata study, File binaryFolder)
     {
@@ -413,7 +413,8 @@ public final class StorageUtil {
 	 * 
 	 * @param existingBinaryFolder
 	 * @param excludedBids
-	 * @return
+	 * @return -1 if successful, or the bid of the rename that failed if something
+	 * went wrong.
 	 */
     public static int renameExcludedFiles(File existingBinaryFolder,
 			Collection<Integer> excludedBids) {

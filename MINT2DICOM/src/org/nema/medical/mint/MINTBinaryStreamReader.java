@@ -22,8 +22,6 @@ public class MINTBinaryStreamReader
 	
 	/**
 	 * Default constructor.
-	 * @param binaryAddress
-	 * @throws MalformedURLException
 	 */
 	public MINTBinaryStreamReader() 
 	{
@@ -149,9 +147,8 @@ public class MINTBinaryStreamReader
 	}
 	
 	/**
-	 * Returns the binary data corresponding to the given bid.
 	 * @param contentID bid to search for
-	 * @return
+	 * @return the binary data corresponding to the given bid
 	 */
 	public byte[] getBinaryData(int contentID)
 	{

@@ -34,7 +34,7 @@
       <maximumStackSize value="2" />
       <properties />
     </buildFile>
-    <buildFile url="file://$PROJECT_DIR$/MINTCommon/build.xml">
+    <buildFile url="file://$PROJECT_DIR$/MINT2DICOM/build.xml">
       <additionalClassPath />
       <antReference projectDefault="true" />
       <customJdkName value="" />
@@ -42,25 +42,6 @@
       <maximumStackSize value="2" />
       <properties />
     </buildFile>
-  </component>
-  <component name="ArtifactManager">
-    <artifact type="war" name="MINTServer:war">
-      <output-path>$PROJECT_DIR$/MINTServer/target</output-path>
-      <root id="archive" name="MINTServer.war-0.9.10.war">
-        <element id="artifact" artifact-name="MINTServer:war exploded" />
-      </root>
-    </artifact>
-    <artifact type="exploded-war" name="MINTServer:war exploded">
-      <output-path>$PROJECT_DIR$/MINTServer/target/MINTServer.war-0.9.10</output-path>
-      <root id="root">
-        <element id="javaee-facet-resources" facet="MINTServer/web/Web" />
-        <element id="directory" name="WEB-INF">
-          <element id="directory" name="classes">
-            <element id="module-output" name="MINTServer" />
-          </element>
-        </element>
-      </root>
-    </artifact>
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -265,10 +246,12 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DICOM2MINT/DICOM2MINT.iml" filepath="$PROJECT_DIR$/DICOM2MINT/DICOM2MINT.iml" />
       <module fileurl="file://$PROJECT_DIR$/DICOM2MINTImport/DICOM2MINT.iml" filepath="$PROJECT_DIR$/DICOM2MINTImport/DICOM2MINT.iml" />
       <module fileurl="file://$PROJECT_DIR$/DICOMSend/DICOMSend.iml" filepath="$PROJECT_DIR$/DICOMSend/DICOMSend.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" filepath="$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTCommon/MINTCommon.iml" filepath="$PROJECT_DIR$/MINTCommon/MINTCommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTServer/MINTServer.iml" filepath="$PROJECT_DIR$/MINTServer/MINTServer.iml" />
     </modules>
