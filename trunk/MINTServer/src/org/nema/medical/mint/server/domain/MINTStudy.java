@@ -15,17 +15,18 @@
  */
 package org.nema.medical.mint.server.domain;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.TimeZone;
+import org.dcm4che2.data.Tag;
+import org.hibernate.annotations.GenericGenerator;
+import org.nema.medical.mint.metadata.StudyMetadata;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 @Entity
 @Table(name = "mint_study")
@@ -44,6 +45,19 @@ public class MINTStudy implements Serializable {
 	public static Timestamp now() {
 		return new Timestamp(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTimeInMillis());
 	}
+
+    public MINTStudy() {
+    }
+
+    public MINTStudy(String uuid, StudyMetadata study) {
+        setID(uuid);
+        setStudyInstanceUID(study.getStudyInstanceUID());
+        setPatientID(study.getValueForAttribute(Tag.PatientID));
+        setAccessionNumber(study.getValueForAttribute(Tag.AccessionNumber));
+        // todo set this from the actual study date and time attributes
+        setDateTime(MINTStudy.now());
+        setStudyVersion(study.getVersion());
+    }
 
 	// this is a UUID, generated externally for new instances by Java's UUID class
 	@Id @Column(name = "studyID")
