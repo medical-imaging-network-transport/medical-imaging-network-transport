@@ -15,14 +15,13 @@
  */
 package org.nema.medical.mint.server.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author Rex
@@ -36,6 +35,8 @@ public class Change {
 	}
 	
 	@Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name="changeId")
 	private String id;
 	

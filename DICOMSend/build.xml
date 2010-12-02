@@ -12,8 +12,6 @@
     </path>
 
     <target name="compile">
-        <ant dir="${common.project.basedir}" target="compile" inheritall="false" />
-
         <antcall target="build-common.compile" />
     </target>
 
@@ -21,6 +19,15 @@
         <copy file="${src.dir}/log4j.properties" todir="${build.classes.dir}"/>
         <jar destfile="${build.dir}/${ant.project.name}.jar">
             <fileset dir="${build.classes.dir}" />
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/dcm4che-core-2.0.23.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/dcm4che-net-2.0.23.jar"/>
+
+            <manifest>
+                <attribute name="Main-Class" value="org.nema.medical.mint.dicomsend.DICOMSend" />
+            </manifest>
         </jar>
     </target>
 

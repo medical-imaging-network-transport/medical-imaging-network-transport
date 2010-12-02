@@ -572,11 +572,11 @@ public class ServerConfig {
         }
         return fileStreamBufferSize;
     }
-    
+
     @Bean
     public String xmlStylesheet() {
     	return "type=\"text/xsl\" href=\"style.xsl\"";
     }
-	
+
 
 }
