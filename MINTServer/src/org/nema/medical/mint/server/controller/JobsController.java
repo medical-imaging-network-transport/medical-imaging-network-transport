@@ -46,6 +46,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.jobs.JobConstants;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfo;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
@@ -136,7 +137,8 @@ public class JobsController {
 
 		final String type;
 
-		if (!params.containsKey("type") || StringUtils.isBlank(type = params.get("type"))) {
+		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) ||
+                StringUtils.isBlank(type = params.get(JobConstants.HTTP_MESSAGE_PART_TYPE))) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
 			return;
 		}
@@ -200,16 +202,27 @@ public class JobsController {
 			return;
 		}
 
-		if (!params.containsKey("studyUUID")) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter studyUUID");
+		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_STUDYUUID)) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
+                    + JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
 			return;
 		}
 
-		String studyUUID = params.get("studyUUID");
+		final String studyUUID = params.get(JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
+
+        if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_OLDVERSION)) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
+                    + JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
+            return;
+        }
+
+        final String oldVersion = params.get(JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
 
 		final String type;
-		if (!params.containsKey("type") || StringUtils.isBlank(type = params.get("type"))) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
+		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) ||
+                StringUtils.isBlank(type = params.get(JobConstants.HTTP_MESSAGE_PART_TYPE))) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter '"
+                    + JobConstants.HTTP_MESSAGE_PART_TYPE + "'");
 			return;
 		}
 
@@ -233,7 +246,7 @@ public class JobsController {
 		String principalName = (principal != null) ? principal.getName() : null;
 
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				studyFolder, type, req.getRemoteUser(), req.getRemoteHost(),
+				studyFolder, type, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
 				principalName, jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 

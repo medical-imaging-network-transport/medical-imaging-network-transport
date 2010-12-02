@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@page import="org.apache.commons.lang.StringUtils"%><html>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="org.nema.medical.mint.jobs.JobConstants"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <title>Create Study</title>
@@ -10,7 +11,7 @@
 <h2>Create Study</h2>
 
 <form name='post_form' method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/createstudy'>
-Type: <select name=type>
+Type: <select name=<%=JobConstants.HTTP_MESSAGE_PART_TYPE%>>
 <!-- TODO dynamically populate this list from the set of types the server knows about -->
 <option value="DICOM">DICOM</option>
 </select><br>
