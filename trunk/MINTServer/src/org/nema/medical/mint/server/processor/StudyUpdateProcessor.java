@@ -46,7 +46,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String type, remoteUser, remoteHost, principal;
+	private final String type, oldVersion, remoteUser, remoteHost, principal;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
@@ -59,10 +59,14 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public StudyUpdateProcessor(File jobFolder, File studyFolder, String type, String remoteUser, String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyUpdateProcessor(final File jobFolder, final File studyFolder, final String type,
+                                final String oldVersion, final String remoteUser, final String remoteHost,
+                                final String principal, final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO,
+                                final ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
 		this.type = type;
+        this.oldVersion = oldVersion;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
 		this.principal = principal;
@@ -135,9 +139,9 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * update is for a version that is not the most recent and
 				 * should not be applied.
 				 */
-				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(newStudy.getVersion())))
+				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(oldVersion)))
 				{
-					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + newStudy.getVersion() + ")");
+					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + oldVersion + ")");
 				}
 				
 				if(!StorageUtil.validateStudy(newStudy, jobFolder))

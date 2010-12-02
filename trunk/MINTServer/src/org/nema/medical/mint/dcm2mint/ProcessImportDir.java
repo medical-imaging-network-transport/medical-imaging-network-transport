@@ -71,6 +71,7 @@ import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.datadictionary.SeriesAttributesType;
 import org.nema.medical.mint.datadictionary.StudyAttributesType;
 import org.nema.medical.mint.datadictionary.DataDictionaryIO;
+import org.nema.medical.mint.jobs.JobConstants;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.utils.Iter;
@@ -438,14 +439,15 @@ public final class ProcessImportDir {
         final MultipartEntity entity = new MultipartEntity();
 
         //Need to specify the 'type' of the data being sent
-        entity.addPart("type", new StringBody("DICOM"));
+        entity.addPart(JobConstants.HTTP_MESSAGE_PART_TYPE, new StringBody("DICOM"));
         if (studyQueryInfo != null) {
-            entity.addPart("studyUUID", new StringBody(studyQueryInfo.studyUUID));
+            entity.addPart(JobConstants.HTTP_MESSAGE_PART_STUDYUUID, new StringBody(studyQueryInfo.studyUUID));
         }
 
         final StudyMetadata study = useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
         if (studyQueryInfo != null) {
-            study.setVersion(studyQueryInfo.studyVersion);
+            //Specify current study version
+            entity.addPart(JobConstants.HTTP_MESSAGE_PART_OLDVERSION, new StringBody(studyQueryInfo.studyVersion));
         }
 
         //Pretty significant in-memory operations, so scoping to get references released ASAP

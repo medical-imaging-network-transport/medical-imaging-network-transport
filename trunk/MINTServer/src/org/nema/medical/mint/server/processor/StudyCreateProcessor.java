@@ -92,6 +92,12 @@ public class StudyCreateProcessor extends TimerTask {
 			}
 			LOG.info("job " + jobID + " validated");
 			
+            //Write metadata to change log
+            File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
+
+            StorageUtil.writeStudy(study, changelogFolder);
+            LOG.info("study changelog for " + jobID + " written");
+
 			// Set to base level version
             study.setVersion(StudyUtils.getBaseVersion());
 	        study.setType(type);
@@ -100,13 +106,6 @@ public class StudyCreateProcessor extends TimerTask {
 			StorageUtil.writeStudy(study, typeFolder);
 			LOG.info("study metadata for " + jobID + " written");
 	        
-	        //Write metadata to change log
-	        File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
-	        
-	        // TODO copy the previous file, unmarshalling again is too time consuming
-	        StorageUtil.writeStudy(study, changelogFolder);
-			LOG.info("study changelog for " + jobID + " written");
-
 	        //Copy binary data into binaryitems folder
 	        File binaryRoot = new File(typeFolder, "binaryitems");
 			binaryRoot.mkdirs();
