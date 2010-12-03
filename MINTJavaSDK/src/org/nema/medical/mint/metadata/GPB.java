@@ -2693,30 +2693,29 @@ public final class GPB {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023mint-metadata.proto\022\rmint.metadata\"\273\001\n" +
-      "\tStudyData\022\032\n\022study_instance_uid\030\001 \001(\t\022\014" +
-      "\n\004type\030\004 \001(\t\022\017\n\007version\030\005 \001(\t\022\026\n\016instanc" +
-      "e_count\030\006 \001(\r\0220\n\nattributes\030\002 \003(\0132\034.mint" +
-      ".metadata.AttributeData\022)\n\006series\030\003 \003(\0132" +
-      "\031.mint.metadata.SeriesData\"\372\001\n\nSeriesDat" +
-      "a\022\033\n\023series_instance_uid\030\001 \001(\t\022\017\n\007exclud" +
-      "e\030\002 \001(\t\022\026\n\016instance_count\030\006 \001(\r\0220\n\nattri" +
-      "butes\030\003 \003(\0132\034.mint.metadata.AttributeDat" +
-      "a\022D\n\036normalized_instance_attributes\030\004 \003(",
-      "\0132\034.mint.metadata.AttributeData\022.\n\tinsta" +
-      "nces\030\005 \003(\0132\033.mint.metadata.InstanceData\"" +
-      "\210\001\n\014InstanceData\022\030\n\020sop_instance_uid\030\001 \001" +
-      "(\t\022\017\n\007exclude\030\002 \001(\t\022\033\n\023transfer_syntax_u" +
-      "id\030\003 \001(\t\0220\n\nattributes\030\004 \003(\0132\034.mint.meta" +
-      "data.AttributeData\"\315\001\n\rAttributeData\022\013\n\003" +
-      "tag\030\001 \001(\r\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024" +
-      "\n\014string_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005" +
-      " \001(\r\022\030\n\020binary_item_size\030\t \001(\r\022\023\n\013frame_" +
-      "count\030\010 \001(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005items\030\006 \003(",
-      "\0132\027.mint.metadata.ItemData\"<\n\010ItemData\0220" +
-      "\n\nattributes\030\001 \003(\0132\034.mint.metadata.Attri" +
-      "buteDataB\'\n\036org.nema.medical.mint.metada" +
-      "taB\003GPBH\001"
+      "\n\nmint.proto\022\rmint.metadata\"\273\001\n\tStudyDat" +
+      "a\022\032\n\022study_instance_uid\030\001 \001(\t\022\014\n\004type\030\004 " +
+      "\001(\t\022\017\n\007version\030\005 \001(\t\022\026\n\016instance_count\030\006" +
+      " \001(\r\0220\n\nattributes\030\002 \003(\0132\034.mint.metadata" +
+      ".AttributeData\022)\n\006series\030\003 \003(\0132\031.mint.me" +
+      "tadata.SeriesData\"\372\001\n\nSeriesData\022\033\n\023seri" +
+      "es_instance_uid\030\001 \001(\t\022\017\n\007exclude\030\002 \001(\t\022\026" +
+      "\n\016instance_count\030\006 \001(\r\0220\n\nattributes\030\003 \003" +
+      "(\0132\034.mint.metadata.AttributeData\022D\n\036norm" +
+      "alized_instance_attributes\030\004 \003(\0132\034.mint.",
+      "metadata.AttributeData\022.\n\tinstances\030\005 \003(" +
+      "\0132\033.mint.metadata.InstanceData\"\210\001\n\014Insta" +
+      "nceData\022\030\n\020sop_instance_uid\030\001 \001(\t\022\017\n\007exc" +
+      "lude\030\002 \001(\t\022\033\n\023transfer_syntax_uid\030\003 \001(\t\022" +
+      "0\n\nattributes\030\004 \003(\0132\034.mint.metadata.Attr" +
+      "ibuteData\"\315\001\n\rAttributeData\022\013\n\003tag\030\001 \001(\r" +
+      "\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024\n\014string_" +
+      "value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\030\n\020b" +
+      "inary_item_size\030\t \001(\r\022\023\n\013frame_count\030\010 \001" +
+      "(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005items\030\006 \003(\0132\027.mint.",
+      "metadata.ItemData\"<\n\010ItemData\0220\n\nattribu" +
+      "tes\030\001 \003(\0132\034.mint.metadata.AttributeDataB" +
+      "\'\n\036org.nema.medical.mint.metadataB\003GPBH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
