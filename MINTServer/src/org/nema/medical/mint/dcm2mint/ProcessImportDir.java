@@ -94,8 +94,8 @@ public final class ProcessImportDir {
     private final boolean forceCreate;
     private final int binaryInlineThreshold;
     private MetadataType metadataType = null; 
-    private Set<Integer> STUDY_LEVEL_TAGS;
-    private Set<Integer> SERIES_LEVEL_TAGS;
+    private Set<Integer> studyLevelTags;
+    private Set<Integer> seriesLevelTags;
     private static final XPath xPath = XPathFactory.newInstance().newXPath();
     private static final DocumentBuilder documentBuilder;
     static {
@@ -140,8 +140,8 @@ public final class ProcessImportDir {
     		String response = httpClient.execute(httpGet, new BasicResponseHandler());
         	InputStream in = new ByteArrayInputStream(response.getBytes());
         	this.metadataType = DataDictionaryIO.parseFromXML(in);
-        	this.STUDY_LEVEL_TAGS = getStudyTags(metadataType);
-        	this.SERIES_LEVEL_TAGS = getSeriesTags(metadataType); 
+        	this.studyLevelTags = getStudyTags(metadataType);
+        	this.seriesLevelTags = getSeriesTags(metadataType);
     	}
         LOG.info("Gathering files for allocation to studies.");
         final long fileGatherStart = System.currentTimeMillis();
@@ -197,7 +197,7 @@ public final class ProcessImportDir {
             metaBinaryPair.setBinaryData(binaryData);
             //Constrain processing
             metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
-            final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(STUDY_LEVEL_TAGS, SERIES_LEVEL_TAGS, metaBinaryPair);
+            final Dcm2MetaBuilder builder = new Dcm2MetaBuilder(studyLevelTags, seriesLevelTags, metaBinaryPair);
             builder.setBinaryInlineThreshold(binaryInlineThreshold);
             final Iterator<File> instanceFileIter = instanceFiles.iterator();
             while (instanceFileIter.hasNext()) {
@@ -237,14 +237,11 @@ public final class ProcessImportDir {
             builder.finish();
 
             try {
-            	if(StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata()))
-            	{
-            		addToSendQueue(metaBinaryPair, instanceFiles);
-            	}
-            	else
-            	{
-            		LOG.error("Skipping study " + studyUID + ": DICOM syntax error in study metadata");
-            	}
+                if (StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata())) {
+                    addToSendQueue(metaBinaryPair, instanceFiles);
+                } else {
+                    LOG.error("Skipping study " + studyUID + ": validation error in study metadata");
+                }
             } catch (final IOException e) {
                 //Catastrophic error
                 throw new RuntimeException(e);
@@ -533,34 +530,28 @@ public final class ProcessImportDir {
                     + " is not a normal file and not a directory");
         }
     }
-    private static Set<Integer> getSeriesTags(MetadataType mt)
-    {    	
+
+    private static Set<Integer> getSeriesTags(final MetadataType mt) {
+		final SeriesAttributesType seriesAttsParent = mt.getSeriesAttributes();
+		final List<AttributeType> seriesAtts = seriesAttsParent.getAttributes();
+        return getTags(seriesAtts);
+    }
+
+    private static Set<Integer> getStudyTags(final MetadataType mt) {
+		final StudyAttributesType studyAttsParent = mt.getStudyAttributes();
+		final List<AttributeType> studyAtts = studyAttsParent.getAttributes();
+        return getTags(studyAtts);
+    }
+
+    private static Set<Integer> getTags(final Collection<AttributeType> attributeTypes) {
     	final Set<Integer> tagSet = new HashSet<Integer>();
-    	 	
-		SeriesAttributesType seriesAttsParent = mt.getSeriesAttributes();
-		List<AttributeType> seriesAtts = seriesAttsParent.getAttributes();
-		for(int x = 0; x < seriesAtts.size(); x++)
-		{
-			AttributeType att = seriesAtts.get(x);
+		for (final AttributeType att: attributeTypes) {
 			final int intTag = (int)Long.parseLong(att.getTag(), 16);
-            tagSet.add(intTag);	
-		}     	
-    	return tagSet;
-    }   
-    private static Set<Integer> getStudyTags(MetadataType mt)
-    {
-    	final Set<Integer> tagSet = new HashSet<Integer>();
-    	
-		StudyAttributesType studyAttsParent = mt.getStudyAttributes();
-		List<AttributeType> studyAtts = studyAttsParent.getAttributes();
-		for(int x = 0; x < studyAtts.size(); x++)
-		{
-			AttributeType att = studyAtts.get(x);
-			final int intTag = (int)Long.parseLong(att.getTag(), 16);
-            tagSet.add(intTag);	
-		}   		
+            tagSet.add(intTag);
+		}
     	return tagSet;
     }
+
     private static class MetaBinaryFiles {
         public String studyInstanceUID;
         public String patientID;

@@ -95,7 +95,7 @@ public class StudyCreateProcessor extends TimerTask {
             //Write metadata to change log
             File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
 
-            StorageUtil.writeStudy(study, changelogFolder);
+            StudyUtils.writeStudy(study, changelogFolder);
             LOG.info("study changelog for " + jobID + " written");
 
 			// Set to base level version
@@ -103,7 +103,7 @@ public class StudyCreateProcessor extends TimerTask {
 	        study.setType(type);
 			
 			//write study into type folder
-			StorageUtil.writeStudy(study, typeFolder);
+			StudyUtils.writeStudy(study, typeFolder);
 			LOG.info("study metadata for " + jobID + " written");
 	        
 	        //Copy binary data into binaryitems folder
@@ -111,11 +111,11 @@ public class StudyCreateProcessor extends TimerTask {
 			binaryRoot.mkdirs();
 
 			LOG.info("moving binary items for " + jobID + " ");
-			StorageUtil.moveBinaryItems(jobFolder, binaryRoot);
+			StudyUtils.moveBinaryItems(jobFolder, binaryRoot);
 			LOG.info("moving binary items for " + jobID + " complete");
 			
 			//delete job folder
-			StorageUtil.deleteFolder(jobFolder);
+			StudyUtils.deleteFolder(jobFolder);
 
 			//update database
 			MINTStudy studyData = new MINTStudy();

@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.*;
 import org.nema.medical.mint.metadata.StudyMetadata;
+import org.nema.medical.mint.utils.StudyUtils;
 
 /**
  * @author Rex
@@ -38,8 +39,6 @@ public final class StorageUtil {
 
     public static final String BINARY_FILE_EXTENSION = "dat";
     public static final String EXCLUDED_BINARY_FILE_EXTENSION = "exclude";
-    
-    public static final String INITIAL_VERSION = "0";
 
     /**
      * This method will looks for BINARY_FILE_EXTENSION files and will try to
@@ -101,7 +100,7 @@ public final class StorageUtil {
     	{
     		return true;
     	}
-    	
+
         /*
          * Need to shift the both the binary file names and the study bids to
          * stay consistent.
@@ -113,7 +112,7 @@ public final class StorageUtil {
             success &= shiftBinaryFiles(binaryDirectory, shiftAmount);
 
         if(success)
-            success &= shiftStudyBids(study, shiftAmount);
+            success &= StudyUtils.shiftStudyBids(study, shiftAmount);
 
         return success;
     }
@@ -166,100 +165,6 @@ public final class StorageUtil {
     }
 
     /**
-     * Will return true always unless something catastrophically unexpected
-     * occurs.  Assumes that all bids will be within the instances.
-     *
-     * @param study
-     * @param shiftAmount
-     * @return
-     */
-    private static boolean shiftStudyBids(StudyMetadata study, int shiftAmount)
-    {
-        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
-        {
-            for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
-            {
-                for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
-                {
-                    Attribute a = iii.next();
-
-                    Queue<Attribute> sequence = new LinkedList<Attribute>();
-                    sequence.add(a);
-                    
-                    while(!sequence.isEmpty())
-                    {
-                    	Attribute curr = sequence.remove();
-                    	
-                    	//Check if bid exists
-                    	int bid = curr.getBid();
-                        if(bid >= 0)
-                        {
-                            bid += shiftAmount;
-                            curr.setBid(bid);
-                            // frameCount is relative to bid, no need to change it
-                        } 
-                    	
-                        //Add children to queue
-                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
-                    	{
-                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
-                    		{
-                    			sequence.add(iiiii.next());
-                    		}
-                    	}
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public static void writeStudy(StudyMetadata study, File studyFolder) throws IOException
-    {
-        StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb"));
-        StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml"));
-        StudyIO.writeToGPB(study, new File(studyFolder, "metadata.gpb.gz"));
-        StudyIO.writeToXML(study, new File(studyFolder, "metadata.xml.gz"));
-        StudyIO.writeSummaryToXML(study, new File(studyFolder, "summary.xml"));
-    }
-
-    public static void moveBinaryItems(File jobFolder, File studyBinaryFolder) {
-        Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
-        while (iterator.hasNext()) {
-            File tempfile = iterator.next();
-
-            //Don't move metadata because has no purpose in the destination
-            if(!tempfile.getName().startsWith("metadata"))
-            {
-                File permfile = new File(studyBinaryFolder, tempfile.getName());
-                // just moving the file since the reference implementation
-                // is using the same MINT_ROOT for temp and perm storage
-                // other implementations may want to copy/delete the file
-                // if the temp storage is on a different device
-                tempfile.renameTo(permfile);
-            }
-        }
-        jobFolder.delete();
-    }
-
-    /**
-     * Will delete all files in the jobs folder and then delete the jobs folder
-     * itself.
-     *
-     * @param jobFolder
-     */
-    public static void deleteFolder(File jobFolder)
-    {
-        for(File f : jobFolder.listFiles())
-        {
-            f.delete();
-        }
-
-        jobFolder.delete();
-    }
-
-    /**
      * This method will find the largest int named file in the changelog root
      * directory and will return a file to root/'the largest int + 1'. Calls
      * mkdirs on the file to return before returning it.
@@ -303,29 +208,18 @@ public final class StorageUtil {
      */
     public static boolean validateStudy(StudyMetadata study, File binaryFolder)
     {
-        boolean result = true;
-
-        result = result && validateBinaryItemsReferences(study, binaryFolder);
-        //add other validation here and && it with result
-
-        return result;
+        return StudyUtils.validateStudy(study, getBinaryItemIds(binaryFolder));
     }
 
     /**
-     * This method will determine if there the bid references from the study to
-     * binary items are all existing and that there are no excess binary items.
-     * The expect usage of this method is during study create and study update
-     * to ensure the passed in metadata and binary items are in agreement (i.e.,
-     * no unreferenced binary items and no bids in the metadata that point to
-     * nothing).
+     * Retrieves binary item ids from a given binary items folder.
      *
-     * @param study
      * @param binaryFolder
      * @return Returns true if no violations were detected.
      */
-    public static boolean validateBinaryItemsReferences(StudyMetadata study, File binaryFolder)
+    public static Collection<Integer> getBinaryItemIds(File binaryFolder)
     {
-        Set<Integer> studyBids = new HashSet<Integer>(), binaryItemIds = new HashSet<Integer>();
+        final Collection<Integer> binaryItemIds = new HashSet<Integer>();
 
         //Collect id from file names
         for(String file : binaryFolder.list())
@@ -343,74 +237,15 @@ public final class StorageUtil {
             }
         }
 
-		/*
-		 * Collect id from attributes
-		 * 
-		 * NOTE: StudyMetadata has a method that does almost exactly this except that
-		 * this method detects repeated bids (which is not allowed). Do not just
-		 * replace the below with that method without first considering this
-		 * fact.
-		 */
-        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
-        {
-            for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
-            {
-                for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
-                {
-                    Attribute a = iii.next();
+        return binaryItemIds;
+}
 
-                    Queue<Attribute> sequence = new LinkedList<Attribute>();
-                    sequence.add(a);
-                    
-                    while(!sequence.isEmpty())
-                    {
-                    	Attribute curr = sequence.remove();
-                    	
-                    	int bid = curr.getBid();
-                        if(bid >= 0)
-                        {
-                            int frameCount = curr.getFrameCount();
-                            if (frameCount >= 1)
-                            {
-                                for (int newBid = bid; newBid < (bid + frameCount); newBid++)
-                                {
-                                    if (!studyBids.add(newBid))
-                                    {
-                                        //If the set already contained the bid, should be unique reference
-                                        return false;
-                                    }
-                                }
-                            } else {
-                                if(!studyBids.add(bid))
-                                {
-                                    //If the set already contained the bid, should be unique reference
-                                    return false;
-                                }
-                            }
-                        }
-                    	
-                        //Add children to queue
-                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
-                    	{
-                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
-                    		{
-                    			sequence.add(iiiii.next());
-                    		}
-                    	}
-                    }
-                }
-            }
-        }
-
-        return studyBids.equals(binaryItemIds);
-    }
-    
 	/**
 	 * Will attempt to rename each file that is bid.dat where possible bids are
 	 * passed in the excludedBids collection to bid.exclude. Will return -1 if
 	 * successful and will return the bid of the rename that failed if something
 	 * went wrong.
-	 * 
+	 *
 	 * @param existingBinaryFolder
 	 * @param excludedBids
 	 * @return -1 if successful, or the bid of the rename that failed if something
@@ -422,11 +257,11 @@ public final class StorageUtil {
 		{
 			File oldFile = new File(existingBinaryFolder, bid + "." + BINARY_FILE_EXTENSION);
 			File newFile = new File(existingBinaryFolder, bid + "." + EXCLUDED_BINARY_FILE_EXTENSION);
-			
+
 			if(!oldFile.renameTo(newFile))
 				return bid;
 		}
-		
+
 		return -1;
 	}
 }
