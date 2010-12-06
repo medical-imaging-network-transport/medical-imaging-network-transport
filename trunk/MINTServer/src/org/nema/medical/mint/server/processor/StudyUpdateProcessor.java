@@ -166,7 +166,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				 */
 		        File changelogFolder = StorageUtil.getNextChangelogDir(changelogRoot);
 		        
-		        StorageUtil.writeStudy(newStudy, changelogFolder);
+		        StudyUtils.writeStudy(newStudy, changelogFolder);
 				
 		        Collection<Integer> excludedBids = new HashSet<Integer>();
 		        if(existingStudy != null)
@@ -234,11 +234,11 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * Need to copy into the Study folder the new study document and
 				 * binary data files.
 				 */
-				StorageUtil.writeStudy(existingStudy, typeFolder);
+				StudyUtils.writeStudy(existingStudy, typeFolder);
 				
-				StorageUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
+				StudyUtils.moveBinaryItems(jobFolder, existingBinaryFolder);
 				
-				StorageUtil.deleteFolder(jobFolder);
+				StudyUtils.deleteFolder(jobFolder);
 				
 				/*
 				 * Update the Job DAO and Study DAO

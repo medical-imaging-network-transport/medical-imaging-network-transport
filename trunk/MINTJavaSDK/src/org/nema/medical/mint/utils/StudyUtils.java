@@ -30,7 +30,7 @@ import java.util.*;
 public final class StudyUtils {
 
     public static final String INITIAL_VERSION = "0";
-    
+
     /**
      * This method should pull all data from the provided study into 'this'
      * study and overwrite any existing values in 'this' study.
@@ -183,6 +183,56 @@ public final class StudyUtils {
                                 iii.remove();
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Will return true always unless something catastrophically unexpected
+     * occurs.  Assumes that all bids will be within the instances.
+     *
+     * @param study
+     * @param shiftAmount
+     * @return
+     */
+    public static boolean shiftStudyBids(StudyMetadata study, int shiftAmount)
+    {
+        for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
+        {
+            for(Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();)
+            {
+                for(Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();)
+                {
+                    Attribute a = iii.next();
+
+                    Queue<Attribute> sequence = new LinkedList<Attribute>();
+                    sequence.add(a);
+
+                    while(!sequence.isEmpty())
+                    {
+                    	Attribute curr = sequence.remove();
+
+                    	//Check if bid exists
+                    	int bid = curr.getBid();
+                        if(bid >= 0)
+                        {
+                            bid += shiftAmount;
+                            curr.setBid(bid);
+                            // frameCount is relative to bid, no need to change it
+                        }
+
+                        //Add children to queue
+                    	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
+                    	{
+                    		for(Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();)
+                    		{
+                    			sequence.add(iiiii.next());
+                    		}
+                    	}
                     }
                 }
             }
@@ -353,7 +403,7 @@ public final class StudyUtils {
      * a very forgiving normalization. We allow study level attributes to come in as instance
      * level attributes and we then normalize them up to the study level using the data dictionary.
      * Ideally this should be changed to force validation before it even gets to this point.
-     * 
+     *
      * //TODO validate where the attributes are and what attributes are present before even getting
      * to the normalization portion.
      * <p/>
@@ -363,22 +413,22 @@ public final class StudyUtils {
      */
     public static boolean normalizeStudy(StudyMetadata study) throws IOException {
     	MetadataType metadata = null;
-    	
+
     	metadata = DataDictionaryIO.parseFromXML(StudyUtils.class.getClassLoader().getResourceAsStream(study.getType() + ".xml"));
-    	
+
     	List<AttributeType> seriesAttributes = metadata.getSeriesAttributes().getAttributes();
     	List<AttributeType> studyAttributes = metadata.getStudyAttributes().getAttributes();
-    	
+
     	List<Attribute> tempNormalizedStudyAttributeList = new LinkedList<Attribute>();
     	List<Attribute> tempNormalizedInstanceAttributeList = new LinkedList<Attribute>();
-               
+
         //For each series
         for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
             Series s = i.next();
 
             tempNormalizedInstanceAttributeList.clear();
 
-            if (s.instanceCount() > 1) 
+            if (s.instanceCount() > 1)
             {
                 //For each Instance in the series
 
@@ -407,7 +457,7 @@ public final class StudyUtils {
                  * for this series.
                  */
                 for (Attribute a : tempNormalizedInstanceAttributeList) {
-                	
+
                 	//If the normalized attribute should exist at the series level then we will put it
                 	//there, otherwise it will go to the normalized instance attribute section.
                 	boolean putInSeries = false;
@@ -418,7 +468,7 @@ public final class StudyUtils {
                 			putInSeries = true;
                 		}
                 	}
-                	
+
                 	if(putInSeries)
                 	{
                 		s.putAttribute(a);
@@ -430,14 +480,14 @@ public final class StudyUtils {
 
                     for (final Instance instanceMeta : Iter.iter(s.instanceIterator())) {
                         instanceMeta.removeAttribute(a.getTag());
-                    }                
+                    }
                 }
             }
         }
-        
+
         //Whatever is left in the normalized attribute section of each series needs to be checked
-        //to see if it should live at the study level. Every series normalized instance attribute section must 
-        //contain that same identical attribute for it to get moved to the study level and then only if 
+        //to see if it should live at the study level. Every series normalized instance attribute section must
+        //contain that same identical attribute for it to get moved to the study level and then only if
         //the data dictionary says it belongs at that level.
         Iterator<Series> seriesIter = study.seriesIterator();
         if(seriesIter.hasNext())
@@ -454,12 +504,12 @@ public final class StudyUtils {
              		{
              			tempNormalizedStudyAttributeList.add(a);
              		}
-             	}    
+             	}
              }
-        	 
+
         	 //Now for the rest of the series, see if any of the normalized study attributes
-        	 //from the first series DONT exist exactly the same in their normalized instance attributes. 
-        	 //If series doesn't have the attribute exactly the same as it is in the normalized  
+        	 //from the first series DONT exist exactly the same in their normalized instance attributes.
+        	 //If series doesn't have the attribute exactly the same as it is in the normalized
         	 //study attributes list it gets removed from the study normalized list since it has to occur the same in
         	 //every series to be a candidate for normalization.
         	 while(seriesIter.hasNext())
@@ -472,16 +522,16 @@ public final class StudyUtils {
         			{
         				tempNormalizedStudyAttributeList.remove(a);
         			}
-        		}        	
-        	 }   	 
-        	 
+        		}
+        	 }
+
         	 for(Attribute a : tempNormalizedStudyAttributeList)
         	 {
         		 study.putAttribute(a);
         		 for (final Series instanceMeta : Iter.iter(study.seriesIterator())) {
                      instanceMeta.removeNormalizedInstanceAttribute(a.getTag());
-                 } 
-        	 }         	     
+                 }
+        	 }
         }
         return true;
     }
@@ -575,7 +625,7 @@ public final class StudyUtils {
     	result = result && validateTransferSyntax(study);
     	return result;
     }
-    
+
     /*
      * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
      * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
@@ -585,7 +635,7 @@ public final class StudyUtils {
     	boolean returnValue = true;
     	//loop over each series
     	for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-    		//loop over the instances 
+    		//loop over the instances
     		Series s = i.next();
     		Attribute att = s.getNormalizedInstanceAttribute(0x00020010);
     		String normalizedTransferSyntax = (att != null) ? att.getVal() : null;
@@ -594,8 +644,8 @@ public final class StudyUtils {
     		{
     			transferSyntaxNormalized = true;
     		}
-    		
-    		for (Iterator<Instance> ii = s.instanceIterator(); ii.hasNext();) 
+
+    		for (Iterator<Instance> ii = s.instanceIterator(); ii.hasNext();)
     		{
     			//This is the instance level transfer syntax element attribute
     			//<instance sopInstanceUID="123" transferSyntaxUID="456" >
@@ -611,9 +661,9 @@ public final class StudyUtils {
     			//The two different transfersyntax must be equal in every case or the entire study is invalid.
     			if(!instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax))
     			{
-    				returnValue = false;   				
+    				returnValue = false;
     				break;
-    			}    			
+    			}
     		}
     		if(!returnValue)
     		{
@@ -622,7 +672,7 @@ public final class StudyUtils {
     	}
     	return returnValue;
     }
-    
+
     /**
      * This method will return true if the given study has passed all
      * implemented validation checks. This is validation for studies that are
@@ -633,10 +683,10 @@ public final class StudyUtils {
      * @param binaryFolder
      * @return true iff the given study has passed all implemented validation checks
      */
-    public static boolean validateStudy(StudyMetadata study, File binaryFolder) {
+    public static boolean validateStudy(StudyMetadata study, final Collection<Integer> binaryItemIds) {
         boolean result = true;
 
-        result = result && validateBinaryItemsReferences(study, binaryFolder);
+        result = result && validateBinaryItemsReferences(study, binaryItemIds);
         result = result && validateStudyMetadata(study);
         //add other validation here and && it with result
 
@@ -652,21 +702,13 @@ public final class StudyUtils {
      * nothing).
      *
      * @param study
-     * @param binaryFolder
+     * @param binaryItemIds
      * @return Returns true if no violations were detected.
      */
-    public static boolean validateBinaryItemsReferences(StudyMetadata study, File binaryFolder) {
-        Set<Integer> studyBids = new HashSet<Integer>(), binaryItemIds = new HashSet<Integer>();
-
-        //Collect id from file names
-        for (String file : binaryFolder.list()) {
-            if (!file.startsWith("metadata")) {
-                int bid = Integer.parseInt(file.substring(0, file.indexOf('.')));
-                binaryItemIds.add(bid);
-            }
-        }
-
-        /*
+    public static boolean validateBinaryItemsReferences(final StudyMetadata study,
+                                                        final Collection<Integer> binaryItemIds) {
+        final Collection<Integer> studyBids = new HashSet<Integer>();
+          /*
            * Collect id from attributes
            *
            * NOTE: StudyMetadata has a method that does almost exactly this except that
