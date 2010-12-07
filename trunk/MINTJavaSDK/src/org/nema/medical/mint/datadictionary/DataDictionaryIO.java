@@ -49,7 +49,7 @@ public class DataDictionaryIO {
 		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(MetadataType.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			dicomDocument = (MetadataType)uctx.unmarshalDocument(in, null);
+			dicomDocument = (MetadataType)uctx.unmarshalDocument(in, "UTF-8");
 		} catch (JiBXException e) {
 			throw new IOException("Exception while unmarshalling data.",e);
 		}
