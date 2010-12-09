@@ -14,6 +14,7 @@
     </path>
 
     <target name="compile">
+        <ant dir="${javasdk.project.basedir}" target="jar" inheritall="false" />
         <antcall target="build-common.compile" />
         <copy  todir="${build.classes.dir}">
             <fileset dir="${src.dir}">
