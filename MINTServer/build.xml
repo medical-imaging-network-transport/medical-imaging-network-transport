@@ -42,6 +42,74 @@
         <unwar dest="${build.dir}/${ant.project.name}" src = "${build.dir}/${ant.project.name}.war"/>
     </target>
 
+    <!-- Runs MINTServer in tomcat and does some testing against it.
+    
+         This is pretty rough and should be run wih supervision.  In particular, you might need to shut down
+         tomcat manually afterwards. -->
+    <target name="integration" depends="war" description="Run integration tests on deployed MINTServer instance">
+        <property name="tomcat.dir" value="${basedir}/tomcat" />
+        <!-- get war into place -->
+        <delete>
+            <fileset dir="${tomcat.dir}/webapps" includes="${ant.project.name}*" />
+        </delete>
+        <copy file="${build.dir}/${ant.project.name}.war" todir="${tomcat.dir}/webapps" />
+
+        <!-- Start tomcat, hard to tell how long it'll take unfortunately -->
+        <property name="build.integration.minthome.dir" value="${build.dir}/inttest-minthome" />
+        <mkdir dir="${build.integration.minthome.dir}" />
+        <java jar="${tomcat.dir}/bin/bootstrap.jar" fork="true" spawn="true">
+            <jvmarg value="-Dcatalina.home=${tomcat.dir}" />
+            <env key="MINT_HOME" value="${build.integration.minthome.dir}" />
+        </java>
+        <echo message="tomcat starting" />
+        <waitfor maxwait="30" maxwaitunit="second">
+            <http url="http://localhost:8080/MINTServer/" />
+        </waitfor>
+        <echo message="tomcat started" />
+
+        <!-- compile integration tests -->
+        <path id="integration.classpath">
+            <fileset dir="${basedir}/inttest-lib" includes="*.jar" />
+            <pathelement location="${basedir}/../MINTJavaSDK/ant-lib/junit-4.8.1.jar" />
+        </path> 
+        
+        <property name="integration.src.dir" value="${basedir}/inttest" />
+        <property name="build.integration.classes.dir" value="${build.dir}/inttest-classes" />
+        <mkdir dir="${build.integration.classes.dir}" />
+        <javac srcdir="${integration.src.dir}"
+               destdir="${build.integration.classes.dir}"
+               debug="true"
+               includeantruntime="no">
+           <classpath refid="integration.classpath" />
+        </javac>
+
+        <!-- run integration tests -->
+        <property name="build.integration.reports.dir" value="${build.dir}/inttest-reports" />
+        <mkdir dir="${build.integration.reports.dir}" />
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <path refid="integration.classpath" />
+                <pathelement location="${build.integration.classes.dir}" />
+            </classpath>
+
+            <formatter type="plain" />
+
+            <batchtest fork="no" todir="${build.integration.reports.dir}">
+                <fileset dir="${build.integration.classes.dir}">
+                    <include name="**/*Test.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <!-- shut down tomcat
+             If this fails, you might have to run tomcat/bin/shutdown.{sh,bat} manually -->
+        <java jar="${tomcat.dir}/bin/bootstrap.jar" fork="true">
+            <jvmarg value="-Dcatalina.home=${tomcat.dir}" />
+            <arg line="stop" />
+        </java>
+        <echo message="tomcat stopped" />
+    </target>
+
     <target name="doc" depends="war" description="Make JavaDoc archives">
         <mkdir dir="${build.dir}/doc" />
         <javadoc sourcepath="${src.dir}" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
