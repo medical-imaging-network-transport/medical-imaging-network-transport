@@ -1,0 +1,93 @@
+#summary Dec 10,2010 Meeting Notes
+
+= Attendees =
+  * Tim Dawson
+  * Tim Culp
+  * Dan Chaffee
+  * Gorkem Sevinc
+  * Chris Hafey
+  * Damien Evans
+
+= Progress Since Last Meeting =
+  * Gorkem
+    * C++ functionality with Dejarnette
+    * Performance of MINT vs DCM4CHE.  
+      * MINT is working at line speed on download, good on upload
+      * DCM4CHE seems to be downloading at line speed
+      * Planning to post results soon
+  * Chris Hafey
+    * Present to WG27 at RSNA
+      * Overall feedback was good
+      * We learned a lot about how the DICOM standard process works
+        * DICOM works on smaller units of work that MINT
+          * MINT probably would turn into about 7-8 work items
+        * Need to see which of these work items overlap with existing standard 
+  * Tim Culp
+    * Looking at the integration test framework
+      * Application framework that tests at a higher level than unit testing
+    * Presented to the MINT demo on Monday evening
+      * Demonstrated DICOM2MINT, MINT2DICOM, ClearCanvas and Conformance Test
+    * Fixed a one line bug to MINT2DICOM, needs to be included in V1.0
+    * Command line tools need to exit with error codes so scripts can take actions accordingly
+  * Dan Chaffe
+    * Modified DICOM2MINT to get data dictionary from MINT server
+  * Tim Dawson
+    * Has not tagged source code yet
+    * Source tree has been cleaned up (Thanks to Uli)
+    * Need to create a deployable WAR file and start scripts, etc
+    * Suggesting creating a step by step guide about how to setup and use MINT
+      * Gorkem has written this up already in SVN at top level of repo (word doc)
+  * Damien Evans
+    * Emmanuel reported that WG27 was looking at MINT at the DICOM standards committee
+    * Has heard that people think its a good idea and want to know when its ready to use
+    * People are curious about it and are interested in things that improve performance
+  
+= Notes =
+
+
+= Decisions =
+  * Cancel Dec 24 and Dec 31 meetings due to holidays
+
+= New Actions =
+  * Review Gorkem's setup document and provide feedback about what needs to be done for version 1.0 "get started" doc (all)
+  * Design "First Experience" and send to mail list (Gorkem)
+
+= Old Actions =
+  * Label source as version 1.0 RC (Tim D)
+  * Send out email to coordinate RSNA demo on Sunday evening (Chris)
+  * Provide feedback on directory structure (all)
+  * Propose agenda for RSNA meeting November 29 (Jim + Chris)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Post to ClearCanvas forums, get help with packaging (Gorkem)
+
+
+= Completed Actions = 
+
+= Backlog Items = 
+  * Look at QC workflow in more detail - specifically about metadata validation errors (does not conform to data dictionary)
+  * Add mint server validation 
+
+
+
+= Issues =
+
+= Future =
