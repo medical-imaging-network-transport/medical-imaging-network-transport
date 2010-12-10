@@ -34,7 +34,7 @@ See http://ant.apache.org/manual/Tasks/import.html for details.
     <path id="test.compile.classpath">
         <path refid="compile.classpath" />
         <pathelement location="${build.classes.dir}" />
-        <pathelement location="${basedir}/ant-lib/junit-4.8.1.jar" />
+        <pathelement location="${basedir}/../MINTJavaSDK/ant-lib/junit-4.8.1.jar" />
     </path>
 
     <target name="clean" description="Delete the build directory">
