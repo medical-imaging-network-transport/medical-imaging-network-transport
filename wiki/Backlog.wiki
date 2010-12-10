@@ -1,0 +1,5 @@
+#summary Backlog of features/ideas for MINT
+
+= Backlog =
+  * How to handle study deletion
+  * 
