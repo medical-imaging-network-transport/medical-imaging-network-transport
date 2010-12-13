@@ -35,7 +35,6 @@ import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 public class DCMImportMain {
 
     private static final int DEFAULT_BINARY_INLINE_THRESHOLD = 256;
-    private static ProcessImportDir importProcessor; 
     public static void main(final String[] args) {
         //Validate inputs before doing any processing
         //Make sure we have arguments and someone isn't looking for usage
@@ -141,11 +140,11 @@ public class DCMImportMain {
         try {
             serverURI = new URI(serverURL);
         } catch (final URISyntaxException e) {
-            System.err.println("Invalid server URL \"" + serverURL + "\": " + e.toString());
+            fatalError(e, "Invalid server URL \"" + serverURL + "\"");
             return;
         }
-        
-        
+
+
         //Finished validating inputs, call the actual processing code
         //Create an instance of the Directory Processing Class
         try
@@ -154,8 +153,7 @@ public class DCMImportMain {
         }
         catch(IOException e)
         {
-        	System.err.println("Error reading from or writing to the processing directory " + inputDir + ". " + e.toString());
-            return;
+        	fatalError(e, "Error reading from or writing to the processing directory " + inputDir + ".");
         }
         if (runOnceOnly) {
             try {
@@ -174,8 +172,7 @@ public class DCMImportMain {
                     }
                 }
             } catch(Exception e) {
-                System.err.println("An exception occurred while processing the files in the input directory.");
-                e.printStackTrace();
+                fatalError(e, "An exception occurred while processing the files in the input directory.");
             }
         } else {
             final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
@@ -186,7 +183,7 @@ public class DCMImportMain {
                         importProcessor.handleSends();
                     } catch(final Throwable e) {
                         System.err.println("An exception occurred while uploading to the server:");
-                        e.printStackTrace();
+                        System.exit(1);
                     }
                 }
             };
@@ -198,7 +195,7 @@ public class DCMImportMain {
                         importProcessor.processDir();
                     } catch(final Throwable e) {
                         System.err.println("An exception occurred while processing files:");
-                        e.printStackTrace();
+                        System.exit(1);
                     }
                 }
             };
@@ -211,10 +208,18 @@ public class DCMImportMain {
                 if (!executor.isShutdown()) {
                     executor.shutdown();
                 }
+                System.exit(1);
                 //Fall through and terminate - user may have pressed Ctrl-C
             }
         }
     }
+
+    private static void fatalError(Exception e, String message)
+    {
+       System.err.println(message);
+       e.printStackTrace();
+	   System.exit(1);
+   }
 
     private static void printUsage() {
         System.err.println("Usage: DICOM2MINT once|daemon xml|gpb {DIRECTORY} {URL} [binThreshold] [nodelete] [forcecreate]");
@@ -238,6 +243,7 @@ public class DCMImportMain {
         System.err.println("dcmrcv tool of the dcm4che2 toolkit. All files under the specified directory and");
         System.err.println("subdirectories will be interpreted as DICOM, except those with a name ending in '.part'.");
         System.err.println("The tool prints a message for each file where reading it as DICOM does not succeed.");
+        System.exit(1);
     }
 
     private static boolean checkServerExists(String urlName) {
@@ -251,7 +257,7 @@ public class DCMImportMain {
             con.setRequestMethod("HEAD");
             return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
         } catch (Exception e) {
-            System.err.println(e.toString());
+            fatalError(e, "");
             return false;
         }
     }
