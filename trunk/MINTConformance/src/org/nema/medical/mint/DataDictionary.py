@@ -42,7 +42,7 @@ class DataDictionary():
    
    ROOT_TAG_NAME = "dictionary"
    
-   def __init__(self, dataDictionaryUrl):
+   def __init__(self, dataDictionaryURL):
        """
        Parses a Data Dictionary XML document.
        """
@@ -50,8 +50,7 @@ class DataDictionary():
        self.__elements = {}
        self.__tags = []
        
-       # TODO: Replace with URL
-       self.__readFromFile(dataDictionaryUrl)
+       self.__readFromURL(dataDictionaryURL)
        
    def numElements(self):
        return len(self.__tags)
@@ -96,8 +95,8 @@ class DataDictionary():
           
        return None
 
-   def __readFromFile(self, dataDictionaryName):
-       self.__xml.readFromFile(dataDictionaryName)
+   def __readFromURL(self, dataDictionaryURL):
+       self.__xml.readFromURL(dataDictionaryURL)
        nodes = self.__xml.childrenWithName("element")
        for node in nodes:
            element = DataDictionaryElement(node)
@@ -121,7 +120,7 @@ def main():
     
     try:
        if len(args) != 1:
-          print "Usage", progName, "<data_dictionary_xml>"
+          print "Usage", progName, "<data_dictionary_url>"
           sys.exit(1)
           
        # ---
