@@ -24,6 +24,8 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
+import urllib
+
 from xml.dom import minidom
 from XmlNode import *
 
@@ -147,7 +149,22 @@ class XmlDocument(XmlNode):
         # Read data from file.
         f = open(fname)
         data = f.read()
-
+        
         # Parse data.
         self.readFromString(data)
+        
+    def readFromURL(self, argURL):
+        """
+        Parse argument URL and populate document.
+        """
+        
+        # Parse argument URL and get document.
+        dom = minidom.parse(urllib.urlopen(argURL))
+        doc = dom.documentElement
 
+        # Initialize XML document.
+        self.__init__(doc.tagName)
+
+        # Parse child nodes.
+        self.parseChildNodes(doc, self)
+        
