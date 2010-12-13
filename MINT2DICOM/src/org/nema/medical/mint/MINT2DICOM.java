@@ -20,17 +20,17 @@ import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
 
 /**
- * Code to convert MINT to DICOM. Relies heavily on dcm4che2 as a placeholder for the dicom object. 
+ * Code to convert MINT to DICOM. Relies heavily on dcm4che2 as a placeholder for the dicom object.
  * Can support bulk loading and file-by-file reads.
- * The algorithm to walk through the metadata needs to be redesigned. 
- * 
+ * The algorithm to walk through the metadata needs to be redesigned.
+ *
  * @author gsevinc1, jvining1
  *
  */
-public class MINT2DICOM 
+public class MINT2DICOM
 {
 	static MINTBinaryStreamReader binaryReader;
-	
+
 	/**
 	 * getVR function converts a vrString to a VR object.
 	 * @param vrString
@@ -40,7 +40,7 @@ public class MINT2DICOM
     {
         return VR.valueOf(256*(vrString.toUpperCase().charAt(0)) + (vrString.toUpperCase().charAt(1)));
     }
-    
+
     /**
      * Insert an attibute into the dicom object
      * @param currentObject Dicom object to insert into
@@ -88,12 +88,12 @@ public class MINT2DICOM
             			// Create a connection to the binary item files
 		                URL binaryAddress = new URL(binaryRoot, newAttribute.getBid() + ".dat");
 		                URLConnection temp = binaryAddress.openConnection();
-		                
+
 		                int contentLength = temp.getContentLength();
 		                if(contentLength > 0)
 		                {
 		                	//Get the data and put in the object
-		                	//Here we again use the binary reader class we created, though we only use the functionality to 
+		                	//Here we again use the binary reader class we created, though we only use the functionality to
 		                	//read binary data from a stream given the content length
 			                currentObject.putBytes(newAttribute.getTag(), getVR(newAttribute.getVr()), binaryReader.readBinaryData(temp.getInputStream(), contentLength));
 			            }
@@ -110,12 +110,12 @@ public class MINT2DICOM
             	// Get the string value and put into the dicom object
             	currentObject.putString(newAttribute.getTag(), getVR(newAttribute.getVr()), newAttribute.getVal());
             }
-        }       
-    }   
-    
+        }
+    }
+
     private static void readStudy(URL metaFile, URL binaryDir, boolean useBulkLoading, File outputDir)
     {
-    	try 
+    	try
         {
         	// Read metadata
             StudyMetadata mintData = StudyIO.parseFromGPB(metaFile.openStream());
@@ -125,75 +125,76 @@ public class MINT2DICOM
             Iterator<Attribute> seriesAttributeIter;
             Iterator<Attribute> seriesNormalizedAttributeIter;
             Iterator<Attribute> instanceAttributeIter;
-            
+
             Series currentSeries;
             Instance nextInstance;
             BasicDicomObject dicomReconstruction;
             DicomOutputStream dcmFileStream;
-            
+
             String filePath = outputDir + "/" + mintData.getStudyInstanceUID();
             File dcmDir = new File(filePath);
             if(!dcmDir.exists())
             {
             	dcmDir.mkdir();
             }
-            
+
             File dcmFile;
             // Loop through the metadata.
             for(int i = 0; seriesIter.hasNext(); i++)
             {
                 dicomReconstruction = new org.dcm4che2.data.BasicDicomObject();
-                
+
                 studyAttributeIter = mintData.attributeIterator();
                 while(studyAttributeIter.hasNext())
                 {
                     insertAttribute(dicomReconstruction, studyAttributeIter.next(), binaryDir, useBulkLoading);
                 }
                 currentSeries = seriesIter.next();
-                
+
                 instanceIter = currentSeries.instanceIterator();
                 seriesAttributeIter = currentSeries.attributeIterator();
                 while(seriesAttributeIter.hasNext())
                 {
                     insertAttribute(dicomReconstruction, seriesAttributeIter.next(), binaryDir, useBulkLoading);
                 }
-                
+
                 seriesNormalizedAttributeIter = currentSeries.normalizedInstanceAttributeIterator();
                 while(seriesNormalizedAttributeIter.hasNext())
                 {
                     insertAttribute(dicomReconstruction, seriesNormalizedAttributeIter.next(), binaryDir, useBulkLoading);
                 }
-                
+
                 while(instanceIter.hasNext())
                 {
                     nextInstance = instanceIter.next();
-                    
+
                     //get transfer syntax uid
                     dicomReconstruction.putString(131088, VR.UI, nextInstance.getTransferSyntaxUID());
                     instanceAttributeIter = nextInstance.attributeIterator();
-                    
+
                     while(instanceAttributeIter.hasNext())
                     {
                         insertAttribute(dicomReconstruction, instanceAttributeIter.next(), binaryDir, useBulkLoading);
                     }
-                    
-                    
+
+
                     //Create dicom file
                     dcmFile = new File(filePath, i + ".dcm");
                     dcmFileStream = new DicomOutputStream(dcmFile);
-                   
+
                     //Write to dicom file
                     dcmFileStream.writeDicomFile(dicomReconstruction);
                     i++;
                 }
             }
-        } 
-        catch (IOException e) 
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
+            System.exit(2);
         }
     }
-    
+
     private static void printUsage() {
         System.err.println("Usage: MINT2DICOM {ServerURL} {OutputDirectory} {usebulkloading}");
         System.err.println("Converts a MINT study back to the DICOM standard");
@@ -202,20 +203,20 @@ public class MINT2DICOM
         System.err.println("    OutputDirectory  The directory to output generated DICOM files to");
         System.err.println("    (true|false)     A boolean to determine if bulk loading is to be used (true|false)");
     }
-    
+
     /**
      * The main function.
      * @param args
      * @throws MalformedURLException
      */
     public static void main(String[] args) throws MalformedURLException {
-    	
+
     	if(args.length != 3)
     	{
     		printUsage();
-    		return;
+    		System.exit(1);
     	}
-    	
+
         URL root = new URL(args[0]);
         URL binaryDirectory = new URL(args[0] + "binaryitems/");
         URL metadataFile = new URL(root,"metadata.gpb");
@@ -223,23 +224,22 @@ public class MINT2DICOM
         outputDir.mkdirs();
 
     	binaryReader = new MINTBinaryStreamReader(binaryDirectory);
-    	
+
         //If we are specified to use bulk loading
         boolean useBulkLoading = Boolean.parseBoolean(args[2]);
         if(useBulkLoading)
         {
-        	try 
+        	try
         	{
 				binaryReader.readHttpStream();
-			} 
-        	catch (IOException e) 
+			}
+        	catch (IOException e)
 			{
 				e.printStackTrace();
+				System.exit(2);
 			}
         }
-        
-        readStudy(metadataFile, binaryDirectory, useBulkLoading, outputDir);
-        
-    }
 
+        readStudy(metadataFile, binaryDirectory, useBulkLoading, outputDir);
+    }
 }
