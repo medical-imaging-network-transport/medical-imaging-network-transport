@@ -35,6 +35,7 @@ import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 public class DCMImportMain {
 
     private static final int DEFAULT_BINARY_INLINE_THRESHOLD = 256;
+    private static ProcessImportDir importProcessor;
     public static void main(final String[] args) {
         //Validate inputs before doing any processing
         //Make sure we have arguments and someone isn't looking for usage

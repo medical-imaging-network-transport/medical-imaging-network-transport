@@ -20,12 +20,26 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="ant-lib1" level="project" />
-    <orderEntry type="library" name="lib1" level="project" />
-    <orderEntry type="library" name="lib" level="project" />
-    <orderEntry type="library" name="ant-lib" level="project" />
-    <orderEntry type="library" name="lib2" level="project" />
-    <orderEntry type="module" module-name="MINTJavaSDK" />
+    <orderEntry type="module" module-name="MINTJavaSDK" exported="" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/ant-lib/servlet-api.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library name="MINTServer WEB-INF/lib">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/WebContent/WEB-INF/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/WebContent/WEB-INF/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
 
