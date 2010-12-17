@@ -33,7 +33,7 @@ public class StudyCreateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String type, remoteUser, remoteHost, principal;
+	private final String remoteUser, remoteHost, principal;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
@@ -48,17 +48,14 @@ public class StudyCreateProcessor extends TimerTask {
 	 * @param studyFolder
 	 *            the target folder where the study will be created (will
 	 *            contain a {type} subdir)
-	 * @param type
-	 *            the type of study being created
 	 * @param jobInfoDAO
 	 *            needed to update the database
 	 * @param studyDAO
 	 *            needed to update the database
 	 */
-	public StudyCreateProcessor(File jobFolder, File studyFolder, String type, String remoteUser, String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyCreateProcessor(File jobFolder, File studyFolder, String remoteUser, String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
-		this.type = type;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
 		this.principal = principal;
@@ -77,7 +74,7 @@ public class StudyCreateProcessor extends TimerTask {
 		jobInfo.setStudyID(studyUUID);
 		
 		try {	
-			File typeFolder = new File(studyFolder, type);
+			File typeFolder = new File(studyFolder, "DICOM");
 			typeFolder.mkdirs();
 			File changelogRoot = new File(studyFolder, "changelog");
 			changelogRoot.mkdirs();
@@ -100,7 +97,7 @@ public class StudyCreateProcessor extends TimerTask {
 
 			// Set to base level version
             study.setVersion(StudyUtils.getBaseVersion());
-	        study.setType(type);
+	        study.setType("DICOM");
 			
 			//write study into type folder
 			StudyUtils.writeStudy(study, typeFolder);
@@ -132,7 +129,7 @@ public class StudyCreateProcessor extends TimerTask {
 			Change updateInfo = new Change();
 			updateInfo.setId(UUID.randomUUID().toString());
 			updateInfo.setStudyID(studyUUID);
-			updateInfo.setType(type);
+			updateInfo.setType("DICOM");
 			updateInfo.setRemoteUser(remoteUser);
 			updateInfo.setRemoteHost(remoteHost);
 			updateInfo.setPrincipal(principal);

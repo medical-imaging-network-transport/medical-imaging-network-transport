@@ -436,8 +436,11 @@ public final class ProcessImportDir {
         final HttpPost httpPost = new HttpPost(studyQueryInfo == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
-        //Need to specify the 'type' of the data being sent
-        entity.addPart(JobConstants.HTTP_MESSAGE_PART_TYPE, new StringBody("DICOM"));
+        //Need to specify the 'type' of the data being sent for updates
+        if (studyQueryInfo != null) {
+            entity.addPart(JobConstants.HTTP_MESSAGE_PART_TYPE, new StringBody("DICOM"));
+        }
+        
         if (studyQueryInfo != null) {
             entity.addPart(JobConstants.HTTP_MESSAGE_PART_STUDYUUID, new StringBody(studyQueryInfo.studyUUID));
         }
