@@ -16,7 +16,6 @@
 package org.nema.medical.mint.utils;
 
 import org.nema.medical.mint.datadictionary.AttributeType;
-import org.nema.medical.mint.datadictionary.DataDictionaryIO;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.*;
 
@@ -625,7 +624,9 @@ public final class StudyUtils {
     public static boolean validateStudyMetadata(StudyMetadata study)
     {
     	boolean result = true;
-    	result = result && validateTransferSyntax(study);
+        if (study.getType().equals("DICOM")) {
+    	    result = result && validateDICOMTransferSyntax(study);
+        }
     	return result;
     }
 
@@ -633,7 +634,7 @@ public final class StudyUtils {
      * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
      * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
      */
-    private static boolean validateTransferSyntax(StudyMetadata study)
+    private static boolean validateDICOMTransferSyntax(StudyMetadata study)
     {
     	boolean returnValue = true;
     	//loop over each series

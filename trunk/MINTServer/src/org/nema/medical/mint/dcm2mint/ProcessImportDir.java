@@ -194,6 +194,7 @@ public final class ProcessImportDir {
             final long mintConvertStart = System.currentTimeMillis();
             final BinaryData binaryData = new BinaryDcmData();
             final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();
+            metaBinaryPair.getMetadata().setType("DICOM");
             metaBinaryPair.setBinaryData(binaryData);
             //Constrain processing
             metaBinaryPair.getMetadata().setStudyInstanceUID(studyUID);
