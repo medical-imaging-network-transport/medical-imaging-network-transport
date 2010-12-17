@@ -317,6 +317,7 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="JProfiler" />
       <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/MINTServer/build.xml" target="explode" />
