@@ -197,7 +197,7 @@ public final class StudyUtils {
      *
      * @param study
      * @param shiftAmount
-     * @return
+     * @return true except in case of a catastrophic failure.
      */
     public static boolean shiftStudyBids(StudyMetadata study, int shiftAmount)
     {
@@ -680,7 +680,7 @@ public final class StudyUtils {
      * pass on studies already written to disk.
      *
      * @param study
-     * @param binaryFolder
+     * @param binaryItemIds
      * @return true iff the given study has passed all implemented validation checks
      */
     public static boolean validateStudy(StudyMetadata study, final Collection<Integer> binaryItemIds) {
