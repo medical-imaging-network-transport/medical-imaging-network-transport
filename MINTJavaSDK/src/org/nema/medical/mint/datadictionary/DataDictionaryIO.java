@@ -33,27 +33,27 @@ import org.jibx.runtime.JiBXException;
 public class DataDictionaryIO {
 
 	static public MetadataType parseFromXML(File file)throws IOException {
-		MetadataType dicomDocument = null;
+		MetadataType dataDictionary = null;
 		
 			InputStream in = new FileInputStream(file);
 			try {
-				dicomDocument = parseFromXML(in);
+				dataDictionary = parseFromXML(in);
 			} finally {
 				in.close();
 			}
-		return dicomDocument;
+		return dataDictionary;
 	}
 	
 	static public MetadataType parseFromXML(InputStream in) throws IOException {
-		MetadataType dicomDocument = null;
+		MetadataType dataDictionary = null;
 		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(MetadataType.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			dicomDocument = (MetadataType)uctx.unmarshalDocument(in, "UTF-8");
+			dataDictionary = (MetadataType)uctx.unmarshalDocument(in, "UTF-8");
 		} catch (JiBXException e) {
 			throw new IOException("Exception while unmarshalling data.",e);
 		}
-		return dicomDocument;
+		return dataDictionary;
 	}
 	
 	
