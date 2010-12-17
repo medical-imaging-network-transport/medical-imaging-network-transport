@@ -1,0 +1,94 @@
+#summary Dec 17,2010 Meeting Notes
+
+= Attendees =
+  * Tim Dawson
+  * Dan Chaffee
+  * Gorkem Sevinc
+  * Chris Hafey
+  * Jim Philbin
+  
+= Progress Since Last Meeting =
+  * Tim Culp (from email)
+    * Integration test framework setup.  Automatic buildup and teardown framework
+    * Create a new application "DicomStudyCompare"
+  * Dan Chaffee
+    * No progress this week
+    * Sent some emails regarding metadata version number
+  * Gorkem Sevinc
+    * Started on first experience, didn't get any replies to emails
+    * Decided to start documenting experience on a wiki page, wants review
+    * One idea was to provide link to an already provided war file along with startup scripts
+    * Would like to include a package with the source code tgz'd
+    * During free time started working on a gui project to wrap dicom2mint
+      * Would like to do the same for mint2dicom
+    * Would like to provide a sample study with the resulting metadata XML
+  * Jim Philbin
+    * No updates
+    * Has been working with vendors to get MINT to work
+    * Visage and Acuo have both committed
+  * Tim Dawson
+    * Tagged version 1.0 RC in the source tree
+      * Realized the metadata library has old tag still
+    * Uli is working on switching Vital implementation over to the data dictionary driven metadata handling that Dan did
+      * Found a couple of small issues that may need to be addressed
+  * Chris Hafey
+    * On vacation next two weeks
+    * Hoping to spend some time hacking on MINT - QC app, viewer or?
+    
+
+= Notes =
+  * Discussion on version number for metadata
+    * XSD has this as optional
+    * Should we default it to zero if not supplied?
+    * Main reason it exists is to deal with update conflicts
+    * It might be possible to support adds without requiring a version number
+
+= Decisions =
+  * Change XSD such that version is required (not optional)
+  * Metadata version shall be zero when creating a study
+  * All study changes (additions, updates or deletes) will reference the metadata version the change is made against 
+
+= New Actions =
+  * Modify metadata version number as decided above [Dan Chaffee]
+
+= Old Actions =
+  * Review Gorkem's setup document and provide feedback about what needs to be done for version 1.0 "get started" doc (all)
+  * Design "First Experience" and send to mail list (Gorkem)
+  * Use cases for proprietary data (Jim)
+  * Use cases for de-id (Jim)
+  * Update clear canvas to support Multi-frame MINT (Tim Culp)
+  * Update conformance test to support Multi-frame (Tim Culp)
+  * Recipe/cookbook for deploying MINT securely (Chris Hafey + Tim Culp)
+  * Specify MINT standard on Wiki (Chris Hafey + All)
+    * Error codes
+    * URL
+    * XSD
+    * Validation rules
+    * Update the MINT metadata document with which VRs are candidates for binary items and the option to encode in base 64 and version number and type for study meta (Chris Hafey)
+  * Add unit tests for key classes and add junit to ant to produce code coverage (Jeremy)
+  * Performance cookbook (Gorkem + Chris + All)
+  * Develop integration tests (Jim + Tim Culp)
+  * Add support for non DICOM types (Chris)
+    * Data dictionaries for Vital Volumes 
+    * Data dictionary for generic mime type attachments
+    * Root study URL to list all types in study
+  * Measure performance of MINT vs DICOM as per PPT (Gorkem)
+  * Post to ClearCanvas forums, get help with packaging (Gorkem)
+
+
+= Completed Actions = 
+  * Label source as version 1.0 RC (Tim D)
+  * Send out email to coordinate RSNA demo on Sunday evening (Chris)
+ * Propose agenda for RSNA meeting November 29 (Jim + Chris)
+  * Create a backlog wiki page to hold functionality/topics that need to be discussed in the future (Chris Hafey)
+   * Provide feedback on directory structure (all)
+
+= Backlog Items = 
+  * Look at QC workflow in more detail - specifically about metadata validation errors (does not conform to data dictionary)
+  * Add mint server validation 
+
+
+
+= Issues =
+
+= Future =
