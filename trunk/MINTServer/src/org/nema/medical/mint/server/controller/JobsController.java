@@ -46,6 +46,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.jobs.JobConstants;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfo;
@@ -77,6 +78,9 @@ public class JobsController {
 	@Autowired
 	protected String xmlStylesheet;
 
+    @Autowired
+    protected HashMap<String, MetadataType> availableTypes;
+    
 	@Autowired
 	protected StudyDAO studyDAO = null;
 	@Autowired
@@ -245,8 +249,10 @@ public class JobsController {
 		Principal principal = req.getUserPrincipal();
 		String principalName = (principal != null) ? principal.getName() : null;
 
+        final MetadataType dataDictionary = availableTypes.get(type);
+
 		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				studyFolder, type, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
+				studyFolder, dataDictionary, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
 				principalName, jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 

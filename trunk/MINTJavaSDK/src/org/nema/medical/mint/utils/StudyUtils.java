@@ -409,15 +409,18 @@ public final class StudyUtils {
      * <p/>
      *
      * @param study
+     * @param dataDictionary
      * @return true
+     * @throws java.io.IOException
      */
-    public static boolean normalizeStudy(StudyMetadata study) throws IOException {
-    	MetadataType metadata = null;
-
-    	metadata = DataDictionaryIO.parseFromXML(StudyUtils.class.getClassLoader().getResourceAsStream(study.getType() + ".xml"));
-
-    	List<AttributeType> seriesAttributes = metadata.getSeriesAttributes().getAttributes();
-    	List<AttributeType> studyAttributes = metadata.getStudyAttributes().getAttributes();
+    public static boolean normalizeStudy(final StudyMetadata study, final MetadataType dataDictionary)
+            throws IOException {
+        if (study.getType() != dataDictionary.getType()) {
+            throw new RuntimeException("Mismatch of study type " + study.getType()
+                    + " and data dictionary type " + dataDictionary.getType());
+        }
+    	List<AttributeType> seriesAttributes = dataDictionary.getSeriesAttributes().getAttributes();
+    	List<AttributeType> studyAttributes = dataDictionary.getStudyAttributes().getAttributes();
 
     	List<Attribute> tempNormalizedStudyAttributeList = new LinkedList<Attribute>();
     	List<Attribute> tempNormalizedInstanceAttributeList = new LinkedList<Attribute>();

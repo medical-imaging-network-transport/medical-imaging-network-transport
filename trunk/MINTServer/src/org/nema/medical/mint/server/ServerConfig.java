@@ -15,21 +15,10 @@
  */
 package org.nema.medical.mint.server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +32,8 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
+import org.nema.medical.mint.datadictionary.DataDictionaryIO;
+import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.JobInfoDAO;
@@ -102,6 +93,8 @@ public class ServerConfig {
     protected Integer binaryItemResponseBufferSize = null;
     protected Integer fileResponseBufferSize = null;
     protected Integer fileStreamBufferSize = null;
+    protected ArrayList<String> availableTypeNames = null;
+    private HashMap<String, MetadataType> availableTypes = null;
 
     @PostConstruct
     public void postConstruct() {
@@ -383,7 +376,9 @@ public class ServerConfig {
 			typesRoot.mkdirs();
 		}
 
-		File dicomFile = new File(typesRoot, "DICOM.xml");
+        //When including other types by default, their .xml definition files must be copied here
+
+        File dicomFile = new File(typesRoot, "DICOM.xml");
 
 		if(!dicomFile.exists())
 		{
@@ -399,6 +394,42 @@ public class ServerConfig {
 	{
 		return ServerConfig.class.getClassLoader().getResourceAsStream("DICOM.xml");
 	}
+
+    @Bean
+    public ArrayList<String> availableTypeNames() throws Exception {
+        if (availableTypeNames == null) {
+            final File typesRoot = typesRoot();
+            final FileFilter typeFilter = new FileFilter() {
+                @Override
+                //Accept a file as indicating a type if its name ends with ".xml"
+                public final boolean accept(final File file) {
+                    return file.getName().endsWith(".xml");
+                }
+            };
+            final File[] typeXMLFiles = typesRoot.listFiles(typeFilter);
+            availableTypeNames = new ArrayList<String>();
+            for (final File typeXMLFile: typeXMLFiles) {
+                final String fileName = typeXMLFile.getName();
+                availableTypeNames.add(fileName.substring(0, fileName.length() - ".xml".length()));
+            }
+        }
+        return availableTypeNames;
+    }
+
+    @Bean
+    public HashMap<String, MetadataType> availableTypes() throws Exception {
+        if (availableTypes == null) {
+            final File typesRoot = typesRoot();
+            final Collection<String> availableTypeNames = availableTypeNames();
+            availableTypes = new HashMap<String, MetadataType>(availableTypeNames.size());
+            for (final String typeName: availableTypeNames) {
+                final File availableTypeFile = new File(typesRoot, typeName + ".xml");
+                final MetadataType dataDictionary = DataDictionaryIO.parseFromXML(availableTypeFile);
+                availableTypes.put(typeName, dataDictionary);
+            }
+        }
+        return availableTypes;
+    }
 
 	@Bean(name = "studyDAO", autowire = Autowire.BY_NAME)
 	public StudyDAO studyDAO() throws Exception {
@@ -577,6 +608,5 @@ public class ServerConfig {
     public String xmlStylesheet() {
     	return "type=\"text/xsl\" href=\"style.xsl\"";
     }
-
 
 }
