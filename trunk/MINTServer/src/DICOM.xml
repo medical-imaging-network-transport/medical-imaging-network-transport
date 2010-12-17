@@ -1,5 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- THIS FILE IS SUPPOSED TO REPRESENT THE DICOM STANDARD -->
-<metadata type="DICOM" version="1.0" xmlns="http://medical.nema.org/mint">
+<metadata type="DICOM" version="1.0"
+          xmlns="http://medical.nema.org/mint"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://medical.nema.org/mint http://medical-imaging-network-transport.googlecode.com/files/mint-datadictionary.xsd">
 	<attributes unknown-attributes="include/ignore/reject?">
 		<element tag="00000000" keyword="CommandGroupLength" vr="UL" vm="1" ret="">Command Group Length</element>
 		<element tag="00000001" keyword="CommandLengthToEnd" vr="UL" vm="1" ret="RET">Length to End</element>
