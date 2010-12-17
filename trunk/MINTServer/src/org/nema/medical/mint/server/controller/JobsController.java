@@ -57,6 +57,7 @@ import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -77,6 +78,9 @@ public class JobsController {
 
 	@Autowired
 	protected String xmlStylesheet;
+
+    @Autowired
+    protected ArrayList<String> availableTypeNames;
 
     @Autowired
     protected HashMap<String, MetadataType> availableTypes;
@@ -139,13 +143,12 @@ public class JobsController {
 			return;
 		}
 
-		final String type;
-
-		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) ||
-                StringUtils.isBlank(type = params.get(JobConstants.HTTP_MESSAGE_PART_TYPE))) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter 'type'");
-			return;
-		}
+        //Sanity check - is caller trying to create an initial study, but not uploading DICOM?
+        if (params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) &&
+                !params.get(JobConstants.HTTP_MESSAGE_PART_TYPE).equals("DICOM")) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Study create must have type 'DICOM'");
+            return;
+        }
 
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -159,7 +162,7 @@ public class JobsController {
 		String principalName = (principal != null) ? principal.getName() : null;
 
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
-				new File(studiesRoot, studyUUID), type, req.getRemoteUser(),
+				new File(studiesRoot, studyUUID), req.getRemoteUser(),
 				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
@@ -168,8 +171,16 @@ public class JobsController {
 		res.setHeader("Location", jobURI);
 	}
 
+    @ModelAttribute("types")
+    public List<String> getTypes() {
+        return new ArrayList<String>();
+    }
+
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
-	public String updateStudy() {
+	public String updateStudy(@ModelAttribute("types") final List<String> types,
+						final HttpServletRequest req,
+						final HttpServletResponse res) {
+        types.addAll(availableTypeNames);
 		return "studyupdate";
 	}
 

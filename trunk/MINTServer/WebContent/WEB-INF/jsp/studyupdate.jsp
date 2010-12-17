@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="ISO-8859-1"%><%@ taglib prefix="c"
+	uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
@@ -12,12 +15,13 @@
 
 <form method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/updatestudy'>
 Study UUID: <input type=text name=<%=JobConstants.HTTP_MESSAGE_PART_STUDYUUID%>><br>
-Previous study version: <input type=text name=<%=JobConstants.HTTP_MESSAGE_PART_OLDVERSION%>><br>
 Type: <select name=<%=JobConstants.HTTP_MESSAGE_PART_TYPE%>>
-<!-- TODO dynamically populate this list from the set of types the server knows about -->
-<option value="DICOM">DICOM</option>
+<c:forEach var="typeName" items="${types}">
+<option value="${typeName}">${typeName}</option>
+</c:forEach>
 </select><br>
 Metadata to upload: <input type=file name=metadata><br>
+Previous version: <input type=text name=<%=JobConstants.HTTP_MESSAGE_PART_OLDVERSION%>><br>
 <%
 	String numFiles = request.getParameter("numFiles");
 	if(!StringUtils.isBlank(numFiles))

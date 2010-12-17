@@ -11,11 +11,7 @@
 <h2>Create Study</h2>
 
 <form name='post_form' method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/createstudy'>
-Type: <select name=<%=JobConstants.HTTP_MESSAGE_PART_TYPE%>>
-<!-- TODO dynamically populate this list from the set of types the server knows about -->
-<option value="DICOM">DICOM</option>
-</select><br>
-Metadata to upload: <input type=file name=metadata><br>
+DICOM metadata to upload: <input type=file name=metadata><br>
 <%
 	String numFiles = request.getParameter("numFiles");
 	if(!StringUtils.isBlank(numFiles))
