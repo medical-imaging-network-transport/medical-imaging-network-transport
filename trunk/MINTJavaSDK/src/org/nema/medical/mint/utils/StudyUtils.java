@@ -415,7 +415,7 @@ public final class StudyUtils {
      */
     public static boolean normalizeStudy(final StudyMetadata study, final MetadataType dataDictionary)
             throws IOException {
-        if (study.getType() != dataDictionary.getType()) {
+        if (!study.getType().equals(dataDictionary.getType())) {
             throw new RuntimeException("Mismatch of study type " + study.getType()
                     + " and data dictionary type " + dataDictionary.getType());
         }

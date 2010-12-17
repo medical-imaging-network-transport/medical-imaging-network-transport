@@ -17,6 +17,8 @@ package org.nema.medical.mint.server.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +36,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class TypesController {
 	
+    @Autowired
+    protected ArrayList<String> availableTypeNames;
+
 	@Autowired
-	protected File typesRoot;
+	protected HashMap<String, File> availableTypeFiles;
 	
 	@Autowired
 	protected Integer fileResponseBufferSize;
@@ -51,43 +56,27 @@ public class TypesController {
 	@RequestMapping("/types")
 	public String types(@ModelAttribute("types") final List<String> types,
 						final HttpServletRequest req,
-						final HttpServletResponse res)
-	{
-		for(String s : typesRoot.list())
-		{
-			if(s.endsWith(".xml"))
-			{
-				types.add(s.substring(0, s.lastIndexOf(".xml")));
-			}
-		}
-		
+						final HttpServletResponse res) {
+        types.addAll(availableTypeNames);
 		return "types";
 	}
 	
 	@RequestMapping("/types/{type}")
-	public String typeEntry(@PathVariable("type") String type,
+	public String typeEntry(@PathVariable("type") final String type,
 							final HttpServletRequest req,
 							final HttpServletResponse res,
-							ModelMap map)
-	{
-		if(StringUtils.isBlank(type))
-		{
+							final ModelMap map) {
+		if (StringUtils.isBlank(type)) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "must specify type");
 			return "error";
 		}
 		
-		//If no file extension, add .xml
-		//TODO make sure this works as expected
-		if(!type.contains("."))
-		{
-			type += ".xml";
-		}
+		//In case of file extension, take off .xml for name
+        final String typeName = type.endsWith(".xml") ? type.substring(0, ".xml".length()) : type;
+		final File typeFile = availableTypeFiles.get(typeName);
 		
-		File typeFile = new File(typesRoot, type);
-		
-		if(typeFile.exists() && typeFile.canRead())
-		{
+		if (typeFile.exists() && typeFile.canRead()) {
 			try {
 				res.setContentType("text/xml");
 				res.setContentLength(Long.valueOf(typeFile.length()).intValue());
@@ -100,7 +89,7 @@ public class TypesController {
 					return "error";
 				}
 			}
-		}else{
+		} else {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			map.put("error_msg", "Type specified does not exist");
 			return "error";

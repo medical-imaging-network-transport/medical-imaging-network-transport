@@ -94,6 +94,7 @@ public class ServerConfig {
     protected Integer fileResponseBufferSize = null;
     protected Integer fileStreamBufferSize = null;
     protected ArrayList<String> availableTypeNames = null;
+    private HashMap<String, File> availableTypeFiles = null;
     private HashMap<String, MetadataType> availableTypes = null;
 
     @PostConstruct
@@ -417,15 +418,28 @@ public class ServerConfig {
     }
 
     @Bean
+    public HashMap<String, File> availableTypeFiles() throws Exception {
+        if (availableTypeFiles == null) {
+            final File typesRoot = typesRoot();
+            final Collection<String> availableTypeNames = availableTypeNames();
+            availableTypeFiles = new HashMap<String, File>(availableTypeNames.size());
+            for (final String typeName: availableTypeNames) {
+                final File typeFile = new File(typesRoot, typeName + ".xml");
+                availableTypeFiles.put(typeName, typeFile);
+            }
+        }
+        return availableTypeFiles;
+    }
+
+    @Bean
     public HashMap<String, MetadataType> availableTypes() throws Exception {
         if (availableTypes == null) {
             final File typesRoot = typesRoot();
-            final Collection<String> availableTypeNames = availableTypeNames();
+            final Map<String, File> availableTypeFiles = availableTypeFiles();
             availableTypes = new HashMap<String, MetadataType>(availableTypeNames.size());
-            for (final String typeName: availableTypeNames) {
-                final File availableTypeFile = new File(typesRoot, typeName + ".xml");
-                final MetadataType dataDictionary = DataDictionaryIO.parseFromXML(availableTypeFile);
-                availableTypes.put(typeName, dataDictionary);
+            for (final Map.Entry<String, File> typeFile: availableTypeFiles.entrySet()) {
+                final MetadataType dataDictionary = DataDictionaryIO.parseFromXML(typeFile.getValue());
+                availableTypes.put(typeFile.getKey(), dataDictionary);
             }
         }
         return availableTypes;
