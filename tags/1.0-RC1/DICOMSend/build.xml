@@ -1,0 +1,44 @@
+<!DOCTYPE project>
+<project basedir="." default="jar" name="DICOMSend">
+    <property name="common.project.basedir" value="${basedir}/../MINTServer" />
+    <available file="${common.project.basedir}" type="dir" property="common.project.available" />
+    <fail message="Must have the MINTServer project in the same parent folder as this project" unless="common.project.available" />
+
+    <import file="../build-common.xml" />
+
+    <path id="compile.classpath">
+        <fileset dir="${common.project.basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+        <pathelement location="${common.project.basedir}/build/classes" />
+    </path>
+
+    <target name="compile">
+        <antcall target="build-common.compile" />
+    </target>
+
+    <target name="jar" depends="compile" description="Make JAR of compiled classes">
+        <copy file="${src.dir}/log4j.properties" todir="${build.classes.dir}"/>
+        <jar destfile="${build.dir}/${ant.project.name}.jar">
+            <fileset dir="${build.classes.dir}" />
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/dcm4che-core-2.0.23.jar"/>
+            <zipfileset src="${common.project.basedir}/WebContent/WEB-INF/lib/dcm4che-net-2.0.23.jar"/>
+
+            <manifest>
+                <attribute name="Main-Class" value="org.nema.medical.mint.dicomsend.DICOMSend" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="doc" depends="jar" description="Make JavaDoc archives">
+        <mkdir dir="${build.dir}/doc" />
+        <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+            <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+            <classpath refid="compile.classpath" />
+            <doctitle>DICOMSend</doctitle>
+        </javadoc>
+        <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+        <jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+    </target>
+</project>

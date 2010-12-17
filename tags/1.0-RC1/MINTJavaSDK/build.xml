@@ -1,0 +1,59 @@
+<!DOCTYPE project>
+<project basedir="." default="doc" name="mint">
+	<property file="build.properties" />
+	<property name="project.version" value="0.9.12" />
+
+    <import file="../build-common.xml" />
+
+	<target name="protoc" depends="compile" description="generates protobuf class">
+		<exec executable="protoc" failonerror="true">
+			<arg value="--proto_path=config" />
+			<arg value="--java_out=src" />
+			<arg value="config/mint.proto" />
+		</exec>
+	</target>
+
+    <!-- Override common to add jibx-generation -->
+    <target name="compile">
+        <antcall target="build-common.compile" />
+
+		<jibx-bind load="true">
+			<bindingfileset dir="${basedir}/config" casesensitive="yes">
+			  <include name="**/*.jibx"/>
+			</bindingfileset>
+			<classpath>
+				<pathelement path="${build.classes.dir}" />
+				<pathelement location="lib/jibx-run.jar" />
+			</classpath>
+        </jibx-bind>
+    </target>
+
+	<target name="jar" depends="compile" description="Make JAR of compiled classes">
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}.jar">
+			<fileset dir="${build.classes.dir}" />
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="doc" depends="jar" description="Make JavaDoc archives">
+		<mkdir dir="${build.dir}/doc" />
+		<javadoc sourcepath="${src.dir}" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+			<bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+			<classpath refid="compile.classpath" />
+			<doctitle>MINTJavaSDK</doctitle>
+		</javadoc>
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+		<jar destfile="${build.dir}/${ant.project.name}-${project.version}-sources.jar" basedir="${src.dir}" includes="**" />
+		<copy file="config/mint.pom" tofile="${build.dir}/mint-${project.version}.pom"/>
+	</target>
+
+	<!-- task definitions -->
+	<taskdef name="jibx-bind" classname="org.jibx.binding.ant.CompileTask">
+		<classpath>
+            <fileset dir="lib" includes="*.jar" />
+            <fileset dir="ant-lib" includes="*.jar" />
+		</classpath>
+	</taskdef>
+</project>

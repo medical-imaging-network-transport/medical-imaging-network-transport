@@ -1,0 +1,25 @@
+00080021    # Series Date
+00080031    # Series Time
+00080060    # Modality
+0008103E    # Series Description
+00081050    # Performing Physician's Name
+00081052    # Performing Physician Identification Sequence
+00081070    # Operator's Name
+00081072    # Operator Identification Sequence
+00081111    # Referenced Performed Procedure Step Sequence
+00081250    # Related Series Sequence 
+00180015    # Body Part Examined
+00181030    # Protocol Name
+00185100    # Patient Position
+0020000E    # Series Instance UID
+00200011    # Series Number
+00200060    # Laterality
+00280108    # Smallest Pixel Value in Series
+00280109    # Largest Pixel Value in Series
+00400244    # Performed Procedure Step Start Date
+00400245    # Performed Procedure Step Start Time
+00400253    # Performed Procedure Step ID
+00400254    # Performed Procedure Step Description
+00400260    # Performed Procedure Step Code Sequence
+00400275    # Request Attribute Sequence
+00400280    # Comments on the Performed Procedure Step

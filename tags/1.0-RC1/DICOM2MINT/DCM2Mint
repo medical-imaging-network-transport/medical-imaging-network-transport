@@ -1,0 +1,2 @@
+#!/bin/sh
+java -Xms32m -Xmx512m -jar build/DICOM2MINT.jar $@
