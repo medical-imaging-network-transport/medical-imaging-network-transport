@@ -15,6 +15,14 @@
  */
 package org.nema.medical.mint.server.processor;
 
+import org.apache.log4j.Logger;
+import org.nema.medical.mint.datadictionary.MetadataType;
+import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.metadata.StudyMetadata;
+import org.nema.medical.mint.server.domain.*;
+import org.nema.medical.mint.server.util.StorageUtil;
+import org.nema.medical.mint.utils.StudyUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -25,13 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.log4j.Logger;
-import org.nema.medical.mint.server.util.StorageUtil;
-import org.nema.medical.mint.metadata.StudyMetadata;
-import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.server.domain.*;
-import org.nema.medical.mint.utils.StudyUtils;
 
 /**
  * 
@@ -46,10 +47,11 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String type, oldVersion, remoteUser, remoteHost, principal;
+	private final String oldVersion, remoteUser, remoteHost, principal;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
+    private final MetadataType dataDictionary;
 
 	/**
 	 * extracts files from the jobFolder, merges them in the studyFolder
@@ -59,13 +61,13 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public StudyUpdateProcessor(final File jobFolder, final File studyFolder, final String type,
+	public StudyUpdateProcessor(final File jobFolder, final File studyFolder, final MetadataType dataDictionary,
                                 final String oldVersion, final String remoteUser, final String remoteHost,
                                 final String principal, final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO,
                                 final ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
-		this.type = type;
+		this.dataDictionary = dataDictionary;
         this.oldVersion = oldVersion;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
@@ -86,6 +88,8 @@ public class StudyUpdateProcessor extends TimerTask {
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
 		
+        final String type = dataDictionary.getType();
+
 		Lock lock = new ReentrantLock(), oldLock;
 		
 		oldLock = studyIdLocks.putIfAbsent(studyUUID, lock);
@@ -100,7 +104,7 @@ public class StudyUpdateProcessor extends TimerTask {
 			try
 			{
 	            LOG.debug("Got lock, and starting process");
-				File typeFolder = new File(studyFolder, type);
+                File typeFolder = new File(studyFolder, type);
 				
 				//Not calling mkdir on this because they better already exist
 				File changelogRoot = new File(studyFolder, "changelog");
@@ -225,7 +229,7 @@ public class StudyUpdateProcessor extends TimerTask {
 		        //Rename all excluded binary files to have .exclude
 				StorageUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
 
-                if(!StudyUtils.normalizeStudy(existingStudy))
+                if(!StudyUtils.normalizeStudy(existingStudy, dataDictionary))
 				{
 					throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
 				}
