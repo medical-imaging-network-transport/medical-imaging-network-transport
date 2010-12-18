@@ -5,7 +5,7 @@
       <xs:extension base="xs:string">
         <xs:attribute type="xs:string" name="tag" use="required"/>
         <xs:attribute type="xs:string" name="keyword" use="required"/>
-        <xs:attribute type="xs:string" name="vr" use="required"/>
+        <xs:attribute type="xs:string" name="vr" use="optional"/>
         <xs:attribute type="xs:string" name="vm" use="optional"/>
         <xs:attribute type="xs:string" name="ret" use="optional"/>
       </xs:extension>
