@@ -199,7 +199,7 @@ public class Series implements AttributeStore
 		this.instanceCount = instanceCount;
 	}
 
-	public int computeInstanceCount() {
+	private int computeInstanceCount() {
 		instanceCount = instanceCount();
         return instanceCount;
 	}
