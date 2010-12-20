@@ -177,7 +177,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#computeInstanceCount()
 	 */
-	public int computeInstanceCount() {
+	private int computeInstanceCount() {
         int count = 0;
         for (Series series : this.seriesMap.values()) {
         	count += series.getInstanceCount();

@@ -56,13 +56,6 @@ public interface StudySummary {
 	public int getInstanceCount();
 
 	/**
-	 * Counts the number of instances in each series and updates the instanceCount variable.
-	 *
-	 * @return instanceCount
-	 */
-	public int computeInstanceCount();
-
-	/**
 	 * @return a list of all binary item IDs currently in the study
 	 */
 	public Collection<Integer> getBinaryItemIDs();

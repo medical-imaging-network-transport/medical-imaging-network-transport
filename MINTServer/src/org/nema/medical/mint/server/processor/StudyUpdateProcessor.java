@@ -137,7 +137,9 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * Need to load new study information
 				 */
 				StudyMetadata newStudy = StudyIO.loadStudy(jobFolder);
-				
+                //Force type to be set on new study
+				newStudy.setType(type);
+
 				/*
 				 * If the study versions are not the same, then this
 				 * update is for a version that is not the most recent and

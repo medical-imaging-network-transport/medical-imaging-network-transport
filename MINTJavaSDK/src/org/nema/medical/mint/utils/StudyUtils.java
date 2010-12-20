@@ -624,8 +624,10 @@ public final class StudyUtils {
     public static boolean validateStudyMetadata(StudyMetadata study)
     {
     	boolean result = true;
+        result = result && validateInstanceCounts(study);
         if (study.getType().equals("DICOM")) {
     	    result = result && validateDICOMTransferSyntax(study);
+            result = result && validateDICOMVR(study);
         }
     	return result;
     }
@@ -677,6 +679,46 @@ public final class StudyUtils {
     	return returnValue;
     }
 
+    private static boolean validateDICOMVR(final StudyMetadata study) {
+        if (!validateAttributeStoreVR(study)) {
+            return false;
+        }
+
+        for (final Series series: Iter.iter(study.seriesIterator())) {
+            if (!validateAttributeStoreVR(series)) {
+                return false;
+            }
+
+            for (final Attribute attr: Iter.iter(series.normalizedInstanceAttributeIterator())) {
+                if (!validateAttributeVR(attr)) {
+                    return false;
+                }
+            }
+
+            for (final Instance instance: Iter.iter(series.instanceIterator())) {
+                if (!validateAttributeStoreVR(instance)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean validateAttributeStoreVR(final AttributeStore attributes) {
+        for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
+            if (!validateAttributeVR(attr)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean validateAttributeVR(final Attribute attribute) {
+        return attribute.getVr() != null;
+    }
+
     /**
      * This method will return true if the given study has passed all
      * implemented validation checks. This is validation for studies that are
@@ -695,6 +737,24 @@ public final class StudyUtils {
         //add other validation here and && it with result
 
         return result;
+    }
+
+    private static boolean validateInstanceCounts(final StudyMetadata study) {
+        int totalInstanceCount = 0;
+        for (final Series series: Iter.iter(study.seriesIterator())) {
+            final int seriesInstanceCount = series.getInstanceCount();
+            if (seriesInstanceCount != series.instanceCount()) {
+                return false;
+            }
+            totalInstanceCount += seriesInstanceCount;
+        }
+
+        final int studyInstanceCount = study.getInstanceCount();
+        if (studyInstanceCount != totalInstanceCount) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
