@@ -15,20 +15,13 @@
  */
 package org.nema.medical.mint.server.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.nema.medical.mint.metadata.*;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.utils.StudyUtils;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * @author Rex
@@ -197,18 +190,17 @@ public final class StorageUtil {
     }
 
     /**
-     * This method will return true if the given study has passed all
+     * This method will return successfully if the given study has passed all
      * implemented validation checks. This is validation for studies that are
      * being 'created' or 'updated' it is not expected that this validation with
      * pass on studies already written to disk.
      *
      * @param study
      * @param binaryFolder
-     * @return true iff the given study has passed all implemented validation checks
      */
-    public static boolean validateStudy(StudyMetadata study, File binaryFolder)
-    {
-        return StudyUtils.validateStudy(study, getBinaryItemIds(binaryFolder));
+    public static void validateStudy(final StudyMetadata study, final File binaryFolder)
+            throws StudyUtils.ValidationException {
+        StudyUtils.validateStudy(study, getBinaryItemIds(binaryFolder));
     }
 
     /**

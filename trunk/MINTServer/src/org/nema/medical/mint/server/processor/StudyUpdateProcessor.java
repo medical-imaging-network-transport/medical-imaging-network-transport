@@ -150,10 +150,11 @@ public class StudyUpdateProcessor extends TimerTask {
 					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + oldVersion + ")");
 				}
 				
-				if(!StorageUtil.validateStudy(newStudy, jobFolder))
-				{
-					throw new RuntimeException("Validation of the jobs study failed");
-				}
+                try {
+                    StorageUtil.validateStudy(newStudy, jobFolder);
+                } catch (final StudyUtils.ValidationException e) {
+                    throw new RuntimeException("Validation of the jobs study failed", e);
+                }
 	
 				/*
 				 * Need to rename the new binary files so there are no collisions

@@ -15,16 +15,16 @@
  */
 package org.nema.medical.mint.server.processor;
 
+import org.apache.log4j.Logger;
+import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.metadata.StudyMetadata;
+import org.nema.medical.mint.server.domain.*;
+import org.nema.medical.mint.server.util.StorageUtil;
+import org.nema.medical.mint.utils.StudyUtils;
+
 import java.io.File;
 import java.util.TimerTask;
 import java.util.UUID;
-
-import org.apache.log4j.Logger;
-import org.nema.medical.mint.server.util.StorageUtil;
-import org.nema.medical.mint.metadata.StudyMetadata;
-import org.nema.medical.mint.metadata.StudyIO;
-import org.nema.medical.mint.server.domain.*;
-import org.nema.medical.mint.utils.StudyUtils;
 
 public class StudyCreateProcessor extends TimerTask {
 
@@ -82,11 +82,13 @@ public class StudyCreateProcessor extends TimerTask {
 			//load study into memory
 			StudyMetadata study = StudyIO.loadStudy(jobFolder);
 			LOG.info("job " + jobID + " loaded");
-			
-			if(!StorageUtil.validateStudy(study, jobFolder))
-			{
-				throw new RuntimeException("Validation of the new study failed");
+
+            try {
+			    StorageUtil.validateStudy(study, jobFolder);
+            } catch (final StudyUtils.ValidationException e) {
+				throw new RuntimeException("Validation of the new study failed", e);
 			}
+
 			LOG.info("job " + jobID + " validated");
 			
             //Write metadata to change log

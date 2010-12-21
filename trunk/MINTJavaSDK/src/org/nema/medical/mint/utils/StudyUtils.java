@@ -30,6 +30,22 @@ public final class StudyUtils {
 
     public static final String INITIAL_VERSION = "0";
 
+    public static class ValidationException extends Exception {
+        public ValidationException() {
+        }
+
+        public ValidationException(Throwable cause) {
+            super(cause);
+        }
+
+        public ValidationException(String message) {
+            super(message);
+        }
+
+        public ValidationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
     /**
      * This method should pull all data from the provided study into 'this'
      * study and overwrite any existing values in 'this' study.
@@ -621,102 +637,93 @@ public final class StudyUtils {
         jobFolder.delete();
     }
 
-    public static boolean validateStudyMetadata(StudyMetadata study)
-    {
-    	boolean result = true;
-        result = result && validateInstanceCounts(study);
-        if (study.getType().equals("DICOM")) {
-    	    result = result && validateDICOMTransferSyntax(study);
-            result = result && validateDICOMVR(study);
+    public static interface AttributeAction {
+        void doAction(Attribute attribute) throws ValidationException;
+    }
+
+    private static void allAttributeTraverser(final StudyMetadata study, final AttributeAction action)
+            throws ValidationException {
+        attributeStoreTraverser(study, action);
+
+        for (final Series series: Iter.iter(study.seriesIterator())) {
+            attributeStoreTraverser(series, action);
+
+            for (final Attribute attr: Iter.iter(series.normalizedInstanceAttributeIterator())) {
+                hierarchicalAttributeTraverser(attr, action);
+            }
+
+            for (final Instance instance: Iter.iter(series.instanceIterator())) {
+                attributeStoreTraverser(instance, action);
+            }
         }
-    	return result;
+    }
+
+    private static void attributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
+            throws ValidationException {
+        for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
+            hierarchicalAttributeTraverser(attr, action);
+        }
+    }
+
+    private static void hierarchicalAttributeTraverser(final Attribute attribute, final AttributeAction action)
+            throws ValidationException {
+        action.doAction(attribute);
+
+        for (final Item item: Iter.iter(attribute.itemIterator())) {
+            for (final Attribute attr: Iter.iter(item.attributeIterator())) {
+                hierarchicalAttributeTraverser(attr, action);
+            }
+        }
+    }
+
+    public static void validateStudyMetadata(final StudyMetadata study) throws ValidationException {
+        validateInstanceCounts(study);
+        if (study.getType().equals("DICOM")) {
+    	    validateDICOMTransferSyntax(study);
+
+            allAttributeTraverser(study, new AttributeAction() {
+                @Override
+                public void doAction(final Attribute attribute) throws ValidationException {
+                    if (attribute.getVr() == null) {
+                        throw new ValidationException("Missing VR value for Attribute \""
+                                + tagString(attribute.getTag())
+                                + "\" in Study " + study.getStudyInstanceUID());
+                    }
+                }
+            });
+        }
     }
 
     /*
      * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
      * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
      */
-    private static boolean validateDICOMTransferSyntax(StudyMetadata study)
-    {
-    	boolean returnValue = true;
+    private static void validateDICOMTransferSyntax(final StudyMetadata study) throws ValidationException {
     	//loop over each series
-    	for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-    		//loop over the instances
-    		Series s = i.next();
-    		Attribute att = s.getNormalizedInstanceAttribute(0x00020010);
-    		String normalizedTransferSyntax = (att != null) ? att.getVal() : null;
-    		boolean transferSyntaxNormalized = false;
-    		if(normalizedTransferSyntax != null)
-    		{
-    			transferSyntaxNormalized = true;
-    		}
+    	for (final Series s: Iter.iter(study.seriesIterator())) {
+    		final Attribute normalizedTransferSyntaxAttribute = s.getNormalizedInstanceAttribute(0x00020010);
+    		final String normalizedTransferSyntax =
+                    (normalizedTransferSyntaxAttribute != null) ? normalizedTransferSyntaxAttribute.getVal() : null;
+    		final boolean transferSyntaxNormalized = (normalizedTransferSyntax != null);
 
-    		for (Iterator<Instance> ii = s.instanceIterator(); ii.hasNext();)
-    		{
+            //loop over the instances
+    		for (final Instance instance: Iter.iter(s.instanceIterator())) {
     			//This is the instance level transfer syntax element attribute
     			//<instance sopInstanceUID="123" transferSyntaxUID="456" >
-    			Instance instance = ii.next();
-    			String instanceTransferSyntax = instance.getTransferSyntaxUID();
+    			final String instanceTransferSyntax = instance.getTransferSyntaxUID();
     			//This is the dicom tag attribute for transfer syntax
     			//<attr tag="00020010" vr="UI" val="456">
-    			String instanceAttributeTransferSyntax = normalizedTransferSyntax;
-    			if(!transferSyntaxNormalized)
-    			{
-    				instanceAttributeTransferSyntax = instance.getValueForAttribute(0x00020010);
+    			final String instanceAttributeTransferSyntax =
+                        transferSyntaxNormalized ? normalizedTransferSyntax : instance.getValueForAttribute(0x00020010);
+    			//The two different transfer syntaxes must be equal in every case or the entire study is invalid.
+    			if (!instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax)) {
+    				throw new ValidationException("Mismatch of Transfer Syntax " + instanceTransferSyntax
+                            + " specified for SOP Instance UID " + instance.getSOPInstanceUID()
+                            + " and transfer syntax " + instanceAttributeTransferSyntax
+                            + " from instance file storage attributes");
     			}
-    			//The two different transfersyntax must be equal in every case or the entire study is invalid.
-    			if(!instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax))
-    			{
-    				returnValue = false;
-    				break;
-    			}
-    		}
-    		if(!returnValue)
-    		{
-    			break;
     		}
     	}
-    	return returnValue;
-    }
-
-    private static boolean validateDICOMVR(final StudyMetadata study) {
-        if (!validateAttributeStoreVR(study)) {
-            return false;
-        }
-
-        for (final Series series: Iter.iter(study.seriesIterator())) {
-            if (!validateAttributeStoreVR(series)) {
-                return false;
-            }
-
-            for (final Attribute attr: Iter.iter(series.normalizedInstanceAttributeIterator())) {
-                if (!validateAttributeVR(attr)) {
-                    return false;
-                }
-            }
-
-            for (final Instance instance: Iter.iter(series.instanceIterator())) {
-                if (!validateAttributeStoreVR(instance)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean validateAttributeStoreVR(final AttributeStore attributes) {
-        for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
-            if (!validateAttributeVR(attr)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean validateAttributeVR(final Attribute attribute) {
-        return attribute.getVr() != null;
     }
 
     /**
@@ -729,32 +736,27 @@ public final class StudyUtils {
      * @param binaryItemIds
      * @return true iff the given study has passed all implemented validation checks
      */
-    public static boolean validateStudy(StudyMetadata study, final Collection<Integer> binaryItemIds) {
-        boolean result = true;
-
-        result = result && validateBinaryItemsReferences(study, binaryItemIds);
-        result = result && validateStudyMetadata(study);
-        //add other validation here and && it with result
-
-        return result;
+    public static void validateStudy(StudyMetadata study, final Collection<Integer> binaryItemIds)
+            throws ValidationException {
+        validateBinaryItemsReferences(study, binaryItemIds);
+        validateStudyMetadata(study);
+        //add other validation here
     }
 
-    private static boolean validateInstanceCounts(final StudyMetadata study) {
+    private static void validateInstanceCounts(final StudyMetadata study) throws ValidationException {
         int totalInstanceCount = 0;
         for (final Series series: Iter.iter(study.seriesIterator())) {
             final int seriesInstanceCount = series.getInstanceCount();
             if (seriesInstanceCount != series.instanceCount()) {
-                return false;
+                throw new ValidationException("Instance count mismatch for series " + series.getSeriesInstanceUID());
             }
             totalInstanceCount += seriesInstanceCount;
         }
 
         final int studyInstanceCount = study.getInstanceCount();
         if (studyInstanceCount != totalInstanceCount) {
-            return false;
+            throw new ValidationException("Instance count mismatch for study " + study.getStudyInstanceUID());
         }
-
-        return true;
     }
 
     /**
@@ -769,58 +771,52 @@ public final class StudyUtils {
      * @param binaryItemIds
      * @return Returns true if no violations were detected.
      */
-    public static boolean validateBinaryItemsReferences(final StudyMetadata study,
-                                                        final Collection<Integer> binaryItemIds) {
+    public static void validateBinaryItemsReferences(final StudyMetadata study,
+                                                     final Collection<Integer> binaryItemIds)
+            throws ValidationException {
         final Collection<Integer> studyBids = new HashSet<Integer>();
+
           /*
-           * Collect id from attributes
+           * Collect ids from attributes
            *
            * NOTE: StudyMetadata has a method that does almost exactly this except that
            * this method detects repeated bids (which is not allowed). Do not just
            * replace the below with that method without first considering this
            * fact.
            */
-        for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-            for (Iterator<Instance> ii = i.next().instanceIterator(); ii.hasNext();) {
-                for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
-                    Attribute a = iii.next();
 
-                    Queue<Attribute> sequence = new LinkedList<Attribute>();
-                    sequence.add(a);
-
-                    while (!sequence.isEmpty()) {
-                        Attribute curr = sequence.remove();
-
-                        int bid = curr.getBid();
-                        if (bid >= 0) {
-                            int frameCount = curr.getFrameCount();
-                            if (frameCount >= 1) {
-                                for (int newBid = bid; newBid < (bid + frameCount); newBid++) {
-                                    if (!studyBids.add(newBid)) {
-                                        //If the set already contained the bid, should be unique reference
-                                        return false;
-                                    }
-                                }
-                            } else {
-                                if (!studyBids.add(bid)) {
-                                    //If the set already contained the bid, should be unique reference
-                                    return false;
-                                }
+        allAttributeTraverser(study, new AttributeAction() {
+            @Override
+            public void doAction(final Attribute attribute) throws ValidationException {
+                final int bid = attribute.getBid();
+                if (bid >= 0) {
+                    final int frameCount = attribute.getFrameCount();
+                    if (frameCount >= 1) {
+                        for (int newBid = bid; newBid < (bid + frameCount); newBid++) {
+                            if (!studyBids.add(newBid)) {
+                                //If the set already contained the bid, should be unique reference
+                                throw new ValidationException("Duplicate binary ID in attribute \""
+                                        + tagString(attribute.getTag()) + " of study "
+                                        + study.getStudyInstanceUID());
                             }
                         }
-
-                        //Add children to queue
-                        for (Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();) {
-                            for (Iterator<Attribute> iiiii = iiii.next().attributeIterator(); iiiii.hasNext();) {
-                                sequence.add(iiiii.next());
-                            }
+                    } else {
+                        if (!studyBids.add(bid)) {
+                            //If the set already contained the bid, should be unique reference
+                            throw new ValidationException("Duplicate binary ID in attribute \""
+                                    + tagString(attribute.getTag()) + " of study "
+                                    + study.getStudyInstanceUID());
                         }
                     }
                 }
             }
-        }
+        });
 
-        return studyBids.equals(binaryItemIds);
+
+        if (!studyBids.equals(binaryItemIds)) {
+            throw new ValidationException("Mismatch of available binary data items " + binaryItemIds
+                    + " and binary IDs in metadata " + studyBids + " for study " + study.getStudyInstanceUID());
+        }
     }
 
     /**
@@ -847,5 +843,9 @@ public final class StudyUtils {
         }
 
         return result;
+    }
+
+    public static String tagString(final int tag) {
+        return String.format("%1$08x", tag);
     }
 }
