@@ -238,10 +238,11 @@ public final class ProcessImportDir {
             builder.finish();
 
             try {
-                if (StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata())) {
+                try {
+                    StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata());
                     addToSendQueue(metaBinaryPair, instanceFiles);
-                } else {
-                    LOG.error("Skipping study " + studyUID + ": validation error in study metadata");
+                } catch (final StudyUtils.ValidationException e) {
+                    LOG.error("Skipping study " + studyUID + ": validation error in study metadata", e);
                 }
             } catch (final IOException e) {
                 //Catastrophic error
