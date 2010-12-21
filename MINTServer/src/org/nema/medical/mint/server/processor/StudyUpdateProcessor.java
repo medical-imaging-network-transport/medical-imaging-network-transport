@@ -247,20 +247,20 @@ public class StudyUpdateProcessor extends TimerTask {
 				
 				StudyUtils.deleteFolder(jobFolder);
 				
-				/*
-				 * Update the Job DAO and Study DAO
-				 */
-				MINTStudy studyData = new MINTStudy();
-				studyData.setID(studyUUID);
-				studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
-				studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
-				studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
-				studyData.setDateTime(MINTStudy
-						.now());
-				studyData.setStudyVersion(existingStudy.getVersion());
-				studyDAO.updateStudy(studyData);
-				// studyData.setDateTime(study.getValueForAttribute(0x00080020));
-				
+                //Update study DAO only if this is DICOM data; don't update study DAO for other types (DICOM is primary)
+                if (type.equals("DICOM")) {
+                    MINTStudy studyData = new MINTStudy();
+                    studyData.setID(studyUUID);
+                    studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
+                    studyData.setPatientID(existingStudy.getValueForAttribute(0x00100020));
+                    studyData.setAccessionNumber(existingStudy.getValueForAttribute(0x00080050));
+                    // studyData.setDateTime(study.getValueForAttribute(0x00080020));
+                    studyData.setDateTime(MINTStudy.now());
+                    studyData.setStudyVersion(existingStudy.getVersion());
+                    studyDAO.updateStudy(studyData);
+                }
+
+                //Update change DAO for any type
 				Change updateInfo = new Change();
 				updateInfo.setId(UUID.randomUUID().toString());
 				updateInfo.setStudyID(studyUUID);
