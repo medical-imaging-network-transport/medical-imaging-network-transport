@@ -8,9 +8,19 @@
 	<html>
 	    <head>
 	        <script type="text/JavaScript">
-	                function timedRefresh (timeoutPeriod) {
-	                    setTimeout("location.reload(true);", timeoutPeriod);
+                function timedRefresh (timeoutPeriod) {
+                    setTimeout("location.reload(true);", timeoutPeriod);
+                }
+
+                function toggle (divID) {
+                    var ele = document.getElementById(divID);
+                    if (ele.style.display == "block") {
+                        ele.style.display = "none";
                     }
+                    else {
+                        ele.style.display = "block";
+                    }
+                }
 	        </script>
 	    </head>
 		<body>
@@ -195,7 +205,7 @@
 	<ul>
 	<xsl:for-each select="mint:type">
 		<li class='type'>
-    		<a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="../@studyUUID"/>/<xsl:value-of select="."/>/summary</xsl:attribute><xsl:value-of select="."/> Summary</a>
+    		<xsl:value-of select="."/>: <a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="../@studyUUID"/>/<xsl:value-of select="."/>/summary</xsl:attribute>Summary</a> <a><xsl:attribute name ="href"><%=request.getContextPath()%>/studies/<xsl:value-of select="../@studyUUID"/>/<xsl:value-of select="."/>/metadata</xsl:attribute>Metadata</a>
 		</li>
 	</xsl:for-each>
 	</ul>
@@ -217,21 +227,23 @@
 			<dd class='Version'><xsl:value-of select="./@version"/></dd>
 		</xsl:if>
 		<xsl:for-each select="mint:attributes">
-		<dt>Attributes</dt>
-		<dd>
-			<table border="1" cellpadding="2" cellspacing="0">
-				<tr>
-					<th>Attribute Tag</th>
-					<th>VR</th>
-					<th>Value</th>
-					<th>Bid</th>
-					<th>Frame count</th>
-					<th>Bytes</th>
-					<th>bsize</th>
-				</tr>
-				<xsl:apply-templates/>
-			</table>
-		</dd>
+            <dt><a href ="javascript:toggle('{generate-id(.)}');">Attributes</a></dt>
+            <dd>
+                <div id="{generate-id(.)}" style="display: none">
+                    <table border="1" cellpadding="2" cellspacing="0">
+                        <tr>
+                            <th>Attribute Tag</th>
+                            <th>VR</th>
+                            <th>Value</th>
+                            <th>Bid</th>
+                            <th>Frame count</th>
+                            <th>Bytes</th>
+                            <th>bsize</th>
+                        </tr>
+                        <xsl:apply-templates/>
+                    </table>
+                </div>
+            </dd>
 		</xsl:for-each>
 	</dl>
 	<xsl:for-each select="mint:seriesList">
@@ -245,67 +257,75 @@
 				<dt>Instance Count</dt>
 				<dd class='InstanceCount'><xsl:value-of select="./@instanceCount"/></dd>
 				<xsl:for-each select="mint:attributes">
-					<dt>Attributes</dt>
+					<dt><a href ="javascript:toggle('{generate-id(.)}');">Attributes</a></dt>
 					<dd>
-						<table border="1" cellpadding="2" cellspacing="0">
-							<tr>
-								<th>Attribute Tag</th>
-								<th>VR</th>
-								<th>Value</th>
-								<th>Bid</th>
-								<th>Frame count</th>
-								<th>Bytes</th>
-								<th>bsize</th>
-							</tr>
-							<xsl:apply-templates/>
-						</table>
+                        <div id="{generate-id(.)}" style="display: none">
+                            <table border="1" cellpadding="2" cellspacing="0">
+                                <tr>
+                                    <th>Attribute Tag</th>
+                                    <th>VR</th>
+                                    <th>Value</th>
+                                    <th>Bid</th>
+                                    <th>Frame count</th>
+                                    <th>Bytes</th>
+                                    <th>bsize</th>
+                                </tr>
+                                <xsl:apply-templates/>
+                            </table>
+                        </div>
 					</dd>
 				</xsl:for-each>
 				<br />
 				<xsl:for-each select="mint:normalizedInstanceAttributes">
-					<dt>Normalized Instance Attributes</dt>
+					<dt><a href ="javascript:toggle('{generate-id(.)}');">Normalized Instance Attributes</a></dt>
 					<dd>
-						<table border="1" cellpadding="2" cellspacing="0">
-							<tr>
-								<th>Attribute Tag</th>
-								<th>VR</th>
-								<th>Value</th>
-								<th>Bid</th>
-								<th>Frame count</th>
-								<th>Bytes</th>
-								<th>bsize</th>
-							</tr>
-							<xsl:apply-templates/>
-						</table>
+                        <div id="{generate-id(.)}" style="display: none">
+                            <table border="1" cellpadding="2" cellspacing="0">
+                                <tr>
+                                    <th>Attribute Tag</th>
+                                    <th>VR</th>
+                                    <th>Value</th>
+                                    <th>Bid</th>
+                                    <th>Frame count</th>
+                                    <th>Bytes</th>
+                                    <th>bsize</th>
+                                </tr>
+                                <xsl:apply-templates/>
+                            </table>
+                        </div>
 					</dd>
 				</xsl:for-each>
 				<xsl:for-each select="mint:instances">
-				    <dt>Instances</dt>
-                    <ol>
-                        <xsl:for-each select="mint:instance">
-                            <li>
-                                <dt>SOP Instance UID</dt>
-                                <dd class='sopInstanceUID'><xsl:value-of select="./@sopInstanceUID"/></dd>
-                                <dt>Transfer Syntax UID</dt>
-                                <dd class='transferSyntaxUID'><xsl:value-of select="./@transferSyntaxUID"/></dd>
-                                <dt>Attributes</dt>
-                                <dd>
-                                    <table border="1" cellpadding="2" cellspacing="0">
-                                        <tr>
-                                            <th>Attribute Tag</th>
-                                            <th>VR</th>
-                                            <th>Value</th>
-                                            <th>Bid</th>
-                                            <th>Frame count</th>
-                                            <th>Bytes</th>
-                                            <th>bsize</th>
-                                        </tr>
-                                        <xsl:apply-templates/>
-                                    </table>
-                                </dd>
-                            </li>
-                        </xsl:for-each>
-                    </ol>
+				    <dt><a href ="javascript:toggle('{generate-id(.)}');">Instances</a></dt>
+                    <div id="{generate-id(.)}" style="display: none">
+                        <ol>
+                            <xsl:for-each select="mint:instance">
+                                <li>
+                                    <dt>SOP Instance UID</dt>
+                                    <dd class='sopInstanceUID'><xsl:value-of select="./@sopInstanceUID"/></dd>
+                                    <dt>Transfer Syntax UID</dt>
+                                    <dd class='transferSyntaxUID'><xsl:value-of select="./@transferSyntaxUID"/></dd>
+                                    <dt><a href ="javascript:toggle('{generate-id(.)}');">Attributes</a></dt>
+                                    <dd>
+                                        <div id="{generate-id(.)}" style="display: none">
+                                            <table border="1" cellpadding="2" cellspacing="0">
+                                                <tr>
+                                                    <th>Attribute Tag</th>
+                                                    <th>VR</th>
+                                                    <th>Value</th>
+                                                    <th>Bid</th>
+                                                    <th>Frame count</th>
+                                                    <th>Bytes</th>
+                                                    <th>bsize</th>
+                                                </tr>
+                                                <xsl:apply-templates/>
+                                            </table>
+                                        </div>
+                                    </dd>
+                                </li>
+                            </xsl:for-each>
+                        </ol>
+                    </div>
 				</xsl:for-each>
 			</dl>
 		</li>
