@@ -133,6 +133,16 @@ public class StudyUpdateProcessor extends TimerTask {
 					existingStudy = null;
 				}
 				
+                /*
+                 * If the study versions are not the same, then this
+                 * update is for a version that is not the most recent and
+                 * should not be applied.
+                 */
+                if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(oldVersion)))
+                {
+                    throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + oldVersion + ")");
+                }
+
 				/*
 				 * Need to load new study information
 				 */
@@ -140,16 +150,11 @@ public class StudyUpdateProcessor extends TimerTask {
                 //Force type to be set on new study
 				newStudy.setType(type);
 
-				/*
-				 * If the study versions are not the same, then this
-				 * update is for a version that is not the most recent and
-				 * should not be applied.
-				 */
-				if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(oldVersion)))
-				{
-					throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + oldVersion + ")");
-				}
-				
+                if (newStudy.getVersion() != null) {
+                    throw new RuntimeException(
+                            "Study update data specifies a version; versions are controlled by server, not client");
+                }
+
                 try {
                     StorageUtil.validateStudy(newStudy, jobFolder);
                 } catch (final StudyUtils.ValidationException e) {
