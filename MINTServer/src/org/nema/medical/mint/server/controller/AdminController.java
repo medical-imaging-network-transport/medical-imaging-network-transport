@@ -23,35 +23,30 @@ public class AdminController {
     private void loadMissingStudies() throws Exception {
         if (studiesRoot != null && studiesRoot.exists()) {
             for (String uuid : studiesRoot.list()) {
-                MINTStudy study = studyDAO.findStudy(uuid);
-                if (study == null) {
-                    // todo handle types other than DICOM
-                    File studyDir = new File(studiesRoot, uuid);
-                    File dicomDir = new File(studyDir, "DICOM");
-                    StudyMetadata studyMeta = StudyIO.loadStudy(dicomDir);
-                    File changelogDir = new File(studyDir, "changelog");
-                    study = new MINTStudy(uuid, studyMeta);
-                    studyDAO.insertStudy(study);
+                if (studyDAO.findStudy(uuid) == null) {
+                    final File studyDir = new File(studiesRoot, uuid);
+                    {
+                        final File dicomDir = new File(studyDir, "DICOM");
+                        final StudyMetadata studyMeta = StudyIO.loadStudy(dicomDir);
+                        final MINTStudy study = new MINTStudy(uuid, studyMeta);
+                        studyDAO.insertStudy(study);
+                    }
+                    
+                    final File changelogDir = new File(studyDir, "changelog");
+                    final File[] changeDirs = changelogDir.listFiles();
+                    for (final File changeDir: changeDirs) {
+                        //Only numbers are allowed as names
+                        final int changeNumber = Integer.parseInt(changeDir.getName());
 
-                    int changeNumber = 0;
-                    while (true) {
-                        File changeDir = new File(changelogDir, "" + changeNumber);
-                        if (!changeDir.exists()) break;
-
-                        Change change = new Change();
+                        final Change change = new Change();
                         change.setDateTime(new Timestamp(changeDir.lastModified()));
                         change.setStudyID(uuid);
                         change.setIndex(changeNumber);
-                        change.setType("DICOM");
+                        final StudyMetadata metadata = StudyIO.loadStudy(changeDir);
+                        change.setType(metadata.getType());
                         change.setRemoteHost("localhost");
                         updateDAO.saveChange(change);
-
-                        changeNumber++;
                     }
-                    if (study.getStudyVersion() == null) {
-                        study.setStudyVersion("" + (changeNumber - 1));
-                    }
-                    studyDAO.updateStudy(study);
                 }
             }
         }
