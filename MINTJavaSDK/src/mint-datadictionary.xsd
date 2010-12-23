@@ -11,11 +11,17 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
+  <xs:simpleType name="unknownAttributesType">
+      <xs:restriction base="xs:token">
+          <xs:enumeration value="accept"/>
+          <xs:enumeration value="reject"/>
+      </xs:restriction>
+  </xs:simpleType>
   <xs:complexType name="attributesType">
     <xs:sequence>
       <xs:element type="tns:elementType" name="element" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute type="xs:string" name="unknown-attributes"/>
+    <xs:attribute type="tns:unknownAttributesType" name="unknown-attributes" use="required"/>
   </xs:complexType>
   <xs:complexType name="attributeType">
     <xs:simpleContent>

@@ -15,11 +15,6 @@
 
 <form method='POST' enctype='multipart/form-data' action='<%=request.getContextPath()%>/jobs/updatestudy'>
 Study UUID: <input type=text name=<%=JobConstants.HTTP_MESSAGE_PART_STUDYUUID%>><br>
-Type: <select name=<%=JobConstants.HTTP_MESSAGE_PART_TYPE%>>
-<c:forEach var="typeName" items="${types}">
-<option value="${typeName}">${typeName}</option>
-</c:forEach>
-</select><br>
 Metadata to upload: <input type=file name=metadata><br>
 Previous version: <input type=text name=<%=JobConstants.HTTP_MESSAGE_PART_OLDVERSION%>><br>
 <%
