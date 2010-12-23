@@ -161,7 +161,7 @@
   * A: When the MINT server first runs, it creates a directory tree hierarchy at the location specified by the MINT_HOME environment variable. At MINT_HOME/types it stores the data dictionary for type DICOM under the name DICOM.xml. Non-DICOM types are supported by adding additional documents in this location following the same pattern as seen in the DICOM.xml file.
 
   * Q: Please give an example of adding a non-DICOM type to the MINT server.
-  * A: We can add a type ExternalData to the MINTServer by adding a file ExternalData.xml in the location described by the previous answer. The contents of ExternalData.xml could look as follows; in essence, this type lets us upload a single arbitrary binary file together with a metadata document.
+  * A: We can add a type `ExternalData` to the MINTServer by adding a file `ExternalData.xml` in the location described by the previous answer. The contents of `ExternalData.xml` could look as follows; in essence, this type lets us upload a single arbitrary binary file together with a metadata document.
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata type="ExternalData" version="1.0"
