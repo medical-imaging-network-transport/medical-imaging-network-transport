@@ -642,34 +642,41 @@ public final class StudyUtils {
 
     private static void allAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws ValidationException {
-        attributeStoreTraverser(study, action);
+        hierarchicalAttributeStoreTraverser(study, action);
 
         for (final Series series: Iter.iter(study.seriesIterator())) {
-            attributeStoreTraverser(series, action);
+            hierarchicalAttributeStoreTraverser(series, action);
 
             for (final Attribute attr: Iter.iter(series.normalizedInstanceAttributeIterator())) {
                 hierarchicalAttributeTraverser(attr, action);
             }
 
             for (final Instance instance: Iter.iter(series.instanceIterator())) {
-                attributeStoreTraverser(instance, action);
+                hierarchicalAttributeStoreTraverser(instance, action);
             }
         }
     }
 
-    private static void studyAttributeTraverser(final StudyMetadata study, final AttributeAction action)
+    private static void flatStudyAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws ValidationException {
-        attributeStoreTraverser(study, action);
+        flatAttributeStoreTraverser(study, action);
     }
 
-    private static void seriesAttributeTraverser(final StudyMetadata study, final AttributeAction action)
+    private static void flatSeriesAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws ValidationException {
         for (final Series series: Iter.iter(study.seriesIterator())) {
-            attributeStoreTraverser(series, action);
+            flatAttributeStoreTraverser(series, action);
         }
     }
 
-    private static void attributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
+    private static void flatAttributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
+            throws ValidationException {
+        for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
+            action.doAction(attr);
+        }
+    }
+
+    private static void hierarchicalAttributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
             throws ValidationException {
         for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
             hierarchicalAttributeTraverser(attr, action);
@@ -752,13 +759,13 @@ public final class StudyUtils {
             public void doAction(final Attribute attribute) throws ValidationException {
                 final int tag = attribute.getTag();
                 if (!levelTags.contains(tag)) {
-                    throw new ValidationException("Tag " + tag + " invalid at " + levelName + " level");
+                    throw new ValidationException("Tag " + tagString(tag) + " invalid at " + levelName + " level");
                 }
             }
         }
 
-        studyAttributeTraverser(study, new LevelCheck("study", studyAttributeTags));
-        seriesAttributeTraverser(study, new LevelCheck("series", seriesAttributeTags));
+        flatStudyAttributeTraverser(study, new LevelCheck("study", studyAttributeTags));
+        flatSeriesAttributeTraverser(study, new LevelCheck("series", seriesAttributeTags));
     }
 
     private static void validateDICOMVRValueExistence(final StudyMetadata study) throws ValidationException {
