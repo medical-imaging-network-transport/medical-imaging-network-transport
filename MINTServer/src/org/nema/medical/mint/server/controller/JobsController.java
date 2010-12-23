@@ -79,12 +79,10 @@ public class JobsController {
 	@Autowired
 	protected String xmlStylesheet;
 
-    @Autowired
-    protected ArrayList<String> availableTypeNames;
 
     @Autowired
     protected HashMap<String, MetadataType> availableTypes;
-    
+
 	@Autowired
 	protected StudyDAO studyDAO = null;
 	@Autowired
@@ -166,16 +164,9 @@ public class JobsController {
 		res.setHeader("Location", jobURI);
 	}
 
-    @ModelAttribute("types")
-    public List<String> getTypes() {
-        return new ArrayList<String>();
-    }
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/updatestudy")
-	public String updateStudy(@ModelAttribute("types") final List<String> types,
-						final HttpServletRequest req,
-						final HttpServletResponse res) {
-        types.addAll(availableTypeNames);
+	public String updateStudy() {
 		return "studyupdate";
 	}
 
@@ -254,7 +245,7 @@ public class JobsController {
 
 		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
 		res.setHeader("Location", jobURI);
-		
+
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/jobs/status/{uuid}")
@@ -263,7 +254,7 @@ public class JobsController {
 			@PathVariable("uuid") final String uuid) throws IOException, JiBXException {
 
 		final JobInfo jobInfo = jobInfoDAO.findJobInfo(uuid);
-		
+
 		org.nema.medical.mint.jobs.JobStatus jobStatus = new org.nema.medical.mint.jobs.JobStatus(
 				jobInfo.getId(), jobInfo.getStudyID(), jobInfo.getStatus().toString(),
 				jobInfo.getCreateTime(), jobInfo.getUpdateTime());
