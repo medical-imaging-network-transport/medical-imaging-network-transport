@@ -20,7 +20,6 @@ package org.nema.medical.mint.jobs;
  * @author Uli Bubenheimer
  */
 public final class JobConstants {
-    public static final String HTTP_MESSAGE_PART_TYPE = "type";
     public static final String HTTP_MESSAGE_PART_STUDYUUID = "studyUUID";
     public static final String HTTP_MESSAGE_PART_OLDVERSION = "oldVersion";
 

@@ -16,6 +16,7 @@
 package org.nema.medical.mint.server.processor;
 
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.server.domain.*;
@@ -37,6 +38,7 @@ public class StudyCreateProcessor extends TimerTask {
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
+    private final MetadataType dataDictionary;
 
 	/**
 	 * extracts files from the jobFolder, places them in the studyFolder updates
@@ -53,9 +55,12 @@ public class StudyCreateProcessor extends TimerTask {
 	 * @param studyDAO
 	 *            needed to update the database
 	 */
-	public StudyCreateProcessor(File jobFolder, File studyFolder, String remoteUser, String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO, ChangeDAO updateDAO) {
+	public StudyCreateProcessor(File jobFolder, File studyFolder, MetadataType dataDictionary,String remoteUser,
+                                String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO,
+                                ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
+        this.dataDictionary = dataDictionary;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
 		this.principal = principal;
@@ -88,8 +93,14 @@ public class StudyCreateProcessor extends TimerTask {
                         "New study data specifies a version; versions are controlled by server, not client");
             }
 
+            final String typeName = study.getType();
+            //Sanity check - is caller trying to create an initial study, but not uploading DICOM?
+            if (typeName == null || !typeName.equals("DICOM")) {
+                throw new RuntimeException("Invalid study type " + typeName + " - must be \"DICOM\"");
+            }
+
             try {
-			    StorageUtil.validateStudy(study, jobFolder);
+			    StorageUtil.validateStudy(study, dataDictionary, jobFolder);
             } catch (final StudyUtils.ValidationException e) {
 				throw new RuntimeException("Validation of the new study failed", e);
 			}

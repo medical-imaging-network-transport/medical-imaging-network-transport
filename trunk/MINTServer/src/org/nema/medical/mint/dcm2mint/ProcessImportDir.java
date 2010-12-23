@@ -93,7 +93,7 @@ public final class ProcessImportDir {
     private final boolean deletePhysicalInstanceFiles;
     private final boolean forceCreate;
     private final int binaryInlineThreshold;
-    private MetadataType metadataType = null; 
+    private MetadataType dicomMetadataType = null;
     private Set<Integer> studyLevelTags;
     private Set<Integer> seriesLevelTags;
     private static final XPath xPath = XPathFactory.newInstance().newXPath();
@@ -110,9 +110,6 @@ public final class ProcessImportDir {
             throw new RuntimeException(e);
         }
     }
-    
-    
-    
     
     public ProcessImportDir(final File importDir, final URI serverURI, final boolean useXMLNotGPB,
             final boolean deletePhysicalInstanceFiles, final boolean forceCreate,
@@ -134,14 +131,14 @@ public final class ProcessImportDir {
     	//Initialization cannot take place in the constructor because this
     	//depends on the server to be already up and running. The server
     	//startup creates this class so it would be a catch22.
-    	if(metadataType == null)
+    	if(dicomMetadataType == null)
     	{
     		HttpGet httpGet = new HttpGet(dicomDatadictionaryURI);
     		String response = httpClient.execute(httpGet, new BasicResponseHandler());
         	InputStream in = new ByteArrayInputStream(response.getBytes());
-        	this.metadataType = DataDictionaryIO.parseFromXML(in);
-        	this.studyLevelTags = getStudyTags(metadataType);
-        	this.seriesLevelTags = getSeriesTags(metadataType);
+        	this.dicomMetadataType = DataDictionaryIO.parseFromXML(in);
+        	this.studyLevelTags = getStudyTags(dicomMetadataType);
+        	this.seriesLevelTags = getSeriesTags(dicomMetadataType);
     	}
         LOG.info("Gathering files for allocation to studies.");
         final long fileGatherStart = System.currentTimeMillis();
@@ -239,7 +236,7 @@ public final class ProcessImportDir {
 
             try {
                 try {
-                    StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata());
+                    StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata(), dicomMetadataType);
                     addToSendQueue(metaBinaryPair, instanceFiles);
                 } catch (final StudyUtils.ValidationException e) {
                     LOG.error("Skipping study " + studyUID + ": validation error in study metadata", e);
@@ -437,11 +434,6 @@ public final class ProcessImportDir {
         final HttpPost httpPost = new HttpPost(studyQueryInfo == null ? createURI : updateURI);
         final MultipartEntity entity = new MultipartEntity();
 
-        //Need to specify the 'type' of the data being sent for updates
-        if (studyQueryInfo != null) {
-            entity.addPart(JobConstants.HTTP_MESSAGE_PART_TYPE, new StringBody("DICOM"));
-        }
-        
         if (studyQueryInfo != null) {
             entity.addPart(JobConstants.HTTP_MESSAGE_PART_STUDYUUID, new StringBody(studyQueryInfo.studyUUID));
         }

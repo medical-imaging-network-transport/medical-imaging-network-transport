@@ -25,10 +25,7 @@ import org.nema.medical.mint.utils.StudyUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -51,7 +48,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
-    private final MetadataType dataDictionary;
+    private final Map<String, MetadataType> availableTypes;
 
 	/**
 	 * extracts files from the jobFolder, merges them in the studyFolder
@@ -61,13 +58,13 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param jobInfoDAO needed to update the database
 	 * @param studyDAO needed to update the database
 	 */
-	public StudyUpdateProcessor(final File jobFolder, final File studyFolder, final MetadataType dataDictionary,
-                                final String oldVersion, final String remoteUser, final String remoteHost,
-                                final String principal, final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO,
-                                final ChangeDAO updateDAO) {
+	public StudyUpdateProcessor(final File jobFolder, final File studyFolder,
+                                final Map<String, MetadataType> availableTypes, final String oldVersion,
+                                final String remoteUser, final String remoteHost, final String principal,
+                                final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO, final ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
-		this.dataDictionary = dataDictionary;
+		this.availableTypes = availableTypes;
         this.oldVersion = oldVersion;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
@@ -88,8 +85,6 @@ public class StudyUpdateProcessor extends TimerTask {
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
 		
-        final String type = dataDictionary.getType();
-
 		Lock lock = new ReentrantLock(), oldLock;
 		
 		oldLock = studyIdLocks.putIfAbsent(studyUUID, lock);
@@ -104,51 +99,25 @@ public class StudyUpdateProcessor extends TimerTask {
 			try
 			{
 	            LOG.debug("Got lock, and starting process");
-                File typeFolder = new File(studyFolder, type);
-				
+
 				//Not calling mkdir on this because they better already exist
 				File changelogRoot = new File(studyFolder, "changelog");
 				
 				if(!changelogRoot.exists())
 				{
-					throw new FileNotFoundException("The changelog for study uuid " + studyUUID + " does not exist, may need to do a create first.");
+					throw new FileNotFoundException("The changelog for study uuid " + studyUUID
+                            + " does not exist, may need to do a create first.");
 				}
 				
-				File existingBinaryFolder = new File(typeFolder, "binaryitems");
-				existingBinaryFolder.mkdirs();
-				
-				StudyMetadata existingStudy;
-				
-				try
-				{
-					/*
-					 * Need to load current study information
-					 */
-					existingStudy = StudyIO.loadStudy(typeFolder);
-				}catch(RuntimeException e){
-					/*
-					 * Do nothing, just means there is no existing study
-					 * which is fine.
-					 */
-					existingStudy = null;
-				}
-				
-                /*
-                 * If the study versions are not the same, then this
-                 * update is for a version that is not the most recent and
-                 * should not be applied.
-                 */
-                if(existingStudy != null && (existingStudy.getVersion() == null || !existingStudy.getVersion().equals(oldVersion)))
-                {
-                    throw new RuntimeException("Study update data is of a different version that the current study, cannot update if versions do not match. (" + existingStudy.getVersion() + " : " + oldVersion + ")");
-                }
-
 				/*
 				 * Need to load new study information
 				 */
-				StudyMetadata newStudy = StudyIO.loadStudy(jobFolder);
-                //Force type to be set on new study
-				newStudy.setType(type);
+				final StudyMetadata newStudy = StudyIO.loadStudy(jobFolder);
+                final String typeName = newStudy.getType();
+                final MetadataType dataDictionary = availableTypes.get(typeName);
+                if (dataDictionary == null) {
+                    throw new RuntimeException("Invalid study type " + typeName);
+                }
 
                 if (newStudy.getVersion() != null) {
                     throw new RuntimeException(
@@ -156,11 +125,41 @@ public class StudyUpdateProcessor extends TimerTask {
                 }
 
                 try {
-                    StorageUtil.validateStudy(newStudy, jobFolder);
+                    StorageUtil.validateStudy(newStudy, dataDictionary, jobFolder);
                 } catch (final StudyUtils.ValidationException e) {
                     throw new RuntimeException("Validation of the jobs study failed", e);
                 }
 	
+                final File typeFolder = new File(studyFolder, typeName);
+                final File existingBinaryFolder = new File(typeFolder, "binaryitems");
+                existingBinaryFolder.mkdirs();
+
+                StudyMetadata existingStudy;
+                try {
+                    /*
+                     * Need to load current study information
+                     */
+                    existingStudy = StudyIO.loadStudy(typeFolder);
+                } catch (final RuntimeException e){
+                    /*
+                     * Do nothing, just means there is no existing study
+                     * which is fine.
+                     */
+                    existingStudy = null;
+                }
+
+                /*
+                 * If the study versions are not the same, then this
+                 * update is for a version that is not the most recent and
+                 * should not be applied.
+                 */
+                if (existingStudy != null && (existingStudy.getVersion() == null
+                        || !existingStudy.getVersion().equals(oldVersion))) {
+                    throw new RuntimeException("Study update data is of a different version than the current study, " +
+                            "cannot update if versions do not match. (" + existingStudy.getVersion() + " : "
+                            + oldVersion + ")");
+                }
+
 				/*
 				 * Need to rename the new binary files so there are no collisions
 				 * with existing data files when merging. This also means updating
@@ -231,7 +230,7 @@ public class StudyUpdateProcessor extends TimerTask {
 		        	
 		        	// Set to base level version
                     existingStudy.setVersion(StudyUtils.getBaseVersion());
-		        	existingStudy.setType(type);
+		        	existingStudy.setType(typeName);
 		        }
 		        
 		        //Rename all excluded binary files to have .exclude
@@ -253,7 +252,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				StudyUtils.deleteFolder(jobFolder);
 				
                 //Update study DAO only if this is DICOM data; don't update study DAO for other types (DICOM is primary)
-                if (type.equals("DICOM")) {
+                if (typeName.equals("DICOM")) {
                     MINTStudy studyData = new MINTStudy();
                     studyData.setID(studyUUID);
                     studyData.setStudyInstanceUID(existingStudy.getStudyInstanceUID());
@@ -269,7 +268,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				Change updateInfo = new Change();
 				updateInfo.setId(UUID.randomUUID().toString());
 				updateInfo.setStudyID(studyUUID);
-				updateInfo.setType(type);
+				updateInfo.setType(typeName);
 				updateInfo.setRemoteUser(remoteUser);
 				updateInfo.setRemoteHost(remoteHost);
 				updateInfo.setPrincipal(principal);
@@ -288,7 +287,8 @@ public class StudyUpdateProcessor extends TimerTask {
 			}
 		}else{
 			jobInfo.setStatus(JobStatus.FAILED);
-			jobInfo.setStatusDescription("unable to process job " + jobID + ", another update is current being processed on the same study.");
+			jobInfo.setStatusDescription("unable to process job " + jobID
+                    + ", another update is current being processed on the same study.");
 		}
 		
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);

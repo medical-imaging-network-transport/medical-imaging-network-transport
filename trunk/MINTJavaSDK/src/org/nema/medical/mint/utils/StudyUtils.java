@@ -15,8 +15,7 @@
  */
 package org.nema.medical.mint.utils;
 
-import org.nema.medical.mint.datadictionary.AttributeType;
-import org.nema.medical.mint.datadictionary.MetadataType;
+import org.nema.medical.mint.datadictionary.*;
 import org.nema.medical.mint.metadata.*;
 
 import java.io.File;
@@ -658,6 +657,18 @@ public final class StudyUtils {
         }
     }
 
+    private static void studyAttributeTraverser(final StudyMetadata study, final AttributeAction action)
+            throws ValidationException {
+        attributeStoreTraverser(study, action);
+    }
+
+    private static void seriesAttributeTraverser(final StudyMetadata study, final AttributeAction action)
+            throws ValidationException {
+        for (final Series series: Iter.iter(study.seriesIterator())) {
+            attributeStoreTraverser(series, action);
+        }
+    }
+
     private static void attributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
             throws ValidationException {
         for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
@@ -676,24 +687,92 @@ public final class StudyUtils {
         }
     }
 
-    public static void validateStudyMetadata(final StudyMetadata study) throws ValidationException {
+    public static void validateStudyMetadata(final StudyMetadata study, final MetadataType type)
+            throws ValidationException {
         validateInstanceCounts(study);
-        if (study.getType().equals("DICOM")) {
+        validateTypeInfo(study, type);
+        if (type.getType().equals("DICOM")) {
     	    validateDICOMTransferSyntax(study);
+            validateDICOMVRValueExistence(study);
+        }
+    }
 
+    private static void validateTypeInfo(final StudyMetadata study, final MetadataType type)
+            throws ValidationException {
+        validateUnknownAttributes(study, type);
+        validateAttributeLevel(study, type);
+    }
+
+    private static void validateUnknownAttributes(final StudyMetadata study, final MetadataType type)
+            throws ValidationException {
+        if (type.getAttributes().getUnknownAttributes().equals("reject")) {
+            final AttributesType attributesType = type.getAttributes();
+            final List<ElementType> elements = attributesType.getElements();
+            final Set<Integer> availableElementTags = new HashSet<Integer>();
+            for (final ElementType element: elements) {
+                availableElementTags.add(Integer.valueOf(element.getTag(), 16));
+            }
             allAttributeTraverser(study, new AttributeAction() {
                 @Override
                 public void doAction(final Attribute attribute) throws ValidationException {
-                    if (attribute.getVr() == null) {
-                        throw new ValidationException("Missing VR value for Attribute \""
-                                + tagString(attribute.getTag())
-                                + "\" in Study " + study.getStudyInstanceUID());
+                    if (!availableElementTags.contains(attribute.getTag())) {
+                        throw new ValidationException("Invalid attribute " + tagString(attribute.getTag())
+                        + " for type " + type.getType());
                     }
                 }
             });
         }
     }
 
+    private static void validateAttributeLevel(final StudyMetadata study, final MetadataType type)
+            throws ValidationException {
+        final class AttributeTransformer {
+            public final Collection<Integer> extractTagSet(final Collection<AttributeType> attributes) {
+                final Collection<Integer> attributeTags = new HashSet<Integer>(attributes.size());
+                for (final AttributeType attributeType: attributes) {
+                    attributeTags.add(Integer.valueOf(attributeType.getTag(), 16));
+                }
+                return attributeTags;
+            }
+        }
+        final AttributeTransformer attributeTransformer = new AttributeTransformer();
+        final Collection<Integer> studyAttributeTags =
+                attributeTransformer.extractTagSet(type.getStudyAttributes().getAttributes());
+        final Collection<Integer> seriesAttributeTags =
+                attributeTransformer.extractTagSet(type.getSeriesAttributes().getAttributes());
+        final class LevelCheck implements AttributeAction {
+            private final String levelName;
+            private final Collection<Integer> levelTags;
+            public LevelCheck(final String levelName, final Collection<Integer> levelTags) {
+                this.levelName = levelName;
+                this.levelTags = levelTags;
+            }
+
+            @Override
+            public void doAction(final Attribute attribute) throws ValidationException {
+                final int tag = attribute.getTag();
+                if (!levelTags.contains(tag)) {
+                    throw new ValidationException("Tag " + tag + " invalid at " + levelName + " level");
+                }
+            }
+        }
+
+        studyAttributeTraverser(study, new LevelCheck("study", studyAttributeTags));
+        seriesAttributeTraverser(study, new LevelCheck("series", seriesAttributeTags));
+    }
+
+    private static void validateDICOMVRValueExistence(final StudyMetadata study) throws ValidationException {
+        allAttributeTraverser(study, new AttributeAction() {
+            @Override
+            public void doAction(final Attribute attribute) throws ValidationException {
+                if (attribute.getVr() == null) {
+                    throw new ValidationException("Missing VR value for Attribute \""
+                            + tagString(attribute.getTag())
+                            + "\" in Study " + study.getStudyInstanceUID());
+                }
+            }
+        });
+    }
     /*
      * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
      * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
@@ -732,15 +811,16 @@ public final class StudyUtils {
      * being 'created' or 'updated' it is not expected that this validation with
      * pass on studies already written to disk.
      *
-     * @param study
-     * @param binaryItemIds
-     * @return true iff the given study has passed all implemented validation checks
+     * @param study the study
+     * @param type the study's type definition
+     * @param binaryItemIds the study's binary item IDs
+     * @throws ValidationException if a validation error occurred
      */
-    public static void validateStudy(StudyMetadata study, final Collection<Integer> binaryItemIds)
+    public static void validateStudy(final StudyMetadata study, final MetadataType type,
+                                     final Collection<Integer> binaryItemIds)
             throws ValidationException {
         validateBinaryItemsReferences(study, binaryItemIds);
-        validateStudyMetadata(study);
-        //add other validation here
+        validateStudyMetadata(study, type);
     }
 
     private static void validateInstanceCounts(final StudyMetadata study) throws ValidationException {
@@ -762,14 +842,14 @@ public final class StudyUtils {
     /**
      * This method will determine if there the bid references from the study to
      * binary items are all existing and that there are no excess binary items.
-     * The expect usage of this method is during study create and study update
+     * The expected usage of this method is during study create and study update
      * to ensure the passed in metadata and binary items are in agreement (i.e.,
      * no unreferenced binary items and no bids in the metadata that point to
      * nothing).
      *
-     * @param study
-     * @param binaryItemIds
-     * @return Returns true if no violations were detected.
+     * @param study the study
+     * @param binaryItemIds the study's binary item IDs
+     * @throws ValidationException if a validation error occurred
      */
     public static void validateBinaryItemsReferences(final StudyMetadata study,
                                                      final Collection<Integer> binaryItemIds)

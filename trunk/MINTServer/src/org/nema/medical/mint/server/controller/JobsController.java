@@ -143,13 +143,6 @@ public class JobsController {
 			return;
 		}
 
-        //Sanity check - is caller trying to create an initial study, but not uploading DICOM?
-        if (params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) &&
-                !params.get(JobConstants.HTTP_MESSAGE_PART_TYPE).equals("DICOM")) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Study create must have type 'DICOM'");
-            return;
-        }
-
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
@@ -161,8 +154,10 @@ public class JobsController {
 		Principal principal = req.getUserPrincipal();
 		String principalName = (principal != null) ? principal.getName() : null;
 
+        final MetadataType dataDictionary = availableTypes.get("DICOM");
+
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
-				new File(studiesRoot, studyUUID), req.getRemoteUser(),
+				new File(studiesRoot, studyUUID), dataDictionary, req.getRemoteUser(),
 				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
 				updateDAO);
 		executor.execute(processor); // process immediately in the background
@@ -233,14 +228,6 @@ public class JobsController {
 
         final String oldVersion = params.get(JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
 
-		final String type;
-		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_TYPE) ||
-                StringUtils.isBlank(type = params.get(JobConstants.HTTP_MESSAGE_PART_TYPE))) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter '"
-                    + JobConstants.HTTP_MESSAGE_PART_TYPE + "'");
-			return;
-		}
-
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
 		jobInfo.setStudyID(studyUUID);
@@ -260,10 +247,8 @@ public class JobsController {
 		Principal principal = req.getUserPrincipal();
 		String principalName = (principal != null) ? principal.getName() : null;
 
-        final MetadataType dataDictionary = availableTypes.get(type);
-
-		StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				studyFolder, dataDictionary, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
+		final StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
+				studyFolder, availableTypes, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
 				principalName, jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
