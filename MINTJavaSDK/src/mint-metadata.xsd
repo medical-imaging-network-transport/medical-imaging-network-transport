@@ -10,7 +10,7 @@
 				maxOccurs="1" minOccurs="1" />
 		</sequence>
 		<attribute name="studyInstanceUID" type="string" use="required"></attribute>
-		<attribute name="type" type="string" use="optional"></attribute>
+		<attribute name="type" type="string" use="required"></attribute>
 		<attribute name="version" type="string" use="optional"></attribute>
 		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
         <attribute name="updateDateTime" type="dateTime" use="optional"/>
