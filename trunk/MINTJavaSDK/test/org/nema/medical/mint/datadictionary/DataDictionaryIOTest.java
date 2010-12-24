@@ -48,9 +48,8 @@ public class DataDictionaryIOTest {
 		dataDictionary.setType("DICOM");
 		dataDictionary.setVersion(1.0f);
 		AttributesType attributes = new AttributesType();
-		attributes.setUnknownAttributes("include/ignore/reject?");
-		
-		
+		attributes.setUnknownAttributes("accept");
+
 		//Set up the <metadata><attributes> tag
 		ArrayList<ElementType> elements = new ArrayList<ElementType>();
 		
