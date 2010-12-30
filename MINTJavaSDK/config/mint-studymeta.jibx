@@ -15,7 +15,7 @@
     </collection>
     <collection name="seriesList" add-method="putSeries" iter-method="seriesIterator" item-type="org.nema.medical.mint.metadata.Series">
     	<structure name="series" map-as="SeriesType"/>
-    </collection> 
+    </collection>
     <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID"/>
     <value style="attribute" name="type" get-method="getType" set-method="setType" usage="optional"/>
     <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
@@ -32,10 +32,10 @@
     <value style="attribute" name="tag" get-method="getTag" set-method="setTag" format="int.hex" />
     <value style="attribute" name="vr" get-method="getVr" set-method="setVr" usage="optional"/>
     <value style="attribute" name="val" get-method="getVal" set-method="setVal" usage="optional"/>
-    <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>    
-    <value style="attribute" name="bsize" get-method="getBinarySize" set-method="setBinarySize" format="int.bsize" usage="optional" default="-1"/>    
-    <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional" default="1"/>    
-    <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>    
+    <value style="attribute" name="bid" get-method="getBid" set-method="setBid" format="int.bid" usage="optional" default="-1"/>
+    <value style="attribute" name="bsize" get-method="getBinarySize" set-method="setBinarySize" format="int.bsize" usage="optional" default="-1"/>
+    <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional" default="1"/>
+    <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>
     <value style="attribute" name="exclude" field="exclude" usage="optional"/>
   </mapping>
   <mapping abstract="true" type-name="SeriesType" class="org.nema.medical.mint.metadata.Series">
@@ -50,7 +50,8 @@
     </collection>
     <value style="attribute" name="seriesInstanceUID" field="seriesInstanceUID"/>
     <value style="attribute" name="exclude" field="exclude" usage="optional"/>
-    <value style="attribute" name="instanceCount" get-method="getInstanceCount" set-method="setInstanceCount"/>
+    <value style="attribute" name="instanceCount" get-method="getInstanceCount" set-method="setInstanceCount"
+        usage="optional" default="-1"/>
   </mapping>
   <mapping abstract="true" type-name="ItemType" class="org.nema.medical.mint.metadata.Item">
     <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator" item-type="org.nema.medical.mint.metadata.Attribute">

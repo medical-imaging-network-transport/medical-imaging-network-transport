@@ -21,6 +21,7 @@ import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.server.domain.*;
 import org.nema.medical.mint.server.util.StorageUtil;
+import org.nema.medical.mint.utils.StudyTraversals;
 import org.nema.medical.mint.utils.StudyUtils;
 
 import java.io.File;
@@ -126,7 +127,7 @@ public class StudyUpdateProcessor extends TimerTask {
 
                 try {
                     StorageUtil.validateStudy(newStudy, dataDictionary, jobFolder);
-                } catch (final StudyUtils.ValidationException e) {
+                } catch (final StudyTraversals.TraversalException e) {
                     throw new RuntimeException("Validation of the jobs study failed", e);
                 }
 	

@@ -18,7 +18,9 @@ package org.nema.medical.mint.server.util;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.StudyMetadata;
+import org.nema.medical.mint.utils.StudyTraversals;
 import org.nema.medical.mint.utils.StudyUtils;
+import org.nema.medical.mint.utils.StudyValidation;
 
 import java.io.File;
 import java.util.Collection;
@@ -200,8 +202,8 @@ public final class StorageUtil {
      * @param binaryFolder
      */
     public static void validateStudy(final StudyMetadata study, final MetadataType type, final File binaryFolder)
-            throws StudyUtils.ValidationException {
-        StudyUtils.validateStudy(study, type, getBinaryItemIds(binaryFolder));
+            throws StudyTraversals.TraversalException {
+        StudyValidation.validateStudy(study, type, getBinaryItemIds(binaryFolder));
     }
 
     /**

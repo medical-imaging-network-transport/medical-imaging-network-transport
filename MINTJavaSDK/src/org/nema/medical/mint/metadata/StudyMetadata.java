@@ -134,14 +134,14 @@ public class StudyMetadata implements AttributeStore, StudySummary
     public void setStudyInstanceUID(String studyInstanceUID) {
         this.studyInstanceUID = studyInstanceUID;
     }
-    
+
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getType()
 	 */
 	public String getType() {
 		return type;
 	}
-    
+
     /**
      * Set the 'type' attribute value.
      *
@@ -166,14 +166,14 @@ public class StudyMetadata implements AttributeStore, StudySummary
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getInstanceCount()
 	 */
 	public int getInstanceCount() {
 		return (instanceCount < 0) ? computeInstanceCount() : instanceCount;
 	}
-	
+
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#computeInstanceCount()
 	 */
@@ -187,12 +187,14 @@ public class StudyMetadata implements AttributeStore, StudySummary
 	}
 
     /**
-     * Set the 'instanceCount' attribute value.
+     * This is here only to satisfy JiBX. The implementation sets instanceCount to -1,
+     * to force computing it once it is read. We always want to compute it on the fly,
+     * once, to avoid discrepancies.
      *
      * @param instanceCount
      */
-	public void setInstanceCount(int instanceCount) {
-		this.instanceCount = instanceCount;
+	private void setInstanceCount(int instanceCount) {
+        this.instanceCount = -1;
 	}
 
     /* (non-Javadoc)
@@ -200,7 +202,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
 	 */
     public Collection<Integer> getBinaryItemIDs() {
 		final Set<Integer> items = new TreeSet<Integer>();
-		
+
 		/*
 		 * Should need only one instance of this structure because should be
 		 * emptied after each us (enforced by the while loop)
@@ -214,7 +216,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
                     Attribute a = iii.next();
 
                     sequence.add(a);
-                    
+
 					/*
 					 * Iteratively checks for bids in each attribute and any
 					 * sequence attributes beneath it
@@ -222,7 +224,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
                     while(!sequence.isEmpty())
                     {
                     	Attribute curr = sequence.remove();
-                    	
+
                     	//Check if bid exists
                     	int bid = curr.getBid();
                         if (bid >= 0) {
@@ -235,7 +237,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
                                 items.add(bid);
                             }
                         }
-                    	
+
                         //Add children to queue
                     	for(Iterator<Item> iiii = curr.itemIterator(); iiii.hasNext();)
                     	{
@@ -248,7 +250,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
                 }
             }
         }
-        
+
 		return items;
     }
 
@@ -260,7 +262,6 @@ public class StudyMetadata implements AttributeStore, StudySummary
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
         if (studyData.hasVersion()) study.setVersion(studyData.getVersion());
-        if (studyData.hasInstanceCount()) study.setInstanceCount(studyData.getInstanceCount());
 
         for (AttributeData attrData : studyData.getAttributesList()) {
             Attribute attr = Attribute.fromGPB(attrData);
