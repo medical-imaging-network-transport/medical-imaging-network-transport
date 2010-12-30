@@ -1,5 +1,5 @@
 <!DOCTYPE project>
-<project basedir="." default="jar" name="DICOMSend">
+<project basedir="." default="doc" name="DICOMSend">
     <property name="common.project.basedir" value="${basedir}/../MINTServer" />
     <available file="${common.project.basedir}" type="dir" property="common.project.available" />
     <fail message="Must have the MINTServer project in the same parent folder as this project" unless="common.project.available" />

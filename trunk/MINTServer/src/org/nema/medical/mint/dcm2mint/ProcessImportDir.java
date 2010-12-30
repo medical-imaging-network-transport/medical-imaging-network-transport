@@ -16,38 +16,6 @@
 
 package org.nema.medical.mint.dcm2mint;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -66,21 +34,32 @@ import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
-import org.nema.medical.mint.datadictionary.AttributeType;
-import org.nema.medical.mint.datadictionary.MetadataType;
-import org.nema.medical.mint.datadictionary.SeriesAttributesType;
-import org.nema.medical.mint.datadictionary.StudyAttributesType;
-import org.nema.medical.mint.datadictionary.DataDictionaryIO;
+import org.nema.medical.mint.datadictionary.*;
 import org.nema.medical.mint.jobs.JobConstants;
-import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.utils.Iter;
-import org.nema.medical.mint.utils.StudyUtils;
+import org.nema.medical.mint.utils.StudyTraversals;
+import org.nema.medical.mint.utils.StudyValidation;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author Uli Bubenheimer
@@ -236,9 +215,9 @@ public final class ProcessImportDir {
 
             try {
                 try {
-                    StudyUtils.validateStudyMetadata(metaBinaryPair.getMetadata(), dicomMetadataType);
+                    StudyValidation.validateStudyMetadata(metaBinaryPair.getMetadata(), dicomMetadataType);
                     addToSendQueue(metaBinaryPair, instanceFiles);
-                } catch (final StudyUtils.ValidationException e) {
+                } catch (final StudyTraversals.TraversalException e) {
                     LOG.error("Skipping study " + studyUID + ": validation error in study metadata", e);
                 }
             } catch (final IOException e) {

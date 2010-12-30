@@ -193,10 +193,13 @@ public class Series implements AttributeStore
 	}
 
     /**
+     * This is here only to satisfy JiBX. The implementation sets instanceCount to -1,
+     * to force computing it once it is read. We always want to compute it on the fly,
+     * once, to avoid discrepancies.
 	 * @param instanceCount the instanceCount to set
 	 */
 	public void setInstanceCount(int instanceCount) {
-		this.instanceCount = instanceCount;
+        this.instanceCount = -1;
 	}
 
 	private int computeInstanceCount() {
@@ -204,20 +207,16 @@ public class Series implements AttributeStore
         return instanceCount;
 	}
 
-
 	//
     // Google Protocol Buffer support - package protection intentional
     //
     static Series fromGPB(SeriesData data) {
         Series series = new Series();
         if (data.hasSeriesInstanceUid()) {
-            series.setSeriesInstanceUID(data.getSeriesInstanceUid());        	
+            series.setSeriesInstanceUID(data.getSeriesInstanceUid());
         }
         if (data.hasExclude()) {
         	series.setExclude(data.getExclude());
-        }
-        if (data.hasInstanceCount()) {
-        	series.setInstanceCount(data.getInstanceCount());
         }
         for (AttributeData attrData : data.getAttributesList()) {
             series.putAttribute(Attribute.fromGPB(attrData));
