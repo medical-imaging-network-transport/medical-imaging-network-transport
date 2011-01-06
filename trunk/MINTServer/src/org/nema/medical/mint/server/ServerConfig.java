@@ -94,8 +94,8 @@ public class ServerConfig {
     protected Integer fileResponseBufferSize = null;
     protected Integer fileStreamBufferSize = null;
     protected ArrayList<String> availableTypeNames = null;
-    private HashMap<String, File> availableTypeFiles = null;
-    private HashMap<String, MetadataType> availableTypes = null;
+    protected HashMap<String, File> availableTypeFiles = null;
+    protected HashMap<String, MetadataType> availableTypes = null;
 
     @PostConstruct
     public void postConstruct() {
