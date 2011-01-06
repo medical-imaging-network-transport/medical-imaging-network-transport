@@ -1,7 +1,7 @@
 <!DOCTYPE project>
 <project basedir="." default="doc" name="mint">
 	<property file="build.properties" />
-	<property name="project.version" value="0.9.12" />
+	<property name="project.version" value="0.9.13" />
 
     <import file="../build-common.xml" />
 
