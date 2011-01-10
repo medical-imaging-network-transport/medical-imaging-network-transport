@@ -436,7 +436,7 @@ public class ServerConfig {
         if (availableTypes == null) {
             final File typesRoot = typesRoot();
             final Map<String, File> availableTypeFiles = availableTypeFiles();
-            availableTypes = new HashMap<String, MetadataType>(availableTypeNames.size());
+            availableTypes = new HashMap<String, MetadataType>(availableTypeFiles.size());
             for (final Map.Entry<String, File> typeFile: availableTypeFiles.entrySet()) {
                 final MetadataType dataDictionary = DataDictionaryIO.parseFromXML(typeFile.getValue());
                 availableTypes.put(typeFile.getKey(), dataDictionary);
