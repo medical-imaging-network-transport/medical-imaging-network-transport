@@ -292,9 +292,9 @@ public final class DICOMSend {
                             LOG.info("Stored " + curFile);
                             break;
                         } catch (final NoPresentationContextException e) {
-                            LOG.error(
-                                    "Presentation Context not supported for file (consider adding the next line to the configuration file): "
-                                    + curFile);
+                            LOG.error("Presentation Context not supported for file " + curFile
+                                    + " (if the server supports the presentation context, consider adding the next line"
+                                    + " to the configuration file)");
                             LOG.error(
                                     "<prezcontext sopclassuid=\"" + sopClassUID
                                     + "\" sopclassdesc=\"" + UIDDictionary.getDictionary().nameOf(sopClassUID)
