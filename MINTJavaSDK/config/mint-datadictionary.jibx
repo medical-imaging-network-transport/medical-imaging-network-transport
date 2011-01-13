@@ -4,7 +4,7 @@
     <value style="text" get-method="getString" set-method="setString"/>
     <value style="attribute" name="tag" get-method="getTag" set-method="setTag"/>
     <value style="attribute" name="keyword" get-method="getKeyword" set-method="setKeyword"/>
-    <value style="attribute" name="vr" get-method="getVr" set-method="setVr"/>
+    <value style="attribute" name="vr" get-method="getVr" set-method="setVr" usage="optional"/>
     <value style="attribute" name="vm" get-method="getVm" set-method="setVm" usage="optional"/>
     <value style="attribute" name="ret" get-method="getRet" set-method="setRet" usage="optional"/>
   </mapping>
