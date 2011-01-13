@@ -29,9 +29,20 @@
     <target name="jar" depends="compile" description="Make JAR of compiled classes">
         <jar destfile="${build.dir}/${ant.project.name}.jar">
             <fileset dir="${build.classes.dir}" />
-            <fileset dir="${src.dir}">
-                <exclude name="**/*.java" />
-            </fileset>
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+            <fileset dir="${common.project.basedir}/build/classes" />
+            <fileset dir="${javasdk.project.basedir}/build/classes" />
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/dcm4che-core-2.0.23.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/build/mint-0.9.14.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/lib/jibx-run-1.2.2.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/lib/protobuf-java-2.3.0.jar"/>
+
+            <manifest>
+	    	<attribute name="Main-Class" value="org.nema.medical.mint.MINT2DICOM" />
+	    </manifest>
         </jar>
     </target>
 
