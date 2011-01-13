@@ -29,39 +29,43 @@ import getopt
 import os
 import sys
 import traceback
-import urllib
 
-from struct import unpack
-
-from org.nema.medical.mint.MintAttribute import MintAttribute
-from org.nema.medical.mint.MintSeries    import MintSeries
-from org.nema.medical.mint.XmlDocument   import XmlDocument
-from org.nema.medical.mint.XmlNode       import XmlNode
+from org.nema.medical.mint.DataDictionaryElement import DataDictionaryElement
+from org.nema.medical.mint.MintAttribute         import MintAttribute
+from org.nema.medical.mint.MintSeries            import MintSeries
+from org.nema.medical.mint.XmlDocument           import XmlDocument
+from org.nema.medical.mint.XmlNode               import XmlNode
 
 # -----------------------------------------------------------------------------
-# MintStudy
+# MintStudyFS
 # -----------------------------------------------------------------------------
-class MintStudy():
+class MintStudyFS():
    
    ROOT_TAG_NAME = "StudyMeta"
    
-   def __init__(self, hostname, port, uuid):
+   def __init__(self, mintStudyDir):
        """
        Parses a MINT Study XML document.
        """
-       self.__xml = XmlDocument(MintStudy.ROOT_TAG_NAME)
+       self.__xml = XmlDocument(MintStudyFS.ROOT_TAG_NAME)
        self.__xmlns = ""
        self.__studyInstanceUID = ""
        self.__type = ""
        self.__version = ""
-       self.__instanceCount = ""       
+       self.__instanceCount = ""
+       
        self.__attributes = {}
        self.__tags = []
        self.__series = {}
        self.__seriesInstanceUIDs = []
-       self.__url = "http://"+hostname+":"+port+"/MINTServer/studies/"+uuid+"/DICOM"
-              
-       self.__readFromURL(self.__url+"/metadata")
+
+       self.__binaryitems = os.path.join(mintStudyDir, "binaryitems")
+
+       metadataName = os.path.join(mintStudyDir, "metadata.xml")
+       self.__readFromFile(metadataName)
+
+   def binaryitems(self):
+       return self.__binaryitems
 
    def xmlns(self): 
        return self.__xmlns
@@ -145,15 +149,6 @@ class MintStudy():
              attr = series.find(tag, sopInstanceUID)
        return attr
        
-   def open(self, bid):
-       return urllib.urlopen(self.__url+"/binaryitems/"+str(bid))
-       
-   def bytes(self, bid, length):
-       f = self.open(bid)
-       buf = f.read(length)
-       f.close()
-       return unpack('B'*len(buf), buf)
-       
    def debug(self, indent=""):
        print "- studyMeta xmlns", self.xmlns(), "studyInstanceUID", self.__studyInstanceUID, "type", self.__type, "version", self.__version, "instanceCount", self.__instanceCount
        indent += " "
@@ -175,9 +170,9 @@ class MintStudy():
 
        indent = indent[0:-1]
        print indent+"- studyMeta"
-       
-   def __readFromURL(self, metadataURL):
-       self.__xml.readFromURL(metadataURL)
+
+   def __readFromFile(self, metadataName):
+       self.__xml.readFromFile(metadataName)
       
        self.__xmlns = self.__xml.attributeWithName("xmlns")
        self.__studyInstanceUID = self.__xml.attributeWithName("studyInstanceUID")
@@ -208,48 +203,24 @@ class MintStudy():
               self.__series[series.seriesInstanceUID()] = series
           self.__seriesInstanceUIDs = self.__series.keys()
           self.__seriesInstanceUIDs.sort()
-
+       
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "p:h")
+    (options, args)=getopt.getopt(sys.argv[1:], "")
     
-    # ---
-    # Check for port option.
-    # ---
-    port = "8080"
-    for opt in options:
-        if opt[0] == "-p":
-           port = opt[1]
-           
-    # ---
-    # Check for help option.
-    # ---
-    help = False
-    for opt in options:
-	if opt[0] == "-h":
-	   help = True
-	              
     try:
-       # ---
-       # Check usage.
-       # ---
-       argc = len(args)
-       if help or argc < 2:
-	  print "Usage:", progName, "[options] <hostname> <mint_study_uuid>"
-	  print "  -p <port>: defaults to 8080"
-	  print "  -h:        displays usage"
-	  sys.exit(1)
-
-       hostname = args[0]
-       uuid     = args[1]
-
+       if len(args) != 1:
+          print "Usage", progName, "<mint_study_dir>"
+          sys.exit(1)
+          
        # ---
        # Read MINT metadata.
        # ---
-       mintStudy = MintStudy(hostname, port, uuid)
+       mintStudyDir = sys.argv[1];
+       mintStudy = MintStudyFS(mintStudyDir)
        mintStudy.debug()
        
     except Exception, exception:

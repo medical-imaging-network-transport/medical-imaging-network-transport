@@ -208,7 +208,6 @@ class DicomAttribute():
              if len(self.__val) > 0 and not self.__val[-1].isalnum():
                 self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
              self.__val = self.__val.rstrip() # strip whitespace
-             self.__val = self.__val
              self.__vl = len(self.__val) # reset length
              
        # Binary
@@ -294,11 +293,12 @@ class DicomAttribute():
            vals += str(format % val)+"\\"    
        return vals[0:-1]
    
-   TRANSFER_SYNTAX_UID_TAG = "00020010"
-   PIXEL_DATA_TAG          = "7fe00010"
-   ITEM_TAG                = "fffee000"
-   ITEM_DELIMITATION_TAG   = "fffee00d"
-   SQ_DELIMITATION_TAG     = "fffee0dd"
+   FILE_META_INFO_GROUP_LENGTH = "00020000"
+   TRANSFER_SYNTAX_UID_TAG     = "00020010"
+   PIXEL_DATA_TAG              = "7fe00010"
+   ITEM_TAG                    = "fffee000"
+   ITEM_DELIMITATION_TAG       = "fffee00d"
+   SQ_DELIMITATION_TAG         = "fffee0dd"
    
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN")

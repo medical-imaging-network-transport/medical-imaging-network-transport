@@ -41,7 +41,8 @@ from org.nema.medical.mint.XmlNode               import XmlNode
 class DataDictionary():
    
    ROOT_TAG_NAME = "dictionary"
-   
+   DCM4CHE_URL = "https://dcm4che.svn.sourceforge.net/svnroot/dcm4che/dcm4che2/trunk/dcm4che-core/src/xml/dictionary.xml"
+
    def __init__(self, dataDictionaryURL):
        """
        Parses a Data Dictionary XML document.

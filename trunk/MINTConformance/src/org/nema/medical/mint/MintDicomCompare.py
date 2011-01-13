@@ -35,29 +35,22 @@ import traceback
 from os.path import join
 from struct import unpack
 
-from org.nema.medical.mint.DicomStudy    import DicomStudy
-from org.nema.medical.mint.MintAttribute import MintAttribute
-from org.nema.medical.mint.MintStudy     import MintStudy
+from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomAttribute import DicomAttribute
+from org.nema.medical.mint.DicomStudy     import DicomStudy
+from org.nema.medical.mint.MintAttribute  import MintAttribute
+from org.nema.medical.mint.MintStudy      import MintStudy
 
 # -----------------------------------------------------------------------------
 # MintDicomCompare
 # -----------------------------------------------------------------------------
 class MintDicomCompare():
    
-   def __init__(self, dicomStudyDir, mintStudyDir, dataDictionaryUrl):
-       if not os.path.isdir(dicomStudyDir):
-          print "Directory not found -", dicomStudyDir
-          sys.exit(1)
-
-       if not os.path.isdir(mintStudyDir):
-          print "Directory not found -", mintStudyDir
-          sys.exit(1)
+   def __init__(self, dicomStudy, mintStudy):
        
-       self.__dicom = DicomStudy(dicomStudyDir, dataDictionaryUrl)
+       self.__dicom = dicomStudy
        self.__studyInstanceUID = self.__dicom.studyInstanceUID()
-       self.__mint = MintStudy(mintStudyDir)
-       self.__binary = os.path.join(mintStudyDir, "binaryitems")
-       self.__binaryitems = glob.glob(os.path.join(self.__binary, "*.dat"))       
+       self.__mint = mintStudy
        self.__offsets = {}          
        self.__count = 0
        self.__verbose = False
@@ -67,6 +60,7 @@ class MintDicomCompare():
        self.__bytesCompared = 0
        self.__itemsCompared = 0
        self.__lazy= False
+       self.__output = None
 
        self.__readOffsets()
 
@@ -75,6 +69,10 @@ class MintDicomCompare():
        
    def setLazy(self, lazy):
        self.__lazy = lazy
+       
+   def setOutput(self, output):
+       if output != "": 
+          self.__output = open(output, "w")
        
    def compare(self):       
        dicm = self.__dicom
@@ -93,37 +91,53 @@ class MintDicomCompare():
 
        # ---
        # Print out stats if verbose.
-       # ---
-       
+       # ---     
        if self.__verbose:
-           print "%10d instance(s) compared." % (instancesCompared)
-           print "%10d text tag(s) compared." % (self.__textTagsCompared)
-           print "%10d items(s) compared." % (self.__itemsCompared)
-           print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
-           print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
-           print "%10d byte(s) compared." % (self.__bytesCompared)          
+          if self.__output == None:
+             print "%10d instance(s) compared." % (instancesCompared)
+             print "%10d text tag(s) compared." % (self.__textTagsCompared)
+             print "%10d items(s) compared." % (self.__itemsCompared)
+             print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
+             print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
+             print "%10d byte(s) compared." % (self.__bytesCompared)          
+          else:
+             self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
+             self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
+             self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
+             self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
+             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
+             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
 
        # ---
        # Always print differences.
        # ---
        if self.__count != 0:
-          print "%10d difference(s) found." % (self.__count)
-
+          if self.__output == None:
+             print "%10d difference(s) found." % (self.__count)
+          else:
+             self.__output.write("%10d difference(s) found.\n" % (self.__count))
+          
        self.__dicom.tidy()
        return self.__count
 
    def __readOffsets(self):
-       offsets = os.path.join(self.__binary, "offsets.dat")
-       if offsets in self.__binaryitems: self.__binaryitems.remove(offsets)       
-       if os.path.isfile(offsets):
-          table = open(offsets, "r")
-          line = table.readline()
-          while line != "":
-             tokens = line.split()
-             assert len(tokens) == 2
-             self.__offsets[tokens[0]] = tokens[1]
-             line = table.readline()
-          table.close()
+       
+       # ---
+       # TODO: 
+       # ---
+       # offsets = os.path.join(self.__binary, "offsets.dat")
+       # if offsets in self.__binaryitems: self.__binaryitems.remove(offsets)       
+       # if os.path.isfile(offsets):
+       #    table = open(offsets, "r")
+       #    line = table.readline()
+       #    while line != "":
+       #       tokens = line.split()
+       #       assert len(tokens) == 2
+       #       self.__offsets[tokens[0]] = tokens[1]
+       #       line = table.readline()
+       #    table.close()
+       
+       pass
 
    def __compareInstances(self, instance, mint): 
 
@@ -180,6 +194,13 @@ class MintDicomCompare():
           print "+++", msg, ":", obj1, "!=", obj2
        
    def __checkTag(self, instance, mint, tag):
+       
+       # ---
+       # TODO: Verify this shouldn't be in mint metadata
+       # ---
+       if tag == DicomAttribute.FILE_META_INFO_GROUP_LENGTH:
+          return
+          
        attr = mint.find(tag, instance.seriesInstanceUID(), instance.sopInstanceUID())
        if attr == None:
           self.__check("Data Element", 
@@ -273,39 +294,24 @@ class MintDicomCompare():
           return
 
        # ---
-       # Check to see if this is single file or multi-file binary.
+       # TODO: Check to see if this is single file or multi-file binary.
        # ---
-       dat2 = None
-       if len(self.__offsets) > 0:
-          dat2 = self.__binaryitems[0]
-       else:
-          dat2 = os.path.join(self.__binary, attr.bid()+".dat")
-          if not os.access(dat2, os.F_OK):
-             self.__count += 1
-             print "File not found", ":", dat2
-             return
-          size1 = os.path.getsize(dat1)
-          size2 = os.path.getsize(dat2)
-          self.__check(dicomAttr.tag()+" binary sizes differ",
-                       size1,
-                       size2,
-                       seriesInstanceUID, 
-                       sopInstanceUID)
-          if size1 != size2 : return
+       # if len(self.__offsets) > 0:
+       #    dat2 = self.__binaryitems[0]
        
        # ---
        # Check binary item byte for byte.
        # ---
        bid1 = open(dat1, "rb")
-       bid2 = open(dat2, "rb")
-
+       bid2 = self.__mint.open(attr.bid())
+       
        # ---
-       # Position the MINT binary file pointer.
+       # TODO: Position the MINT binary file pointer.
        # ---
-       boffset = 0
-       if len(self.__offsets):
-          boffset = int(self.__offsets[attr.bid()])
-       bid2.seek(boffset)
+       # boffset = 0
+       # if len(self.__offsets):
+       #    boffset = int(self.__offsets[attr.bid()])
+       # bid2.seek(boffset)
        
        # ---
        # Read in a block.
@@ -398,8 +404,32 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "vlh")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:p:vlh")
 
+    # ---
+    # Check for data dictionary.
+    # ---
+    dictionaryURL = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dictionaryURL = opt[1]
+           
+    # ---
+    # Check for output option.
+    # ---
+    output = ""
+    for opt in options:
+        if opt[0] == "-o":
+           output = opt[1]
+           
+    # ---
+    # Check for port option.
+    # ---
+    port = "8080"
+    for opt in options:
+        if opt[0] == "-p":
+           port = opt[1]
+           
     # ---
     # Check for verbose option.
     # ---
@@ -429,24 +459,30 @@ def main():
        # Check usage.
        # ---
        argc = len(args)
-       if help or argc < 2 or argc > 3:
-          print "Usage:", progName, "[options] <dicom_study_dir> <mint_study_dir> <data_dictionary.xml>"
-          print "  -v: verbose"
-          print "  -l: lazy check (skips binary content)"
-          print "  -h: displays usage"
+       if help or argc < 3:
+          print "Usage:", progName, "[options] <dicom_study_dir> <hostname> <uuid>"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+          print "  -o <output>:              output filename (defaults to stdout)"
+          print "  -p <port>:                defaults to 8080"
+          print "  -v:                       verbose"
+          print "  -l:                       lazy check (skips binary content)"
+          print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
        # Read MINT metadata.
        # ---
        dicomStudyDir = args[0];
-       mintStudyDir = args[1];
-       dataDictionaryUrl = ""
-       if argc == 3:
-          dataDictionaryUrl = args[2];
-       studies = MintDicomCompare(dicomStudyDir, mintStudyDir, dataDictionaryUrl)
+       hostname      = args[1];
+       uuid          = args[2];
+       
+       dicomStudy = DicomStudy(dicomStudyDir, dictionaryURL)
+       mintStudy  = MintStudy(hostname, port, uuid)  
+       
+       studies = MintDicomCompare(dicomStudy, mintStudy)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
+       studies.setOutput(output)
 
        return studies.compare()
        

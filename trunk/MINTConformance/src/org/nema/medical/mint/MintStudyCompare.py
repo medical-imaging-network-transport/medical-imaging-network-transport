@@ -34,28 +34,21 @@ import traceback
 from os.path import join
 from struct import unpack
 
-from org.nema.medical.mint.MintStudy import MintStudy
+from org.nema.medical.mint.MintStudy   import MintStudy
+from org.nema.medical.mint.MintStudyFS import MintStudyFS
 
 # -----------------------------------------------------------------------------
 # MintStudy
 # -----------------------------------------------------------------------------
 class MintStudyCompare():
    
-   def __init__(self, refMintStudyDir, newMintStudyDir):
-       if not os.path.isdir(refMintStudyDir):
-          print "Directory not found -", refMintStudyDir
-          sys.exit(1)
-
-       if not os.path.isdir(newMintStudyDir):
-          print "Directory not found -", newMintStudyDir
-          sys.exit(1)
+   def __init__(self, refMintStudy, newMintStudy):
                 
-       self.__study1 = MintStudy(refMintStudyDir)
-       self.__study2 = MintStudy(newMintStudyDir)
+       self.__study1 = refMintStudy
+       self.__study2 = newMintStudy
 
-       self.__binary1 = os.path.join(refMintStudyDir, "binaryitems")
-       self.__binary2 = os.path.join(newMintStudyDir, "binaryitems")
-       self.__binaryitems = glob.glob(os.path.join(self.__binary1, "*.dat"))
+       self.__binary1 = refMintStudy.binaryitems()
+       self.__bids = []
        self.__offsets1 = {}
        self.__offsets2 = {}
        
@@ -74,6 +67,7 @@ class MintStudyCompare():
        self.__sequenceAttributesCompared = 0
        self.__bytesCompared = 0
        self.__lazy= False
+       self.__output = None
 
        self.__readOffsets()
 
@@ -82,6 +76,10 @@ class MintStudyCompare():
        
    def setLazy(self, lazy):
        self.__lazy = lazy
+       
+   def setOutput(self, output):
+       if output != "": 
+          self.__output = open(output, "w")
        
    def compare(self):
        s1 = self.__study1
@@ -139,24 +137,41 @@ class MintStudyCompare():
        # Print out stats if verbose.
        # ---       
        if self.__verbose:
-           print "%10d study attribute(s) compared." % (self.__studyAttributesCompared)
-           print "%10d series compared." % (self.__seriesCompared)
-           print "%10d series attribute(s) compared." % (self.__seriesAttributesCompared)
-           print "%10d normalized instance attribute(s) compared." % (self.__normalizedInstanceAttributesCompared)
-           print "%10d instance(s) compared." % (self.__instancesCompared)
-           print "%10d instance attribute(s) compared." % (self.__instanceAttributesCompared)
-           print "%10d sequence items(s) compared." % (self.__sequenceItemsCompared)
-           print "%10d sequence attributes(s) compared." % (self.__sequenceAttributesCompared)
-           print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
-           print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
-           print "%10d offset(s) compared." % (self.__offsetsCompared)    
-           print "%10d byte(s) compared." % (self.__bytesCompared)    
-
+          if self.__output == None:
+             print "%10d study attribute(s) compared." % (self.__studyAttributesCompared)
+             print "%10d series compared." % (self.__seriesCompared)
+             print "%10d series attribute(s) compared." % (self.__seriesAttributesCompared)
+             print "%10d normalized instance attribute(s) compared." % (self.__normalizedInstanceAttributesCompared)
+             print "%10d instance(s) compared." % (self.__instancesCompared)
+             print "%10d instance attribute(s) compared." % (self.__instanceAttributesCompared)
+             print "%10d sequence items(s) compared." % (self.__sequenceItemsCompared)
+             print "%10d sequence attributes(s) compared." % (self.__sequenceAttributesCompared)
+             print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
+             print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
+             print "%10d offset(s) compared." % (self.__offsetsCompared)    
+             print "%10d byte(s) compared." % (self.__bytesCompared)    
+          else:
+             self.__output.write("%10d study attribute(s) compared.\n" % (self.__studyAttributesCompared))
+             self.__output.write("%10d series compared.\n" % (self.__seriesCompared))
+             self.__output.write("%10d series attribute(s) compared.\n" % (self.__seriesAttributesCompared))
+             self.__output.write("%10d normalized instance attribute(s) compared.\n" % (self.__normalizedInstanceAttributesCompared))
+             self.__output.write("%10d instance(s) compared.\n" % (self.__instancesCompared))
+             self.__output.write("%10d instance attribute(s) compared.\n" % (self.__instanceAttributesCompared))
+             self.__output.write("%10d sequence items(s) compared.\n" % (self.__sequenceItemsCompared))
+             self.__output.write("%10d sequence attributes(s) compared.\n" % (self.__sequenceAttributesCompared))
+             self.__output.write("%10d inline binary item(s) compared.\n" % (self.__inlineBinaryCompared))
+             self.__output.write("%10d binary item(s) compared.\n" % (self.__binaryItemsCompared))
+             self.__output.write("%10d offset(s) compared.\n" % (self.__offsetsCompared))
+             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
+          
        # ---
        # Always print differences.
        # ---
        if self.__count != 0:
-          print self.__count, "difference(s) found."
+          if self.__output == None:
+             print self.__count, "difference(s) found."
+          else:
+             self.__output.write("%10d difference(s) found.\n" % (self.__count))
 
        return self.__count
       
@@ -166,25 +181,39 @@ class MintStudyCompare():
           print msg, ":", obj1, "!=", obj2
 
    def __readOffsets(self):
-       offsets1 = os.path.join(self.__binary1, "offsets.dat")
-       if offsets1 in self.__binaryitems: self.__binaryitems.remove(offsets1)
-       if os.path.isfile(offsets1):
-          self.__readOffsetTable(offsets1, self.__offsets1)
-
-       offsets2 = os.path.join(self.__binary2, "offsets.dat")
-       if os.path.isfile(offsets2):
-          self.__readOffsetTable(offsets2, self.__offsets2)
-
+   
+       # ---
+       # TODO
+       # ---
+       #
+       # offsets1 = os.path.join(self.__binary1, "offsets.dat")
+       # if offsets1 in self.__binaryitems: self.__binaryitems.remove(offsets1)
+       # if os.path.isfile(offsets1):
+       #    self.__readOffsetTable(offsets1, self.__offsets1)
+       #
+       # offsets2 = os.path.join(self.__binary2, "offsets.dat")
+       # if os.path.isfile(offsets2):
+       #    self.__readOffsetTable(offsets2, self.__offsets2)
+       
+       pass
+       
    def __readOffsetTable(self, offsetsName, offsets):
-       table = open(offsetsName, "r")
-       line = table.readline()
-       while line != "":
-          tokens = line.split()
-          assert len(tokens) == 2
-          offsets[tokens[0]] = tokens[1]
-          line = table.readline()
-       table.close()
-
+       
+       # ---
+       # TODO
+       # ---
+       #
+       # table = open(offsetsName, "r")
+       # line = table.readline()
+       # while line != "":
+       #    tokens = line.split()
+       #    assert len(tokens) == 2
+       #    offsets[tokens[0]] = tokens[1]
+       #    line = table.readline()
+       # table.close()
+       
+       pass
+       
    def __checkAttributes(self, msg, attr1, attr2):
        if attr2 == None:
           self.check(msg, attr1.toString(), "None") 
@@ -193,6 +222,8 @@ class MintStudyCompare():
        else:
           self.check(msg, str(attr1), str(attr2))
           if attr1.bytes() != "": self.__inlineBinaryCompared += 1
+          if attr1.bid() != "":
+             self.__bids.append(attr1.bid())
    
    def __checkSequence(self, msg, attr1, attr2):
 
@@ -295,8 +326,10 @@ class MintStudyCompare():
        # ---
        # Loop through each binary item.
        # ---
-       for binaryitem in self.__binaryitems:
-       
+       for bid in self.__bids:
+
+           binaryitem = os.path.join(self.__binary1, bid+".dat")
+
            # ---
            # Check for binary item in study 1.
            # ---
@@ -305,32 +338,13 @@ class MintStudyCompare():
               self.__count += 1
               print "File not found", ":", dat1
               pass
-           
-           # ---
-           # Check for binary item in study 2.
-           # ---
-           dat2 = os.path.join(self.__binary2, os.path.basename(binaryitem))
-           if not os.access(dat2, os.F_OK):
-              self.__count += 1
-              print "File not found", ":", dat2
-              pass
-              
-           # ---
-           # Check binary item sizes.
-           # ---
-           size1 = os.path.getsize(dat1)
-           size2 = os.path.getsize(dat2)
-           self.check(binaryitem+".dat size",
-                      size1,
-                      size2)
-           
-           if size1 != size2: return
+                         
 
            # ---
            # Check binary item byte for byte.
            # ---
            bid1 = open(dat1, "rb")
-           bid2 = open(dat2, "rb")
+           bid2 = self.__study2.open(bid)
            
            # ---
            # Read in a block.
@@ -378,26 +392,33 @@ class MintStudyCompare():
 
    def __checkOffsets(self):
 
-       if self.__lazy: return
-
-       bids1 = self.__offsets1.keys()
-       bids2 = self.__offsets2.keys()
+       # ---
+       # TODO
+       # ---
+       #
+       #
+       # if self.__lazy: return
+       # 
+       # bids1 = self.__offsets1.keys()
+       # bids2 = self.__offsets2.keys()
+       # 
+       # if len(bids1) != len(bids2):
+       #    self.check("Number of bid offsets",
+       #               len(bids1),
+       #               len(bids2))
+       #    return
+       #
+       # for bid in bids1:
+       #     offset1 = self.__offsets1[bid]
+       #     offset2 = self.__offsets2[bid]
+       #     if offset1 == offset2:
+       #        self.check("bid "+bid+" boffset",
+       #                   offset1,
+       #                   offset2)
+       #     self.__offsetsCompared += 1
        
-       if len(bids1) != len(bids2):
-          self.check("Number of bid offsets",
-                     len(bids1),
-                     len(bids2))
-          return
-
-       for bid in bids1:
-           offset1 = self.__offsets1[bid]
-           offset2 = self.__offsets2[bid]
-           if offset1 == offset2:
-              self.check("bid "+bid+" boffset",
-                         offset1,
-                         offset2)
-           self.__offsetsCompared += 1
-           
+       pass
+       
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
@@ -407,8 +428,24 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "vlh")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:p:vlh")
 
+    # ---
+    # Check for output option.
+    # ---
+    output = ""
+    for opt in options:
+        if opt[0] == "-o":
+           output = opt[1]
+           
+    # ---
+    # Check for port option.
+    # ---
+    port = "8080"
+    for opt in options:
+        if opt[0] == "-p":
+           port = opt[1]
+           
     # ---
     # Check for verbose option.
     # ---
@@ -434,21 +471,27 @@ def main():
            help = True
            
     try:
-       if help or len(args) != 2:
-          print "Usage:", progName, "[options] <ref_mint_study_dir> <new_mint_study_dir>"
-          print "  -v: verbose"
-          print "  -l: lazy check (skips binary content)"
-          print "  -h: displays usage"
+       if help or len(args) != 3:
+          print "Usage:", progName, "[options] <mint_study_dir> <hostname> <uuid>"
+          print "  -o <output>: output filename (defaults to stdout)"
+          print "  -p <port>:   defaults to 8080"
+          print "  -v:          verbose"
+          print "  -l:          lazy check (skips binary content)"
+          print "  -h:          displays usage"
           sys.exit(1)
           
        # ---
        # Read MINT metadata.
        # ---
-       refMintStudyDir = args[0];
-       newMintStudyDir = args[1];
-       studies = MintStudyCompare(refMintStudyDir, newMintStudyDir)
+       mintStudyDir = args[0];
+       hostname = args[1];
+       uuid = args[2];
+       refMintStudy = MintStudyFS(mintStudyDir)
+       newMintStudy = MintStudy(hostname, port, uuid)
+       studies = MintStudyCompare(refMintStudy, newMintStudy)
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
+       studies.setOutput(output)
 
        return studies.compare()
        
