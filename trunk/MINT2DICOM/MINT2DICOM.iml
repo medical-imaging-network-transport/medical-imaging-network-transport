@@ -8,6 +8,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="MINTServer" />
+    <orderEntry type="library" name="MINTServer WEB-INF/lib" level="project" />
+    <orderEntry type="module" module-name="MINTJavaSDK" />
   </component>
 </module>
 

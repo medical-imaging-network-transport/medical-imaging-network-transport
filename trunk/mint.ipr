@@ -337,5 +337,30 @@
     <mapping directory="" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
+  <component name="libraryTable">
+    <library name="JUnit">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/MINTJavaSDK/ant-lib/junit-4.8.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="MINTJavaSDK lib">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/MINTJavaSDK/lib" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/MINTJavaSDK/lib" recursive="false" />
+    </library>
+    <library name="MINTServer WEB-INF/lib">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/MINTServer/WebContent/WEB-INF/lib" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/MINTServer/WebContent/WEB-INF/lib" recursive="false" />
+    </library>
+  </component>
 </project>
 

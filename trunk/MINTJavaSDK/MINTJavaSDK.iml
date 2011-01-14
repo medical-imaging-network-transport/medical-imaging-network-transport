@@ -8,25 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library name="MINTJavaSDK lib">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/ant-lib/junit-4.8.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="module-library">
       <library name="MINTJavaSDK ant-lib (except junit.jar)">
         <CLASSES>
@@ -41,6 +22,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="MINTJavaSDK lib" level="project" />
+    <orderEntry type="library" name="JUnit" level="project" />
   </component>
 </module>
 

@@ -20,7 +20,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="MINTJavaSDK" exported="" />
+    <orderEntry type="module" module-name="MINTJavaSDK" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -30,16 +30,9 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library name="MINTServer WEB-INF/lib">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/WebContent/WEB-INF/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/WebContent/WEB-INF/lib" recursive="false" />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="MINTJavaSDK lib" level="project" />
+    <orderEntry type="library" name="JUnit" level="project" />
+    <orderEntry type="library" name="MINTServer WEB-INF/lib" level="project" />
   </component>
 </module>
 
