@@ -24,6 +24,7 @@
 # licensing are not clear to you.
 # -----------------------------------------------------------------------------
 
+import base64
 import os
 import tempfile
 import sys
@@ -39,7 +40,7 @@ from org.nema.medical.mint.DicomTransfer         import DicomTransfer
 # -----------------------------------------------------------------------------
 class DicomAttribute():
 
-   MAX_BINARY_LENGTH = 100
+   MAX_BINARY_LENGTH = 256
       
    def __init__(self, dcm, dataDictionary, transferSyntax):
           
@@ -52,7 +53,7 @@ class DicomAttribute():
        self.__bytesRead = 0
        self.__dataDictionary = dataDictionary
        self.__transferSyntax = transferSyntax
-              
+       
        # ---
        # Read the next tag
        # ---
@@ -73,7 +74,7 @@ class DicomAttribute():
        elif transferSyntax.isExplicit() or self.isPart10Header():
           self.__vr=dcm.read(2)
           self.__bytesRead += 2
-
+          
        # ---
        # Read the length
        # ---
@@ -175,6 +176,28 @@ class DicomAttribute():
    def isItemStop(self)       : return self.__tag == self.ITEM_DELIMITATION_TAG
    def isSequenceStart(self)  : return self.__vr == "SQ"
    def isSequenceStop(self)   : return self.__tag == self.SQ_DELIMITATION_TAG
+   def isGroupLength(self)    : return self.__tag[4:8] == "0000"
+   
+   def promote(self, vr):
+       """
+       This method is used to promote a dicom tag from UN to a more specific VR.
+       DCM4CHE will fill in the VR for implicit DICOM if it recognizes the tag.
+       Normally only private tags need to be promoted since the VR for standard tags are known.
+       """
+   
+       # Only promote unknown VR's.
+       if self.__vr != "UN": return
+
+       # Promote the VR.      
+       self.__vr = vr    
+      
+       # If we are promoting from UN to another binary, we are done.
+       if self.isBinary(): return
+       
+       # If the promotion changes the val from inline binary to text, we need to unpack again.
+       if self.__val != "":
+          self.__val = base64.b64decode(self.__val)
+          self.__unpackToString()
 
    def __readVal(self, dcm):
       
@@ -185,39 +208,16 @@ class DicomAttribute():
        if not self.isBinary():
           self.__val=dcm.read(self.__vl)
           self.__bytesRead += self.__vl
-          
-          # Signed Short
-          if   self.__vr=="SS": self.__val = self.__val2str(2, "h", "%d")
-          # Unsigned Short
-          elif self.__vr=="US": self.__val = self.__val2str(2, "H", "%d")
-          # Signed Long
-          elif self.__vr=="SL": self.__val = self.__val2str(4, "l", "%d")
-          # Unsigned Long
-          elif self.__vr=="UL": self.__val = self.__val2str(4, "L", "%d")
-          # Single Precision Float
-          elif self.__vr=="FL": self.__val = self.__val2str(4, "f", "%.5f")
-          # Double Precision Float
-          elif self.__vr=="FD": self.__val = self.__val2str(8, "d", "%.5f")
-          # TODO: Other Float 4 FLOAT
-          elif self.__vr=="OF": self.__val = self.__val2str(4, "f", "%.5f")
-          # Attribute Tag 4 ULONG
-          elif self.__vr=="AT": self.__val = self.__val2str(4, "L", "%d")
-          # Text
-          else:
-             self.__val = self.__val[0:self.__vl]
-             if len(self.__val) > 0 and not self.__val[-1].isalnum():
-                self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
-             self.__val = self.__val.rstrip() # strip whitespace
-             self.__vl = len(self.__val) # reset length
+          self.__unpackToString()
              
        # Binary
        else:
-          # Read short binaries into memory
+          # Store small binaries as inline base64
           if self.__vl <= self.MAX_BINARY_LENGTH:
              val = dcm.read(self.__vl)
              self.__bytesRead += self.__vl
-             self.__val = unpack('B'*len(val), val)
-             self.__vl  = len(self.__val)
+             self.__val = base64.b64encode(val)
+             
           # Write long binaries to tmp file
           else:             
              tmp = tempfile.NamedTemporaryFile(delete=False)
@@ -284,6 +284,32 @@ class DicomAttribute():
        s = s.lower()
        return s
 
+   def __unpackToString(self):
+       
+       # Signed Short
+       if   self.__vr=="SS": self.__val = self.__val2str(2, "h", "%d")
+       # Unsigned Short
+       elif self.__vr=="US": self.__val = self.__val2str(2, "H", "%d")
+       # Signed Long
+       elif self.__vr=="SL": self.__val = self.__val2str(4, "l", "%d")
+       # Unsigned Long
+       elif self.__vr=="UL": self.__val = self.__val2str(4, "L", "%d")
+       # Single Precision Float
+       elif self.__vr=="FL": self.__val = self.__val2str(4, "f", "%.5f")
+       # Double Precision Float
+       elif self.__vr=="FD": self.__val = self.__val2str(8, "d", "%.5f")
+       # TODO: Other Float 4 FLOAT
+       elif self.__vr=="OF": self.__val = self.__val2str(4, "f", "%.5f")
+       # Attribute Tag 4 ULONG
+       elif self.__vr=="AT": self.__val = self.__val2str(4, "L", "%d")
+       # Text
+       else:
+          self.__val = self.__val[0:self.__vl]
+          if len(self.__val) > 0 and not self.__val[-1].isalnum():
+             self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
+          self.__val = self.__val.rstrip() # strip whitespace
+          self.__vl = len(self.__val) # reset length
+
    def __val2str(self, size, type, format):
        vals = ""
        numVals = self.__vl / size
@@ -292,8 +318,7 @@ class DicomAttribute():
            val = self.__transferSyntax.unpack(type, self.__val[i:i+size])
            vals += str(format % val)+"\\"    
        return vals[0:-1]
-   
-   FILE_META_INFO_GROUP_LENGTH = "00020000"
+
    TRANSFER_SYNTAX_UID_TAG     = "00020010"
    PIXEL_DATA_TAG              = "7fe00010"
    ITEM_TAG                    = "fffee000"
