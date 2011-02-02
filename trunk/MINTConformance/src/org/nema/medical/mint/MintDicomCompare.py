@@ -194,13 +194,12 @@ class MintDicomCompare():
           print "+++", msg, ":", obj1, "!=", obj2
        
    def __checkTag(self, instance, mint, tag):
+
+       # ---
+       # Group Length tags are not stored in MINT so we don't need to look for them.
+       # ---
+       if tag[4:8] == "0000": return
        
-       # ---
-       # TODO: Verify this shouldn't be in mint metadata
-       # ---
-       if tag == DicomAttribute.FILE_META_INFO_GROUP_LENGTH:
-          return
-          
        attr = mint.find(tag, instance.seriesInstanceUID(), instance.sopInstanceUID())
        if attr == None:
           self.__check("Data Element", 
@@ -214,13 +213,16 @@ class MintDicomCompare():
              
    def __checkAttribute(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
       
+       if dicomAttr.vr() == "UN" and attr.vr() != "UN":
+          dicomAttr.promote(attr.vr())
+      
        if dicomAttr.vr() != "":
           self.__check(dicomAttr.tag()+" VR",
                        dicomAttr.vr(),
                        attr.vr(),
                        seriesInstanceUID, 
                        sopInstanceUID)
-
+       
        # ---
        # Check binary items and values.
        # ---
@@ -287,10 +289,10 @@ class MintDicomCompare():
        # ---
        if attr.bid() == None:
           self.__check(dicomAttr.tag()+" missing binary",
-                    dat1,
-                    "None",
-                    seriesInstanceUID, 
-                    sopInstanceUID)
+                       dat1,
+                       "None",
+                       seriesInstanceUID, 
+                       sopInstanceUID)
           return
 
        # ---
@@ -332,7 +334,7 @@ class MintDicomCompare():
           diff = False
           for i in range(0, n):              
               if bytes1[i] != bytes2[i]:
-                 self.__check("byte "+str(block*bufsize+i),
+                 self.__check(dicomAttr.tag()+" byte "+str(block*bufsize+i),
                               hex(bytes1[i]),
                               hex(bytes2[i]),
                               seriesInstanceUID, 
@@ -362,36 +364,11 @@ class MintDicomCompare():
 
    def __checkInlineBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
-       # Decode inline binary
-       buf = base64.b64decode(attr.bytes())
-
-       bytes1 = dicomAttr.val()
-       bytes2 = unpack('B'*len(buf), buf)
-       
-       # ---
-       # Check binary item sizes.
-       # ---
-       size1 = len(bytes1)
-       size2 = len(bytes2)
        self.__check(dicomAttr.tag()+" <Binary Data>",
-                    size1,
-                    size2,
+                    dicomAttr.val(),
+                    attr.bytes(),
                     seriesInstanceUID, 
                     sopInstanceUID)
-       
-       if size1 != size2: return
-
-       # ---
-       # Check binary item byte for byte.
-       # ---
-       for i in range(0, size1):
-           if bytes1[i] != bytes2[i]:
-              self.__check(dicomAttr.tag()+" <Binary Data> byte "+str(i),
-                           bytes1[i],
-                           bytes2[i],
-                           seriesInstanceUID, 
-                           sopInstanceUID)
-              break
 
        self.__inlineBinaryTagsCompared += 1
  

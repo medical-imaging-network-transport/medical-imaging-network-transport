@@ -51,10 +51,13 @@ class MintAttribute():
           self.__bytes = ""
        if self.__bsize == None:
           self.__bsize = "0"
-          
-       if len(self.__val) > 0 and not self.__val[-1].isalnum():
-          self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
-          
+       
+       # ---
+       # TODO: Don't strip for now
+       # ---
+       # if len(self.__val) > 0 and not self.__val[-1].isalnum():
+       #    self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
+       
        if self.__vr == "SQ":
           items = node.childrenWithName("item")
           if items != None:

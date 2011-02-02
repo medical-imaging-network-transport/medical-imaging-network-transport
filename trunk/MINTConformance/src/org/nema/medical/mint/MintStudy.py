@@ -146,6 +146,7 @@ class MintStudy():
        return attr
        
    def open(self, bid):
+       assert bid != ""
        return urllib.urlopen(self.__url+"/binaryitems/"+str(bid))
        
    def bytes(self, bid, length):
