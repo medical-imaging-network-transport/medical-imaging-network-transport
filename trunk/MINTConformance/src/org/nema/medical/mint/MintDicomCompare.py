@@ -196,7 +196,7 @@ class MintDicomCompare():
    def __checkTag(self, instance, mint, tag):
 
        # ---
-       # Group Length tags are not stored in MINT so we don't need to look for them.
+       # Optional and deprecated Group Length tags are not included so we don't need to look for them,
        # ---
        if tag[4:8] == "0000": return
        
@@ -213,6 +213,10 @@ class MintDicomCompare():
              
    def __checkAttribute(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
       
+       # ---
+       # The MINT study may have a more explicit VR for private tags so promote
+       # original DICOM tag if necessary.
+       # ---
        if dicomAttr.vr() == "UN" and attr.vr() != "UN":
           dicomAttr.promote(attr.vr())
       

@@ -44,6 +44,7 @@ class DicomStudy():
    def __init__(self, dcmDir, dataDictionaryUrl):
        self.__dcmDir = dcmDir
        self.__instances = []
+       self.__instancesByUID = {}
        self.__dataDictionary = DataDictionary(dataDictionaryUrl)
        self.__read()
 
@@ -55,15 +56,18 @@ class DicomStudy():
 
    def studyInstanceUID(self):
        if self.numInstances() > 0:
-          return self.instances(0).studyInstanceUID()
+          return self.instance(0).studyInstanceUID()
        else:
           return ""
        
    def numInstances(self):
        return len(self.__instances)
        
-   def instances(self, n):
+   def instance(self, n):
        return self.__instances[n]
+       
+   def instanceByUID(self, sopInstanceUID):
+       return self.__instancesByUID[sopInstanceUID]
        
    def debug(self):
        print "> Study", self.studyInstanceUID()
@@ -82,9 +86,10 @@ class DicomStudy():
                   dcmNames.append(filename)
 
        for dcmName in dcmNames:
-           instances = DicomInstance(dcmName, self.__dataDictionary)
-           self.__instances.append(instances)
-       
+           instance = DicomInstance(dcmName, self.__dataDictionary)
+           self.__instances.append(instance)
+           self.__instancesByUID[instance.sopInstanceUID()] = instance
+           
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
