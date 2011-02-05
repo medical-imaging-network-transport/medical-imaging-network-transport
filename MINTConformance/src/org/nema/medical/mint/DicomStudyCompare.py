@@ -29,6 +29,7 @@ import base64
 import getopt
 import glob
 import os
+import re
 import sys
 import traceback
 
@@ -56,8 +57,10 @@ class DicomStudyCompare():
        self.__textTagsCompared = 0
        self.__bytesCompared = 0
        self.__itemsCompared = 0
+       self.__excludedTags = 0
        self.__lazy= False
        self.__output = None
+       self.__exclude = []
 
    def setVerbose(self, verbose):
        self.__verbose = verbose
@@ -69,6 +72,9 @@ class DicomStudyCompare():
        if output != "": 
           self.__output = open(output, "w")       
        
+   def setExclude(self, exclude):
+       self.__exclude = exclude
+
    def compare(self):       
        dicm1 = self.__dicom1
        dicm2 = self.__dicom2
@@ -80,8 +86,8 @@ class DicomStudyCompare():
        numInstances = dicm1.numInstances()
        instancesCompared = 0
        for n in range(0, numInstances):
-           instance1 = dicm1.instances(n)
-           instance2 = dicm2.instances(n)
+           instance1 = dicm1.instance(n)
+           instance2 = dicm2.instanceByUID(instance1.sopInstanceUID())
            self.__compareInstances(instance1, instance2)
            instancesCompared += 1
 
@@ -95,12 +101,14 @@ class DicomStudyCompare():
              print "%10d items(s) compared." % (self.__itemsCompared)
              print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
              print "%10d byte(s) compared." % (self.__bytesCompared)          
+             print "%10d excluded tag(s)." % (self.__excludedTags)
           else:
             self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
             self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
             self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
+            self.__output.write("%10d excluded tag(s)." % (self.__excludedTags))
 
        # ---
        # Always print differences.
@@ -121,14 +129,14 @@ class DicomStudyCompare():
        # ---
        # Check Study Instance ID.
        # ---
-       self.__check("UI",
+       self.__check("Study Instance UID",
                     instance1.studyInstanceUID(), 
                     instance2.studyInstanceUID())
                   
        # ---
        # Check Series Instance ID.
        # ---       
-       self.__check("UI",
+       self.__check("Seriese Instance UID",
                     instance1.seriesInstanceUID(),
                     instance2.seriesInstanceUID(),
                     instance1.seriesInstanceUID())
@@ -136,7 +144,7 @@ class DicomStudyCompare():
        # ---
        # Check SOP Instance ID.
        # ---
-       self.__check("UI",
+       self.__check("SOP Instance UID",
                     instance1.sopInstanceUID(),
                     instance2.sopInstanceUID(),
                     instance1.seriesInstanceUID(),
@@ -161,6 +169,24 @@ class DicomStudyCompare():
           print "+++", msg, ":", obj1, "!=", obj2
        
    def __checkTag(self, instance1, instance2, tag):
+   
+       # ---
+       # Optional and deprecated Group Length tags are not included so we don't need to look for them,
+       # except for Group 2 which is a required tag.
+       # ---
+       if tag[0:4] != "0002" and tag[4:8] == "0000": 
+          self.__excludedTags += 1
+          return
+       
+       # ---
+       # User might want to exclude problem tags.
+       # ---
+       for exclude in self.__exclude:
+           search = re.search(exclude, tag)
+           if search != None:
+              self.__excludedTags += 1
+              return
+          
        attr2 = instance2.attributeByTag(tag)
        if attr2 == None:
           self.__check("Data Element", 
@@ -173,7 +199,7 @@ class DicomStudyCompare():
           self.__checkAttribute(attr1, attr2, instance1.seriesInstanceUID(), instance1.sopInstanceUID())
              
    def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
-      
+       
        if attr1.vr() != "":
           self.__check(attr1.tag()+" VR",
                        attr1.vr(),
@@ -314,7 +340,7 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "d:o:vlh")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:x:vlh")
 
     # ---
     # Check for data dictionary.
@@ -331,6 +357,15 @@ def main():
     for opt in options:
         if opt[0] == "-o":
            output = opt[1]
+
+    # ---
+    # Check for exclude option.
+    # ---
+    exclude = []
+    for opt in options:
+        if opt[0] == "-x":
+           patterns = opt[1].replace('x', '.')
+           exclude = patterns.split(' ')
 
     # ---
     # Check for verbose option.
@@ -365,6 +400,7 @@ def main():
           print "Usage:", progName, "[options] <ref_dicom_study_dir> <new_dicom_study_dir>"
           print "  -d <data_dictionary_url>: defaults to DCM4CHE"
           print "  -o <output>:              output filename (defaults to stdout)"
+          print "  -x <exclude>:             list of tags to exclude"
           print "  -v:                       verbose"
           print "  -l:                       lazy check (skips binary content)"
           print "  -h:                       displays usage"
@@ -383,6 +419,7 @@ def main():
        studies.setVerbose(verbose)
        studies.setLazy(lazy)
        studies.setOutput(output)
+       studies.setExclude(exclude)
 
        differences = studies.compare()
        if differences != 0:
