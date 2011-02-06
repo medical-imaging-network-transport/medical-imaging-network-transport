@@ -55,6 +55,7 @@ class DicomStudyCompare():
        self.__verbose = False
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
+       self.__inlineBinaryTagsCompared = 0
        self.__bytesCompared = 0
        self.__itemsCompared = 0
        self.__excludedTags = 0
@@ -99,6 +100,7 @@ class DicomStudyCompare():
              print "%10d instance(s) compared." % (instancesCompared)
              print "%10d text tag(s) compared." % (self.__textTagsCompared)
              print "%10d items(s) compared." % (self.__itemsCompared)
+             print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
              print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
              print "%10d byte(s) compared." % (self.__bytesCompared)          
              print "%10d excluded tag(s)." % (self.__excludedTags)
@@ -106,9 +108,10 @@ class DicomStudyCompare():
             self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
             self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
             self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
+            self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
-            self.__output.write("%10d excluded tag(s)." % (self.__excludedTags))
+            self.__output.write("%10d excluded tag(s)\n." % (self.__excludedTags))
 
        # ---
        # Always print differences.
@@ -174,9 +177,7 @@ class DicomStudyCompare():
        # Optional and deprecated Group Length tags are not included so we don't need to look for them,
        # except for Group 2 which is a required tag.
        # ---
-       if tag[0:4] != "0002" and tag[4:8] == "0000": 
-          self.__excludedTags += 1
-          return
+       if tag[0:4] != "0002" and tag[4:8] == "0000": return
        
        # ---
        # User might want to exclude problem tags.
@@ -251,6 +252,10 @@ class DicomStudyCompare():
            self.__itemsCompared += 1
            
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
+
+       if attr1.dat() == "":
+          self.__checkInlineBinary(attr1, attr2, seriesInstanceUID, sopInstanceUID)
+          return
 
        if self.__lazy: return
        
@@ -331,6 +336,16 @@ class DicomStudyCompare():
        bid2.close()
        self.__binaryTagsCompared += 1
  
+   def __checkInlineBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
+ 
+       self.__check(attr1.tag()+" <Binary Data>",
+                    attr1.val(),
+                    attr2.val(),
+                    seriesInstanceUID, 
+                    sopInstanceUID)
+ 
+       self.__inlineBinaryTagsCompared += 1
+
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
@@ -364,8 +379,8 @@ def main():
     exclude = []
     for opt in options:
         if opt[0] == "-x":
-           patterns = opt[1].replace('x', '.')
-           exclude = patterns.split(' ')
+           patterns = opt[1].replace('n', '.')
+           exclude = patterns.split(',')
 
     # ---
     # Check for verbose option.
@@ -400,7 +415,7 @@ def main():
           print "Usage:", progName, "[options] <ref_dicom_study_dir> <new_dicom_study_dir>"
           print "  -d <data_dictionary_url>: defaults to DCM4CHE"
           print "  -o <output>:              output filename (defaults to stdout)"
-          print "  -x <exclude>:             list of tags to exclude"
+          print "  -x <exclude>:             list of tags to exclude, ie. \"08590030,600001nn\""
           print "  -v:                       verbose"
           print "  -l:                       lazy check (skips binary content)"
           print "  -h:                       displays usage"
