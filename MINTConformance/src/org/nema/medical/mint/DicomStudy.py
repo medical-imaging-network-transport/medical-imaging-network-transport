@@ -73,7 +73,7 @@ class DicomStudy():
        print "> Study", self.studyInstanceUID()
        numInstances = self.numInstances()
        for n in range(0, numInstances):
-           instance = self.instances(n)
+           instance = self.instance(n)
            instance.debug()
        
    def __read(self):

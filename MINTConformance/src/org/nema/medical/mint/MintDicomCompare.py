@@ -85,7 +85,7 @@ class MintDicomCompare():
        numInstances = dicm.numInstances()
        instancesCompared = 0
        for n in range(0, numInstances):
-           instance = dicm.instances(n)
+           instance = dicm.instance(n)
            self.__compareInstances(instance, mint)
            instancesCompared += 1
 
