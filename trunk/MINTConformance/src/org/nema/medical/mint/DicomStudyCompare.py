@@ -111,7 +111,7 @@ class DicomStudyCompare():
             self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
-            self.__output.write("%10d excluded tag(s)\n." % (self.__excludedTags))
+            self.__output.write("%10d excluded tag(s).\n" % (self.__excludedTags))
 
        # ---
        # Always print differences.
