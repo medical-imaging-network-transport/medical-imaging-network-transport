@@ -78,6 +78,9 @@ public class StudyDAO extends HibernateDaoSupport {
             detachedCriteria.add(Restrictions.lt("dateTime", DateUtils.parseISO8601Date(maxStudyDate)));
         }
 
+        //Eliminate deleted studies from search results
+        detachedCriteria.add(Restrictions.ne("studyVersion", "-1"));
+
         int firstResult = (offset-1) * limit;
         final List<MINTStudy> list = (List<MINTStudy>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,limit);
         return list;
@@ -103,6 +106,10 @@ public class StudyDAO extends HibernateDaoSupport {
 
 		final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class)
 				.add(Restrictions.ge("lastModified", calendar.getTime())).addOrder(Order.desc("lastModified"));
+
+        //Eliminate deleted studies from search results
+        detachedCriteria.add(Restrictions.ne("studyVersion", "-1"));
+
 		final List<MINTStudy> list = getHibernateTemplate().findByCriteria(detachedCriteria, 0, between(1, 50, max));
 		return list;
 	}

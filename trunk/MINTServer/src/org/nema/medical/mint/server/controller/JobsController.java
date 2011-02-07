@@ -211,6 +211,11 @@ public class JobsController {
 
 		final String studyUUID = params.get(JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
 
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, studyUUID, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
+            return;
+        }
+
         if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_OLDVERSION)) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
                     + JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
@@ -228,12 +233,6 @@ public class JobsController {
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
 		File studyFolder = new File(studiesRoot, studyUUID);
-
-		if(!studyFolder.exists())
-		{
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "study with uuid " + studyUUID + " does not exists so cannot update");
-			return;
-		}
 
 		Principal principal = req.getUserPrincipal();
 		String principalName = (principal != null) ? principal.getName() : null;

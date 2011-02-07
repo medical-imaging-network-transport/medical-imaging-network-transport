@@ -4,6 +4,10 @@ import java.sql.Timestamp;
 
 public class Change {
 
+    public static final String OPERATION_CREATE = "CREATE";
+    public static final String OPERATION_UPDATE = "UPDATE";
+    public static final String OPERATION_DELETE = "DELETE";
+
     /**
      * Default constructor for JiBX
      */
@@ -11,7 +15,7 @@ public class Change {
     }
 
 	public Change(final String studyUUID, final int changeNumber, final String type, final Timestamp dateTime,
-			final String remoteHost, final String remoteUser, final String principal) {
+			final String remoteHost, final String remoteUser, final String principal, final String operation) {
 		this.studyUUID = studyUUID;
 		this.changeNumber = changeNumber;
 		this.type = type;
@@ -19,6 +23,7 @@ public class Change {
 		this.remoteHost = remoteHost;
 		this.remoteUser = remoteUser;
 		this.principal = principal;
+        this.operation = operation;
 	}
 	
 	public String getStudyUUID() {
@@ -77,6 +82,14 @@ public class Change {
         this.principal = principal;
     }
 
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(final String operation) {
+        this.operation = operation;
+    }
+
 	private String studyUUID;
 	private int changeNumber;
 	private String type;
@@ -84,4 +97,5 @@ public class Change {
 	private String remoteHost;
 	private String remoteUser;
 	private String principal;
+    private String operation;
 }

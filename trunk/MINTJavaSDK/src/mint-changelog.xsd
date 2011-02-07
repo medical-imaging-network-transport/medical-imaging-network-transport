@@ -1,4 +1,11 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:simpleType name="operationType">
+      <xsd:restriction base="xsd:token">
+          <xsd:enumeration value="CREATE"/>
+          <xsd:enumeration value="UPDATE"/>
+          <xsd:enumeration value="DELETE"/>
+      </xsd:restriction>
+  </xsd:simpleType>
   <xsd:element name="changelog">
     <xsd:complexType>
       <xsd:sequence>
@@ -8,6 +15,10 @@
             <xsd:attribute name="changeNumber" type="xsd:integer" use="required"/>
             <xsd:attribute name="type" type="xsd:string" use="required"/>
             <xsd:attribute name="dateTime" type="xsd:dateTime" use="required"/>
+            <xsd:attribute name="operation" type="operationType" use="required"/>
+            <xsd:attribute name="remoteHost" type="xsd:string" use="required"/>
+            <xsd:attribute name="remoteUser" type="xsd:string" use="optional"/>
+            <xsd:attribute name="principal" type="xsd:string" use="optional"/>
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>

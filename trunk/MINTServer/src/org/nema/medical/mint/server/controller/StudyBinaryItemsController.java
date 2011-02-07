@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.server.domain.MINTStudy;
+import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.server.util.StorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,6 +51,9 @@ public class StudyBinaryItemsController {
     @Autowired
     protected Integer binaryItemStreamBufferSize;
 
+    @Autowired
+    protected StudyDAO studyDAO;
+
 	@RequestMapping("/studies/{uuid}/{type}/binaryitems/{seq}")
     public void studiesBinaryItems(final HttpServletResponse res, HttpServletRequest req,
                                    @PathVariable("uuid") final String uuid,
@@ -56,17 +61,12 @@ public class StudyBinaryItemsController {
                                    @PathVariable("seq") final String seq
     ) throws IOException {
 
-		if (StringUtils.isBlank(uuid)) {
-            // Shouldn't happen...but could be +++, I suppose
-        	res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request: Missing binary item id");
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
             return;
         }
 
         final File studyRoot = new File(studiesRoot, uuid);
-        if (!studyRoot.exists()) {
-        	res.sendError(HttpServletResponse.SC_NOT_FOUND, "Requested Study Not Found");
-            return;
-        }
 
         final Iterator<Integer> itemList;
         try {

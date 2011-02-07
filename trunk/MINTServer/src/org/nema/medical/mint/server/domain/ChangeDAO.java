@@ -19,9 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -63,6 +61,23 @@ public class ChangeDAO extends HibernateDaoSupport {
 		return null;
 	}
 	
+    @SuppressWarnings("unchecked")
+    public Change findLastChange(final String studyID) {
+        final DetachedCriteria maxChangeIndex =
+                DetachedCriteria.forClass(Change.class)
+                .setProjection(Projections.max("changeIndex"))
+                .add(Restrictions.eq("studyID", studyID));
+        final DetachedCriteria lastChange =
+                DetachedCriteria.forClass(Change.class)
+                .add(Restrictions.eq("studyID", studyID))
+                .add(Property.forName("changeIndex").eq(maxChangeIndex));
+        final List<Change> list = getHibernateTemplate().findByCriteria(lastChange);
+        if (!list.isEmpty()) {
+            assert list.size() == 1;
+            return list.get(0);
+        }
+        return null;
+    }
 	public Change saveChange(final Change change) {
 		if (change != null) {
 			getHibernateTemplate().save(change);

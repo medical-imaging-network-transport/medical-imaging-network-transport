@@ -153,6 +153,7 @@ public class StudyCreateProcessor extends TimerTask {
 			updateInfo.setRemoteHost(remoteHost);
 			updateInfo.setPrincipal(principal);
 			updateInfo.setIndex(0);
+            updateInfo.setOperation(org.nema.medical.mint.changelog.Change.OPERATION_CREATE);
 			updateDAO.saveChange(updateInfo);
 
 			jobInfo.setStatus(JobStatus.SUCCESS);

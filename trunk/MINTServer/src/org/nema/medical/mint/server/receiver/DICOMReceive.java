@@ -20,6 +20,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,13 +34,7 @@ import org.dcm4che2.data.DicomObject;
 import org.dcm4che2.data.Tag;
 import org.dcm4che2.data.UID;
 import org.dcm4che2.io.DicomOutputStream;
-import org.dcm4che2.net.Association;
-import org.dcm4che2.net.Device;
-import org.dcm4che2.net.DicomServiceException;
-import org.dcm4che2.net.NetworkApplicationEntity;
-import org.dcm4che2.net.NetworkConnection;
-import org.dcm4che2.net.PDVInputStream;
-import org.dcm4che2.net.TransferCapability;
+import org.dcm4che2.net.*;
 import org.dcm4che2.net.service.StorageService;
 
 public final class DICOMReceive {
@@ -180,7 +177,7 @@ public final class DICOMReceive {
         return networkConnection;
     }
 
-    private final class CustomStorageService extends StorageService {
+    private final class CustomStorageService extends StorageService implements AssociationListener {
         public CustomStorageService(final String[] sopClasses) {
             super(sopClasses);
         }
@@ -193,9 +190,14 @@ public final class DICOMReceive {
             final String classUID = dcmReqObj.getString(Tag.AffectedSOPClassUID);
             final String instanceUID = dcmReqObj.getString(Tag.AffectedSOPInstanceUID);
             final File associationDir = getStorageRootDir();
-            final String dicomFileBaseName = instanceUID + DICOM_FILE_EXTENSION;
+            final long instanceSerialNo = incrementInstanceCounter();
+            if (instanceSerialNo % 500 == 0) {
+                LOG.info("Received instance no. " + instanceSerialNo);
+            }
+            final String serialNoStr = "SN" + String.format("%09d", instanceSerialNo);
+            final String prefixedFileName = serialNoStr + '-' + instanceUID;
+            final String dicomFileBaseName = prefixedFileName + DICOM_FILE_EXTENSION;
             final File dicomFile = new File(associationDir, dicomFileBaseName + PARTIAL_FILE_EXTENSION);
-            //TODO Things could get hairy if the same instance was sent before, and has not been deleted yet
             assert !dicomFile.exists();
             final BasicDicomObject fileMetaDcmObj = new BasicDicomObject();
             fileMetaDcmObj.initFileMetaInformation(classUID, instanceUID, transferSyntaxUID);
@@ -211,6 +213,18 @@ public final class DICOMReceive {
             }
             dicomFile.renameTo(new File(associationDir, dicomFileBaseName));
         }
+
+        @Override
+        public void associationAccepted(final AssociationAcceptEvent associationAcceptEvent) {
+            final Association association = associationAcceptEvent.getAssociation();
+            LOG.info("Association created: " + association.toString());
+        }
+
+        @Override
+        public void associationClosed(final AssociationCloseEvent associationCloseEvent) {
+            final Association association = associationCloseEvent.getAssociation();
+            LOG.info("Association closed: " + association.toString());
+        }
     }
 
     private final CustomStorageService cStoreSCP = new CustomStorageService(storageSOPClasses);
@@ -221,13 +235,13 @@ public final class DICOMReceive {
         ae.setAssociationAcceptor(true);
         ae.register(cStoreSCP);
         ae.setPackPDV(true);
-        //TODO do we need to support the Verification Service Class? If so, look at special treatment in dcmrcv.
         final TransferCapability[] transferCapabilities = new TransferCapability[storageSOPClasses.length];
         for (int i = 0; i < transferCapabilities.length; ++i) {
             transferCapabilities[i] = new TransferCapability(
                     storageSOPClasses[i], transferSyntaxes, TransferCapability.SCP);
         }
         ae.setTransferCapability(transferCapabilities);
+        ae.addAssociationListener(cStoreSCP);
     }
 
     private final Device device = new Device();
@@ -246,6 +260,12 @@ public final class DICOMReceive {
     //does not seem to work, so keep the two numbers in sync)
     private final ExecutorService executor = new ThreadPoolExecutor(
             100, 100, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+
+    private long instanceCounter = 0L;
+
+    private long incrementInstanceCounter() {
+        return instanceCounter++;
+    }
 
     public final void start() throws IOException {
         device.startListening(executor);

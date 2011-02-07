@@ -33,33 +33,36 @@ public class Change {
 	public static Timestamp now() {
 		return new Timestamp(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTimeInMillis());
 	}
-	
+
 	@Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name="changeId")
 	private String id;
-	
-	@Column
+
+	@Column(nullable = false)
 	private String studyID;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private int changeIndex;
-	
-	@Column
+
+	@Column(nullable = false)
 	private String changeType;
-	
-	@Column(name="changeDateTime")
+
+	@Column(name="changeDateTime", nullable = false)
 	private Timestamp dateTime = now();
-	
+
 	@Column
 	private String remoteUser;
-	
-	@Column
+
+    @Column(nullable = false)
 	private String remoteHost;
-	
+
 	@Column
 	private String principal;
+
+    @Column(nullable = false)
+    private String operation;
 
 	public String getId() {
 		return id;
@@ -133,5 +136,11 @@ public class Change {
 		this.principal = principal;
 	}
 
-	
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
 }

@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +39,7 @@ public class StudyMetadataController {
 	protected File studiesRoot;
 	
 	@Autowired
-	protected StudyDAO studyDAO = null;
+	protected StudyDAO studyDAO;
 
 	@Autowired
 	protected Integer fileResponseBufferSize;
@@ -52,17 +53,12 @@ public class StudyMetadataController {
 							    final HttpServletRequest req,
 							    final HttpServletResponse res)
 			throws IOException {
-        if (StringUtils.isBlank(uuid)) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
             return;
         }
 
         final File studyDir = new File(studiesRoot, uuid);
-        if (!studyDir.exists() || !studyDir.canRead()) {
-            LOG.error("Unable to locate directory for study: " + studyDir);
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
-            return;
-        }
         final File typeDir = new File(studyDir, type);
         if (!typeDir.exists() || !typeDir.canRead()) {
             LOG.error("Unable to locate directory for study: " + studyDir);

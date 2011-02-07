@@ -62,20 +62,10 @@ public class StudyValidation {
 
     static void validateAttributeLevel(final StudyMetadata study, final MetadataType type)
             throws StudyTraversals.TraversalException {
-        final class AttributeTransformer {
-            public final Collection<Integer> extractTagSet(final Collection<AttributeType> attributes) {
-                final Collection<Integer> attributeTags = new HashSet<Integer>(attributes.size());
-                for (final AttributeType attributeType: attributes) {
-                    attributeTags.add(Integer.valueOf(attributeType.getTag(), 16));
-                }
-                return attributeTags;
-            }
-        }
-        final AttributeTransformer attributeTransformer = new AttributeTransformer();
         final Collection<Integer> studyAttributeTags =
-                attributeTransformer.extractTagSet(type.getStudyAttributes().getAttributes());
+                MetadataType.extractTagSet(type.getStudyAttributes().getAttributes());
         final Collection<Integer> seriesAttributeTags =
-                attributeTransformer.extractTagSet(type.getSeriesAttributes().getAttributes());
+                MetadataType.extractTagSet(type.getSeriesAttributes().getAttributes());
         final class LevelCheck implements StudyTraversals.AttributeAction {
             private final String levelName;
             private final Collection<Integer> levelTags;

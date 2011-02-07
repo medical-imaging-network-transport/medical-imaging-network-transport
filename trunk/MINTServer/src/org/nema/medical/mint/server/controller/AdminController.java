@@ -45,6 +45,9 @@ public class AdminController {
                         final StudyMetadata metadata = StudyIO.loadStudy(changeDir);
                         change.setType(metadata.getType());
                         change.setRemoteHost("localhost");
+                        change.setOperation(changeNumber == 0 ?
+                                org.nema.medical.mint.changelog.Change.OPERATION_CREATE :
+                                org.nema.medical.mint.changelog.Change.OPERATION_UPDATE);
                         updateDAO.saveChange(change);
                     }
                 }
