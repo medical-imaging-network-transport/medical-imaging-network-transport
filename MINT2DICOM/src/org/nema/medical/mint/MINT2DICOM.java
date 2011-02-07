@@ -51,6 +51,13 @@ public class MINT2DICOM
      */
     private static void insertAttribute(DicomObject currentObject, Attribute newAttribute, URL binaryRoot, boolean useBulkLoading) throws IOException
     {
+    	String hexString = Integer.toHexString(newAttribute.getTag());
+    	if(hexString.endsWith("0000"))
+    	{
+    		System.out.println("Group length found, skipping.");
+    		return;
+    	}
+    	
         if(newAttribute.hasSequenceItems() || newAttribute.getVr().equalsIgnoreCase("SQ"))
         {
             //Loop through a sequence, get atrributes and recurse -- bad design on Jack's part but does not recurse more than 2 or 3 times. Need to rewrite.
