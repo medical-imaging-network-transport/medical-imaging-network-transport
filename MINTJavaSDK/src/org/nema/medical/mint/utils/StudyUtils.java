@@ -15,13 +15,14 @@
  */
 package org.nema.medical.mint.utils;
 
-import org.nema.medical.mint.datadictionary.AttributeType;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static org.nema.medical.mint.utils.Iter.iter;
 
 /**
  * @author Rex
@@ -31,59 +32,56 @@ public final class StudyUtils {
     public static final String INITIAL_VERSION = "0";
 
     /**
-     * This method should pull all data from the provided study into 'this'
-     * study and overwrite any existing values in 'this' study.
+     * This method should pull all data from sourceStudy into destinationStudy
+     * and overwrite any existing values in destinationStudy. destinationStudy is considered the old study,
+     * sourceStudy is the new study.
      *
      * @param sourceStudy
      */
-    public static void mergeStudy(StudyMetadata destinationStudy, StudyMetadata sourceStudy, Collection<Integer> excludedBinaryIds) {
+    public static void mergeStudy(final StudyMetadata destinationStudy, final StudyMetadata sourceStudy,
+                                  final Collection<Integer> excludedBinaryIds) {
         //Merge study level attributes
-        for (Iterator<Attribute> i = sourceStudy.attributeIterator(); i.hasNext();) {
-            Attribute attribute = i.next();
-
+        for (final Attribute attribute: iter(sourceStudy.attributeIterator())) {
             collectBidsInAttribute(destinationStudy.getAttribute(attribute.getTag()), excludedBinaryIds);
             destinationStudy.putAttribute(attribute);
         }
 
         //Merge series from study
-        for (Iterator<Series> i = sourceStudy.seriesIterator(); i.hasNext();) {
-            Series series = i.next();
-            Series thisSeries = destinationStudy.getSeries(series.getSeriesInstanceUID());
+        for (final Series series: iter(sourceStudy.seriesIterator())) {
+            final Series thisSeries = destinationStudy.getSeries(series.getSeriesInstanceUID());
 
-            if (thisSeries != null) {
+            if (thisSeries == null) {
+                destinationStudy.putSeries(series);
+            } else {
                 //Merge attributes from series
-                for (Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();) {
-                    Attribute attribute = ii.next();
-
+                for (final Attribute attribute: iter(series.attributeIterator())) {
                     collectBidsInAttribute(thisSeries.getAttribute(attribute.getTag()), excludedBinaryIds);
                     thisSeries.putAttribute(attribute);
                 }
 
                 //Merge instances from series
-                for (Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();) {
-                    Instance instance = ii.next();
-                    Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
+                for (final Instance instance: iter(series.instanceIterator())) {
+                    final Instance thisInstance = thisSeries.getInstance(instance.getSOPInstanceUID());
 
-                    if (thisInstance != null) {
+                    if (thisInstance == null) {
+                        thisSeries.putInstance(instance);
+                    } else {
                         //Check if transfer syntax is existing, update current if it is provided
-                        String transferSyntaxUID = instance.getTransferSyntaxUID();
+                        //TODO this code will not work for changing transfer syntaxes for the same instance;
+                        //we need to translate the entire instance to the new transfer syntax, then merge,
+                        //if we allow this case.
+                        final String transferSyntaxUID = instance.getTransferSyntaxUID();
                         if (transferSyntaxUID != null && !transferSyntaxUID.isEmpty()) {
                             thisInstance.setTransferSyntaxUID(transferSyntaxUID);
                         }
 
                         //Merge attributes for instances
-                        for (Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();) {
-                            Attribute attribute = iii.next();
-
+                        for (final Attribute attribute: iter(instance.attributeIterator())) {
                             collectBidsInAttribute(thisInstance.getAttribute(attribute.getTag()), excludedBinaryIds);
                             thisInstance.putAttribute(attribute);
                         }
-                    } else {
-                        thisSeries.putInstance(instance);
                     }
                 }
-            } else {
-                destinationStudy.putSeries(series);
             }
         }
     }
@@ -371,86 +369,74 @@ public final class StudyUtils {
 
     /**
      * Will go through each series and push all normalized attributes into each
-     * instance in that series.  Will return true always unless something
+     * instance in that series.  Will always return true unless something
      * catastrophically unexpected occurs.
      *
      * @param study
      * @return true
      */
-    public static boolean denormalizeStudy(StudyMetadata study) {
-        for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-            Series s = i.next();
+    public static boolean denormalizeStudy(final StudyMetadata study) {
+        for (final Series series: iter(study.seriesIterator())) {
+            for (final Iterator<Attribute> attrIter = series.normalizedInstanceAttributeIterator(); attrIter.hasNext();) {
+                final Attribute attr = attrIter.next();
 
-            for (Iterator<Attribute> ii = s.normalizedInstanceAttributeIterator(); ii.hasNext();) {
-                Attribute a = ii.next();
-
-                for (Iterator<Instance> iii = s.instanceIterator(); iii.hasNext();) {
-                    Instance inst = iii.next();
-
-                    inst.putAttribute(a);
+                for (final Instance instance: iter(series.instanceIterator())) {
+                    instance.putAttribute(attr);
                 }
 
-                ii.remove();
+                attrIter.remove();
             }
         }
 
         return true;
     }
 
+
+    //"??" is illegal VR used by old SIEMENS modalities (or at least so says DCM4CHE Javadoc)
+    private static final Collection<String> binaryVRs =
+            new HashSet<String>(Arrays.asList("SQ", "OW", "OB", "OF", "UN", "??"));
+    private static boolean isBinaryVR(final String vr) {
+        return binaryVRs.contains(vr);
+    }
+
     /**
-     * Performs a normalization algorithm on the provided StudyMetadata. Currently this is
-     * a very forgiving normalization. We allow study level attributes to come in as instance
-     * level attributes and we then normalize them up to the study level using the data dictionary.
-     * Ideally this should be changed to force validation before it even gets to this point.
-     *
-     * //TODO validate where the attributes are and what attributes are present before even getting
-     * to the normalization portion.
-     * <p/>
+     * Performs a normalization algorithm on the provided StudyMetadata. The study must be valid except for
+     * attributes not having been normalized to the series-level yet.
      *
      * @param study
-     * @param dataDictionary
      * @return true
-     * @throws java.io.IOException
      */
-    public static boolean normalizeStudy(final StudyMetadata study, final MetadataType dataDictionary)
-            throws IOException {
-        if (!study.getType().equals(dataDictionary.getType())) {
-            throw new RuntimeException("Mismatch of study type " + study.getType()
-                    + " and data dictionary type " + dataDictionary.getType());
-        }
-    	List<AttributeType> seriesAttributes = dataDictionary.getSeriesAttributes().getAttributes();
-    	List<AttributeType> studyAttributes = dataDictionary.getStudyAttributes().getAttributes();
-
-    	List<Attribute> tempNormalizedStudyAttributeList = new LinkedList<Attribute>();
-    	List<Attribute> tempNormalizedInstanceAttributeList = new LinkedList<Attribute>();
+    public static boolean normalizeStudy(final StudyMetadata study) {
+    	final Collection<Attribute> tempNormalizedInstanceAttributeList = new ArrayList<Attribute>();
 
         //For each series
-        for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-            Series s = i.next();
-
+        for (final Series series: iter(study.seriesIterator())) {
             tempNormalizedInstanceAttributeList.clear();
 
-            if (s.instanceCount() > 1)
-            {
+            if (series.instanceCount() > 1) {
                 //For each Instance in the series
 
                 //Prime list by loading all attributes in from first instance
-                Iterator<Instance> ii = s.instanceIterator();
-                for (Iterator<Attribute> iii = ii.next().attributeIterator(); iii.hasNext();) {
-                	tempNormalizedInstanceAttributeList.add(iii.next());
+                final Iterator<Instance> ii = series.instanceIterator();
+                final Instance firstInstance = ii.next();
+                for (final Attribute attr: iter(firstInstance.attributeIterator())) {
+                    if (!isBinaryVR(attr.getVr())) {
+                	    tempNormalizedInstanceAttributeList.add(attr);
+                    }
                 }
 
                 //Loop over the rest of the attributes
                 while (ii.hasNext()) {
-                    Instance inst = ii.next();
+                    final Instance inst = ii.next();
 
                     //For each attribute in the instance
-                    for (Iterator<Attribute> iii = tempNormalizedInstanceAttributeList.iterator(); iii.hasNext();) {
-                        Attribute normalA = iii.next();
-                        Attribute a = inst.getAttribute(normalA.getTag());
-
-                        if (!equalAttributes(a, normalA))
-                            iii.remove();
+                    for (final Iterator<Attribute> normAttrIter = tempNormalizedInstanceAttributeList.iterator();
+                         normAttrIter.hasNext();) {
+                        final Attribute normalA = normAttrIter.next();
+                        final Attribute a = inst.getAttribute(normalA.getTag());
+                        if (a == null || isBinaryVR(a.getVr()) || !equalNonBinaryAttributes(a, normalA)) {
+                            normAttrIter.remove();
+                        }
                     }
                 }
 
@@ -458,83 +444,16 @@ public final class StudyUtils {
                  * All attributes left in the list were found in all instances
                  * for this series.
                  */
-                for (Attribute a : tempNormalizedInstanceAttributeList) {
+                for (final Attribute a: tempNormalizedInstanceAttributeList) {
+                    series.putNormalizedInstanceAttribute(a);
 
-                	//If the normalized attribute should exist at the series level then we will put it
-                	//there, otherwise it will go to the normalized instance attribute section.
-                	boolean putInSeries = false;
-                	for(AttributeType at : seriesAttributes)
-                	{
-                		if(StudyIO.hex2int(at.getTag()) == a.getTag())
-                		{
-                			putInSeries = true;
-                		}
-                	}
-
-                	if(putInSeries)
-                	{
-                		s.putAttribute(a);
-                	}
-                	else
-                	{
-                		s.putNormalizedInstanceAttribute(a);
-                	}
-
-                    for (final Instance instanceMeta : Iter.iter(s.instanceIterator())) {
+                    for (final Instance instanceMeta : Iter.iter(series.instanceIterator())) {
                         instanceMeta.removeAttribute(a.getTag());
                     }
                 }
             }
         }
 
-        //Whatever is left in the normalized attribute section of each series needs to be checked
-        //to see if it should live at the study level. Every series normalized instance attribute section must
-        //contain that same identical attribute for it to get moved to the study level and then only if
-        //the data dictionary says it belongs at that level.
-        Iterator<Series> seriesIter = study.seriesIterator();
-        if(seriesIter.hasNext())
-        {
-        	//Get the first series and prime the tempNormalizedStudyAttributeList with any normalized instance
-        	//attributes that should be normalized even further up to that level.
-        	Series s = seriesIter.next();
-        	 for(Iterator<Attribute> attributeIter = s.normalizedInstanceAttributeIterator(); attributeIter.hasNext();)
-             {
-             	Attribute a = attributeIter.next();
-            	for(AttributeType at : studyAttributes)
-             	{
-             		if(a.getTag() == StudyIO.hex2int(at.getTag()))
-             		{
-             			tempNormalizedStudyAttributeList.add(a);
-             		}
-             	}
-             }
-
-        	 //Now for the rest of the series, see if any of the normalized study attributes
-        	 //from the first series DONT exist exactly the same in their normalized instance attributes.
-        	 //If series doesn't have the attribute exactly the same as it is in the normalized
-        	 //study attributes list it gets removed from the study normalized list since it has to occur the same in
-        	 //every series to be a candidate for normalization.
-        	 while(seriesIter.hasNext())
-        	 {
-        		Series ss = seriesIter.next();
-        		for(Iterator<Attribute> i = tempNormalizedStudyAttributeList.iterator(); i.hasNext();)
-        		{
-        			Attribute a = i.next();
-        			if(!equalAttributes(a, ss.getNormalizedInstanceAttribute(a.getTag())))
-        			{
-        				tempNormalizedStudyAttributeList.remove(a);
-        			}
-        		}
-        	 }
-
-        	 for(Attribute a : tempNormalizedStudyAttributeList)
-        	 {
-        		 study.putAttribute(a);
-        		 for (final Series instanceMeta : Iter.iter(study.seriesIterator())) {
-                     instanceMeta.removeNormalizedInstanceAttribute(a.getTag());
-                 }
-        	 }
-        }
         return true;
     }
 
@@ -545,40 +464,30 @@ public final class StudyUtils {
      * @param attr
      * @return true if equals
      */
-    public static boolean equalAttributes(Attribute a, Attribute attr) {
-        boolean equal;
-
+    public static boolean equalNonBinaryAttributes(final Attribute a, final Attribute attr) {
         //True if both references point to the same object
         if (a == attr) {
             //references are the same (may be null)
-            equal = true;
+            return true;
         } else if (a != null && attr != null) {
             //references are not equal and neither reference is null
             if (a.getTag() != attr.getTag()) {
                 //Tags are not equal : false
-                equal = false;
-            } else if (!((a.getVr() == attr.getVr()) || (a.getVr() != null && a.getVr().equals(attr.getVr())))) {
-                //VR are not equal : false
-                equal = false;
-            } else if (!(a.getBid() == attr.getBid())) {
-                //Binary IDs not equal : false
-                equal = false;
-            } else if (a.getBid() >= 0) {
-                //Binary IDs valid but frame counts not equal : false
-                equal = (a.getFrameCount() == attr.getFrameCount());
-            } else if (!((a.getVal() == attr.getVal()) || (a.getVal() != null && a.getVal().equals(attr.getVal())))) {
+                return false;
+            } else if (a.getVr() != attr.getVr() && (a.getVr() == null || !a.getVr().equals(attr.getVr()))) {
+                //VRs are not equal : false
+                return false;
+            } else if (a.getVal() != attr.getVal() && (a.getVal() == null || !a.getVal().equals(attr.getVal()))) {
                 //Value fields not equal : false
-                equal = false;
+                return false;
             } else {
-                //Tags, VRs, Binary IDs, and Values were all equal : true
-                equal = true;
+                //Tags, VRs, and Values were all equal : true
+                return true;
             }
         } else {
             //a != attr and one of them is null
-            equal = false;
+            return false;
         }
-
-        return equal;
     }
 
     public static void writeStudy(StudyMetadata study, File studyFolder) throws IOException {

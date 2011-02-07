@@ -210,8 +210,7 @@ public class StudyUpdateProcessor extends TimerTask {
 					throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
 				}
 		        
-		        if(existingStudy != null)
-		        {
+		        if(existingStudy != null) {
                     if(!StudyUtils.denormalizeStudy(existingStudy))
 					{
 						throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
@@ -221,7 +220,7 @@ public class StudyUpdateProcessor extends TimerTask {
 
                     // Get next version number
                     existingStudy.setVersion(StudyUtils.getNextVersion(existingStudy.getVersion()));
-		        }else{
+		        } else {
 					/*
 					 * If no existing study, new study becomes the existing
 					 * study. This happens when an update is done on a type that
@@ -237,8 +236,7 @@ public class StudyUpdateProcessor extends TimerTask {
 		        //Rename all excluded binary files to have .exclude
 				StorageUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
 
-                if(!StudyUtils.normalizeStudy(existingStudy, dataDictionary))
-				{
+                if (!StudyUtils.normalizeStudy(existingStudy)) {
 					throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
 				}
 				
@@ -274,6 +272,7 @@ public class StudyUpdateProcessor extends TimerTask {
 				updateInfo.setRemoteHost(remoteHost);
 				updateInfo.setPrincipal(principal);
 				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
+                updateInfo.setOperation(org.nema.medical.mint.changelog.Change.OPERATION_UPDATE);
 				updateDAO.saveChange(updateInfo);
 	
 				jobInfo.setStatus(JobStatus.SUCCESS);

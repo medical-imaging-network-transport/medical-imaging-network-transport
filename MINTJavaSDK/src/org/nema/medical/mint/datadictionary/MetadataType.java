@@ -16,7 +16,10 @@
 
 package org.nema.medical.mint.datadictionary;
 
-/** 
+import java.util.Collection;
+import java.util.HashSet;
+
+/**
  * Schema fragment(s) for this class:
  * <pre>
  * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="metadataType">
@@ -38,7 +41,19 @@ public class MetadataType
     private String type;
     private Float version;
 
-    /** 
+    /**
+     * Convenience method
+     */
+    //TODO Should really refactor StudyAttributesType & SeriesAttributesType so that we don't need this method
+    public static final Collection<Integer> extractTagSet(final Collection<AttributeType> attributes) {
+        final Collection<Integer> attributeTags = new HashSet<Integer>(attributes.size());
+        for (final AttributeType attributeType: attributes) {
+            attributeTags.add(Integer.valueOf(attributeType.getTag(), 16));
+        }
+        return attributeTags;
+    }
+
+    /**
      * Get the 'attributes' element value.
      * 
      * @return value

@@ -117,7 +117,7 @@ public class MINTStudy implements Serializable {
 	private Timestamp dateTime;
 	
 	// Current version of study.
-	@Column
+	@Column(nullable = false)
 	private String studyVersion;
 
 	// DICOM StudyInstanceUID (0020,0010) T1

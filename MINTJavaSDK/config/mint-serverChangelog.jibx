@@ -10,6 +10,7 @@
 		<value style="attribute" name="changeNumber" get-method="getChangeNumber" set-method="setChangeNumber"/>
 		<value style="attribute" name="type" get-method="getType" set-method="setType"/>
 		<value style="attribute" name="dateTime" get-method="getDateTime" set-method="setDateTime"/>
+        <value style="attribute" name="operation" get-method="getOperation" set-method="setOperation"/>
 		<value style="attribute" name="remoteHost" get-method="getRemoteHost" set-method="setRemoteHost"/>
 		<value style="attribute" name="remoteUser" get-method="getRemoteUser" set-method="setRemoteUser"
 		    usage="optional"/>

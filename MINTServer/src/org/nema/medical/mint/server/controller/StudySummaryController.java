@@ -24,6 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.metadata.StudyIO;
+import org.nema.medical.mint.server.domain.MINTStudy;
+import org.nema.medical.mint.server.domain.StudyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +42,9 @@ public class StudySummaryController {
 
 	@Autowired
 	protected Integer fileStreamBufferSize;
+
+    @Autowired
+    protected StudyDAO studyDAO;
 	
 	@RequestMapping("/studies/{uuid}/{type}/summary")
 	public void studiesSummary(@PathVariable("uuid") final String uuid,
@@ -49,6 +54,16 @@ public class StudySummaryController {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing Study UUID");
 			return;
 		}
+
+        {
+            final MINTStudy study = studyDAO.findStudy(uuid);
+
+            if (study != null && study.getStudyVersion().equals("-1")) {
+                LOG.error("Requested study has previously been deleted: " + uuid);
+                res.sendError(HttpServletResponse.SC_GONE, "Invalid study requested: deleted");
+                return;
+            }
+        }
 
 		final File studyDir = new File(studiesRoot, uuid);
         if (!studyDir.exists() || !studyDir.canRead()) {

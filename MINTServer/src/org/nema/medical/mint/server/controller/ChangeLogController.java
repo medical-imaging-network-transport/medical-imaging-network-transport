@@ -34,6 +34,7 @@ import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.changelog.ChangeSet;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
+import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,6 +50,9 @@ public class ChangeLogController {
 
 	@Autowired
 	protected ChangeDAO changeDAO = null;
+
+    @Autowired
+    protected StudyDAO studyDAO = null;
 
 	@Autowired
 	protected String xmlStylesheet;
@@ -96,7 +100,9 @@ public class ChangeLogController {
 		
 		if (changesFound != null) {
 			for (Change change : changesFound) {
-				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
+				changes.add(new org.nema.medical.mint.changelog.Change(
+                        change.getStudyUUID(), change.getIndex(), change.getType(), change.getDateTime(),
+                        change.getRemoteHost(), change.getRemoteUser(), change.getPrincipal(), change.getOperation()));
 			}
 		}
 
@@ -116,18 +122,19 @@ public class ChangeLogController {
                                final HttpServletRequest req,
                                final HttpServletResponse res) throws IOException, JiBXException {
 
-		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
-
-		if (StringUtils.isBlank(uuid)) {
-            // Shouldn't happen...but could be +++, I suppose
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-			return;
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
+            return;
         }
+
+		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
 
         final List<Change> changesFound = changeDAO.findChanges(uuid);
 		if (changesFound != null) {
 			for (Change change : changesFound) {
-				changes.add(new org.nema.medical.mint.changelog.Change(change.getStudyUUID(),change.getIndex(),change.getType(),change.getDateTime(),change.getRemoteHost(),change.getRemoteUser(),change.getPrincipal()));
+				changes.add(new org.nema.medical.mint.changelog.Change(
+                        change.getStudyUUID(), change.getIndex(), change.getType(), change.getDateTime(),
+                        change.getRemoteHost(), change.getRemoteUser(), change.getPrincipal(), change.getOperation()));
 			}
 		}
 
@@ -149,6 +156,11 @@ public class ChangeLogController {
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException {
 
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
+            return;
+        }
+
 		String ext = null;
 		
 		/*
@@ -161,12 +173,6 @@ public class ChangeLogController {
 		if(StringUtils.isBlank(tmp))
 		{
 			tmp = seq;
-		}
-		
-		if (StringUtils.isBlank(uuid)) {
-			// Shouldn't happen...but could be +++, I suppose
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-			return;
 		}
 		
 		if(StringUtils.isBlank(tmp))

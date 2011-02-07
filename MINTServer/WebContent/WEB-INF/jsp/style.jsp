@@ -384,6 +384,7 @@
 					<th>Change Number</th>
 					<th>Type</th>
 					<th>Date Time</th>
+                    <th>Operation</th>
 					<th>Remote host</th>
 					<th>Remote user</th>
 					<th>Principal</th>
@@ -404,6 +405,7 @@
 		</td>
 		<td class='type'><xsl:value-of select="./@type"/></td>
 		<td class='dateTime'><xsl:value-of select="./@dateTime"/></td>
+		<td class='operation'><xsl:value-of select="./@operation"/></td>
 		<td class='remoteHost'><xsl:value-of select="./@remoteHost"/></td>
 		<td class='remoteUser'>
 			<xsl:if test="./@remoteUser">

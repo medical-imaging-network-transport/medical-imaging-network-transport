@@ -15,17 +15,16 @@
  */
 package org.nema.medical.mint.dcm2mint;
 
-import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
-
 import org.dcm4che2.data.*;
-import org.nema.medical.mint.metadata.Attribute;
-import org.nema.medical.mint.metadata.AttributeStore;
-import org.nema.medical.mint.metadata.Instance;
-import org.nema.medical.mint.metadata.Item;
-import org.nema.medical.mint.metadata.Series;
+import org.nema.medical.mint.metadata.*;
 import org.nema.medical.mint.utils.Iter;
+import org.nema.medical.mint.utils.StudyUtils;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -152,27 +151,7 @@ public final class Dcm2MetaBuilder {
    accumulateFile().
     */
    public void finish() {
-       for (final Entry<String, Map<Integer, NormalizationCounter>> seriesTagsEntry: tagNormalizerTable.entrySet()) {
-           final Series series = metaBinaryPair.getMetadata().getSeries(seriesTagsEntry.getKey());
-           if (series == null) {
-               throw new RuntimeException(
-                       "Normalization: cannot find series " + seriesTagsEntry.getKey() + " in study data.");
-           }
-
-           final int nInstancesInSeries = series.instanceCount();
-           if (nInstancesInSeries > 1) {
-               for (final NormalizationCounter normCtr: seriesTagsEntry.getValue().values()) {
-                   if (normCtr.count == nInstancesInSeries) {
-                       // Move the attribute to the normalized section...
-                       series.putNormalizedInstanceAttribute(normCtr.attr);
-
-                       for (final Instance instanceMeta: Iter.iter(series.instanceIterator())) {
-                           instanceMeta.removeAttribute(normCtr.attr.getTag());
-                       }
-                   }
-               }
-           }
-       }
+       StudyUtils.normalizeStudy(metaBinaryPair.getMetadata());
    }
 
      /**
@@ -207,8 +186,6 @@ public final class Dcm2MetaBuilder {
              series = new Series();
              series.setSeriesInstanceUID(seriesInstanceUID);
              metaBinaryPair.getMetadata().putSeries(series);
-             assert !tagNormalizerTable.containsKey(seriesInstanceUID);
-             tagNormalizerTable.put(seriesInstanceUID, new HashMap<Integer, NormalizationCounter>());
          }
 
          final Instance instance = new Instance();
@@ -234,23 +211,17 @@ public final class Dcm2MetaBuilder {
         final int tag = dcmElement.tag();
          if (studyLevelTags.contains(tag)) {
              if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
-                 handleDICOMElement(dcmPath, dcmElement, dcmObj, metaBinaryPair.getMetadata(), null, emptyTagPath,
+                 handleDICOMElement(dcmPath, dcmElement, dcmObj, metaBinaryPair.getMetadata(), emptyTagPath,
                                     transferSyntax);
              }
          }
          else if (seriesLevelTags.contains(tag)) {
              if (series.getAttribute(tag) == null) {
-                 handleDICOMElement(dcmPath, dcmElement, dcmObj,
-                         series, null, emptyTagPath, transferSyntax);
+                 handleDICOMElement(dcmPath, dcmElement, dcmObj, series, emptyTagPath, transferSyntax);
              }
          }
          else {
-             // tagNormalizerTable is only used for instance-level storage...
-             final Map<Integer, NormalizationCounter> seriesNormMap =
-                 tagNormalizerTable.get(series.getSeriesInstanceUID());
-             assert seriesNormMap != null;
-             handleDICOMElement(dcmPath, dcmElement, dcmObj,
-                     instance, seriesNormMap, emptyTagPath, transferSyntax);
+             handleDICOMElement(dcmPath, dcmElement, dcmObj, instance, emptyTagPath, transferSyntax);
          }
     }
 
@@ -259,10 +230,9 @@ public final class Dcm2MetaBuilder {
              final DicomElement dcmElem,
              final DicomObject parentDcmObj,
              final AttributeStore attrs,
-             final Map<Integer, NormalizationCounter> seriesNormMap,
              final int[] tagPath,
              final TransferSyntax transferSyntax) {
-         final Store store = new Store(dcmPath, attrs, seriesNormMap, tagPath, dcmElem, parentDcmObj, transferSyntax);
+         final Store store = new Store(dcmPath, attrs, tagPath, dcmElem, parentDcmObj, transferSyntax);
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
@@ -278,12 +248,10 @@ public final class Dcm2MetaBuilder {
      }
 
      private final class Store {
-         public Store(final File dcmPath, final AttributeStore attrs,
-                 final Map<Integer, NormalizationCounter> seriesNormMap, final int[] tagPath,
-                 final DicomElement elem, final DicomObject parentDcmObj, final TransferSyntax transferSyntax) {
+         public Store(final File dcmPath, final AttributeStore attrs, final int[] tagPath, final DicomElement elem,
+                      final DicomObject parentDcmObj, final TransferSyntax transferSyntax) {
              this.dcmPath = dcmPath;
              this.attrs = attrs;
-             this.seriesNormMap = seriesNormMap;
              this.tagPath = tagPath;
              this.elem = elem;
              this.parentDcmObj = parentDcmObj;
@@ -293,37 +261,9 @@ public final class Dcm2MetaBuilder {
          public void storePlain() {
              assert elem != null;
              assert !elem.hasItems();
-             Attribute attr = null;
-             NormalizationCounter normCounter = null;
              final String strVal = getStringValue(elem, parentDcmObj.getSpecificCharacterSet());
-             if (seriesNormMap != null) {
-                 normCounter = seriesNormMap.get(elem.tag());
-                 if (normCounter != null) {
-                     final Attribute ncAttr = normCounter.attr;
-                     if (areEqual(ncAttr, elem, strVal)) {
-                         // The data is the same. Instead of creating a new Attribute just to throw it
-                         // away shortly, re-use the previously created attribute.
-                         attr = ncAttr;
-                         ++normCounter.count;
-                     }
-                 }
-             }
-
-             if (attr == null) {
-                 attr = newAttr(elem);
-                 if (strVal != null) {
-                     attr.setVal(strVal);
-                 }
-
-                 if (seriesNormMap != null && normCounter == null) {
-                     // This is the first occurrence of this particular attribute
-                     normCounter = new NormalizationCounter();
-                     normCounter.attr = attr;
-                     seriesNormMap.put(elem.tag(), normCounter);
-                 }
-             }
-
-             assert attr != null;
+             final Attribute attr = newAttr(elem);
+             attr.setVal(strVal);
              attrs.putAttribute(attr);
          }
 
@@ -341,8 +281,7 @@ public final class Dcm2MetaBuilder {
                  final Item newItem = new Item();
                  attr.addItem(newItem);
                  for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
-                     // Don't use tag normalization in sequence items...
-                     handleDICOMElement(dcmPath, dcmElement, dcmObj, newItem, null, newTagPath, transferSyntax);
+                     handleDICOMElement(dcmPath, dcmElement, dcmObj, newItem, newTagPath, transferSyntax);
                  }
              }
          }
@@ -508,7 +447,6 @@ public final class Dcm2MetaBuilder {
 
          private final File dcmPath;
          private final AttributeStore attrs;
-         private final Map<Integer, NormalizationCounter> seriesNormMap;
          private final int[] tagPath;
          private final DicomElement elem;
          private final DicomObject parentDcmObj;
@@ -516,7 +454,7 @@ public final class Dcm2MetaBuilder {
      }
 
      private static boolean areNonValueFieldsEqual(final Attribute a, final DicomElement obj) {
-         return a.getTag() == obj.tag() && obj.vr().toString().equals(a.getVr().toString());
+         return a.getTag() == obj.tag() && obj.vr().toString().equals(a.getVr());
      }
 
      private static String getStringValue(final DicomElement elem, final SpecificCharacterSet charSet) {
@@ -540,22 +478,10 @@ public final class Dcm2MetaBuilder {
          return attr;
      }
 
-     private static final class NormalizationCounter {
-
-         /** The DICOM attribute. */
-         Attribute attr;
-         /** The number of instances in the series that have
-             an identical value for the attribute.
-         */
-         long count = 1;
-     }
-
      private static final int[] emptyTagPath = new int[0];
 
      private final Set<Integer> studyLevelTags;
      private final Set<Integer> seriesLevelTags;
-     private final Map<String, Map<Integer, NormalizationCounter>> tagNormalizerTable =
-         new HashMap<String, Map<Integer, NormalizationCounter>>();
      private final MetaBinaryPair metaBinaryPair;
      private int binaryInlineThreshold = 256;
      private boolean p10Aware = true;

@@ -18,18 +18,23 @@ package org.nema.medical.mint.server.controller;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.server.domain.Change;
+import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.studies.StudyRoot;
 import org.nema.medical.mint.server.domain.StudyDAO;
@@ -37,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class StudyRootController {
@@ -45,7 +51,7 @@ public class StudyRootController {
 	protected String xmlStylesheet;
 
 	@Autowired
-	protected StudyDAO studyDAO = null;
+	protected StudyDAO studyDAO;
 
 	@Autowired
 	protected File studiesRoot;
@@ -56,24 +62,21 @@ public class StudyRootController {
 	@Autowired
 	protected Integer fileResponseBufferSize;
 
-	@RequestMapping("/studies/{uuid}")
+    @Autowired
+    protected ChangeDAO changeDAO;
+
+	@RequestMapping(method = RequestMethod.GET, value = "/studies/{uuid}")
 	public void studyRoot(@PathVariable("uuid") final String uuid,
 				final HttpServletRequest req,
 				final HttpServletResponse res) throws IOException, JiBXException {
 
-		if (StringUtils.isBlank(uuid)) {
-            // Shouldn't happen...but could be +++, I suppose
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing");
-			return;
-        }
-
-        final File studyDir = new File(studiesRoot, uuid);
-        if (!studyDir.exists() || !studyDir.canRead()) {
-            LOG.error("Unable to locate directory for study: " + studyDir);
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
             return;
         }
 
+        final MINTStudy study = studyDAO.findStudy(uuid);
+        final File studyDir = new File(studiesRoot, uuid);
         final File[] studyTypeFiles = studyDir.listFiles(
         		new FilenameFilter() {
         			
@@ -93,8 +96,6 @@ public class StudyRootController {
 		for (File studyTypeFile : studyTypeFiles) {
 			studyTypeFileList.add(studyTypeFile.getName());
 		}
-		
-		MINTStudy study = studyDAO.findStudy(uuid);
 		
 		Timestamp lastUpdated;
 		if (study.getLastModified() != null){
@@ -116,6 +117,50 @@ public class StudyRootController {
 		mctx.endDocument();
 		
 	}
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/studies/{uuid}")
+    public void deleteStudy(@PathVariable("uuid") final String uuid, final HttpServletRequest req,
+                            final HttpServletResponse res) throws IOException {
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
+            return;
+        }
+
+        final Principal principal = req.getUserPrincipal();
+        final String principalName = (principal != null) ? principal.getName() : null;
+
+        deleteStudy(uuid, studiesRoot, req.getRemoteUser(), req.getRemoteHost(), principalName, changeDAO);
+        res.setStatus(204);
+    }
+
+    public void deleteStudy(final String uuid, final File studiesRoot, final String remoteUser, final String remoteHost,
+                             final String principal, final ChangeDAO changeDAO) throws IOException {
+         final File studyDir = new File(studiesRoot, uuid);
+         FileUtils.deleteDirectory(studyDir);
+
+         final Change lastChange = changeDAO.findLastChange(uuid);
+         if (lastChange == null) {
+             throw new IOException("No changes in database for study UUID " + uuid);
+         }
+
+         final Change deleteInfo = new Change();
+         deleteInfo.setId(UUID.randomUUID().toString());
+         deleteInfo.setType("DICOM");
+         deleteInfo.setStudyID(uuid);
+         deleteInfo.setRemoteUser(remoteUser);
+         deleteInfo.setRemoteHost(remoteHost);
+         deleteInfo.setPrincipal(principal);
+         deleteInfo.setIndex(lastChange.getIndex() + 1);
+         deleteInfo.setOperation(org.nema.medical.mint.changelog.Change.OPERATION_DELETE);
+         changeDAO.saveChange(deleteInfo);
+
+         final MINTStudy studyData = new MINTStudy();
+         studyData.setID(uuid);
+         studyData.setDateTime(MINTStudy.now());
+         studyData.setStudyVersion("-1");
+         studyDAO.updateStudy(studyData);
+     }
+
 	private static final Logger LOG = Logger.getLogger(StudyRootController.class);
 
 }
