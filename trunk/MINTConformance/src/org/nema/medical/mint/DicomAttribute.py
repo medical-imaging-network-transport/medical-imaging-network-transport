@@ -305,11 +305,15 @@ class DicomAttribute():
        # Text
        else:
           self.__val = self.__val[0:self.__vl]
-          if len(self.__val) > 0 and not self.__val[-1].isalnum():
-             self.__val = self.__val.rstrip(self.__val[-1]) # strip non alphanumerics
-          self.__val = self.__val.rstrip() # strip whitespace
-          self.__vl = len(self.__val) # reset length
-
+          
+          # ---
+          # Strip NULL character and whitespace.
+          # ---
+          if len(self.__val) > 0 and ord(self.__val[-1]) == 0:
+             self.__val = self.__val[0:len(self.__val)-1]
+          self.__val = self.__val.rstrip()
+          self.__vl = len(self.__val)
+          
    def __val2str(self, size, type, format):
        vals = ""
        numVals = self.__vl / size

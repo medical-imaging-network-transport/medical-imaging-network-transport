@@ -57,6 +57,7 @@ class MintDicomCompare():
        self.__inlineBinaryTagsCompared = 0
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
+       self.__fpTagsCompared = 0
        self.__bytesCompared = 0
        self.__itemsCompared = 0
        self.__lazy= False
@@ -96,6 +97,7 @@ class MintDicomCompare():
           if self.__output == None:
              print "%10d instance(s) compared." % (instancesCompared)
              print "%10d text tag(s) compared." % (self.__textTagsCompared)
+             print "%10d floating point tag(s) compared." % (self.__fpTagsCompared)
              print "%10d items(s) compared." % (self.__itemsCompared)
              print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
              print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
@@ -103,6 +105,7 @@ class MintDicomCompare():
           else:
              self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
              self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
+             self.__output.write("%10d floating point tag(s) compared.\n" % (self.__fpTagsCompared))
              self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
              self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
              self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
@@ -232,6 +235,8 @@ class MintDicomCompare():
        # ---
        if dicomAttr.isBinary():
           self.__checkBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
+       elif attr.vr() == "FL" or attr.vr() == "FD":
+          self.__checkFloatingPoint(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
        else:
           self.__check(dicomAttr.tag()+" Value",
                        dicomAttr.val(),
@@ -271,6 +276,28 @@ class MintDicomCompare():
            
            self.__itemsCompared += 1
            
+   def __checkFloatingPoint(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+
+       # Convert to float   
+       val1 = float(dicomAttr.val())
+       val2 = float(attr.val())
+
+       # Set precision to 6 decimal places
+       precision = 100000.0
+       
+       # Round       
+       rval1 = int(val1*precision+0.5)/precision
+       rval2 = int(val2*precision+0.5)/precision
+       
+       # Compare
+       self.__check(dicomAttr.tag()+" Floating Point",
+                    rval1,
+                    rval2,
+                    seriesInstanceUID, 
+                    sopInstanceUID)
+       
+       self.__fpTagsCompared += 1
+         
    def __checkBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
        if dicomAttr.dat() == "":
