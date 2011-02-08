@@ -50,27 +50,12 @@ public class StudySummaryController {
 	public void studiesSummary(@PathVariable("uuid") final String uuid,
 			@PathVariable("type") final String type, 
 			final HttpServletResponse res) throws IOException {
-		if (StringUtils.isBlank(uuid)) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid study requested: Missing Study UUID");
-			return;
-		}
-
-        {
-            final MINTStudy study = studyDAO.findStudy(uuid);
-
-            if (study != null && study.getStudyVersion().equals("-1")) {
-                LOG.error("Requested study has previously been deleted: " + uuid);
-                res.sendError(HttpServletResponse.SC_GONE, "Invalid study requested: deleted");
-                return;
-            }
+        final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, uuid, res, studyDAO);
+        if (studyStatus != Utils.StudyStatus.OK) {
+            return;
         }
 
 		final File studyDir = new File(studiesRoot, uuid);
-        if (!studyDir.exists() || !studyDir.canRead()) {
-            LOG.error("Unable to locate directory for study: " + studyDir);
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid study requested: Not found");
-            return;
-        }
         final File typeDir = new File(studyDir, type);
         if (!typeDir.exists() || !typeDir.canRead()) {
             LOG.error("Unable to locate directory for study: " + studyDir);

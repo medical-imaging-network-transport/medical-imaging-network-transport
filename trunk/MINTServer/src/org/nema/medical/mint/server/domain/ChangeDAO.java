@@ -78,6 +78,7 @@ public class ChangeDAO extends HibernateDaoSupport {
         }
         return null;
     }
+
 	public Change saveChange(final Change change) {
 		if (change != null) {
 			getHibernateTemplate().save(change);

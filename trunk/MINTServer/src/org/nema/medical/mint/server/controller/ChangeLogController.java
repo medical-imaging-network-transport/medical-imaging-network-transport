@@ -15,17 +15,6 @@
  */
 package org.nema.medical.mint.server.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -41,6 +30,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 public class ChangeLogController {
@@ -71,7 +70,7 @@ public class ChangeLogController {
 			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException, JiBXException {
 
-		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
+		final List<org.nema.medical.mint.changelog.Change> changes = new ArrayList<org.nema.medical.mint.changelog.Change>();
 
 		// TODO read limit from a config file
         if (limit == null) limit = 50;
@@ -127,7 +126,7 @@ public class ChangeLogController {
             return;
         }
 
-		List<org.nema.medical.mint.changelog.Change> changes = new LinkedList<org.nema.medical.mint.changelog.Change>();
+		final List<org.nema.medical.mint.changelog.Change> changes = new ArrayList<org.nema.medical.mint.changelog.Change>();
 
         final List<Change> changesFound = changeDAO.findChanges(uuid);
 		if (changesFound != null) {
