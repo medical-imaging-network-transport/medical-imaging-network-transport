@@ -49,9 +49,7 @@ public interface StudySummary {
 	public String getVersion();
 
 	/**
-	 * Get the 'instanceCount' attribute value.
-	 *
-	 * @return instanceCount
+	 * @return number of instances in all series
 	 */
 	public int getInstanceCount();
 

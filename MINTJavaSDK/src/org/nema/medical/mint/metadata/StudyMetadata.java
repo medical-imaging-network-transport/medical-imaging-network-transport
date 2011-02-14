@@ -49,7 +49,6 @@ public class StudyMetadata implements AttributeStore, StudySummary
     private String studyInstanceUID;
     private String type;
     private String version;
-    private int instanceCount = -1;
 
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getAttribute(int)
@@ -171,30 +170,24 @@ public class StudyMetadata implements AttributeStore, StudySummary
 	 * @see org.nema.medical.mint.metadata.StudySummary#getInstanceCount()
 	 */
 	public int getInstanceCount() {
-		return (instanceCount < 0) ? computeInstanceCount() : instanceCount;
-	}
-
-    /* (non-Javadoc)
-	 * @see org.nema.medical.mint.metadata.StudySummary#computeInstanceCount()
-	 */
-	private int computeInstanceCount() {
+        //We have to re-compute this every time, as something may change within a series
+        //where the study would not know about it (series does not know about study object).
+        //Also, elements can be deleted directly from the iterator without us knowing about it;
+        //this can be prevented, but then we still have the first problem.
         int count = 0;
-        for (Series series : this.seriesMap.values()) {
+        for (final Series series : seriesMap.values()) {
         	count += series.getInstanceCount();
         }
-        instanceCount = count;
-        return instanceCount;
-	}
+        return count;
+    }
 
     /**
-     * This is here only to satisfy JiBX. The implementation sets instanceCount to -1,
-     * to force computing it once it is read. We always want to compute it on the fly,
-     * once, to avoid discrepancies.
+     * This is here only to satisfy JiBX. Does nothing, as the value is computed.
      *
-     * @param instanceCount
+     * @param instanceCount the number of instances to set
      */
-	private void setInstanceCount(int instanceCount) {
-        this.instanceCount = -1;
+	private void setInstanceCount(final int instanceCount) {
+        //Do nothing
 	}
 
     /* (non-Javadoc)
@@ -285,7 +278,7 @@ public class StudyMetadata implements AttributeStore, StudySummary
         if (this.version != null) {
             builder.setVersion(this.version);
         }
-        builder.setInstanceCount(computeInstanceCount());
+        builder.setInstanceCount(getInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
         }
