@@ -45,7 +45,6 @@ public class Series implements AttributeStore
     private final Map<String, Instance> instances = new TreeMap<String, Instance>();
     private String seriesInstanceUID;
     private String exclude;
-    private int instanceCount = -1;
 
     /**
      * @param tag
@@ -114,7 +113,6 @@ public class Series implements AttributeStore
      * @param inst
      */
     public void putInstance(final Instance inst) {
-    	this.instanceCount = -1;
         instances.put(inst.getSOPInstanceUID(), inst);
     }
 
@@ -123,7 +121,6 @@ public class Series implements AttributeStore
      * @param sopInstanceUID
      */
     public Instance removeInstance(final String sopInstanceUID) {
-    	this.instanceCount = -1;
         return instances.remove(sopInstanceUID);
     }
 
@@ -186,25 +183,18 @@ public class Series implements AttributeStore
     }
 
 	/**
-	 * @return the instanceCount
+	 * @return the number of instances in this series
 	 */
 	public int getInstanceCount() {
-		return (instanceCount < 0) ? computeInstanceCount() : instanceCount;
+		return instances.size();
 	}
 
     /**
-     * This is here only to satisfy JiBX. The implementation sets instanceCount to -1,
-     * to force computing it once it is read. We always want to compute it on the fly,
-     * once, to avoid discrepancies.
-	 * @param instanceCount the instanceCount to set
+     * This is here only to satisfy JiBX. Does nothing, as the value is computed.
+	 * @param instanceCount the number of instances to set
 	 */
-	public void setInstanceCount(int instanceCount) {
-        this.instanceCount = -1;
-	}
-
-	private int computeInstanceCount() {
-		instanceCount = instanceCount();
-        return instanceCount;
+	private void setInstanceCount(final int instanceCount) {
+        //Do nothing
 	}
 
 	//

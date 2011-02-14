@@ -129,12 +129,13 @@ public class StudyRootController {
         final Principal principal = req.getUserPrincipal();
         final String principalName = (principal != null) ? principal.getName() : null;
 
-        deleteStudy(uuid, studiesRoot, req.getRemoteUser(), req.getRemoteHost(), principalName, changeDAO);
+        deleteStudy(uuid, studiesRoot, req.getRemoteUser(), req.getRemoteHost(), principalName, changeDAO, studyDAO);
         res.setStatus(204);
     }
 
-    public void deleteStudy(final String uuid, final File studiesRoot, final String remoteUser, final String remoteHost,
-                             final String principal, final ChangeDAO changeDAO) throws IOException {
+    public static void deleteStudy(final String uuid, final File studiesRoot, final String remoteUser,
+                                   final String remoteHost, final String principal, final ChangeDAO changeDAO,
+                                   final StudyDAO studyDAO) throws IOException {
          final File studyDir = new File(studiesRoot, uuid);
          FileUtils.deleteDirectory(studyDir);
 
