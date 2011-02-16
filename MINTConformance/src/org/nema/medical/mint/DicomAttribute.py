@@ -113,7 +113,8 @@ class DicomAttribute():
              self.__items.append(attrs)
              itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
              self.__bytesRead += itemAttr.bytesRead()
-             if not itemAttr.isItemStop(): attrs.append(itemAttr)
+             if not itemAttr.isGroupLength() and not itemAttr.isItemStop():
+                attrs.append(itemAttr)
              itemBytesToRead -= itemAttr.bytesRead()
              sequenceBytesToRead -= itemAttr.bytesRead()
 

@@ -52,6 +52,7 @@ class DicomStudyCompare():
        self.__studyInstanceUID = self.__dicom1.studyInstanceUID()
        self.__dicom2 = newDicomStudy
        self.__count = 0
+       self.__warningCount = 0
        self.__verbose = False
        self.__binaryTagsCompared = 0
        self.__textTagsCompared = 0
@@ -60,6 +61,7 @@ class DicomStudyCompare():
        self.__itemsCompared = 0
        self.__excludedTags = 0
        self.__lazy= False
+       self.__warnings=False
        self.__output = None
        self.__exclude = []
 
@@ -75,6 +77,9 @@ class DicomStudyCompare():
        
    def setExclude(self, exclude):
        self.__exclude = exclude
+
+   def setWarnings(self, warnings):
+       self.__warnings = warnings
 
    def compare(self):       
        dicm1 = self.__dicom1
@@ -112,6 +117,15 @@ class DicomStudyCompare():
             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
             self.__output.write("%10d excluded tag(s).\n" % (self.__excludedTags))
+
+       # ---
+       # Print warnings if they want.
+       # ---
+       if self.__warnings:
+          if self.__output == None:
+             print "%10d warning(s) found." % (self.__warningCount)
+          else:
+             self.__output.write("%10d warning(s) found.\n" % (self.__warningCount))
 
        # ---
        # Always print differences.
@@ -169,7 +183,17 @@ class DicomStudyCompare():
              print " - Series Instance UID", series
              if sop != "":
                 print "  - SOP Instance UID", sop
-          print "+++", msg, ":", obj1, "!=", obj2
+          print "ERROR:", msg, ":", obj1, "!=", obj2
+       
+   def __warn(self, msg, obj1, obj2, series="", sop=""):
+       if obj1 != obj2:
+          self.__warningCount += 1
+          print "- Study Instance UID", self.__studyInstanceUID
+          if series != "":
+             print " - Series Instance UID", series
+             if sop != "":
+                print "  - SOP Instance UID", sop
+          print "WARNING:", msg, ":", obj1, "!=", obj2
        
    def __checkTag(self, instance1, instance2, tag):
    
@@ -200,7 +224,7 @@ class DicomStudyCompare():
           self.__checkAttribute(attr1, attr2, instance1.seriesInstanceUID(), instance1.sopInstanceUID())
              
    def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
-       
+          
        if attr1.vr() != "":
           self.__check(attr1.tag()+" VR",
                        attr1.vr(),
@@ -214,13 +238,34 @@ class DicomStudyCompare():
        if attr1.isBinary():
           self.__checkBinary(attr1, attr2, seriesInstanceUID, sopInstanceUID)
        else:
+          
+          # ---
+          # Remove trailing characters before comparing.
+          # ---
+          val1 = attr1.val()
+          val2 = attr2.val()
+          
+          if len(val1) > 0 and not val1[-1].isalnum(): val1 = val1.rstrip(val1[-1])
+          if len(val2) > 0 and not val2[-1].isalnum(): val2 = val1.rstrip(val2[-1])
+
           self.__check(attr1.tag()+" Value",
-                       attr1.val(),
-                       attr2.val(),
+                       val1,
+                       val2,
                        seriesInstanceUID, 
                        sopInstanceUID)
+
           self.__textTagsCompared += 1
           
+          # ---
+          # Warn if trailing characters are different.
+          # ---
+          if (val1 == val2) and self.__warnings:
+             self.__warn(attr1.tag()+" Value",
+                         attr1.val(),
+                         attr2.val(),
+                         seriesInstanceUID, 
+                         sopInstanceUID)
+
        # ---
        # Check number of items.
        # ---
@@ -229,27 +274,29 @@ class DicomStudyCompare():
        self.__check(attr1.tag()+" Number of items",
                     numItems1,
                     numItems2)
-          
-       for i in range(0, numItems1):
-          
-           # ---
-           # Check items.
-           # ---
-           numAttributes1 = attr1.numItemAttributes(i)
-           numAttributes2 = attr2.numItemAttributes(i)
-           self.__check(attr1.tag()+" number of item attributes",
-                        numAttributes1,
-                        numAttributes2)
 
-           # ---
-           # Check item attributes.
-           # ---
-           for j in range(0, numAttributes1):
-               itemAttribute1 = attr1.itemAttribute(i, j)
-               itemAttribute2 = attr2.itemAttribute(i, j)
-               self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
+       if numItems1 == numItems2:
+          for i in range(0, numItems1):
+          
+              # ---
+              # Check items.
+              # ---
+              numAttributes1 = attr1.numItemAttributes(i)
+              numAttributes2 = attr2.numItemAttributes(i)
+              self.__check(attr1.tag()+" number of item attributes",
+                           numAttributes1,
+                           numAttributes2)
+
+              # ---
+              # Check item attributes.
+              # ---
+              if numAttributes1 == numAttributes2:
+                 for j in range(0, numAttributes1):
+                     itemAttribute1 = attr1.itemAttribute(i, j)
+                     itemAttribute2 = attr2.itemAttribute(i, j)
+                     self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
            
-           self.__itemsCompared += 1
+              self.__itemsCompared += 1
            
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
 
@@ -355,7 +402,7 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "d:o:x:vlh")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:x:vlwh")
 
     # ---
     # Check for data dictionary.
@@ -399,6 +446,14 @@ def main():
            lazy = True
            
     # ---
+    # Check for warning option.
+    # ---
+    warnings = False
+    for opt in options:
+        if opt[0] == "-w":
+           warnings = True
+           
+    # ---
     # Check for help option.
     # ---
     help = False
@@ -418,6 +473,7 @@ def main():
           print "  -x <exclude>:             list of tags to exclude, ie. \"08590030,600001nn\""
           print "  -v:                       verbose"
           print "  -l:                       lazy check (skips binary content)"
+          print "  -w:                       show warnings"
           print "  -h:                       displays usage"
           sys.exit(1)
           
@@ -435,6 +491,7 @@ def main():
        studies.setLazy(lazy)
        studies.setOutput(output)
        studies.setExclude(exclude)
+       studies.setWarnings(warnings)
 
        differences = studies.compare()
        if differences != 0:
