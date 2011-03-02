@@ -29,6 +29,7 @@ import base64
 import getopt
 import glob
 import os
+import string
 import sys
 import traceback
 
@@ -253,7 +254,7 @@ class MintDicomCompare():
        self.__check(dicomAttr.tag()+" Number of items",
                     numItems1,
                     numItems2)
-          
+       
        if numItems1 == numItems2:
           for i in range(0, numItems1):
           
@@ -280,23 +281,38 @@ class MintDicomCompare():
            
    def __checkFloatingPoint(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
-       # Convert to float   
-       val1 = float(dicomAttr.val())
-       val2 = float(attr.val())
+       # Convert to floats
+       floats1 = string.split(dicomAttr.val(), "\\")
+       floats2 = string.split(attr.val(), "\\")
 
-       # Set precision to 6 decimal places
-       precision = 100000.0
+       # ---
+       # Check number of items.
+       # ---
+       numFloats1 = len(floats1)
+       numFloats2 = len(floats2)
+       self.__check(dicomAttr.tag()+" Number of floats",
+                    numFloats1,
+                    numFloats2)
        
-       # Round       
-       rval1 = int(val1*precision+0.5)/precision
-       rval2 = int(val2*precision+0.5)/precision
+       numFloats = min(numFloats1, numFloats2)
+       for i in range(0, numFloats):
+              
+           val1 = float(floats1[i])
+           val2 = float(floats2[i])
+
+           # Set precision to 6 decimal places
+           precision = 100000.0
        
-       # Compare
-       self.__check(dicomAttr.tag()+" Floating Point",
-                    rval1,
-                    rval2,
-                    seriesInstanceUID, 
-                    sopInstanceUID)
+           # Round       
+           rval1 = int(val1*precision+0.5)/precision
+           rval2 = int(val2*precision+0.5)/precision
+        
+           # Compare
+           self.__check(dicomAttr.tag()+" Floating Point",
+                        rval1,
+                        rval2,
+                        seriesInstanceUID, 
+                        sopInstanceUID)
        
        self.__fpTagsCompared += 1
          

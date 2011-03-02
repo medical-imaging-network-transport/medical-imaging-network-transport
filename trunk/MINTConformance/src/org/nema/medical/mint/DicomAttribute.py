@@ -64,7 +64,7 @@ class DicomAttribute():
        element=dcm.read(2)
        self.__bytesRead += 2
        self.__tag=self.__getTag(group, element)
-          
+                 
        # ---
        # If explicit or Part 10 header tag then read the VR.
        # ---
@@ -100,35 +100,28 @@ class DicomAttribute():
        # Read Sequence Data Elements
        # ---
        if self.__vr == "SQ":
-          if self.__vl == 0: pass
-
           sequenceBytesToRead = self.__vl
-          item = DicomAttribute(dcm, dataDictionary, transferSyntax)
-          self.__bytesRead += item.bytesRead()
-          sequenceBytesToRead -= item.bytesRead()
-          itemBytesToRead = item.vl()
+          readingSequence = True
+          while readingSequence and sequenceBytesToRead > 0:
+             item = DicomAttribute(dcm, dataDictionary, transferSyntax)
+             if item.isSequenceStop(): readingSequence = False
+             self.__bytesRead += item.bytesRead()
+             sequenceBytesToRead -= item.bytesRead()
+             if readingSequence:
+                assert item.isItemStart()
+                attrs = []
+                self.__items.append(attrs)
+                itemBytesToRead = item.vl()
+                readingItem = True
 
-          while not item.isSequenceStop() and sequenceBytesToRead > 0:
-             attrs = []
-             self.__items.append(attrs)
-             itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
-             self.__bytesRead += itemAttr.bytesRead()
-             if not itemAttr.isGroupLength() and not itemAttr.isItemStop():
-                attrs.append(itemAttr)
-             itemBytesToRead -= itemAttr.bytesRead()
-             sequenceBytesToRead -= itemAttr.bytesRead()
-
-             while not itemAttr.isItemStop() and itemBytesToRead > 0:
-                itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
-                self.__bytesRead += itemAttr.bytesRead()
-                if not itemAttr.isItemStop(): attrs.append(itemAttr)
-                itemBytesToRead -= itemAttr.bytesRead()
-                sequenceBytesToRead -= itemAttr.bytesRead()
-                
-             if sequenceBytesToRead > 0:
-                item = DicomAttribute(dcm, dataDictionary, transferSyntax)
-                self.__bytesRead += item.bytesRead()
-                sequenceBytesToRead -= item.bytesRead()
+                while readingItem and itemBytesToRead > 0:
+                   itemAttr = DicomAttribute(dcm, dataDictionary, transferSyntax)
+                   if itemAttr.isItemStop(): readingItem = False
+                   self.__bytesRead += itemAttr.bytesRead()
+                   if readingItem and not itemAttr.isGroupLength():
+                      attrs.append(itemAttr)
+                   itemBytesToRead -= itemAttr.bytesRead()
+                   sequenceBytesToRead -= itemAttr.bytesRead()
 
        # Read the val
        self.__readVal(dcm)
@@ -203,7 +196,7 @@ class DicomAttribute():
    def __readVal(self, dcm):
       
        # Check for undefined length or sequence/item start
-       if self.__vl == 0xffffffff or self.isSequenceStart() or self.isItemStart():
+       if self.__vl == DicomAttribute.UNDEFINED_LENGTH or self.isSequenceStart() or self.isItemStart():
           return
           
        if not self.isBinary():
@@ -235,42 +228,56 @@ class DicomAttribute():
              self.__val = None    
              tmp.close()
              
-   def debug(self, indent=""):
+   def debug(self, output=None, indent=""):
 
-       print indent+"tag =", self.__tag, "vr =", self.__vr, "vl =", self.__vl,
-       if self.__val != "": print "val =", self.valstr(),
-
+       if output==None:
+          print indent+"tag =", self.__tag, "vr =", self.__vr, "vl = %7d" % self.__vl,
+       else:
+          output.write(indent+"tag = "+self.__tag+" vr = "+self.__vr+" vl = %7d " % self.__vl)
+       if self.__val != "": 
+          if output==None:
+             print "val =", self.valstr(),
+          else:
+             output.write("val = "+self.valstr()+" ")
+          
        if self.__vr == "SQ":
-          print " # "+self.tagName().encode('ascii', 'replace')
+          if output == None:
+             print " # "+self.tagName().encode('ascii', 'replace')
+          else:
+             output.write(" # "+self.tagName().encode('ascii', 'replace')+"\n")
           indent += " "
           numItems = self.numItems()
           for i in range(0, numItems):
-              print indent+"- item"
+              if output == None:
+                 print indent+"- item"
+              else:
+                 output.write(indent+"- item\n")
               numItemAttributes = self.numItemAttributes(i)
               indent += " "
-              print indent+"- attributes"
+              if output == None:
+                 print indent+"- attributes"
+              else:
+                 output.write(indent+"- attributes\n")
               indent += " "
               for j in range(0, numItemAttributes):
-                  self.itemAttribute(i, j).debug(indent)
+                  self.itemAttribute(i, j).debug(output, indent)
               indent = indent[0:-1]
-              print indent+"- attributes"
+              if output == None:
+                 print indent+"- attributes"
+              else:
+                 output.write(indent+"- attributes\n")
               indent = indent[0:-1]
-              print indent+"- item"
-              
-       elif self.__val != "":
-          if self.isPixelData():
-             print "<Pixel Data>",
-          elif self.isBinary():
-             print "<Binary Data>",
-          elif self.isUnknown():
-             print "<Unknown>",
-          elif self.__val != "":
-             print self.__val.encode('ascii', 'replace'),
-          print " # "+self.tagName().encode('ascii', 'replace')
-
-       else:
-          print " # "+self.tagName().encode('ascii', 'replace')
+              if output == None:
+                 print indent+"- item"
+              else:
+                 output.write(indent+"- item\n")
        
+       else:
+          if output == None:
+             print " # "+self.tagName().encode('ascii', 'replace')
+          else:
+             output.write(" # "+self.tagName().encode('ascii', 'replace')+"\n")
+               
    def __bin2str(self, b):
        h = hex(b)
        s = str(h).replace("0x", "")
@@ -324,6 +331,7 @@ class DicomAttribute():
            vals += str(format % val)+"\\"    
        return vals[0:-1]
 
+   UNDEFINED_LENGTH            = 0xffffffff
    TRANSFER_SYNTAX_UID_TAG     = "00020010"
    PIXEL_DATA_TAG              = "7fe00010"
    ITEM_TAG                    = "fffee000"
