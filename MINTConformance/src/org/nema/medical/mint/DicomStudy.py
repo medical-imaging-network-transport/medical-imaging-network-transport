@@ -42,17 +42,30 @@ from org.nema.medical.mint.DicomInstance  import DicomInstance
 # -----------------------------------------------------------------------------
 class DicomStudy():
    def __init__(self, dcmDir, dataDictionaryUrl):
+   
+       if not os.path.isdir(dcmDir):
+          raise IOError("Directory does not exist - "+dcmDir)
+          
        self.__dcmDir = dcmDir
        self.__instances = []
        self.__instancesByUID = {}
        self.__dataDictionary = DataDictionary(dataDictionaryUrl)
+       self.__output = None
        self.__read()
 
+   def setOutput(self, output):
+       if output == "": return
+       if self.__output != None: self.__output(close)
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
+       
    def tidy(self):
        """
        Removes tempory binary items.
        """
        for instance in self.__instances: instance.tidy()
+       if self.__output != None: self.__output.close()
 
    def studyInstanceUID(self):
        if self.numInstances() > 0:
@@ -70,11 +83,14 @@ class DicomStudy():
        return self.__instancesByUID[sopInstanceUID]
        
    def debug(self):
-       print "> Study", self.studyInstanceUID()
+       if self.__output == None:
+          print "> Study", self.studyInstanceUID()
+       else:
+          self.__output.write("> Study "+self.studyInstanceUID()+"\n")
        numInstances = self.numInstances()
        for n in range(0, numInstances):
            instance = self.instance(n)
-           instance.debug()
+           instance.debug(self.__output)
        
    def __read(self):
 
@@ -95,19 +111,47 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:h")
     
+    # ---
+    # Check for data dictionary.
+    # ---
+    dataDictionaryUrl = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dataDictionaryUrl = opt[1]
+           
+    # ---
+    # Check for output option.
+    # ---
+    output = ""
+    for opt in options:
+        if opt[0] == "-o":
+           output = opt[1]
+           
+    # ---
+    # Check for help option.
+    # ---
+    help = False
+    for opt in options:
+        if opt[0] == "-h":
+           help = True
+           
     try:
-       if len(args) != 2:
-          print "Usage", progName, "<dicom_dir> <data_dictionary_url>"
+       if help or len(args) < 1:
+
+          print "Usage", progName, "[options] <dicom_dir>"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+	  print "  -o <output>:              output filename (defaults to stdout)"
+	  print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
-       dcmDir = sys.argv[1];
-       dataDictionaryUrl = args[1];
+       dcmDir = args[0];
        study = DicomStudy(dcmDir, dataDictionaryUrl)
+       study.setOutput(output)
        study.debug()
        study.tidy()
        

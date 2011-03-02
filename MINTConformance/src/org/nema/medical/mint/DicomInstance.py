@@ -101,13 +101,16 @@ class DicomInstance():
        else:
           return None
    
-   def debug(self):
-      print ">> Instance", self.sopInstanceUID()
-      numAttributes = self.numAttributes()
-      for n in range(0, numAttributes):
-          tag = self.tag(n)
-          attr = self.attributeByTag(tag)
-          attr.debug()
+   def debug(self, output=None):
+       if output == None:
+          print ">> Instance", self.sopInstanceUID()
+       else:
+          output.write(">> Instance "+self.sopInstanceUID()+"\n")       
+       numAttributes = self.numAttributes()
+       for n in range(0, numAttributes):
+           tag = self.tag(n)
+           attr = self.attributeByTag(tag)
+           attr.debug(output)
 
    def __open(self):
        dcm = open(self.__dcmName, "rb")
