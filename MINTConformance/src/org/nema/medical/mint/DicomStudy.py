@@ -35,6 +35,7 @@ import traceback
 from os.path import join
 
 from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomSeries    import DicomSeries
 from org.nema.medical.mint.DicomInstance  import DicomInstance
 
 # -----------------------------------------------------------------------------
@@ -47,8 +48,9 @@ class DicomStudy():
           raise IOError("Directory does not exist - "+dcmDir)
           
        self.__dcmDir = dcmDir
-       self.__instances = []
-       self.__instancesByUID = {}
+       self.__studyInstanceUID = ""
+       self.__series = {}
+       self.__seriesInstanceUIDs = []
        self.__dataDictionary = DataDictionary(dataDictionaryUrl)
        self.__output = None
        self.__read()
@@ -64,33 +66,36 @@ class DicomStudy():
        """
        Removes tempory binary items.
        """
-       for instance in self.__instances: instance.tidy()
+       numSeries = self.numSeries()
+       for n in range(0, numSeries):
+           self.series(n).tidy()
        if self.__output != None: self.__output.close()
 
    def studyInstanceUID(self):
-       if self.numInstances() > 0:
-          return self.instance(0).studyInstanceUID()
-       else:
-          return ""
+       return self.__studyInstanceUID
        
-   def numInstances(self):
-       return len(self.__instances)
+   def numSeries(self):
+       return len(self.__series)
        
-   def instance(self, n):
-       return self.__instances[n]
+   def series(self, n):
+       if len(self.__seriesInstanceUIDs) == 0:
+          self.__seriesInstanceUIDs = self.__series.keys()
+          self.__seriesInstanceUIDs.sort()
+	  
+       return self.__series[self.__seriesInstanceUIDs[n]]
        
-   def instanceByUID(self, sopInstanceUID):
-       return self.__instancesByUID[sopInstanceUID]
+   def seriesByUID(self, seriesInstanceUID):
+       return self.__seriesByUID[seriesInstanceUID]
        
    def debug(self):
        if self.__output == None:
           print "> Study", self.studyInstanceUID()
        else:
           self.__output.write("> Study "+self.studyInstanceUID()+"\n")
-       numInstances = self.numInstances()
-       for n in range(0, numInstances):
-           instance = self.instance(n)
-           instance.debug(self.__output)
+       numSeries = self.numSeries()
+       for n in range(0, numSeries):
+           series = self.series(n)
+           series.debug(self.__output)
        
    def __read(self):
 
@@ -103,8 +108,19 @@ class DicomStudy():
 
        for dcmName in dcmNames:
            instance = DicomInstance(dcmName, self.__dataDictionary)
-           self.__instances.append(instance)
-           self.__instancesByUID[instance.sopInstanceUID()] = instance
+	              
+           if self.__studyInstanceUID == "":
+              self.__studyInstanceUID = instance.studyInstanceUID()
+           else:
+              assert self.__studyInstanceUID == instance.studyInstanceUID()
+	   
+           seriesInstanceUID = instance.seriesInstanceUID()
+           if self.__series.has_key(seriesInstanceUID):
+              self.__series[seriesInstanceUID].append(instance)
+           else:
+              series = DicomSeries()
+              series.append(instance)
+              self.__series[seriesInstanceUID] = series
            
 # -----------------------------------------------------------------------------
 # main
