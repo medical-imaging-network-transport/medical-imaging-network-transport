@@ -39,6 +39,8 @@ from struct import unpack
 from org.nema.medical.mint.DataDictionary import DataDictionary
 from org.nema.medical.mint.DicomAttribute import DicomAttribute
 from org.nema.medical.mint.DicomStudy     import DicomStudy
+from org.nema.medical.mint.DicomSeries    import DicomSeries
+from org.nema.medical.mint.DicomInstance  import DicomInstance
 from org.nema.medical.mint.MintAttribute  import MintAttribute
 from org.nema.medical.mint.MintStudy      import MintStudy
 
@@ -80,22 +82,36 @@ class MintDicomCompare():
        dicm = self.__dicom
        mint = self.__mint
               
-       self.__check("Number of instances",
-                    dicm.numInstances(), 
-                    mint.numInstances())
-       
-       numInstances = dicm.numInstances()
+       seriesCompared = 0
        instancesCompared = 0
-       for n in range(0, numInstances):
-           instance = dicm.instance(n)
-           self.__compareInstances(instance, mint)
-           instancesCompared += 1
+       
+       self.__check("Number of series",
+                    dicm.numSeries(), 
+                    mint.numSeries())
+       
+       numSeries = min(dicm.numSeries(), mint.numSeries())
+       for n in range(0, numSeries):
+           dicomSeries = dicm.series(n)
+           mintSeries = mint.series(n)
+           
+           self.__check("Number of instances",
+                        dicomSeries.numInstances(), 
+                        mintSeries.numInstances())       
+                        
+           numInstances = min(dicomSeries.numInstances(), mintSeries.numInstances())
+           for m in range(0, numInstances):
+               instance = dicomSeries.instance(m)
+               self.__compareInstances(instance, mint)
+               instancesCompared += 1
+               
+           seriesCompared += 1
 
        # ---
        # Print out stats if verbose.
        # ---     
        if self.__verbose:
           if self.__output == None:
+             print "%10d series compared." % (seriesCompared)
              print "%10d instance(s) compared." % (instancesCompared)
              print "%10d text tag(s) compared." % (self.__textTagsCompared)
              print "%10d floating point tag(s) compared." % (self.__fpTagsCompared)
@@ -104,6 +120,7 @@ class MintDicomCompare():
              print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
              print "%10d byte(s) compared." % (self.__bytesCompared)          
           else:
+             self.__output.write("%10d series compared.\n" % (seriesCompared))
              self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
              self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
              self.__output.write("%10d floating point tag(s) compared.\n" % (self.__fpTagsCompared))
