@@ -103,9 +103,9 @@ class DicomInstance():
    
    def debug(self, output=None):
        if output == None:
-          print ">> Instance", self.sopInstanceUID()
+          print ">>> Instance", self.sopInstanceUID()
        else:
-          output.write(">> Instance "+self.sopInstanceUID()+"\n")       
+          output.write(">>> Instance "+self.sopInstanceUID()+"\n")       
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
            tag = self.tag(n)
