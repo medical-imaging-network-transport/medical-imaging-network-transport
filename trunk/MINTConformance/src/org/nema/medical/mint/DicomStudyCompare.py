@@ -38,6 +38,8 @@ from struct import unpack
 
 from org.nema.medical.mint.DataDictionary import DataDictionary
 from org.nema.medical.mint.DicomStudy     import DicomStudy
+from org.nema.medical.mint.DicomSeries    import DicomSeries
+from org.nema.medical.mint.DicomInstance  import DicomInstance
 from org.nema.medical.mint.MintAttribute  import MintAttribute
 from org.nema.medical.mint.MintStudy      import MintStudy
 
@@ -84,24 +86,39 @@ class DicomStudyCompare():
    def compare(self):       
        dicm1 = self.__dicom1
        dicm2 = self.__dicom2
-              
-       self.__check("Number of instances",
-                    dicm1.numInstances(), 
-                    dicm2.numInstances())
-       
-       numInstances = dicm1.numInstances()
-       instancesCompared = 0
-       for n in range(0, numInstances):
-           instance1 = dicm1.instance(n)
-           instance2 = dicm2.instanceByUID(instance1.sopInstanceUID())
-           self.__compareInstances(instance1, instance2)
-           instancesCompared += 1
 
+       seriesCompared = 0
+       instancesCompared = 0
+                     
+       self.__check("Number of series",
+                    dicm1.numSeries(), 
+                    dicm2.numSeries())
+       
+       numSeries = min(dicm1.numSeries(), dicm2.numSeries()) 
+       for n in range(0, numSeries):
+       
+           series1 = dicm1.series(n)
+           series2 = dicm2.series(n)
+           
+           self.__check("Number of instances",
+                        series1.numInstances(), 
+                        series2.numInstances())
+           
+           numInstances = min(series1.numInstances(), series2.numInstances()) 
+           for m in range(0, numInstances):
+               instance1 = series1.instance(m)
+               instance2 = series2.instanceByUID(instance1.sopInstanceUID())
+               self.__compareInstances(instance1, instance2)
+               instancesCompared += 1
+           
+           seriesCompared += 1
+       
        # ---
        # Print out stats if verbose.
        # ---       
        if self.__verbose:
           if self.__output == None:
+             print "%10d series compared." % (seriesCompared)
              print "%10d instance(s) compared." % (instancesCompared)
              print "%10d text tag(s) compared." % (self.__textTagsCompared)
              print "%10d items(s) compared." % (self.__itemsCompared)
@@ -110,6 +127,7 @@ class DicomStudyCompare():
              print "%10d byte(s) compared." % (self.__bytesCompared)          
              print "%10d excluded tag(s)." % (self.__excludedTags)
           else:
+            self.__output.write("%10d series compared.\n" % (seriesCompared))
             self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
             self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
             self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
