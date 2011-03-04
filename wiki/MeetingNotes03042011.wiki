@@ -5,10 +5,7 @@
   * Tim Culp
   * Gorkem Sevinc
   * Anasuya Basu
-
   * Jim Philbin
-  * Dan Chaffee  
-
 
 = Progress Since Last Meeting =
   * Tim Dawson
