@@ -136,6 +136,7 @@ public class MINT2DICOM
             Series currentSeries;
             Instance nextInstance;
             BasicDicomObject dicomReconstruction;
+			BasicDicomObject dicomInstanceReconstruction;
             DicomOutputStream dcmFileStream;
 
             String filePath = outputDir + "/" + mintData.getStudyInstanceUID();
@@ -154,7 +155,8 @@ public class MINT2DICOM
                 studyAttributeIter = mintData.attributeIterator();
                 while(studyAttributeIter.hasNext())
                 {
-                    insertAttribute(dicomReconstruction, studyAttributeIter.next(), binaryDir, useBulkLoading);
+                	Attribute nextAttr = studyAttributeIter.next();
+                	insertAttribute(dicomReconstruction, nextAttr, binaryDir, useBulkLoading);
                 }
                 currentSeries = seriesIter.next();
 
@@ -162,35 +164,40 @@ public class MINT2DICOM
                 seriesAttributeIter = currentSeries.attributeIterator();
                 while(seriesAttributeIter.hasNext())
                 {
-                    insertAttribute(dicomReconstruction, seriesAttributeIter.next(), binaryDir, useBulkLoading);
+                	Attribute nextAttr = seriesAttributeIter.next();
+                	insertAttribute(dicomReconstruction, nextAttr, binaryDir, useBulkLoading);
                 }
 
                 seriesNormalizedAttributeIter = currentSeries.normalizedInstanceAttributeIterator();
                 while(seriesNormalizedAttributeIter.hasNext())
                 {
-                    insertAttribute(dicomReconstruction, seriesNormalizedAttributeIter.next(), binaryDir, useBulkLoading);
+                	Attribute nextAttr = seriesNormalizedAttributeIter.next();
+                	insertAttribute(dicomReconstruction, nextAttr, binaryDir, useBulkLoading);
                 }
 
                 while(instanceIter.hasNext())
                 {
+					dicomInstanceReconstruction = new org.dcm4che2.data.BasicDicomObject();
+					dicomInstanceReconstruction = dicomReconstruction;
                     nextInstance = instanceIter.next();
-
+                    
                     //get transfer syntax uid
-                    dicomReconstruction.putString(131088, VR.UI, nextInstance.getTransferSyntaxUID());
+                    dicomInstanceReconstruction.putString(131088, VR.UI, nextInstance.getTransferSyntaxUID());
                     instanceAttributeIter = nextInstance.attributeIterator();
 
                     while(instanceAttributeIter.hasNext())
                     {
-                        insertAttribute(dicomReconstruction, instanceAttributeIter.next(), binaryDir, useBulkLoading);
+                    	Attribute nextAttr = instanceAttributeIter.next();
+                        insertAttribute(dicomInstanceReconstruction, nextAttr, binaryDir, useBulkLoading);
                     }
-
 
                     //Create dicom file
                     dcmFile = new File(filePath, i + ".dcm");
                     dcmFileStream = new DicomOutputStream(dcmFile);
 
                     //Write to dicom file
-                    dcmFileStream.writeDicomFile(dicomReconstruction);
+                    dcmFileStream.writeDicomFile(dicomInstanceReconstruction);
+                    dcmFileStream.close();
                     i++;
                 }
             }
