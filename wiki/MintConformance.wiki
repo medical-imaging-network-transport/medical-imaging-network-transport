@@ -26,54 +26,39 @@ The MINTConformance package was developed based on the draft [http://groups.goog
 
 == Mint Study Compare ==
 
-The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py] tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py] tool is a python application that compares a MINT study on the file system to a MINT study on the MINTServer. This is useful for regression testing the MINTServer against a previous golden copy. It compares the metadata.xml and the binary items on the filesystem to the study on the MINTServer. 
 
 Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
 
 Running the tool with no arguments displays the usage:
 
 {{{
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py
-Usage: MintStudyCompare.py [options] <old_mint_study_dir> <new_mint_study_dir>
-  -v: verbose
-  -l: lazy check (skips binary content)
-  -h: displays usage
+> python %PYTHONPATH%\org\nema\medical\mint\MintStudyCompare.py -h
+Usage: MintStudyCompare.py [options] <mint_study_dir> <hostname> <uuid>
+  -o <output>: output filename (defaults to stdout)
+  -p <port>:   defaults to 8080
+  -v:          verbose
+  -l:          lazy check (skips binary content)
+  -h:          displays usage
 }}}
 
-The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
+The output option is for specifying an output file to capture the summary results (useful for automated testing). The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. 
 
 {{{
-> cd $MINT_HOME/testdata/MINT/Simple/DICOM
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py -v . .
+> cd $MINT_HOME\testdata\MINT\20_phase\DICOM
+> python %PYTHONPATH%\org\nema\medical\mint\MintStudyCompare.py -v . localhost 02e47f6a-6f5c-4a50-887a-94d0802198b7
         12 study attribute(s) compared.
          2 series compared.
         14 series attribute(s) compared.
-       102 normalized instance attribute(s) compared.
+       112 normalized instance attribute(s) compared.
          4 instance(s) compared.
-        24 instance attribute(s) compared.
+        32 instance attribute(s) compared.
+         0 sequence items(s) compared.
+         0 sequence attributes(s) compared.
+         4 inline binary item(s) compared.
          4 binary item(s) compared.
+         0 offset(s) compared.
    2097152 byte(s) compared.
-}}}
-
-To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
-
-{{{
-> cd $MINT_HOME/testdata/MINT
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py Simple/DICOM Simple/DICOM
-Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00080008 vr=CS val=ORIGINAL\PRIMARY\AXIAL != tag=00080008 vr=CS val=ORIGINAL
-Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200020 vr=CS val=L\P != tag=00200020 vr=CS val=L
-Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Instance Attribute : tag=00200037 vr=DS val=1.000000\0.000000\0.000000\0.000000\1.000000\0.000000 != tag=00200037 vr=DS val=1.000000
-...
-2.dat size : 524288 != 524287
-        12 study attribute(s) compared.
-         2 series compared.
-        14 series attribute(s) compared.
-       102 normalized instance attribute(s) compared.
-         4 instance(s) compared.
-        24 instance attribute(s) compared.
-         4 binary item(s) compared.
-   1572864 byte(s) compared.
-17 difference(s) found.
 }}}
 
 == Mint Dicom Compare ==
@@ -124,7 +109,7 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
 
 == Dicom Study Compare ==
 
-TBD
+To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
 
 = Next Steps =
 
