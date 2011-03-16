@@ -173,6 +173,9 @@ To see all the differences the application should be run twice, switching the co
    * Provide support for inline binary
    * Provide support for bulk binary
    * Read DCM4CHE data dictionary from URL
+   * Added warning option to DicomStudyCompare.
+   * Added logic for comparing floats within an epsilon.
+   * Created DicomSeries class that is a collection of DicomInstances.
 
 *To Do*
 
