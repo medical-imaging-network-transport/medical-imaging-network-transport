@@ -99,11 +99,65 @@ The data dictionary is required for looking up implicit VRs based on the group-e
 
 == Dicom Study Compare ==
 
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/DicomStudyCompare.py DicomStudyCompare.py] tool is a python application that compares an original DICOM study on the file system to an exported DICOM study on the file system (by running MINT2DICOM on a MINTServer study). It parses the data elements in the original DICOM and compares them to the data elements in the exported DICOM.
+
+There are some subtle differences between the original DICOM and exported MINT DICOM if you are using another tool for comparison. Group length tags are stripped out of MINT studies so they will not be present in the exported DICOM. Also Sequence data elements (VR of SQ) have undefined lengths (-1) in exported studies instead of an explicit lengths.
+
+Launch the tool by using the _python_ command to parse the file. This tool should run either in a Unix or Windows command shell.
+
+Running the tool with no arguments displays the usage:
+
+{{{
+> python %PYTHONPATH%\org\nema\medical\mint\DicomStudyCompare.py
+Usage: DicomStudyCompare.py [options] <ref_dicom_study_dir> <new_dicom_study_dir>
+  -d <data_dictionary_url>: defaults to DCM4CHE
+  -o <output>:              output filename (defaults to stdout)
+  -x <exclude>:             list of tags to exclude, ie. "08590030,600001nn"
+  -v:                       verbose
+  -l:                       lazy check (skips binary content)
+  -w:                       show warnings
+  -h:                       displays usage
+}}}
+
+The data dictionary is required for looking up implicit VRs based on the group-element tag. The output option is for specifying an output file to capture the summary results (useful for automated testing). The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging.
+
+There is an additional option for excluding tags in case you identify a difference but discover it is not an error (for example dcm4chee might implicitly add additional attribution that you might want to ignore).
+
+By default, non-alphanumeric padding characters at the right end of a string (such as ^^^ or \\\) are treated as warnings as opposed to differences. To see these differences use the -w option.
+
+{{{
+> cd $MINT_HOME\testdata\MINT\20_phase\DICOM
+> python %PYTHONPATH%\org\nema\medical\mint\DicomStudyCompare.py -vw original-20_phase exported-20_phase
+         2 series compared.
+         4 instance(s) compared.
+       328 text tag(s) compared.
+         0 items(s) compared.
+         4 inline binary tag(s) compared.
+         4 binary tag(s) compared.
+   2097152 byte(s) compared.
+         0 excluded tag(s).
+         0 warning(s) found.
+}}}
+
 To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
 
-= Next Steps =
+{{{
+> cd $MINT_HOME\testdata\MINT\20_phase\DICOM
+> python %PYTHONPATH%\org\nema\medical\mint\DicomStudyCompare.py -vw exported-20_phase original-20_phase
+         2 series compared.
+         4 instance(s) compared.
+       328 text tag(s) compared.
+         0 items(s) compared.
+         4 inline binary tag(s) compared.
+         4 binary tag(s) compared.
+   2097152 byte(s) compared.
+         0 excluded tag(s).
+         0 warning(s) found.
+}}}
 
 --------------------
+
+= Next Steps =
 
 *Done*
 
