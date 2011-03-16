@@ -33,7 +33,7 @@ Launch the tool by using the _python_ command to parse the file. This tool shoul
 Running the tool with no arguments displays the usage:
 
 {{{
-> python %PYTHONPATH%\org\nema\medical\mint\MintStudyCompare.py -h
+> python %PYTHONPATH%\org\nema\medical\mint\MintStudyCompare.py
 Usage: MintStudyCompare.py [options] <mint_study_dir> <hostname> <uuid>
   -o <output>: output filename (defaults to stdout)
   -p <port>:   defaults to 8080
@@ -63,7 +63,7 @@ The output option is for specifying an output file to capture the summary result
 
 == Mint Dicom Compare ==
 
-The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py] tool is a smart python application that compares a DICOM study to a MINT study by parsing the data elements in the DICOM and comparing them to the metadata and binary items in the MINT study.
+The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py] tool is a python application that compares a DICOM study on the file system to a MINT study on the MINTServer by parsing the data elements in the DICOM and comparing them to the metadata and binary items in the MINT study.
 
 There are some subtle differences between the DICOM and MINT representations if you are using another tool for comparison. Some binary VRs are represented as text in MINT for clarity ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT") so the values will not compare directly to the DICOM binaries. Arrays of these primitive types are represented as strings with the values separated by a "\" delimiter (ie. 208.55017\166.19896). Note that the precision for floating point representations is set to 6.
 
@@ -72,46 +72,38 @@ Launch the tool by using the _python_ command to parse the file. This tool shoul
 Running the tool with no arguments displays the usage:
 
 {{{
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py
-Usage: MintDicomCompare.py [options] <dicom_study_dir> <mint_study_dir> <data_dictionary.xml>
-  -v: verbose
-  -l: lazy check (skips binary content)
-  -h: displays usage
+> python %PYTHONPATH%\org\nema\medical\mint\MintDicomCompare.py
+Usage: MintDicomCompare.py [options] <dicom_study_dir> <hostname> <uuid>
+  -d <data_dictionary_url>: defaults to DCM4CHE
+  -o <output>:              output filename (defaults to stdout)
+  -p <port>:                defaults to 8080
+  -v:                       verbose
+  -l:                       lazy check (skips binary content)
+  -h:                       displays usage
 }}}
 
-The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging. The data dictionary is required for looking up implicit VRs based on the group-element tag.
+The data dictionary is required for looking up implicit VRs based on the group-element tag. The output option is for specifying an output file to capture the summary results (useful for automated testing). The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging.
 
 {{{
-> cd $MINT_HOME/testdata
-> python $MC_HOME/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py -v DICOM MINT/Simple/DICOM DICOMDictionary.xml
-- Study Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873
- - Series Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350
-  - SOP Instance UID 1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037
-+++ 00280002 Value :  != 1
-- Study Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873
- - Series Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350
-  - SOP Instance UID 1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037
-+++ 00280006 Value :  != 0
-- Study Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.945873
- - Series Instance UID 1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350
-  - SOP Instance UID 1.2.392.200036.9116.2.2.2.1762660474.1026398161.357037
-+++ 00280010 Value : 
-...
+> cd $MINT_HOME\testdata\MINT\20_phase\DICOM
+> python %PYTHONPATH%\org\nema\medical\mint\MintDicomCompare.py -v . localhost 02e47f6a-6f5c-4a50-887a-94d0802198b7
+         2 series compared.
          4 instance(s) compared.
-        32 tag(s) skipped.
-       300 text tag(s) compared.
+       324 text tag(s) compared.
+         0 floating point tag(s) compared.
+         0 items(s) compared.
+         4 inline binary tag(s) compared.
          4 binary tag(s) compared.
    2097152 byte(s) compared.
-        32 difference(s) found.
 }}}
-
---------------------
 
 == Dicom Study Compare ==
 
 To see all the differences the application should be run twice, switching the command line arguments. This will find all the tags that may be present in one study but not the other.
 
 = Next Steps =
+
+--------------------
 
 *Done*
 
@@ -135,3 +127,4 @@ To see all the differences the application should be run twice, switching the co
    * Add flag for changing the floating point precision
    * Comparisons before and after updates
    * Support multi-frame DICOM
+   * Consider using the MINT DataDictionary instead of the DCM4CHE
