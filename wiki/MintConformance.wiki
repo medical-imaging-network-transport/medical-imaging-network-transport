@@ -8,13 +8,13 @@ The MINT Conformance tools require [http://www.python.org Python2.7] or later. C
 
 *Unix*
 {{{
-PATH=${PATH}:/pub/python/bin
+PATH=${PATH}:/usr/local/bin/python/bin
 PYTHONPATH=$MC_HOME/MINTConformance/src
 }}}
 
 *Windows*
 {{{
-set PATH=%PATH%;C:\Python2.6
+set PATH=%PATH%;C:\Python2.7.1
 set PYTHONPATH=%MC_HOME%\MINTConformance\src
 }}}
 
