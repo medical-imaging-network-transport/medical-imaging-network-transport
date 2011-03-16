@@ -24,7 +24,7 @@ set PYTHONPATH=%MC_HOME%\MINTConformance\src
 
 The MINTConformance package was developed based on the draft [http://groups.google.com/group/mint-user/files MINT Conformance Test] Power Point specification located in the [http://groups.google.com mint-user Google Group]. It currently consists of three tools.
 
-== MintStudyCompare ==
+== Mint Study Compare ==
 
 The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintStudyCompare.py  MintStudyCompare.py] tool is a smart python application that compares two MINT studies by parsing the metadata.xml files and doing a byte by byte comparison for each of the binary items. This tool checks that the MINT studies are equivalent and is tolerant to minor formatting differences and attribute sorting.
 
@@ -76,7 +76,7 @@ Series (1.2.392.200036.9116.2.2.2.1762893313.1029997326.946350) Normalized Insta
 17 difference(s) found.
 }}}
 
-== MintDicomCompare ==
+== Mint Dicom Compare ==
 
 The [http://code.google.com/p/medical-imaging-network-transport/source/browse/trunk/MINTConformance/src/org/nema/medical/mint/MintDicomCompare.py MintDicomCompare.py] tool is a smart python application that compares a DICOM study to a MINT study by parsing the data elements in the DICOM and comparing them to the metadata and binary items in the MINT study.
 
@@ -122,7 +122,7 @@ The verbose flag turns on output to show how many tags and bytes were compared. 
 
 --------------------
 
-== DicomStudyCompare ==
+== Dicom Study Compare ==
 
 TBD
 
