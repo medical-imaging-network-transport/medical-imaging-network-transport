@@ -60,21 +60,21 @@ public class MINT2DICOM
     	
         if(newAttribute.hasSequenceItems() || newAttribute.getVr().equalsIgnoreCase("SQ"))
         {
-            //Loop through a sequence, get atrributes and recurse -- bad design on Jack's part but does not recurse more than 2 or 3 times. Need to rewrite.
+            //Loop through a sequence, get atrributes and recurse
             DicomElement sequenceObject = currentObject.putSequence(newAttribute.getTag());
             Iterator<Item> sequenceIterator = newAttribute.itemIterator();
-            BasicDicomObject sequenceConstruct = new BasicDicomObject();
             while(sequenceIterator.hasNext())
             {
                 Item curItem = sequenceIterator.next();
                 Iterator<Attribute> itemAttributeIter = curItem.attributeIterator();
+                BasicDicomObject itemConstruct = new BasicDicomObject();
                 while(itemAttributeIter.hasNext())
                 {
                     Attribute curAttribute = itemAttributeIter.next();
-                    MINT2DICOM.insertAttribute(sequenceConstruct, curAttribute, binaryRoot, useBulkLoading);
+                    MINT2DICOM.insertAttribute(itemConstruct, curAttribute, binaryRoot, useBulkLoading);
                 }
+                sequenceObject.addDicomObject(itemConstruct);
             }
-            sequenceObject.addDicomObject(sequenceConstruct);
         }
         else
         {
@@ -176,7 +176,7 @@ public class MINT2DICOM
                 }
 
                 while(instanceIter.hasNext())
-                {
+                {	
 					dicomInstanceReconstruction = new org.dcm4che2.data.BasicDicomObject();
 					dicomInstanceReconstruction = dicomReconstruction;
                     nextInstance = instanceIter.next();
@@ -185,14 +185,16 @@ public class MINT2DICOM
                     dicomInstanceReconstruction.putString(131088, VR.UI, nextInstance.getTransferSyntaxUID());
                     instanceAttributeIter = nextInstance.attributeIterator();
 
+                    String sopInstanceUID = nextInstance.getSOPInstanceUID();
+                    
                     while(instanceAttributeIter.hasNext())
                     {
                     	Attribute nextAttr = instanceAttributeIter.next();
                         insertAttribute(dicomInstanceReconstruction, nextAttr, binaryDir, useBulkLoading);
                     }
-
+                    
                     //Create dicom file
-                    dcmFile = new File(filePath, i + ".dcm");
+                    dcmFile = new File(filePath, sopInstanceUID + ".dcm");
                     dcmFileStream = new DicomOutputStream(dcmFile);
 
                     //Write to dicom file
