@@ -157,9 +157,19 @@ To see all the differences the application should be run twice, switching the co
 
 --------------------
 
-= Next Steps =
+= Status =
 
-*Done*
+*Issues Discovered*
+   * MINT only stores VRs of OB, OW, and UN as binary.
+   * MINT was stripping Part 10 header tags (corrected)
+   * MINT strips group length tags (except for 0002000)
+   * Some external DICOM applications strip padding from text tags
+   * MINT does not reflect float types with exact precision
+   * MINT2DICOM stores SQ lengths as undefined (-1) 
+   * MINT2DICOM sometimes adds additional tags to SOP Instances
+   * MINT2DICOM was removing items from sequence records (corrected) 
+
+*Completed Tasks*
 
    * Resolve binary/text differences between DICOM and MINT
    * Revisit Part 10 header differences between DICOM and MINT
@@ -176,12 +186,13 @@ To see all the differences the application should be run twice, switching the co
    * Added warning option to DicomStudyCompare.
    * Added logic for comparing floats within an epsilon.
    * Created DicomSeries class that is a collection of DicomInstances.
+   * Added output option to DataDictionary to support integration testing.
 
 *To Do*
 
    * Consider cases for multiple VRs
    * SAX parsing for large metadata files
    * Add flag for changing the floating point precision
-   * Comparisons before and after updates
+   * Comparisons before and after DICOM2MINT update
    * Support multi-frame DICOM
    * Consider using the MINT DataDictionary instead of the DCM4CHE
