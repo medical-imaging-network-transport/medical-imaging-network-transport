@@ -53,10 +53,18 @@ class DataDictionaryElement():
    def ret(self)     : return self.__ret;
    def name(self)    : return self.__name;
    
-   def debug(self):
-       print "tag =", self.__tag,
-       print "keyword =", self.__keyword,
-       print "vr =", string.join(self.__vrs, "|"),
-       print "vm =", self.__vm,
-       print "ret =", self.__ret,
-       print "name =", self.__name.encode('ascii', 'replace')
+   def debug(self, output = None):
+       if output == None:
+          print "tag =", self.__tag,
+          print "keyword =", self.__keyword,
+          print "vr =", string.join(self.__vrs, "|"),
+          print "vm =", self.__vm,
+          print "ret =", self.__ret,
+          print "name =", self.__name.encode('ascii', 'replace')
+       else:
+          output.write("tag = "+self.__tag+" ")
+          output.write("keyword = "+self.__keyword+" ")
+          output.write("vr = "+string.join(self.__vrs, "|")+" ")
+          output.write("vm = "+self.__vm+" ")
+          output.write("ret = "+str(self.__ret)+" ")
+          output.write("name = "+self.__name.encode('ascii', 'replace')+"\n")

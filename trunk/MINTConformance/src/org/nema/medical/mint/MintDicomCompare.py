@@ -68,6 +68,9 @@ class MintDicomCompare():
 
        self.__readOffsets()
 
+   def tidy(self):
+       if self.__output != None: self.__output.close()
+
    def setVerbose(self, verbose):
        self.__verbose = verbose
        
@@ -75,8 +78,11 @@ class MintDicomCompare():
        self.__lazy = lazy
        
    def setOutput(self, output):
-       if output != "": 
-          self.__output = open(output, "w")
+       if output == "": return
+       if self.__output != None: self.__output.close()
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
        
    def compare(self):       
        dicm = self.__dicom
@@ -96,7 +102,8 @@ class MintDicomCompare():
            
            self.__check("Number of instances",
                         dicomSeries.numInstances(), 
-                        mintSeries.numInstances())       
+                        mintSeries.numInstances(),
+                        dicomSeries.seriesInstanceUID())       
                         
            numInstances = min(dicomSeries.numInstances(), mintSeries.numInstances())
            for m in range(0, numInstances):
@@ -270,7 +277,9 @@ class MintDicomCompare():
        numItems2 = attr.numItems()
        self.__check(dicomAttr.tag()+" Number of items",
                     numItems1,
-                    numItems2)
+                    numItems2,
+                    seriesInstanceUID,
+                    sopInstanceUID)
        
        if numItems1 == numItems2:
           for i in range(0, numItems1):
@@ -283,7 +292,9 @@ class MintDicomCompare():
               numAttributes2 = attr.numItemAttributes(i)
               self.__check(dicomAttr.tag()+" number of item attributes",
                            numAttributes1,
-                           numAttributes2)
+                           numAttributes2,
+                           seriesInstanceUID,
+                           sopInstanceUID)
 
               # ---
               # Check item attributes.
@@ -309,7 +320,9 @@ class MintDicomCompare():
        numFloats2 = len(floats2)
        self.__check(dicomAttr.tag()+" Number of floats",
                     numFloats1,
-                    numFloats2)
+                    numFloats2,
+                    seriesInstanceUID,
+                    sopInstanceUID)
        
        numFloats = min(numFloats1, numFloats2)
        for i in range(0, numFloats):
@@ -527,8 +540,10 @@ def main():
        studies.setLazy(lazy)
        studies.setOutput(output)
 
-       return studies.compare()
-       
+       status = studies.compare()
+       studies.tidy()
+       return status
+
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
                                  sys.exc_info()[1],

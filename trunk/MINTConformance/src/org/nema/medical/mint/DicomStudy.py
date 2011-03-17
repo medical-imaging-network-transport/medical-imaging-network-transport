@@ -53,15 +53,9 @@ class DicomStudy():
        self.__seriesInstanceUIDs = []
        self.__dataDictionary = DataDictionary(dataDictionaryUrl)
        self.__output = None
+ 
        self.__read()
 
-   def setOutput(self, output):
-       if output == "": return
-       if self.__output != None: self.__output(close)
-       if os.access(output, os.F_OK):
-          raise IOError("File already exists - "+output)
-       self.__output = open(output, "w")
-       
    def tidy(self):
        """
        Removes tempory binary items.
@@ -71,6 +65,13 @@ class DicomStudy():
            self.series(n).tidy()
        if self.__output != None: self.__output.close()
 
+   def setOutput(self, output):
+       if output == "": return
+       if self.__output != None: self.__output.close()
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
+       
    def studyInstanceUID(self):
        return self.__studyInstanceUID
        

@@ -70,7 +70,7 @@ class DicomSeries():
        self.__sopInstanceUIDs = []	  
        self.__instances[instance.sopInstanceUID()] = instance
        
-   def debug(self, output):
+   def debug(self, output=None):
        if output == None:
           print ">> Series", self.seriesInstanceUID()
        else:

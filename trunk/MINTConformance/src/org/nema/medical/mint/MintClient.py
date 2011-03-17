@@ -113,28 +113,30 @@ def main():
        for option in options:
            if option[0] == "-u": studyUUID = option[1]
 
-       output = ""
+       output = None
        for option in options:
            if option[0] == "-o": 
-              output = option[1]
-              out = open(output, "w")
+              outputName = option[1]
+              if os.access(outputName, os.F_OK):
+                 raise IOError("File already exists - "+outputName)
+              output = open(outputName, "w")
 
        mintClient = MintClient()
        mintClient.connect(hostname, port)
 
        if studyUID != "":
-          if output == "":
+          if output == None:
              print mintClient.lookupStudyUUID(studyUID);
           else:
-             out.write(mintClient.lookupStudyUUID(studyUID)+"\n");
+             output.write(mintClient.lookupStudyUUID(studyUID)+"\n");
                      
        if studyUUID != "":
-          if output == "":
+          if output == None:
              print mintClient.lookupStudyUID(studyUUID);
           else:
-             out.write(mintClient.lookupStudyUID(studyUUID)+"\n");
+             output.write(mintClient.lookupStudyUID(studyUUID)+"\n");
                     
-       if output != "": out.close()
+       if output != None: output.close()
        
     except IOError, exception:
        print "Bad port?", exception

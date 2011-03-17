@@ -38,7 +38,7 @@ from org.nema.medical.mint.MintStudy   import MintStudy
 from org.nema.medical.mint.MintStudyFS import MintStudyFS
 
 # -----------------------------------------------------------------------------
-# MintStudy
+# MintStudyCompare
 # -----------------------------------------------------------------------------
 class MintStudyCompare():
    
@@ -71,6 +71,9 @@ class MintStudyCompare():
 
        self.__readOffsets()
 
+   def tidy(self):
+       if self.__output != None: self.__output.close()
+
    def setVerbose(self, verbose):
        self.__verbose = verbose
        
@@ -78,9 +81,12 @@ class MintStudyCompare():
        self.__lazy = lazy
        
    def setOutput(self, output):
-       if output != "": 
-          self.__output = open(output, "w")
-       
+       if output == "": return
+       if self.__output != None: self.__output.close()
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
+
    def compare(self):
        s1 = self.__study1
        s2 = self.__study2
@@ -493,8 +499,10 @@ def main():
        studies.setLazy(lazy)
        studies.setOutput(output)
 
-       return studies.compare()
-       
+       status = studies.compare()
+       studies.tidy()
+       return status
+
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
                                  sys.exc_info()[1],
