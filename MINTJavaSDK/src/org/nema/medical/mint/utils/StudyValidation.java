@@ -20,6 +20,8 @@ import static org.nema.medical.mint.utils.StudyUtils.tagString;
  * @author Uli Bubenheimer
  */
 public class StudyValidation {
+    private static final int TRANSFER_SYNTAX_TAG = 0x00020010;
+
     StudyValidation() {
         throw new AssertionError("Class not to be instantiated");
     }
@@ -106,7 +108,7 @@ public class StudyValidation {
     static void validateDICOMTransferSyntax(final StudyMetadata study) throws StudyTraversals.TraversalException {
     	//loop over each series
     	for (final Series s: Iter.iter(study.seriesIterator())) {
-    		final Attribute normalizedTransferSyntaxAttribute = s.getNormalizedInstanceAttribute(0x00020010);
+    		final Attribute normalizedTransferSyntaxAttribute = s.getNormalizedInstanceAttribute(TRANSFER_SYNTAX_TAG);
     		final String normalizedTransferSyntax =
                     (normalizedTransferSyntaxAttribute != null) ? normalizedTransferSyntaxAttribute.getVal() : null;
     		final boolean transferSyntaxNormalized = (normalizedTransferSyntax != null);
@@ -119,9 +121,11 @@ public class StudyValidation {
     			//This is the dicom tag attribute for transfer syntax
     			//<attr tag="00020010" vr="UI" val="456">
     			final String instanceAttributeTransferSyntax =
-                        transferSyntaxNormalized ? normalizedTransferSyntax : instance.getValueForAttribute(0x00020010);
+                        transferSyntaxNormalized ? normalizedTransferSyntax : instance.getValueForAttribute(TRANSFER_SYNTAX_TAG);
     			//The two different transfer syntaxes must be equal in every case or the entire study is invalid.
-    			if (!instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax)) {
+                //An exception is the case where no transfer syntax attribute is available on the instance.
+    			if (instanceAttributeTransferSyntax != null &&
+                        !instanceTransferSyntax.equalsIgnoreCase(instanceAttributeTransferSyntax)) {
     				throw new StudyTraversals.TraversalException("Mismatch of Transfer Syntax " + instanceTransferSyntax
                             + " specified for SOP Instance UID " + instance.getSOPInstanceUID()
                             + " and transfer syntax " + instanceAttributeTransferSyntax

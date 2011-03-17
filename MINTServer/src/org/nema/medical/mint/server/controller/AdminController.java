@@ -1,5 +1,6 @@
 package org.nema.medical.mint.server.controller;
 
+import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.server.domain.Change;
@@ -46,8 +47,8 @@ public class AdminController {
                         change.setType(metadata.getType());
                         change.setRemoteHost("localhost");
                         change.setOperation(changeNumber == 0 ?
-                                org.nema.medical.mint.changelog.Change.OPERATION_CREATE :
-                                org.nema.medical.mint.changelog.Change.OPERATION_UPDATE);
+                                ChangeOperation.CREATE :
+                                ChangeOperation.UPDATE);
                         updateDAO.saveChange(change);
                     }
                 }
