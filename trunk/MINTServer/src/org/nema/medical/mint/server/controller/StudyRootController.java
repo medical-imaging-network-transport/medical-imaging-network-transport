@@ -33,6 +33,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.MINTStudy;
@@ -152,7 +153,7 @@ public class StudyRootController {
          deleteInfo.setRemoteHost(remoteHost);
          deleteInfo.setPrincipal(principal);
          deleteInfo.setIndex(lastChange.getIndex() + 1);
-         deleteInfo.setOperation(org.nema.medical.mint.changelog.Change.OPERATION_DELETE);
+         deleteInfo.setOperation(ChangeOperation.DELETE);
          changeDAO.saveChange(deleteInfo);
 
          final MINTStudy studyData = new MINTStudy();

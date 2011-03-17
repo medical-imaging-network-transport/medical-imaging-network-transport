@@ -16,6 +16,7 @@
 package org.nema.medical.mint.server.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.nema.medical.mint.changelog.ChangeOperation;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -62,7 +63,8 @@ public class Change {
 	private String principal;
 
     @Column(nullable = false)
-    private String operation;
+    @Enumerated(EnumType.STRING)
+    private ChangeOperation operation;
 
 	public String getId() {
 		return id;
@@ -136,11 +138,11 @@ public class Change {
 		this.principal = principal;
 	}
 
-    public String getOperation() {
+    public ChangeOperation getOperation() {
         return operation;
     }
 
-    public void setOperation(String operation) {
+    public void setOperation(ChangeOperation operation) {
         this.operation = operation;
     }
 }

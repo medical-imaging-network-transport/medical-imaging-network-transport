@@ -16,6 +16,7 @@
 package org.nema.medical.mint.server.processor;
 
 import org.apache.log4j.Logger;
+import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
@@ -153,7 +154,7 @@ public class StudyCreateProcessor extends TimerTask {
 			updateInfo.setRemoteHost(remoteHost);
 			updateInfo.setPrincipal(principal);
 			updateInfo.setIndex(0);
-            updateInfo.setOperation(org.nema.medical.mint.changelog.Change.OPERATION_CREATE);
+            updateInfo.setOperation(ChangeOperation.CREATE);
 			updateDAO.saveChange(updateInfo);
 
 			jobInfo.setStatus(JobStatus.SUCCESS);
