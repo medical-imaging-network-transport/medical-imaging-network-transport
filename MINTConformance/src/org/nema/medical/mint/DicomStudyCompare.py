@@ -67,6 +67,9 @@ class DicomStudyCompare():
        self.__output = None
        self.__exclude = []
 
+   def tidy(self):
+       if self.__output != None: self.__output.close()
+
    def setVerbose(self, verbose):
        self.__verbose = verbose
        
@@ -74,8 +77,11 @@ class DicomStudyCompare():
        self.__lazy = lazy
        
    def setOutput(self, output):
-       if output != "": 
-          self.__output = open(output, "w")       
+       if output == "": return
+       if self.__output != None: self.__output.close()
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
        
    def setExclude(self, exclude):
        self.__exclude = exclude
@@ -102,8 +108,9 @@ class DicomStudyCompare():
            
            self.__check("Number of instances",
                         series1.numInstances(), 
-                        series2.numInstances())
-           
+                        series2.numInstances(),
+                        series1.seriesInstanceUID())
+
            numInstances = min(series1.numInstances(), series2.numInstances()) 
            for m in range(0, numInstances):
                instance1 = series1.instance(m)
@@ -291,7 +298,9 @@ class DicomStudyCompare():
        numItems2 = attr2.numItems()
        self.__check(attr1.tag()+" Number of items",
                     numItems1,
-                    numItems2)
+                    numItems2,
+                    seriesInstanceUID, 
+                    sopInstanceUID)
 
        if numItems1 == numItems2:
           for i in range(0, numItems1):
@@ -303,7 +312,9 @@ class DicomStudyCompare():
               numAttributes2 = attr2.numItemAttributes(i)
               self.__check(attr1.tag()+" number of item attributes",
                            numAttributes1,
-                           numAttributes2)
+                           numAttributes2,
+                           seriesInstanceUID, 
+                           sopInstanceUID)
 
               # ---
               # Check item attributes.
@@ -512,6 +523,8 @@ def main():
        studies.setWarnings(warnings)
 
        differences = studies.compare()
+       studies.tidy()
+
        if differences != 0:
           raise AssertionError("Bad compare: "+str(differences)+" difference(s).")
        return 0

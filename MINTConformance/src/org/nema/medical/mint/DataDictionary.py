@@ -50,9 +50,19 @@ class DataDictionary():
        self.__xml = XmlDocument(DataDictionary.ROOT_TAG_NAME)
        self.__elements = {}
        self.__tags = []
-       
+       self.__output = None
        self.__readFromURL(dataDictionaryURL)
+
+   def tidy(self):
+       if self.__output != None: self.__output.close()
        
+   def setOutput(self, output):
+       if output == "": return
+       if self.__output != None: self.__output.close()
+       if os.access(output, os.F_OK):
+          raise IOError("File already exists - "+output)
+       self.__output = open(output, "w")
+              
    def numElements(self):
        return len(self.__tags)
           
@@ -110,26 +120,58 @@ class DataDictionary():
        for n in range(0, numElements):
            tag = self.tag(n)  
            element = self.elementByTag(tag)
-           if element != None: element.debug()
+           if element != None: element.debug(self.__output)
                       
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "")
-    
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:h")
+
+    # ---
+    # Check for data dictionary.
+    # ---
+    dictionaryURL = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dictionaryURL = opt[1]
+           
+    # ---
+    # Check for output option.
+    # ---
+    output = ""
+    for opt in options:
+        if opt[0] == "-o":
+           output = opt[1]
+           
+    # ---
+    # Check for help option.
+    # ---
+    help = False
+    for opt in options:
+        if opt[0] == "-h":
+           help = True
+           
     try:
-       if len(args) != 1:
-          print "Usage", progName, "<data_dictionary_url>"
+       # ---
+       # Check usage.
+       # ---
+       argc = len(args)
+       if help or argc > 0:
+          print "Usage:", progName, "[options]"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+          print "  -o <output>:              output filename (defaults to stdout)"
+          print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
        # Read data dictionary.
        # ---
-       dataDictionaryName = sys.argv[1];
-       dataDictionary = DataDictionary(dataDictionaryName)
+       dataDictionary = DataDictionary(dictionaryURL)
+       dataDictionary.setOutput(output)
        dataDictionary.debug()
+       dataDictionary.tidy()
 
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 
