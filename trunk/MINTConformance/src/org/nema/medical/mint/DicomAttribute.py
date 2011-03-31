@@ -26,7 +26,6 @@
 
 import base64
 import os
-import tempfile
 import sys
 
 from struct import unpack
@@ -44,12 +43,13 @@ class DicomAttribute():
       
    def __init__(self, dcm, dataDictionary, transferSyntax):
           
-       self.__tag   = None
-       self.__vr    = ""
-       self.__vl    = -1
-       self.__val   = ""
-       self.__dat   = ""
-       self.__items = []
+       self.__tag    = None
+       self.__vr     = ""
+       self.__vl     = -1
+       self.__val    = ""
+       self.__dicom  = ""
+       self.__offset = -1
+       self.__items  = []
        self.__bytesRead = 0
        self.__dataDictionary = dataDictionary
        self.__transferSyntax = transferSyntax
@@ -125,22 +125,27 @@ class DicomAttribute():
 
        # Read the val
        self.__readVal(dcm)
-       
-   def tidy(self):
-       """
-       Removes a tempory binary item.
-       """
-       if os.path.exists(self.__dat): os.unlink(self.__dat)
 
-   def group(self)   :  return self.__tag[0:4]
+   def group(self)    : return self.__tag[0:4]
    def element(self)  : return self.__tag[4:]
    def tag(self)      : return self.__tag
    def vr (self)      : return self.__vr
    def vl (self)      : return self.__vl
    def val(self)      : return self.__val
-   def dat(self)      : return self.__dat
    def bytesRead(self): return self.__bytesRead
-   
+   def hasBinary(self): return self.__dicom != ""
+
+   def binary(self):
+       """
+       Returns a file pointer to the binary data. User's responsibility to close.
+       """
+       if self.__dicom == "": return None
+       if not os.access(self.__dicom, os.F_OK): raise IOError("File not found: "+self.__dicom)
+       if not self.__offset > 0: raise IOError("Binary offset uninitialized")
+       binary = open(self.__dicom, "rb")
+       binary.seek(self.__offset)
+       return binary
+
    def valstr(self):
        if self.isPixelData()      : return "<Pixel Data>"
        elif self.isBinary()       : return "<Binary Data>"
@@ -212,21 +217,13 @@ class DicomAttribute():
              self.__bytesRead += self.__vl
              self.__val = base64.b64encode(val)
              
-          # Write long binaries to tmp file
-          else:             
-             tmp = tempfile.NamedTemporaryFile(delete=False)
-             self.__dat = tmp.name
-             BLOCK_SIZE = 1024 * 1024    
-             blocks = int(self.__vl / BLOCK_SIZE)
-             bytes = self.__vl % BLOCK_SIZE
-             for b in range(0, blocks):
-                tmp.write(dcm.read(BLOCK_SIZE))
-                self.__bytesRead += BLOCK_SIZE
-             if bytes > 0:
-                tmp.write(dcm.read(bytes))
-                self.__bytesRead += bytes
+          # Store long binaries as a filename and an offset
+          else:
              self.__val = None    
-             tmp.close()
+             self.__dicom = dcm.name             
+             self.__offset = dcm.tell()             
+             self.__bytesRead += self.__vl
+             dcm.seek(self.__vl, os.SEEK_CUR)
              
    def debug(self, output=None, indent=""):
 

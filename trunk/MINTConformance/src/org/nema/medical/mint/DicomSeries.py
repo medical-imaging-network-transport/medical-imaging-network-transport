@@ -35,14 +35,6 @@ class DicomSeries():
        self.__seriesInstanceUID = ""
        self.__instances = {}
        self.__sopInstanceUIDs = []
-       
-   def tidy(self):
-       """
-       Removes tempory binary items.
-       """
-       numInstances = self.numInstances()
-       for n in range(0, numInstances):
-           instance = self.instance(n).tidy()
 
    def seriesInstanceUID(self):
        return self.__seriesInstanceUID

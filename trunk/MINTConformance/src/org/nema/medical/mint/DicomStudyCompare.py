@@ -329,29 +329,41 @@ class DicomStudyCompare():
            
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
 
-       if attr1.dat() == "":
+       if not attr1.hasBinary():
           self.__checkInlineBinary(attr1, attr2, seriesInstanceUID, sopInstanceUID)
           return
 
        if self.__lazy: return
        
        # ---
-       # Check for DICOM binary items
+       # Check for DICOM binary item
        # ---
-       dat1 = attr1.dat()
-       if not os.access(dat1, os.F_OK):
-          self.__count += 1
-          print "Binary not found for", attr1.tag(), ":", dat1
+       bid1 = attr1.binary()
+       if bid1 == None:
+          self.__check(dicomAttr.tag()+" missing binary",
+                       "None",
+                       "<Binary>",
+                       seriesInstanceUID, 
+                       sopInstanceUID)
           return
 
-       dat2 = attr2.dat()
-       if not os.access(dat2, os.F_OK):
-          self.__count += 1
-          print "Binary not found for", attr2.tag(), ":", dat2
+       # ---
+       # Check for DICOM binary item
+       # ---
+       bid2 = attr2.binary()
+       if bid2 == None:
+          self.__check(dicomAttr.tag()+" missing binary",
+                       "<Binary>",
+                       "None",
+                       seriesInstanceUID, 
+                       sopInstanceUID)
           return
-
-       size1 = os.path.getsize(dat1)
-       size2 = os.path.getsize(dat2)
+ 
+       # ----
+       # Check binary sizes
+       # ---     
+       size1 = attr1.vl()
+       size2 = attr2.vl()
        self.__check(attr1.tag()+" binary sizes differ",
                     size1,
                     size2,
@@ -360,23 +372,21 @@ class DicomStudyCompare():
        if size1 != size2 : return
        
        # ---
-       # Check binary item byte for byte.
-       # ---
-       bid1 = open(dat1, "rb")
-       bid2 = open(dat2, "rb")
-
-       # ---
        # Read in a block.
        # ---
-       bufsize = 1024
+       BUFLEN = 1024
+       bytesToRead = attr1.vl()
+       assert bytesToRead > 0
+       bufsize = min(bytesToRead, BUFLEN)
        block = 0
        buf1 = bid1.read(bufsize)
        buf2 = bid2.read(bufsize)
-          
+       bytesToRead -= len(buf1)
+
        bytes1 = unpack('B'*len(buf1), buf1)
        bytes2 = unpack('B'*len(buf2), buf2)
        n = len(bytes1)
-       while n > 0:        
+       while n > 0:       
 
           # ---
           # Loop through block.
@@ -384,7 +394,7 @@ class DicomStudyCompare():
           diff = False
           for i in range(0, n):              
               if bytes1[i] != bytes2[i]:
-                 self.__check("byte "+str(block*bufsize+i),
+                 self.__check(attr1.tag()+"byte "+str(block*bufsize+i),
                               hex(bytes1[i]),
                               hex(bytes2[i]),
                               seriesInstanceUID, 
@@ -397,11 +407,14 @@ class DicomStudyCompare():
           # ---
           # Skip to end if difference was found.
           # ---
-          if diff:
-             n = -1
+          if diff or bytesToRead == 0:
+             n = 0
           else:
+             bufsize = min(bytesToRead, BUFLEN)
              buf1 = bid1.read(bufsize)
-             buf2 = bid2.read(len(buf1))
+             buf2 = bid2.read(bufsize)
+             bytesToRead -= len(buf1)
+             assert bytesToRead >= 0
 
              bytes1 = unpack('B'*len(buf1), buf1)
              bytes2 = unpack('B'*len(buf2), buf2)
@@ -414,7 +427,7 @@ class DicomStudyCompare():
  
    def __checkInlineBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
  
-       self.__check(attr1.tag()+" <Binary Data>",
+       self.__check(attr1.tag()+" <Binary>",
                     attr1.val(),
                     attr2.val(),
                     seriesInstanceUID, 
