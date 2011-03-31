@@ -53,13 +53,6 @@ class DicomInstance():
        
        self.__open()
 
-   def tidy(self):
-       """
-       Removes tempory binary items.
-       """
-       numAttributes = self.numAttributes()
-       for n in range(0, numAttributes): self.attribute(n).tidy()
-
    def isDicom(filename):
        dcm = open(filename, "rb")
        preamble=dcm.read(128)
@@ -69,15 +62,24 @@ class DicomInstance():
 
    def studyInstanceUID(self):
        attr = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
-       return attr.val()
+       if attr != None:
+          return attr.val()
+       else:
+          return ""
        
    def seriesInstanceUID(self):
        attr = self.attributeByTag(SERIES_INSTANCE_UID_TAG)
-       return attr.val()
+       if attr != None:
+          return attr.val()
+       else:
+          return ""
 
    def sopInstanceUID(self):
        attr = self.attributeByTag(SOP_INSTANCE_UID_TAG)
-       return attr.val()
+       if attr != None:
+          return attr.val()
+       else:
+          return ""
                         
    def numAttributes(self):
        return len(self.__tags)
@@ -147,7 +149,15 @@ class DicomInstance():
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "h")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:h")
+    
+    # ---
+    # Check for data dictionary.
+    # ---
+    dataDictionaryUrl = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dataDictionaryUrl = opt[1]
     
     # ---
     # Check for help option.
@@ -158,20 +168,19 @@ def main():
            help = True
     
     try:
-       if len(args) != 2 or help:
-          print "Usage", progName, "[options] <dicom_file> <data_dictionary_url>"
-          print "  -h: displays usage"
+       if len(args) != 1 or help:
+          print "Usage", progName, "[options] <dicom_file>"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+          print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
        dcmName = args[0];
-       dataDictionaryUrl = args[1];
        dataDictionary = DataDictionary(dataDictionaryUrl)
        instance = DicomInstance(dcmName, dataDictionary)
        instance.debug()
-       instance.tidy()
                         
     except Exception, exception:
        traceback.print_exception(sys.exc_info()[0], 

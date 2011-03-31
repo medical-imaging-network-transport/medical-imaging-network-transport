@@ -57,12 +57,6 @@ class DicomStudy():
        self.__read()
 
    def tidy(self):
-       """
-       Removes tempory binary items.
-       """
-       numSeries = self.numSeries()
-       for n in range(0, numSeries):
-           self.series(n).tidy()
        if self.__output != None: self.__output.close()
 
    def setOutput(self, output):

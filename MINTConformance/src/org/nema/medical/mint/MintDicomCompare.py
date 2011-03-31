@@ -346,10 +346,10 @@ class MintDicomCompare():
        
        self.__fpTagsCompared += 1
          
-   def __checkBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+   def __checkBinary(self, dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID):
 
-       if dicomAttr.dat() == "":
-          self.__checkInlineBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
+       if not dicomAttr.hasBinary():
+          self.__checkInlineBinary(dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID)
           return
 
        if self.__lazy: return
@@ -357,34 +357,32 @@ class MintDicomCompare():
        # ---
        # Check for DICOM binary item
        # ---
-       dat1 = dicomAttr.dat()
-       if not os.access(dat1, os.F_OK):
-          self.__count += 1
-          print "File not found", ":", dat1
-          return
-
-       # ---
-       # Check for MINT binary item.
-       # ---
-       if attr.bid() == None:
+       bid1 = dicomAttr.binary()
+       if bid1 == None:
           self.__check(dicomAttr.tag()+" missing binary",
-                       dat1,
                        "None",
+                       "<Binary>",
                        seriesInstanceUID, 
                        sopInstanceUID)
           return
 
        # ---
+       # Check for MINT binary item.
+       # ---
+       if mintAttr.bid() == None:
+          self.__check(mintAttr.tag()+" missing bid "+mintAttr.bid(),
+                       "<Binary>",
+                       "None",
+                       seriesInstanceUID, 
+                       sopInstanceUID)
+          return
+       bid2 = self.__mint.open(mintAttr.bid())
+       
+       # ---
        # TODO: Check to see if this is single file or multi-file binary.
        # ---
        # if len(self.__offsets) > 0:
        #    dat2 = self.__binaryitems[0]
-       
-       # ---
-       # Check binary item byte for byte.
-       # ---
-       bid1 = open(dat1, "rb")
-       bid2 = self.__mint.open(attr.bid())
        
        # ---
        # TODO: Position the MINT binary file pointer.
@@ -397,10 +395,14 @@ class MintDicomCompare():
        # ---
        # Read in a block.
        # ---
-       bufsize = 1024
+       BUFLEN = 1024
+       bytesToRead = dicomAttr.vl()
+       assert bytesToRead > 0
+       bufsize = min(bytesToRead, BUFLEN)
        block = 0
        buf1 = bid1.read(bufsize)
        buf2 = bid2.read(bufsize)
+       bytesToRead -= len(buf1)
           
        bytes1 = unpack('B'*len(buf1), buf1)
        bytes2 = unpack('B'*len(buf2), buf2)
@@ -426,11 +428,14 @@ class MintDicomCompare():
           # ---
           # Skip to end if difference was found.
           # ---
-          if diff:
-             n = -1
+          if diff or bytesToRead == 0:
+             n = 0
           else:
+             bufsize = min(bytesToRead, BUFLEN)
              buf1 = bid1.read(bufsize)
-             buf2 = bid2.read(len(buf1))
+             buf2 = bid2.read(bufsize)
+             bytesToRead -= len(buf1)
+             assert bytesToRead >= 0
 
              bytes1 = unpack('B'*len(buf1), buf1)
              bytes2 = unpack('B'*len(buf2), buf2)
@@ -441,11 +446,11 @@ class MintDicomCompare():
        bid2.close()
        self.__binaryTagsCompared += 1
 
-   def __checkInlineBinary(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
+   def __checkInlineBinary(self, dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID):
 
-       self.__check(dicomAttr.tag()+" <Binary Data>",
+       self.__check(dicomAttr.tag()+" <Binary>",
                     dicomAttr.val(),
-                    attr.bytes(),
+                    mintAttr.bytes(),
                     seriesInstanceUID, 
                     sopInstanceUID)
 
