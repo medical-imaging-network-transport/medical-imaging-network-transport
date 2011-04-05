@@ -54,6 +54,11 @@ public class MINTBinaryStreamReader
 		BinaryAddress = new URL(binaryAddress, "all");
 	}
 	
+	public void SetAddressRange(URL binaryAddress, String range) throws MalformedURLException
+	{
+		BinaryAddress = new URL(binaryAddress, range);
+	}
+	
 	/**
 	 * Readline function. Takes an input stream and reads a line until the carriage feed 
 	 * character. 
