@@ -6,8 +6,9 @@ import org.junit.Test;
 import org.nema.medical.mint.datadictionary.*;
 import org.nema.medical.mint.metadata.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.*;
-import java.util.jar.Attributes;
 
 /**
  * @author Uli Bubenheimer
@@ -17,231 +18,88 @@ public class StudyValidationTest {
     private MetadataType metadataType;
 
     @Before
-    public void setUp() {
-        study = new StudyMetadata();
-        study.setStudyInstanceUID("1.2.3.4.5");
-        study.setType("DICOM");
-        {
-            final Attribute attr = new Attribute();
-            attr.setTag(0x00080020);
-            attr.setVr("DA");
-            attr.setVal("20101123");
-            study.putAttribute(attr);
-        }
-        {
-            final Attribute attr = new Attribute();
-            attr.setTag(0x00080051);
-            attr.setVr("SQ");
-            {
-                final Item item = new Item();
-                {
-                    final Attribute itemAttr = new Attribute();
-                    itemAttr.setTag(0x00081150);
-                    itemAttr.setVr("UI");
-                    itemAttr.setVal("1.2.840.10008.5.1.4.1.1.2");
-                    item.putAttribute(itemAttr);
-                }
-                attr.addItem(item);
-            }
-            study.putAttribute(attr);
-        }
-        {
-            Series series = new Series();
-            series.setSeriesInstanceUID("9.8.7.5");
-            {
-                final Instance instance = new Instance();
-                instance.setSOPInstanceUID("5.4.3.1");
-                instance.setTransferSyntaxUID("1.2.840.10008.1.2.1");
-                {
-                    final Attribute attr = new Attribute();
-                    attr.setTag(0x00020010);
-                    attr.setVr("UI");
-                    attr.setVal("1.2.840.10008.1.2.1");
-                    instance.putAttribute(attr);
-                }
-                series.putInstance(instance);
-            }
-            study.putSeries(series);
-        }
-        {
-            Series series = new Series();
-            series.setSeriesInstanceUID("9.8.7.6");
-            {
-                final Attribute attr = new Attribute();
-                attr.setTag(0x00080021);
-                attr.setVr("DA");
-                attr.setVal("20101123");
-                series.putAttribute(attr);
-            }
-            {
-                final Attribute attr = new Attribute();
-                attr.setTag(0x00081072);
-                attr.setVr("SQ");
-                {
-                    final Item item = new Item();
-                    {
-                        final Attribute itemAttr = new Attribute();
-                        itemAttr.setTag(0x00081150);
-                        itemAttr.setVr("UI");
-                        itemAttr.setVal("1.2.840.10008.5.1.4.1.1.2");
-                        item.putAttribute(itemAttr);
-                    }
-                    attr.addItem(item);
-                }
-                series.putAttribute(attr);
-            }
-            {
-                final Attribute attr = new Attribute();
-                attr.setTag(0x00080008);
-                attr.setVr("CS");
-                attr.setVal("ORIGINAL\\PRIMARY\\AXIAL");
-                series.putNormalizedInstanceAttribute(attr);
-            }
-            {
-                final Attribute attr = new Attribute();
-                attr.setTag(0x00020010);
-                attr.setVr("UI");
-                attr.setVal("1.2.840.10008.1.2.1");
-                series.putNormalizedInstanceAttribute(attr);
-            }
-            {
-                final Instance instance = new Instance();
-                instance.setSOPInstanceUID("5.4.3.2");
-                instance.setTransferSyntaxUID("1.2.840.10008.1.2.1");
-                {
-                    final Attribute attr = new Attribute();
-                    attr.setTag(0x00080013);
-                    attr.setVr("TM");
-                    attr.setVal("082635");
-                    instance.putAttribute(attr);
-                }
-                {
-                    final Attribute attr = new Attribute();
-                    attr.setBid(0);
-                    attr.setFrameCount(1);
-                    attr.setBinarySize(3000);
-                    attr.setTag(0x7fe00010);
-                    attr.setVr("OW");
-                    instance.putAttribute(attr);
-                }
-                series.putInstance(instance);
-            }
-            {
-                final Instance instance = new Instance();
-                instance.setSOPInstanceUID("1.0.9.8");
-                instance.setTransferSyntaxUID("1.2.840.10008.1.2.1");
-                {
-                    final Attribute attr = new Attribute();
-                    attr.setTag(0x00080013);
-                    attr.setVr("TM");
-                    attr.setVal("082636");
-                    instance.putAttribute(attr);
-                }
-                {
-                    final Attribute attr = new Attribute();
-                    attr.setTag(0x00081140);
-                    attr.setVr("SQ");
-                    {
-                        final Item item = new Item();
-                        {
-                            final Attribute itemAttr = new Attribute();
-                            itemAttr.setTag(0x00081150);
-                            itemAttr.setVr("UI");
-                            itemAttr.setVal("1.2.840.10008.5.1.4.1.1.2");
-                            item.putAttribute(itemAttr);
-                        }
-                        attr.addItem(item);
-                    }
-                    instance.putAttribute(attr);
-                }
-                series.putInstance(instance);
-            }
-            study.putSeries(series);
-        }
+    public void setUp() throws IOException {
+        final String xml =
+                "<study xmlns='http://medical.nema.org/mint' studyInstanceUID='1.2.3.4.5' type='DICOM'>" +
+                "  <attributes>" +
+                "    <attr tag='00080020' vr='DA' val='20101123'/>" +
+                "    <attr tag='00080051' vr='SQ'>" +
+                "      <item>" +
+                "        <attributes>" +
+                "          <attr tag='00081150' vr='UI' val='1.2.840.10008.5.1.4.1.1.2'/>" +
+                "        </attributes>" +
+                "      </item>" +
+                "    </attr>" +
+                "  </attributes>" +
+                "  <seriesList>" +
+                "    <series seriesInstanceUID='9.8.7.5'>" +
+                "      <attributes/>" +
+                "      <normalizedInstanceAttributes/>" +
+                "      <instances>" +
+                "        <instance sopInstanceUID='5.4.3.1' transferSyntaxUID='1.2.840.10008.1.2.1'>" +
+                "          <attributes>" +
+                "            <attr tag='00020010' vr='UI' val='1.2.840.10008.1.2.1'/>" +
+                "          </attributes>" +
+                "        </instance>" +
+                "      </instances>" +
+                "    </series>" +
+                "    <series seriesInstanceUID='9.8.7.6'>" +
+                "      <attributes>" +
+                "        <attr tag='00080021' vr='DA' val='20101123'/>" +
+                "        <attr tag='00081072' vr='SQ'>" +
+                "          <item>" +
+                "            <attributes>" +
+                "              <attr tag='00081150' vr='UI' val='1.2.840.10008.5.1.4.1.1.2'/>" +
+                "            </attributes>" +
+                "          </item>" +
+                "        </attr>" +
+                "      </attributes>" +
+                "      <normalizedInstanceAttributes>" +
+                "        <attr tag='00020010' vr='UI' val='1.2.840.10008.1.2.1'/>" +
+                "        <attr tag='00080008' vr='CS' val='ORIGINAL\\PRIMARY\\AXIAL'/>" +
+                "      </normalizedInstanceAttributes>" +
+                "      <instances>" +
+                "        <instance sopInstanceUID='5.4.3.2' transferSyntaxUID='1.2.840.10008.1.2.1'>" +
+                "          <attributes>" +
+                "            <attr tag='00080013' vr='TM' val='082635'/>" +
+                "            <attr tag='7fe00010' vr='OW' bid='0' bsize='3000'/>" +
+                "          </attributes>" +
+                "        </instance>" +
+                "        <instance sopInstanceUID='1.0.9.8' transferSyntaxUID='1.2.840.10008.1.2.1'>" +
+                "          <attributes>" +
+                "            <attr tag='00080013' vr='TM' val='082636'/>" +
+                "            <attr tag='00081140' vr='SQ'>" +
+                "              <item>" +
+                "                <attributes>" +
+                "                  <attr tag='00081150' vr='UI' val='1.2.840.10008.5.1.4.1.1.2'/>" +
+                "                </attributes>" +
+                "              </item>" +
+                "            </attr>" +
+                "          </attributes>" +
+                "        </instance>" +
+                "      </instances>" +
+                "    </series>" +
+                "  </seriesList>" +
+                "</study>";
+        study = StudyIO.parseFromXML(new ByteArrayInputStream(xml.getBytes()));
 
-        final List<AttributeType> studyAttributes = new ArrayList<AttributeType>();
-        {
-            final AttributeType attrType = new AttributeType();
-            attrType.setTag("00080020");
-            studyAttributes.add(attrType);
-        }
-        {
-            final AttributeType attrType = new AttributeType();
-            attrType.setTag("00080051");
-            studyAttributes.add(attrType);
-        }
         final StudyAttributesType studyAttrType = new StudyAttributesType();
+        final List<AttributeType> studyAttributes = createAttributeTypes(Arrays.asList("00080020","00080051"));
         studyAttrType.setAttributes(studyAttributes);
 
-        final List<AttributeType> seriesAttributes = new ArrayList<AttributeType>();
-        {
-            final AttributeType attrType = new AttributeType();
-            attrType.setTag("00080021");
-            seriesAttributes.add(attrType);
-        }
-        {
-            final AttributeType attrType = new AttributeType();
-            attrType.setTag("00081072");
-            seriesAttributes.add(attrType);
-        }
         final SeriesAttributesType seriesAttrType = new SeriesAttributesType();
+        final List<AttributeType> seriesAttributes = createAttributeTypes(Arrays.asList("00080021","00081072"));
         seriesAttrType.setAttributes(seriesAttributes);
 
         final AttributesType attrType = new AttributesType();
-        final List<ElementType> attrs = new ArrayList<ElementType>();
         attrType.setUnknownAttributes("reject");
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00020010");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00080008");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00080013");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00080020");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00080021");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00080051");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00081072");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00081140");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("00081150");
-            attrs.add(elemType);
-        }
-        {
-            final ElementType elemType = new ElementType();
-            elemType.setTag("7fe00010");
-            attrs.add(elemType);
-        }
+        final List<ElementType> attrs = createElementTypes(Arrays.asList(
+                "00020010","00080008","00080013","00080020","00080021",
+                "00080051","00081072","00081140","00081150","7fe00010"));
         attrType.setElements(attrs);
+
         metadataType = new MetadataType();
+        metadataType.setType("DICOM");
         metadataType.setAttributes(attrType);
         metadataType.setStudyAttributes(studyAttrType);
         metadataType.setSeriesAttributes(seriesAttrType);
@@ -250,13 +108,42 @@ public class StudyValidationTest {
     @After
     public void tearDown() {
         study = null;
+        metadataType = null;
     }
 
+    private List<ElementType> createElementTypes(final Collection<String> tags) {
+        final List<ElementType> elementTypes = new ArrayList<ElementType>(tags.size());
+        for (final String tag: tags) {
+            final ElementType elemType = new ElementType();
+            elemType.setTag(tag);
+            elementTypes.add(elemType);
+        }
+        return elementTypes;
+    }
+
+    private List<AttributeType> createAttributeTypes(final Collection<String> tags) {
+        final List<AttributeType> attributeTypes = new ArrayList<AttributeType>(tags.size());
+        for (final String tag: tags) {
+            final AttributeType attrType = new AttributeType();
+            attrType.setTag(tag);
+            attributeTypes.add(attrType);
+        }
+        return attributeTypes;
+    }
+
+    /**
+     * Tests the baseline case where an absence of unknown attributes will not cause study rejection.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
     public void testValidateUnknownAttributes1() throws StudyTraversals.TraversalException {
         StudyValidation.validateUnknownAttributes(study, metadataType);
     }
 
+    /**
+     * Tests that an unknown study-level attribute causes the study to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateUnknownAttributes2() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();
@@ -265,6 +152,11 @@ public class StudyValidationTest {
         StudyValidation.validateUnknownAttributes(study, metadataType);
     }
 
+    /**
+     * Tests that an unknown study-level attribute will not cause the study to be rejected when
+     * unknown attributes are silently accepted.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test
     public void testValidateUnknownAttributes3() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();
@@ -274,59 +166,103 @@ public class StudyValidationTest {
         StudyValidation.validateUnknownAttributes(study, metadataType);
     }
 
+    /**
+     * Tests the baseline case where having an attribute at the right level (study, series, instance)
+     * will not cause study rejection.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
-    public void testValidateAttributeLevel1() throws StudyTraversals.TraversalException{
+    public void testValidateAttributeLevel1() throws StudyTraversals.TraversalException {
         StudyValidation.validateAttributeLevel(study, metadataType);
     }
 
+    /**
+     * Tests that an instance-level attribute causes the study to be rejected when it occurs at the study level.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
-    public void testValidateAttributeLevel2() throws StudyTraversals.TraversalException{
+    public void testValidateAttributeLevel2() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();
         attr.setTag(0x00010003);
         study.putAttribute(attr);
         StudyValidation.validateAttributeLevel(study, metadataType);
     }
 
+    /**
+     * Tests the baseline case where having all attributes with an initialized VR value
+     * will not cause study rejection.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
-    public void testValidateDICOMVRValueExistence1() throws StudyTraversals.TraversalException{
+    public void testValidateDICOMVRValueExistence1() throws StudyTraversals.TraversalException {
         StudyValidation.validateDICOMVRValueExistence(study);
     }
 
+    /**
+     * Tests that a study-level attribute with no VR set causes the study to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
-    public void testValidateDICOMVRValueExistence2() throws StudyTraversals.TraversalException{
+    public void testValidateDICOMVRValueExistence2() throws StudyTraversals.TraversalException {
         study.attributeIterator().next().setVr(null);
         StudyValidation.validateDICOMVRValueExistence(study);
     }
 
+    /**
+     * Tests the baseline case where the transfer syntax strings in the instance tags and in the Part 10
+     * metadata inside the instances match.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
-    public void testValidateDICOMTransferSyntax1() throws StudyTraversals.TraversalException{
+    public void testValidateDICOMTransferSyntax1() throws StudyTraversals.TraversalException {
         StudyValidation.validateDICOMTransferSyntax(study);
     }
 
+    /**
+     * Tests the baseline case where the list of binary item IDs matches what's in the metadata.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
     public void testValidateBinaryItemsReferences1() throws StudyTraversals.TraversalException {
         final Collection<Integer> binaryItemIds = Arrays.asList(0);
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests that a mismatch between a single wrong binary ID in the passed list and the metadata
+     * causes the study to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateBinaryItemsReferences2() throws StudyTraversals.TraversalException {
         final Collection<Integer> binaryItemIds = Arrays.asList(1);
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests that having additional binary IDs in the passed list than in the metadata causes the study to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateBinaryItemsReferences3() throws StudyTraversals.TraversalException {
         final Collection<Integer> binaryItemIds = Arrays.asList(0, 1);
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests that having more binary IDs in the passed list than in the metadata causes the study to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateBinaryItemsReferences4() throws StudyTraversals.TraversalException {
         final Collection<Integer> binaryItemIds = Collections.emptyList();
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests that having a duplicate binary ID in the study causes it to be rejected.
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateBinaryItemsReferences5() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();
@@ -340,6 +276,12 @@ public class StudyValidationTest {
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests that having a duplicate binary ID in the study causes it to be rejected, even when it's on a multi-frame
+     * attribute and is at the instance level.
+     *
+     * @throws StudyTraversals.TraversalException when correct
+     */
     @Test(expected = StudyTraversals.TraversalException.class)
     public void testValidateBinaryItemsReferences6() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();
@@ -360,6 +302,11 @@ public class StudyValidationTest {
         StudyValidation.validateBinaryItemsReferences(study, binaryItemIds);
     }
 
+    /**
+     * Tests the baseline case where the list of binary item IDs matches what's in the metadata, even in the case
+     * of having both a single-frame binary item and a multi-frame binary item.
+     * @throws StudyTraversals.TraversalException when something is wrong
+     */
     @Test
     public void testValidateBinaryItemsReferences7() throws StudyTraversals.TraversalException {
         final Attribute attr = new Attribute();

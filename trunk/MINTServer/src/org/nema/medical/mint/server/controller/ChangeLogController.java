@@ -16,6 +16,7 @@
 package org.nema.medical.mint.server.controller;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +45,8 @@ import java.util.List;
 
 @Controller
 public class ChangeLogController {
+
+    private static final Logger LOG = Logger.getLogger(ChangeLogController.class);
 
 	@Autowired
 	protected File studiesRoot;
@@ -64,58 +68,62 @@ public class ChangeLogController {
 
 	@RequestMapping("/changelog")
 	public void changelogXML(
-            @RequestParam(value = "since", required = false) String since,
+            @RequestParam(value = "since", required = false) final String since,
             @RequestParam(value = "limit", required = false) Integer limit,
             @RequestParam(value = "offset", required = false) Integer offset,
-			final HttpServletRequest req,
 			final HttpServletResponse res) throws IOException, JiBXException {
 
 		final List<org.nema.medical.mint.changelog.Change> changes = new ArrayList<org.nema.medical.mint.changelog.Change>();
 
 		// TODO read limit from a config file
-        if (limit == null) limit = 50;
-        if (offset == null) offset = 0;
-        int firstIndex = offset*limit;
-        
-        final List<Change> changesFound;
-        
-		if (since != null) {
+        if (limit == null) {
+            limit = 50;
+        }
+        if (offset == null) {
+            offset = 0;
+        }
+        final int firstIndex = offset * limit;
 
-			Date date = null;
+        final List<Change> changesFound;
+
+		if (since != null) {
+			final Date date;
 			try {
                 date = DateUtils.parseISO8601Basic(since);
-			} catch (ParseException e) {
+			} catch (final ParseException e) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
 				return;
 			}
-			if (date.getTime() > System.currentTimeMillis()) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Future date '" + date + "' is not valid for 'since' queries.");
-				return;
-			}
+            if (date.getTime() > System.currentTimeMillis()) {
+                LOG.warn(String.format("Changelog requested with invalid future start date %s",
+                        DateFormat.getDateTimeInstance().format(date)));
+                res.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
 			changesFound = changeDAO.findChanges(date, firstIndex, limit);
 		} else {
 			changesFound = changeDAO.findChanges(firstIndex, limit);
 		}
-		
+
 		if (changesFound != null) {
-			for (Change change : changesFound) {
+			for (final Change change : changesFound) {
 				changes.add(new org.nema.medical.mint.changelog.Change(
                         change.getStudyUUID(), change.getIndex(), change.getType(), change.getDateTime(),
-                        change.getRemoteHost(), change.getRemoteUser(), change.getPrincipal(), change.getOperation()));
+                        change.getRemoteHost(), change.getRemoteUser(), change.getOperation()));
 			}
 		}
 
 		res.setBufferSize(fileResponseBufferSize);
-		ChangeSet changeSet = new ChangeSet(changes);
-		IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog",ChangeSet.class);
-		IMarshallingContext mctx = bfact.createMarshallingContext();
+		final ChangeSet changeSet = new ChangeSet(changes);
+		final IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog", ChangeSet.class);
+		final IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
 		mctx.startDocument("UTF-8", null, res.getOutputStream());
 		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
 		mctx.marshalDocument(changeSet);
 		mctx.endDocument();
 	}
-	
+
 	@RequestMapping("/studies/{uuid}/changelog")
     public void studyChangelog(@PathVariable("uuid") final String uuid,
                                final HttpServletRequest req,
@@ -133,14 +141,14 @@ public class ChangeLogController {
 			for (Change change : changesFound) {
 				changes.add(new org.nema.medical.mint.changelog.Change(
                         change.getStudyUUID(), change.getIndex(), change.getType(), change.getDateTime(),
-                        change.getRemoteHost(), change.getRemoteUser(), change.getPrincipal(), change.getOperation()));
+                        change.getRemoteHost(), change.getRemoteUser(), change.getOperation()));
 			}
 		}
 
 		res.setBufferSize(fileResponseBufferSize);
-		ChangeSet changeSet = new ChangeSet(uuid, changes);
-		IBindingFactory bfact = BindingDirectory.getFactory("studyChangelog",ChangeSet.class);
-		IMarshallingContext mctx = bfact.createMarshallingContext();
+        final ChangeSet changeSet = new ChangeSet(uuid, changes);
+        final IBindingFactory bfact = BindingDirectory.getFactory("studyChangelog", ChangeSet.class);
+        final IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
 		mctx.startDocument("UTF-8", null, res.getOutputStream());
 		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
@@ -160,8 +168,7 @@ public class ChangeLogController {
             return;
         }
 
-		String ext = null;
-		
+
 		/*
 		 * The path variable 'seq' when '0.gpb' is on the end of the URL seems
 		 * to be only '0' for some reason. I'm not sure what the weirdness is
@@ -169,22 +176,19 @@ public class ChangeLogController {
 		 * sequence (i.e., '0.gpb').
 		 */
 		String tmp = req.getAttribute("org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping").toString();
-		if(StringUtils.isBlank(tmp))
-		{
+        if (StringUtils.isBlank(tmp)) {
 			tmp = seq;
 		}
-		
-		if(StringUtils.isBlank(tmp))
-		{
+
+        if (StringUtils.isBlank(tmp)) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Empty");
 			return;
 		}
-		
-		Long sequence;
-		
-		int extPoint = tmp.indexOf('.');
-		if(extPoint > -1)
-		{
+
+        final Long sequence;
+        String ext = null;
+        final int extPoint = tmp.indexOf('.');
+        if (extPoint > -1) {
 			try {
 				sequence = Long.valueOf(tmp.substring(0, extPoint));
 				ext = tmp.substring(extPoint+1);
@@ -200,12 +204,11 @@ public class ChangeLogController {
 				return;
 			}
 		}
-		
-		if(StringUtils.isBlank(ext))
-		{
+
+        if (StringUtils.isBlank(ext)) {
 			ext = "xml";
 		}
-		
+
 		if (sequence < 0) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid sequence requested: Negative");
 			return;

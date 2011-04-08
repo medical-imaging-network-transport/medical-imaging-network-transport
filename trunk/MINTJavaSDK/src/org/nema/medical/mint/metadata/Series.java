@@ -38,7 +38,7 @@ import org.nema.medical.mint.metadata.GPB.SeriesData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Series implements AttributeStore
+public class Series implements AttributeContainer, Excludable
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new TreeMap<Integer,Attribute>();
@@ -169,6 +169,7 @@ public class Series implements AttributeStore
      *
      * @return value
      */
+    @Override
     public String getExclude() {
         return exclude;
     }

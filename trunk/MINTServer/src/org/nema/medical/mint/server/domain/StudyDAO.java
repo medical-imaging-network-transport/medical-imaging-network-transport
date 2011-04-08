@@ -17,6 +17,7 @@ package org.nema.medical.mint.server.domain;
 
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -40,42 +41,43 @@ public class StudyDAO extends HibernateDaoSupport {
 	}
 
     @SuppressWarnings("unchecked")
-	public List<MINTStudy> findStudies(String studyInstanceUID, String accessionNumber,
-                                String accessionNumberIssuer, String patientID, String patientIDIssuer,
-                                String minStudyDateTime, String minStudyDate, String maxStudyDateTime,
-                                String maxStudyDate, int limit, int offset) throws ParseException {
+	public List<MINTStudy> findStudies(final String studyInstanceUID, final String accessionNumber,
+                                final String accessionNumberIssuer, final String patientID,
+                                final String patientIDIssuer, final Date minStudyDateTime, final Date minStudyDate,
+                                final Date maxStudyDateTime, final Date maxStudyDate, final int limit,
+                                final int offset) throws ParseException {
 
         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class);
         detachedCriteria.addOrder(Order.desc("lastModified"));
         
-        if (studyInstanceUID != null && StringUtils.isNotBlank(studyInstanceUID)){
+        if (studyInstanceUID != null && StringUtils.isNotBlank(studyInstanceUID)) {
             detachedCriteria.add(Restrictions.eq("studyInstanceUID", studyInstanceUID));
         }
-        if (accessionNumber != null && StringUtils.isNotBlank(accessionNumber)){
+        if (accessionNumber != null && StringUtils.isNotBlank(accessionNumber)) {
             detachedCriteria.add(Restrictions.eq("accessionNumber", accessionNumber));
         }
-        if (accessionNumberIssuer != null && StringUtils.isNotBlank(accessionNumberIssuer)){
+        if (accessionNumberIssuer != null && StringUtils.isNotBlank(accessionNumberIssuer)) {
             //TODO rename issuerOfAccessionNumber to accessionNumberIssuer
             detachedCriteria.add(Restrictions.eq("issuerOfAccessionNumber", accessionNumberIssuer));
         }
-        if (patientID != null && StringUtils.isNotBlank(patientID)){
+        if (patientID != null && StringUtils.isNotBlank(patientID)) {
             detachedCriteria.add(Restrictions.eq("patientID", patientID));
         }
-        if (patientIDIssuer != null && StringUtils.isNotBlank(patientIDIssuer)){
+        if (patientIDIssuer != null && StringUtils.isNotBlank(patientIDIssuer)) {
             //TODO rename issuerOfPatientID to patientIDIssuer
             detachedCriteria.add(Restrictions.eq("issuerOfPatientID", patientIDIssuer));
         }
-        if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-            detachedCriteria.add(Restrictions.ge("dateTime", DateUtils.parseISO8601(minStudyDateTime)));
+        if (minStudyDateTime != null) {
+            detachedCriteria.add(Restrictions.ge("dateTime", minStudyDateTime));
         }
-        if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-            detachedCriteria.add(Restrictions.ge("dateTime", DateUtils.parseISO8601Date(minStudyDate)));
+        if (minStudyDate != null) {
+            detachedCriteria.add(Restrictions.ge("dateTime", minStudyDate));
         }
-        if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-            detachedCriteria.add(Restrictions.le("dateTime", DateUtils.parseISO8601(maxStudyDateTime)));
+        if (maxStudyDateTime != null) {
+            detachedCriteria.add(Restrictions.le("dateTime", maxStudyDateTime));
         }
-        if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-            detachedCriteria.add(Restrictions.lt("dateTime", DateUtils.parseISO8601Date(maxStudyDate)));
+        if (maxStudyDate != null) {
+            detachedCriteria.add(Restrictions.lt("dateTime", maxStudyDate));
         }
 
         //Eliminate deleted studies from search results

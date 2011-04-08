@@ -15,32 +15,11 @@
  */
 package org.nema.medical.mint.server.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -48,19 +27,26 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.jobs.JobConstants;
-import org.nema.medical.mint.server.domain.ChangeDAO;
-import org.nema.medical.mint.server.domain.JobInfo;
-import org.nema.medical.mint.server.domain.JobInfoDAO;
-import org.nema.medical.mint.server.domain.JobStatus;
-import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.server.domain.*;
 import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Controller
 public class JobsController {
@@ -149,15 +135,11 @@ public class JobsController {
 		String jobURI = req.getContextPath() + "/jobs/status/" + jobInfo.getId();
 		jobInfoDAO.saveOrUpdateJobInfo(jobInfo);
 
-		Principal principal = req.getUserPrincipal();
-		String principalName = (principal != null) ? principal.getName() : null;
-
         final MetadataType dataDictionary = availableTypes.get("DICOM");
 
 		StudyCreateProcessor processor = new StudyCreateProcessor(jobFolder,
 				new File(studiesRoot, studyUUID), dataDictionary, req.getRemoteUser(),
-				req.getRemoteHost(), principalName, jobInfoDAO, studyDAO,
-				updateDAO);
+				req.getRemoteHost(), jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
 		res.setStatus(HttpServletResponse.SC_SEE_OTHER);
@@ -234,12 +216,8 @@ public class JobsController {
 
 		File studyFolder = new File(studiesRoot, studyUUID);
 
-		Principal principal = req.getUserPrincipal();
-		String principalName = (principal != null) ? principal.getName() : null;
-
-		final StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder,
-				studyFolder, availableTypes, oldVersion, req.getRemoteUser(), req.getRemoteHost(),
-				principalName, jobInfoDAO, studyDAO, updateDAO);
+		final StudyUpdateProcessor processor = new StudyUpdateProcessor(jobFolder, studyFolder, availableTypes,
+                oldVersion, req.getRemoteUser(), req.getRemoteHost(), jobInfoDAO, studyDAO, updateDAO);
 		executor.execute(processor); // process immediately in the background
 
 		res.setStatus(HttpServletResponse.SC_SEE_OTHER);

@@ -42,7 +42,7 @@ import org.nema.medical.mint.metadata.GPB.StudyData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class StudyMetadata implements AttributeStore, StudySummary
+public class StudyMetadata implements AttributeContainer, StudySummary
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();

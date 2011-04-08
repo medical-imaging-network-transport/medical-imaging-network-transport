@@ -17,6 +17,7 @@
 package org.nema.medical.mint.metadata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,9 +43,8 @@ import com.google.protobuf.ByteString;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Attribute
-{
-    private final List<Item> items = new ArrayList<Item>();
+public class Attribute implements Cloneable, Excludable {
+    private List<Item> items = new ArrayList<Item>();
     private int tag;
     private String vr;
     private String val;
@@ -52,7 +52,78 @@ public class Attribute
     private int bsize = -1;
     private int frameCount = 1; // index must be a positive integer
     private byte[] bytes;
+    //TODO unclear what the contents of the exclude String are supposed to mean; currently used in just a boolean fashion
     private String exclude;
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Attribute attribute = (Attribute) o;
+
+        if (tag != attribute.tag) {
+            return false;
+        }
+        if (vr != attribute.vr && (vr == null || !vr.equals(attribute.vr))) {
+            return false;
+        }
+        if (!Arrays.equals(bytes, attribute.bytes)) {
+            return false;
+        }
+        if (val != attribute.val && (val == null || !val.equals(attribute.val))) {
+            return false;
+        }
+        if (bid != attribute.bid) {
+            return false;
+        }
+        if (bsize != attribute.bsize) {
+            return false;
+        }
+        if (frameCount != attribute.frameCount) {
+            return false;
+        }
+        if (exclude != attribute.exclude && (exclude == null || !exclude.equals(attribute.exclude))) {
+            return false;
+        }
+        if (!items.equals(attribute.items)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = items.hashCode();
+        result = 31 * result + tag;
+        result = 31 * result + (vr != null ? vr.hashCode() : 0);
+        result = 31 * result + (val != null ? val.hashCode() : 0);
+        result = 31 * result + bid;
+        result = 31 * result + bsize;
+        result = 31 * result + frameCount;
+        result = 31 * result + (bytes != null ? Arrays.hashCode(bytes) : 0);
+        result = 31 * result + (exclude != null ? exclude.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        final Attribute clone = (Attribute) super.clone();
+        clone.items = new ArrayList<Item>(items.size());
+        for (final Item item: items) {
+            clone.items.add((Item)item.clone());
+        }
+        if (bytes != null) {
+            clone.bytes = new byte[bytes.length];
+            System.arraycopy(bytes, 0, clone.bytes, 0, bytes.length);
+        }
+        return clone;
+    }
 
     /**
      * puts an Item into the Attribute
@@ -101,11 +172,11 @@ public class Attribute
     public void setTag(int tag) {
         this.tag = tag;
     }
-    
+
     public int getBinarySize() {
     	return bsize;
     }
-    
+
     public void setBinarySize(int size) {
     	if (size < -1) size = -1;
     	this.bsize = size;
@@ -190,6 +261,8 @@ public class Attribute
      * The minimum (and default) value is 1.
      * @param frameCount
      */
+    //TODO It's odd to have a default of 1 when we don't care about frameCount as in the case of non-binary attributes
+    //TODO It's odd as well to automatically clamp the value without the caller knowing, instead of throwing an error
     public void setFrameCount(int frameCount) {
         if (frameCount < 1) frameCount = 1;
         this.frameCount = frameCount;
@@ -217,6 +290,7 @@ public class Attribute
      *
      * @return exclude
      */
+    @Override
     public String getExclude() {
         return exclude;
     }

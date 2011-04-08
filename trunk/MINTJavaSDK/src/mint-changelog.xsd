@@ -19,7 +19,6 @@
             </xsd:attribute>
             <xsd:attribute name="remoteHost" type="xsd:string" use="required"/>
             <xsd:attribute name="remoteUser" type="xsd:string" use="optional"/>
-            <xsd:attribute name="principal" type="xsd:string" use="optional"/>
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>

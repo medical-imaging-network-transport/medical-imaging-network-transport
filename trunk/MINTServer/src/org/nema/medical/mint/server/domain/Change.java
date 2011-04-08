@@ -59,9 +59,6 @@ public class Change {
     @Column(nullable = false)
 	private String remoteHost;
 
-	@Column
-	private String principal;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ChangeOperation operation;
@@ -128,14 +125,6 @@ public class Change {
 
 	public void setRemoteHost(String sourceHost) {
 		this.remoteHost = sourceHost;
-	}
-
-	public String getPrincipal() {
-		return principal;
-	}
-
-	public void setPrincipal(String principal) {
-		this.principal = principal;
 	}
 
     public ChangeOperation getOperation() {

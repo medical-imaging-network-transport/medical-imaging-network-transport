@@ -22,7 +22,7 @@ import java.util.Iterator;
  * @author Uli Bubenheimer
  *
  */
-public interface AttributeStore {
+public interface AttributeContainer {
     /**
      * @param tag
      * @return the attribute for the given tag

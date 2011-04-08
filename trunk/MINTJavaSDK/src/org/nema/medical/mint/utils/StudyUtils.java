@@ -15,7 +15,6 @@
  */
 package org.nema.medical.mint.utils;
 
-import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.*;
 
 import java.io.File;
@@ -27,6 +26,9 @@ import static org.nema.medical.mint.utils.Iter.iter;
 /**
  * @author Rex
  */
+//TODO comment from code review: in general these methods are very verbose and could use a heap of refactoring for
+//reuse and clarity. the code itself does not seem to be bad, but if there was bad code in there it would be hard to
+//find
 public final class StudyUtils {
 
     public static final String INITIAL_VERSION = "0";
@@ -34,9 +36,11 @@ public final class StudyUtils {
     /**
      * This method should pull all data from sourceStudy into destinationStudy
      * and overwrite any existing values in destinationStudy. destinationStudy is considered the old study,
-     * sourceStudy is the new study.
+     * sourceStudy is the new study. Both studies must be denormalized.
      *
+     * @param destinationStudy
      * @param sourceStudy
+     * @param excludedBinaryIds
      */
     public static void mergeStudy(final StudyMetadata destinationStudy, final StudyMetadata sourceStudy,
                                   final Collection<Integer> excludedBinaryIds) {
@@ -48,11 +52,17 @@ public final class StudyUtils {
 
         //Merge series from study
         for (final Series series: iter(sourceStudy.seriesIterator())) {
+            if (series.normalizedInstanceAttributeIterator().hasNext()) {
+                throw new RuntimeException("New study not denormalized");
+            }
             final Series thisSeries = destinationStudy.getSeries(series.getSeriesInstanceUID());
 
             if (thisSeries == null) {
                 destinationStudy.putSeries(series);
             } else {
+                if (thisSeries.normalizedInstanceAttributeIterator().hasNext()) {
+                    throw new RuntimeException("Old study not denormalized");
+                }
                 //Merge attributes from series
                 for (final Attribute attribute: iter(series.attributeIterator())) {
                     collectBidsInAttribute(thisSeries.getAttribute(attribute.getTag()), excludedBinaryIds);
@@ -66,10 +76,10 @@ public final class StudyUtils {
                     if (thisInstance == null) {
                         thisSeries.putInstance(instance);
                     } else {
-                        //Check if transfer syntax is existing, update current if it is provided
-                        //TODO this code will not work for changing transfer syntaxes for the same instance;
-                        //we need to translate the entire instance to the new transfer syntax, then merge,
-                        //if we allow this case.
+                        //Check if transfer syntax is existing, update current if it is provided.
+                        //This code will not work for changing transfer syntaxes for the same instance;
+                        //we would need to translate the entire instance to the new transfer syntax, then merge,
+                        //if we allowed this case, to at least account for big endian vs. little endian cases.
                         final String transferSyntaxUID = instance.getTransferSyntaxUID();
                         if (transferSyntaxUID != null && !transferSyntaxUID.isEmpty()) {
                             thisInstance.setTransferSyntaxUID(transferSyntaxUID);
@@ -88,14 +98,13 @@ public final class StudyUtils {
 
     /**
      * Iterates over excludeStudy and will remove from both studies any elements
-     * that have a non-null exclude string. Will return true always unless
-     * something catastrophically unexpected occurs.
+     * that have a non-null exclude string.
      *
      * @param currentStudy
      * @param excludeStudy
-     * @return true
+     * @param excludedBinaryIds
      */
-    public static boolean applyExcludes(StudyMetadata currentStudy, StudyMetadata excludeStudy, Collection<Integer> excludedBinaryIds) {
+    public static void applyExcludes(StudyMetadata currentStudy, StudyMetadata excludeStudy, Collection<Integer> excludedBinaryIds) {
         //Remove study level attributes?
         for (Iterator<Attribute> i = excludeStudy.attributeIterator(); i.hasNext();) {
             Attribute attribute = i.next();
@@ -162,7 +171,7 @@ public final class StudyUtils {
                         continue;
 
                     if (isExclude(excludeInstance.getExclude())) {
-                        collectBidsInInstance(currentInstance, excludedBinaryIds);
+                        collectBidsInAttributeContainer(currentInstance, excludedBinaryIds);
 
                         currentSeries.removeInstance(excludeInstance.getSOPInstanceUID());
                         ii.remove();
@@ -184,19 +193,15 @@ public final class StudyUtils {
                 }
             }
         }
-
-        return true;
     }
 
     /**
-     * Will return true always unless something catastrophically unexpected
-     * occurs.  Assumes that all bids will be within the instances.
+     * Assumes that all bids will be within the instances.
      *
      * @param study
      * @param shiftAmount
-     * @return true except in case of a catastrophic failure.
      */
-    public static boolean shiftStudyBids(StudyMetadata study, int shiftAmount)
+    public static void shiftStudyBids(StudyMetadata study, int shiftAmount)
     {
         for(Iterator<Series> i = study.seriesIterator(); i.hasNext();)
         {
@@ -234,54 +239,53 @@ public final class StudyUtils {
                 }
             }
         }
-
-        return true;
     }
 
-    private static void collectBidsInSeries(Series series,
-                                            Collection<Integer> destinationCollection) {
-        if (series == null || destinationCollection == null)
+    //TODO there shouldn't be any binary ids at the series level; remove this method once this is clear in MINT group
+    private static void collectBidsInSeries(final Series series, final Collection<Integer> destinationCollection) {
+        if (series == null || destinationCollection == null) {
             return;
-
-        for (Iterator<Attribute> i = series.attributeIterator(); i.hasNext();) {
-            collectBidsInAttribute(i.next(), destinationCollection);
         }
 
-        for (Iterator<Attribute> i = series.normalizedInstanceAttributeIterator(); i.hasNext();) {
-            collectBidsInAttribute(i.next(), destinationCollection);
+        collectBidsInAttributeContainer(series, destinationCollection);
+
+        for (final Attribute attr: iter(series.normalizedInstanceAttributeIterator())) {
+            collectBidsInAttribute(attr, destinationCollection);
         }
 
-        for (Iterator<Instance> i = series.instanceIterator(); i.hasNext();) {
-            collectBidsInInstance(i.next(), destinationCollection);
+        for (final Instance inst: iter(series.instanceIterator())) {
+            collectBidsInAttributeContainer(inst, destinationCollection);
         }
     }
 
-    private static void collectBidsInInstance(Instance instance,
-                                              Collection<Integer> destinationCollection) {
-        if (instance == null || destinationCollection == null)
+    private static void collectBidsInAttributeContainer(final AttributeContainer attributes,
+                                                        final Collection<Integer> destinationCollection) {
+        if (attributes == null || destinationCollection == null) {
             return;
+        }
 
-        for (Iterator<Attribute> i = instance.attributeIterator(); i.hasNext();) {
-            collectBidsInAttribute(i.next(), destinationCollection);
+        for (final Attribute attr: iter(attributes.attributeIterator())) {
+            collectBidsInAttribute(attr, destinationCollection);
         }
     }
 
-    private static void collectBidsInAttribute(Attribute attribute,
-                                               Collection<Integer> destinationCollection) {
-        if (attribute == null || destinationCollection == null)
+    private static void collectBidsInAttribute(final Attribute attribute,
+                                               final Collection<Integer> destinationCollection) {
+        if (attribute == null || destinationCollection == null) {
             return;
+        }
 
-        Queue<Attribute> sequence = new LinkedList<Attribute>();
+        final Queue<Attribute> sequence = new LinkedList<Attribute>();
         sequence.add(attribute);
 
         while (!sequence.isEmpty()) {
-            Attribute curr = sequence.remove();
+            final Attribute curr = sequence.remove();
 
-            int bid = curr.getBid();
+            final int bid = curr.getBid();
             if (bid >= 0) {
-                int frameCount = curr.getFrameCount();
-                if (frameCount >= 1) {
-                    for (int newBid = bid; newBid < (bid + frameCount); newBid++) {
+                final int frameCount = curr.getFrameCount();
+                if (frameCount > 1) {
+                    for (int newBid = bid; newBid < (bid + frameCount); ++newBid) {
                         destinationCollection.add(newBid);
                     }
                 } else {
@@ -290,9 +294,9 @@ public final class StudyUtils {
             }
 
             //Add children to queue
-            for (Iterator<Item> i = curr.itemIterator(); i.hasNext();) {
-                for (Iterator<Attribute> ii = i.next().attributeIterator(); ii.hasNext();) {
-                    sequence.add(ii.next());
+            for (final Item item: iter(curr.itemIterator())) {
+                for (final Attribute attr: iter(item.attributeIterator())) {
+                    sequence.add(attr);
                 }
             }
         }
@@ -303,58 +307,35 @@ public final class StudyUtils {
      *
      * @param study
      */
-    public static void removeExcludes(StudyMetadata study) {
+    public static void removeStudyExcludes(final StudyMetadata study) {
         //Remove study level attributes?
-        for (Iterator<Attribute> i = study.attributeIterator(); i.hasNext();) {
-            Attribute attribute = i.next();
+        removeExcludes(study.attributeIterator());
+        //Remove series from study?
+        removeExcludes(study.seriesIterator());
 
-            if (isExclude(attribute.getExclude())) {
-                i.remove();
+        //Descend into remaining series
+        for (final Series series: iter(study.seriesIterator())) {
+            //Remove attributes from series?
+            removeExcludes(series.attributeIterator());
+            //Remove normalized attributes from series?
+            removeExcludes(series.normalizedInstanceAttributeIterator());
+            //Remove instance from series?
+            removeExcludes(series.instanceIterator());
+
+            //Descend into remaining instances
+            for (final Instance instance: iter(series.instanceIterator())) {
+                //Remove attributes from instance?
+                removeExcludes(instance.attributeIterator());
             }
         }
+    }
 
-        //Remove series from study?
-        for (Iterator<Series> i = study.seriesIterator(); i.hasNext();) {
-            Series series = i.next();
+    private static void removeExcludes(final Iterator<? extends Excludable> iter) {
+        while (iter.hasNext()) {
+            final Excludable element = iter.next();
 
-            if (isExclude(series.getExclude())) {
-                i.remove();
-            } else {
-                //Remove attributes from series?
-                for (Iterator<Attribute> ii = series.attributeIterator(); ii.hasNext();) {
-                    Attribute attribute = ii.next();
-
-                    if (isExclude(attribute.getExclude())) {
-                        ii.remove();
-                    }
-                }
-
-                //Remove normalized attributes from series?
-                for (Iterator<Attribute> ii = series.normalizedInstanceAttributeIterator(); ii.hasNext();) {
-                    Attribute attribute = ii.next();
-
-                    if (isExclude(attribute.getExclude())) {
-                        ii.remove();
-                    }
-                }
-
-                //Remove instances from series?
-                for (Iterator<Instance> ii = series.instanceIterator(); ii.hasNext();) {
-                    Instance instance = ii.next();
-
-                    if (isExclude(instance.getExclude())) {
-                        ii.remove();
-                    } else {
-                        //Remove attributes from instance?
-                        for (Iterator<Attribute> iii = instance.attributeIterator(); iii.hasNext();) {
-                            Attribute attribute = iii.next();
-
-                            if (isExclude(attribute.getExclude())) {
-                                iii.remove();
-                            }
-                        }
-                    }
-                }
+            if (isExclude(element.getExclude())) {
+                iter.remove();
             }
         }
     }
@@ -369,13 +350,11 @@ public final class StudyUtils {
 
     /**
      * Will go through each series and push all normalized attributes into each
-     * instance in that series.  Will always return true unless something
-     * catastrophically unexpected occurs.
+     * instance in that series.
      *
      * @param study
-     * @return true
      */
-    public static boolean denormalizeStudy(final StudyMetadata study) {
+    public static void denormalizeStudy(final StudyMetadata study) {
         for (final Series series: iter(study.seriesIterator())) {
             for (final Iterator<Attribute> attrIter = series.normalizedInstanceAttributeIterator(); attrIter.hasNext();) {
                 final Attribute attr = attrIter.next();
@@ -387,16 +366,57 @@ public final class StudyUtils {
                 attrIter.remove();
             }
         }
-
-        return true;
     }
 
-
-    //"??" is illegal VR used by old SIEMENS modalities (or at least so says DCM4CHE Javadoc)
+    //"??" is "illegal" VR used by old SIEMENS modalities (or at least so says DCM4CHE Javadoc)
     private static final Collection<String> binaryVRs =
             new HashSet<String>(Arrays.asList("SQ", "OW", "OB", "OF", "UN", "??"));
-    private static boolean isBinaryVR(final String vr) {
+
+    static boolean isBinaryVR(final String vr) {
         return binaryVRs.contains(vr);
+    }
+
+    static boolean isNonBinaryFloatVR(final String vr) {
+        return "FL".equals(vr) || "FD".equals(vr);
+    }
+
+    /**
+     * Reverse array
+     * @param value array to be reversed
+     */
+    static void reverse(final byte[] value) {
+        final int byteCnt = value.length;
+        //Ignore center byte if an odd number of bytes
+        final int halfByteCnt = byteCnt >> 1;
+        for (int i = 0; i < halfByteCnt; ++i) {
+            final int otherIndex = byteCnt - 1 - i;
+            final byte buf = value[i];
+            value[i] = value[otherIndex];
+            value[otherIndex] = buf;
+        }
+    }
+
+    /**
+     * Convert attribute to little endian if it is FD/FL with big endian binary representation
+     * @param attr attribute to convert
+     * @param hasBigEndianTransferSyntax indicated endianness of attribute's binary representation
+     * @return the potentially converted attribute.
+     */
+    public static Attribute standardizedAttribute(final Attribute attr, final boolean hasBigEndianTransferSyntax) {
+        if (!hasBigEndianTransferSyntax || !isNonBinaryFloatVR(attr.getVr()) || attr.getBytes() == null
+                || attr.getBytes().length <= 1) {
+            return attr;
+        } else {
+            final Attribute normalizedAttr;
+            try {
+                normalizedAttr = (Attribute) attr.clone();
+            } catch(final CloneNotSupportedException e) {
+                //Should never happen
+                throw new RuntimeException(e);
+            }
+            reverse(normalizedAttr.getBytes());
+            return normalizedAttr;
+        }
     }
 
     /**
@@ -404,9 +424,8 @@ public final class StudyUtils {
      * attributes not having been normalized to the series-level yet.
      *
      * @param study
-     * @return true
      */
-    public static boolean normalizeStudy(final StudyMetadata study) {
+    public static void normalizeStudy(final StudyMetadata study) {
     	final Collection<Attribute> tempNormalizedInstanceAttributeList = new ArrayList<Attribute>();
 
         //For each series
@@ -418,22 +437,26 @@ public final class StudyUtils {
 
                 //Prime list by loading all attributes in from first instance
                 final Iterator<Instance> ii = series.instanceIterator();
-                final Instance firstInstance = ii.next();
-                for (final Attribute attr: iter(firstInstance.attributeIterator())) {
-                    if (!isBinaryVR(attr.getVr())) {
-                	    tempNormalizedInstanceAttributeList.add(attr);
+                {
+                    final Instance instance = ii.next();
+                    for (final Attribute attr: iter(instance.attributeIterator())) {
+                        final String vr = attr.getVr();
+                        //Do not normalize binary VRs or non-binary float VRs
+                        if (!isBinaryVR(vr) && !isNonBinaryFloatVR(vr)) {
+                	        tempNormalizedInstanceAttributeList.add(attr);
+                        }
                     }
                 }
 
                 //Loop over the rest of the attributes
                 while (ii.hasNext()) {
-                    final Instance inst = ii.next();
+                    final Instance instance = ii.next();
 
                     //For each attribute in the instance
                     for (final Iterator<Attribute> normAttrIter = tempNormalizedInstanceAttributeList.iterator();
                          normAttrIter.hasNext();) {
                         final Attribute normalA = normAttrIter.next();
-                        final Attribute a = inst.getAttribute(normalA.getTag());
+                        final Attribute a = instance.getAttribute(normalA.getTag());
                         if (a == null || isBinaryVR(a.getVr()) || !equalNonBinaryAttributes(a, normalA)) {
                             normAttrIter.remove();
                         }
@@ -447,47 +470,25 @@ public final class StudyUtils {
                 for (final Attribute a: tempNormalizedInstanceAttributeList) {
                     series.putNormalizedInstanceAttribute(a);
 
-                    for (final Instance instanceMeta : Iter.iter(series.instanceIterator())) {
+                    for (final Instance instanceMeta : iter(series.instanceIterator())) {
                         instanceMeta.removeAttribute(a.getTag());
                     }
                 }
             }
         }
-
-        return true;
     }
 
     /**
-     * Returns true
+     * If passed-in attributes have inline binary data (as in the case of floats), the binary
+     * data must have been normalized to a single endianness (typically little endian) by
+     * the caller to correctly determine equality.
      *
-     * @param a
-     * @param attr
-     * @return true if equals
+     * @param a1
+     * @param a2
+     * @return true if equal
      */
-    public static boolean equalNonBinaryAttributes(final Attribute a, final Attribute attr) {
-        //True if both references point to the same object
-        if (a == attr) {
-            //references are the same (may be null)
-            return true;
-        } else if (a != null && attr != null) {
-            //references are not equal and neither reference is null
-            if (a.getTag() != attr.getTag()) {
-                //Tags are not equal : false
-                return false;
-            } else if (a.getVr() != attr.getVr() && (a.getVr() == null || !a.getVr().equals(attr.getVr()))) {
-                //VRs are not equal : false
-                return false;
-            } else if (a.getVal() != attr.getVal() && (a.getVal() == null || !a.getVal().equals(attr.getVal()))) {
-                //Value fields not equal : false
-                return false;
-            } else {
-                //Tags, VRs, and Values were all equal : true
-                return true;
-            }
-        } else {
-            //a != attr and one of them is null
-            return false;
-        }
+    public static boolean equalNonBinaryAttributes(final Attribute a1, final Attribute a2) {
+        return a1 == a2 || a1 != null && a1.equals(a2);
     }
 
     public static void writeStudy(StudyMetadata study, File studyFolder) throws IOException {
@@ -498,38 +499,6 @@ public final class StudyUtils {
         StudyIO.writeSummaryToXML(study, new File(studyFolder, "summary.xml"));
     }
 
-    public static void moveBinaryItems(File jobFolder, File studyBinaryFolder) {
-        Iterator<File> iterator = Arrays.asList(jobFolder.listFiles()).iterator();
-        while (iterator.hasNext()) {
-            File tempfile = iterator.next();
-
-            //Don't move metadata because has no purpose in the destination
-            if (!tempfile.getName().startsWith("metadata")) {
-                File permfile = new File(studyBinaryFolder, tempfile.getName());
-                // just moving the file since the reference implementation
-                // is using the same MINT_ROOT for temp and perm storage
-                // other implementations may want to copy/delete the file
-                // if the temp storage is on a different device
-                tempfile.renameTo(permfile);
-            }
-        }
-        jobFolder.delete();
-    }
-
-    /**
-     * Will delete all files in the jobs folder and then delete the jobs folder
-     * itself.
-     *
-     * @param jobFolder
-     */
-    public static void deleteFolder(File jobFolder) {
-        for (File f : jobFolder.listFiles()) {
-            f.delete();
-        }
-
-        jobFolder.delete();
-    }
-
     /**
      * @return the version to set a study to on creation
      */
@@ -538,7 +507,9 @@ public final class StudyUtils {
     }
 
     /**
-     * Generates the next version string after the provided string.  An example of this for a 0 based index version system would be to pass in "3" and get back "4".  Values don't need to be sequential but the 'next' value should at least be bigger than the current.
+     * Generates the next version string after the provided string.
+     * An example of this for a 0 based index version system would be to pass in "3" and get back "4".
+     * Values don't need to be sequential but the 'next' value should at least be bigger than the current.
      *
      * @param current
      * @return the next version string

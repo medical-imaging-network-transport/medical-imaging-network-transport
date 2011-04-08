@@ -15,19 +15,7 @@
  */
 package org.nema.medical.mint.server.controller;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.util.LinkedList;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -37,13 +25,22 @@ import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.MINTStudy;
-import org.nema.medical.mint.studies.StudyRoot;
 import org.nema.medical.mint.server.domain.StudyDAO;
+import org.nema.medical.mint.studies.StudyRoot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.UUID;
 
 @Controller
 public class StudyRootController {
@@ -127,16 +124,13 @@ public class StudyRootController {
             return;
         }
 
-        final Principal principal = req.getUserPrincipal();
-        final String principalName = (principal != null) ? principal.getName() : null;
-
-        deleteStudy(uuid, studiesRoot, req.getRemoteUser(), req.getRemoteHost(), principalName, changeDAO, studyDAO);
+        deleteStudy(uuid, studiesRoot, req.getRemoteUser(), req.getRemoteHost(), changeDAO, studyDAO);
         res.setStatus(204);
     }
 
     public static void deleteStudy(final String uuid, final File studiesRoot, final String remoteUser,
-                                   final String remoteHost, final String principal, final ChangeDAO changeDAO,
-                                   final StudyDAO studyDAO) throws IOException {
+                                   final String remoteHost, final ChangeDAO changeDAO, final StudyDAO studyDAO)
+            throws IOException {
          final File studyDir = new File(studiesRoot, uuid);
          FileUtils.deleteDirectory(studyDir);
 
@@ -151,7 +145,6 @@ public class StudyRootController {
          deleteInfo.setStudyID(uuid);
          deleteInfo.setRemoteUser(remoteUser);
          deleteInfo.setRemoteHost(remoteHost);
-         deleteInfo.setPrincipal(principal);
          deleteInfo.setIndex(lastChange.getIndex() + 1);
          deleteInfo.setOperation(ChangeOperation.DELETE);
          changeDAO.saveChange(deleteInfo);

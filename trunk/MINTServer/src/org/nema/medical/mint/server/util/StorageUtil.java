@@ -23,8 +23,11 @@ import org.nema.medical.mint.utils.StudyUtils;
 import org.nema.medical.mint.utils.StudyValidation;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * @author Rex
@@ -88,29 +91,16 @@ public final class StorageUtil {
      * @param study
      * @param binaryDirectory
      * @param shiftAmount
-     * @return true if successful
      */
-    public static boolean shiftItemIds(StudyMetadata study, File binaryDirectory, int shiftAmount)
+    public static void shiftItemIds(StudyMetadata study, File binaryDirectory, int shiftAmount)
     {
-    	if(shiftAmount == 0)
-    	{
-    		return true;
+    	if(shiftAmount == 0) {
+    		return;
     	}
 
-        /*
-         * Need to shift the both the binary file names and the study bids to
-         * stay consistent.
-         */
-        boolean success = true;
-
         //I know this if is not necessary, I put it here in order to be symmetric
-        if(success)
-            success &= shiftBinaryFiles(binaryDirectory, shiftAmount);
-
-        if(success)
-            success &= StudyUtils.shiftStudyBids(study, shiftAmount);
-
-        return success;
+        shiftBinaryFiles(binaryDirectory, shiftAmount);
+        StudyUtils.shiftStudyBids(study, shiftAmount);
     }
 
     /**
@@ -119,9 +109,8 @@ public final class StorageUtil {
      *
      * @param directory
      * @param shiftAmount
-     * @return
      */
-    private static boolean shiftBinaryFiles(File directory, int shiftAmount)
+    private static void shiftBinaryFiles(File directory, int shiftAmount)
     {
         File[] files = directory.listFiles();
 
@@ -156,8 +145,6 @@ public final class StorageUtil {
                 //Not a binary file
             }
         }
-
-        return true;
     }
 
     /**
@@ -259,4 +246,23 @@ public final class StorageUtil {
 
 		return -1;
 	}
+
+	//TODO from code review of StudyUtils where this method used to live: this method doesn't belong in here - the rest of the methods operate on metadata. this belongs in a store
+    public static void moveBinaryItems(final File jobFolder, final File studyBinaryFolder) throws IOException {
+        for (final File file: jobFolder.listFiles()) {
+            //Don't move metadata because has no purpose in the destination
+            final String fileName = file.getName();
+            if (!fileName.startsWith("metadata")) {
+                final File permfile = new File(studyBinaryFolder, fileName);
+                // just moving the file since the reference implementation
+                // is using the same MINT_ROOT for temp and perm storage
+                // other implementations may want to copy/delete the file
+                // if the temp storage is on a different device
+                if(!file.renameTo(permfile)) {
+                    throw new IOException(
+                            "Unable to move/rename file '" + file.getPath() + " to " + permfile.getPath());
+                }
+            }
+        }
+    }
 }
