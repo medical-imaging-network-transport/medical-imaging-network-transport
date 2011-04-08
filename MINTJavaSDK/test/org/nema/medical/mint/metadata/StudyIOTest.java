@@ -132,6 +132,7 @@ public class StudyIOTest {
 		ArrayList<Instance> instances = new ArrayList<Instance>();
 
 		study.setStudyInstanceUID("1");
+        study.setType("DICOM");
 
 		Attribute attr = new Attribute();
 		attr.setBid(1);

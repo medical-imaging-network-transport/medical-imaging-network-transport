@@ -14,7 +14,5 @@
 		<value style="attribute" name="remoteHost" get-method="getRemoteHost" set-method="setRemoteHost"/>
 		<value style="attribute" name="remoteUser" get-method="getRemoteUser" set-method="setRemoteUser"
 		    usage="optional"/>
-		<value style="attribute" name="principal" get-method="getPrincipal" set-method="setPrincipal"
-			usage="optional"/>
 	</mapping>
 </binding>

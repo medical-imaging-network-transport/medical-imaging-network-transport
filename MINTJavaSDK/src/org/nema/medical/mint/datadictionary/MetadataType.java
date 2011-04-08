@@ -130,7 +130,7 @@ public class MetadataType
      * 
      * @return value
      */
-    public Float getVersion() {
+    public float getVersion() {
         return version;
     }
 
@@ -139,7 +139,7 @@ public class MetadataType
      * 
      * @param version
      */
-    public void setVersion(Float version) {
+    public void setVersion(float version) {
         this.version = version;
     }
 }

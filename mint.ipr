@@ -250,12 +250,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DICOM2MINT/DICOM2MINT.iml" filepath="$PROJECT_DIR$/DICOM2MINT/DICOM2MINT.iml" />
-      <module fileurl="file://$PROJECT_DIR$/DICOM2MINTImport/DICOM2MINT.iml" filepath="$PROJECT_DIR$/DICOM2MINTImport/DICOM2MINT.iml" />
       <module fileurl="file://$PROJECT_DIR$/DICOMSend/DICOMSend.iml" filepath="$PROJECT_DIR$/DICOMSend/DICOMSend.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" filepath="$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MINTCommon/MINTCommon.iml" filepath="$PROJECT_DIR$/MINTCommon/MINTCommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTMetadata/MINTJavaSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTServer/MINTServer.iml" filepath="$PROJECT_DIR$/MINTServer/MINTServer.iml" />
     </modules>
   </component>

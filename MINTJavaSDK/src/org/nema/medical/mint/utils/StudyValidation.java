@@ -1,6 +1,5 @@
 package org.nema.medical.mint.utils;
 
-import org.nema.medical.mint.datadictionary.AttributeType;
 import org.nema.medical.mint.datadictionary.AttributesType;
 import org.nema.medical.mint.datadictionary.ElementType;
 import org.nema.medical.mint.datadictionary.MetadataType;
@@ -14,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.nema.medical.mint.utils.Iter.iter;
 import static org.nema.medical.mint.utils.StudyUtils.tagString;
 
 /**
@@ -43,7 +43,7 @@ public class StudyValidation {
 
     static void validateUnknownAttributes(final StudyMetadata study, final MetadataType type)
             throws StudyTraversals.TraversalException {
-        if (type.getAttributes().getUnknownAttributes().equals("reject")) {
+        if ("reject".equals(type.getAttributes().getUnknownAttributes())) {
             final AttributesType attributesType = type.getAttributes();
             final List<ElementType> elements = attributesType.getElements();
             final Set<Integer> availableElementTags = new HashSet<Integer>();
@@ -89,6 +89,12 @@ public class StudyValidation {
         StudyTraversals.flatSeriesAttributeTraverser(study, new LevelCheck("series", seriesAttributeTags));
     }
 
+    /**
+     * Validates that, for a DICOM study, all attributes have a VR value. This method must not be called for
+     * metadata with a type other than DICOM, as the VR field is optional otherwise.
+     * @param study the DICOM study metadata
+     * @throws StudyTraversals.TraversalException if there is an attribute in the metadata without the VR value set.
+     */
     static void validateDICOMVRValueExistence(final StudyMetadata study) throws StudyTraversals.TraversalException {
         StudyTraversals.allAttributeTraverser(study, new StudyTraversals.AttributeAction() {
             @Override
@@ -101,20 +107,25 @@ public class StudyValidation {
             }
         });
     }
-    /*
-     * Verifies that the transferSyntaxUID value in <instance sopInstanceUID="123" transferSyntaxUID="456" >
-     * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value.
+    /**
+     * For a DICOM study, verifies that the transferSyntaxUID value in
+     * <instance sopInstanceUID="123" transferSyntaxUID="456">
+     * is equal to the DICOM attribute <attr tag="00020010" vr="UI" val="456"> value. This method must not be called
+     * for metadata with a type other than DICOM, as other types do not, in general, have a concept of transfer syntax.
+     *
+     * @param study the DICOM study metadata
+     * @throws StudyTraversals.TraversalException if there is an instance with a transfer syntax mismatch.
      */
     static void validateDICOMTransferSyntax(final StudyMetadata study) throws StudyTraversals.TraversalException {
     	//loop over each series
-    	for (final Series s: Iter.iter(study.seriesIterator())) {
+    	for (final Series s: iter(study.seriesIterator())) {
     		final Attribute normalizedTransferSyntaxAttribute = s.getNormalizedInstanceAttribute(TRANSFER_SYNTAX_TAG);
     		final String normalizedTransferSyntax =
                     (normalizedTransferSyntaxAttribute != null) ? normalizedTransferSyntaxAttribute.getVal() : null;
     		final boolean transferSyntaxNormalized = (normalizedTransferSyntax != null);
 
             //loop over the instances
-    		for (final Instance instance: Iter.iter(s.instanceIterator())) {
+    		for (final Instance instance: iter(s.instanceIterator())) {
     			//This is the instance level transfer syntax element attribute
     			//<instance sopInstanceUID="123" transferSyntaxUID="456" >
     			final String instanceTransferSyntax = instance.getTransferSyntaxUID();
@@ -144,7 +155,7 @@ public class StudyValidation {
      * @param study the study
      * @param type the study's type definition
      * @param binaryItemIds the study's binary item IDs
-     * @throws org.nema.medical.mint.utils.StudyTraversals.TraversalException if a validation error occurred
+     * @throws StudyTraversals.TraversalException if a validation error occurred
      */
     public static void validateStudy(final StudyMetadata study, final MetadataType type,
                                      final Collection<Integer> binaryItemIds)
@@ -163,7 +174,7 @@ public class StudyValidation {
      *
      * @param study the study
      * @param binaryItemIds the study's binary item IDs
-     * @throws org.nema.medical.mint.utils.StudyTraversals.TraversalException if a validation error occurred
+     * @throws StudyTraversals.TraversalException if a validation error occurred
      */
     public static void validateBinaryItemsReferences(final StudyMetadata study,
                                                      final Collection<Integer> binaryItemIds)
@@ -205,7 +216,6 @@ public class StudyValidation {
                 }
             }
         });
-
 
         //Can't use equals() here, since the collection types may be quite different
         if (studyBids.size() != binaryItemIds.size() || !studyBids.containsAll(binaryItemIds)) {

@@ -15,6 +15,7 @@
  */
 package org.nema.medical.mint.server.processor;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.datadictionary.MetadataType;
@@ -46,7 +47,9 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String oldVersion, remoteUser, remoteHost, principal;
+	private final String oldVersion;
+    private final String remoteUser;
+    private final String remoteHost;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
@@ -62,7 +65,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	 */
 	public StudyUpdateProcessor(final File jobFolder, final File studyFolder,
                                 final Map<String, MetadataType> availableTypes, final String oldVersion,
-                                final String remoteUser, final String remoteHost, final String principal,
+                                final String remoteUser, final String remoteHost,
                                 final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO, final ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
@@ -70,7 +73,6 @@ public class StudyUpdateProcessor extends TimerTask {
         this.oldVersion = oldVersion;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
-		this.principal = principal;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -168,12 +170,8 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * the new study document.
 				 */
 				int maxExistingItemNumber = StorageUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
-				if(!StorageUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1))
-				{
-					//Shift Item Ids failed!
-					throw new RuntimeException("Failed to shift binary item identifies. Cause is unknown.");
-				}
-				
+				StorageUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1);
+
 				/*
 				 * Write metadata update message to change log folder.
 				 */
@@ -188,35 +186,24 @@ public class StudyUpdateProcessor extends TimerTask {
 					 * Need to move through the new study and look for things to exclude
 					 * and exclude them from the existing study.
 					 */
-                    if(!StudyUtils.applyExcludes(existingStudy, newStudy, excludedBids))
-					{
-						//Applying Excludes failed!
-						throw new RuntimeException("Failed to apply exclude tags. Cause is unknown.");
-					}
+                    StudyUtils.applyExcludes(existingStudy, newStudy, excludedBids);
 		        }
 		        
 				/*
 				 * Clean out excludes because excludes should not be left in
 				 * the newStudy.
 				 */
-                StudyUtils.removeExcludes(newStudy);
+                StudyUtils.removeStudyExcludes(newStudy);
 
                 /*
                      * Need to merge the study documents and renormalize the result.
                      * This means first denormalize, then merge, then normalize the
                      * result
                      */
-                if(!StudyUtils.denormalizeStudy(newStudy))
-				{
-					throw new RuntimeException("Failed to denormalize new study. Cause is unknown.");
-				}
-		        
-		        if(existingStudy != null) {
-                    if(!StudyUtils.denormalizeStudy(existingStudy))
-					{
-						throw new RuntimeException("Failed to denormalize existing study. Cause is unknown.");
-					}
+                StudyUtils.denormalizeStudy(newStudy);
 
+		        if(existingStudy != null) {
+                    StudyUtils.denormalizeStudy(existingStudy);
                     StudyUtils.mergeStudy(existingStudy, newStudy, excludedBids);
 
                     // Get next version number
@@ -237,20 +224,18 @@ public class StudyUpdateProcessor extends TimerTask {
 		        //Rename all excluded binary files to have .exclude
 				StorageUtil.renameExcludedFiles(existingBinaryFolder, excludedBids);
 
-                if (!StudyUtils.normalizeStudy(existingStudy)) {
-					throw new RuntimeException("Failed to normalize final study. Cause is unknown.");
-				}
-				
+                StudyUtils.normalizeStudy(existingStudy);
+
 				/*
 				 * Need to copy into the Study folder the new study document and
 				 * binary data files.
 				 */
 				StudyUtils.writeStudy(existingStudy, typeFolder);
 				
-				StudyUtils.moveBinaryItems(jobFolder, existingBinaryFolder);
+				StorageUtil.moveBinaryItems(jobFolder, existingBinaryFolder);
 				
-				StudyUtils.deleteFolder(jobFolder);
-				
+                FileUtils.deleteDirectory(jobFolder);
+
                 //Update study DAO only if this is DICOM data; don't update study DAO for other types (DICOM is primary)
                 if (typeName.equals("DICOM")) {
                     MINTStudy studyData = new MINTStudy();
@@ -271,7 +256,6 @@ public class StudyUpdateProcessor extends TimerTask {
 				updateInfo.setType(typeName);
 				updateInfo.setRemoteUser(remoteUser);
 				updateInfo.setRemoteHost(remoteHost);
-				updateInfo.setPrincipal(principal);
 				updateInfo.setIndex(Integer.parseInt(changelogFolder.getName()));
                 updateInfo.setOperation(ChangeOperation.UPDATE);
 				updateDAO.saveChange(updateInfo);

@@ -17,7 +17,6 @@ package org.nema.medical.mint.dcm2mint;
 
 import org.dcm4che2.data.*;
 import org.nema.medical.mint.metadata.*;
-import org.nema.medical.mint.utils.Iter;
 import org.nema.medical.mint.utils.StudyUtils;
 
 import java.io.File;
@@ -25,6 +24,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.nema.medical.mint.utils.Iter.iter;
 
 
 /**
@@ -72,6 +73,22 @@ behavior is deemed acceptable.
 @author Uli Bubenheimer
 */
 public final class Dcm2MetaBuilder {
+
+    /**
+     * Codes from org.dcm4che.data.VR.valueOf.
+     * These codes are a 16-bit integer representation of the two 8-bit ASCII character bytes representing
+     * the constant names.
+     */
+    private interface VRCodes {
+        int UN_SIEMENS = 0x3F3F;
+        int FD = 0x4644;
+        int FL = 0x464c;
+        int OB = 0x4f42;
+        int OF = 0x4f46;
+        int OW = 0x4f57;
+        int SQ = 0x5351;
+        int UN = 0x554E;
+    }
 
     private static final Collection<String> JPEG_TRANSFER_SYNTAXES = new HashSet<String>(Arrays.asList(
             UID.JPEGBaseline1,
@@ -197,11 +214,11 @@ public final class Dcm2MetaBuilder {
          // This dispatches the Attribute storage to one of the study level, series level
          // or instance-level Attributes sets.
          if (p10Aware) {
-             for (final DicomElement dcmElement: Iter.iter(dcmObj.fileMetaInfoIterator())) {
+             for (final DicomElement dcmElement: iter(dcmObj.fileMetaInfoIterator())) {
                  handleTopElems(dcmPath, dcmObj, series, instance, dcmElement, transferSyntax);
              }
          }
-         for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
+         for (final DicomElement dcmElement: iter(dcmObj.datasetIterator())) {
              handleTopElems(dcmPath, dcmObj, series, instance, dcmElement, transferSyntax);
          }
      }
@@ -229,49 +246,83 @@ public final class Dcm2MetaBuilder {
              final File dcmPath,
              final DicomElement dcmElem,
              final DicomObject parentDcmObj,
-             final AttributeStore attrs,
+             final AttributeContainer attrs,
              final int[] tagPath,
              final TransferSyntax transferSyntax) {
-         final Store store = new Store(dcmPath, attrs, tagPath, dcmElem, parentDcmObj, transferSyntax);
+         final Store store = new Store(dcmPath, tagPath, dcmElem, parentDcmObj, transferSyntax);
          final VR vr = dcmElem.vr();
          if (vr == null) {
              throw new RuntimeException("Null VR");
-         } else if (vr == VR.OW || vr == VR.OB || vr == VR.OF || vr == VR.UN || vr == VR.UN_SIEMENS) {
-             //Binary
-             store.storeBinary();
-         } else if (vr == VR.SQ) {
-             store.storeSequence();
-         } else {
-             //Non-binary, non-sequence
-             store.storePlain();
          }
+
+         final Attribute attr;
+
+         switch (vr.code()) {
+             case VRCodes.OW:
+             case VRCodes.OB:
+             case VRCodes.OF:
+             case VRCodes.UN:
+             case VRCodes.UN_SIEMENS:
+                 //Non-sequence binary
+                 attr = store.createBinary();
+                 break;
+
+             case VRCodes.SQ:
+                 //Sequence
+                 attr = store.createSequence();
+                 break;
+
+             case VRCodes.FD:
+             case VRCodes.FL:
+                 //Float
+                 attr = store.createFloat();
+                 break;
+
+             default:
+                 attr = store.createPlain();
+         }
+
+         //TODO revisit once MINT WG has defined attribute standardization in terms of endianness
+         //For the time being, convert Study-level and Series-level FL/FD tags binary data to little endian
+         final Attribute standardizedAttribute;
+         if (attrs instanceof StudyMetadata || attrs instanceof Series) {
+             standardizedAttribute = StudyUtils.standardizedAttribute(attr, transferSyntax.bigEndian());
+         } else {
+             standardizedAttribute = attr;
+         }
+         attrs.putAttribute(standardizedAttribute);
      }
 
      private final class Store {
-         public Store(final File dcmPath, final AttributeStore attrs, final int[] tagPath, final DicomElement elem,
+         public Store(final File dcmPath, final int[] tagPath, final DicomElement elem,
                       final DicomObject parentDcmObj, final TransferSyntax transferSyntax) {
              this.dcmPath = dcmPath;
-             this.attrs = attrs;
              this.tagPath = tagPath;
              this.elem = elem;
              this.parentDcmObj = parentDcmObj;
              this.transferSyntax = transferSyntax;
          }
 
-         public void storePlain() {
+         public Attribute createPlain() {
              assert elem != null;
              assert !elem.hasItems();
              final String strVal = getStringValue(elem, parentDcmObj.getSpecificCharacterSet());
              final Attribute attr = newAttr(elem);
              attr.setVal(strVal);
-             attrs.putAttribute(attr);
+             return attr;
          }
 
-         public void storeSequence() {
+         public Attribute createFloat() {
+             final Attribute attr = createPlain();
+             final byte[] binaryData = elem.getBytes();
+             attr.setBytes(binaryData);
+             return attr;
+         }
+
+         public Attribute createSequence() {
              assert elem != null;
              assert elem.hasDicomObjects();
              final Attribute attr = newAttr(elem);
-             attrs.putAttribute(attr);
              final int[] newTagPath = new int[tagPath.length + 2];
              System.arraycopy(tagPath, 0, newTagPath, 0, tagPath.length);
              newTagPath[tagPath.length] = elem.tag();
@@ -280,13 +331,14 @@ public final class Dcm2MetaBuilder {
                  final DicomObject dcmObj = elem.getDicomObject(i);
                  final Item newItem = new Item();
                  attr.addItem(newItem);
-                 for (final DicomElement dcmElement: Iter.iter(dcmObj.datasetIterator())) {
+                 for (final DicomElement dcmElement: iter(dcmObj.datasetIterator())) {
                      handleDICOMElement(dcmPath, dcmElement, dcmObj, newItem, newTagPath, transferSyntax);
                  }
              }
+             return attr;
          }
 
-         public void storeBinary() {
+         public Attribute createBinary() {
              assert elem != null;
 
              final Attribute attr = newAttr(elem);
@@ -442,11 +494,10 @@ public final class Dcm2MetaBuilder {
                      binaryDataStore.addNative(dcmPath, newTagPath, 0, binaryData.length);
                  }
              }
-             attrs.putAttribute(attr);
+             return attr;
          }
 
          private final File dcmPath;
-         private final AttributeStore attrs;
          private final int[] tagPath;
          private final DicomElement elem;
          private final DicomObject parentDcmObj;

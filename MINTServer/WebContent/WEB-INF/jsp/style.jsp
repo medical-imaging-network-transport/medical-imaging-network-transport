@@ -387,7 +387,6 @@
                     <th>Operation</th>
 					<th>Remote host</th>
 					<th>Remote user</th>
-					<th>Principal</th>
 				</tr>
 				<xsl:apply-templates/>
 			</table>
@@ -410,11 +409,6 @@
 		<td class='remoteUser'>
 			<xsl:if test="./@remoteUser">
 				<xsl:value-of select="./@remoteUser"/>
-			</xsl:if>
-		</td>
-		<td class='principal'>
-			<xsl:if test="./@principal">
-				<xsl:value-of select="./@principal"/>
 			</xsl:if>
 		</td>
 	</tr>

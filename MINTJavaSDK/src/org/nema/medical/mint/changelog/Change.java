@@ -11,14 +11,13 @@ public class Change {
     }
 
 	public Change(final String studyUUID, final int changeNumber, final String type, final Timestamp dateTime,
-			final String remoteHost, final String remoteUser, final String principal, final ChangeOperation operation) {
+			final String remoteHost, final String remoteUser, final ChangeOperation operation) {
 		this.studyUUID = studyUUID;
 		this.changeNumber = changeNumber;
 		this.type = type;
 		this.dateTime = dateTime;
 		this.remoteHost = remoteHost;
 		this.remoteUser = remoteUser;
-		this.principal = principal;
         this.operation = operation;
 	}
 	
@@ -70,14 +69,6 @@ public class Change {
         this.remoteUser = remoteUser;
     }
 
-	public String getPrincipal() {
-		return principal;
-	}
-
-    public void setPrincipal(final String principal) {
-        this.principal = principal;
-    }
-
     public ChangeOperation getOperation() {
         return operation;
     }
@@ -92,6 +83,5 @@ public class Change {
 	private Timestamp dateTime;
 	private String remoteHost;
 	private String remoteUser;
-	private String principal;
     private ChangeOperation operation;
 }

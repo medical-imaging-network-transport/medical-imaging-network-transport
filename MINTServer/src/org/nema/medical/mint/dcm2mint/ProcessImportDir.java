@@ -38,7 +38,6 @@ import org.nema.medical.mint.datadictionary.*;
 import org.nema.medical.mint.jobs.JobConstants;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
-import org.nema.medical.mint.utils.Iter;
 import org.nema.medical.mint.utils.StudyTraversals;
 import org.nema.medical.mint.utils.StudyValidation;
 import org.w3c.dom.Document;
@@ -60,6 +59,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import static org.nema.medical.mint.utils.Iter.iter;
 
 /**
  * @author Uli Bubenheimer
@@ -443,7 +444,7 @@ public final class ProcessImportDir {
 
         //We support only one type
         assert binaryData instanceof BinaryDcmData;
-        for (final InputStream binaryStream: Iter.iter(((BinaryDcmData) binaryData).streamIterator())) {
+        for (final InputStream binaryStream: iter(((BinaryDcmData) binaryData).streamIterator())) {
             entity.addPart("binary", new InputStreamBody(binaryStream, "binary"));
         }
 

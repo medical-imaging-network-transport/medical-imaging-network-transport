@@ -35,7 +35,7 @@ import org.nema.medical.mint.metadata.GPB.InstanceData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Instance implements AttributeStore
+public class Instance implements AttributeContainer, Excludable
 {
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private String sopInstanceUID;
@@ -121,6 +121,7 @@ public class Instance implements AttributeStore
      *
      * @return value
      */
+    @Override
     public String getExclude() {
         return exclude;
     }

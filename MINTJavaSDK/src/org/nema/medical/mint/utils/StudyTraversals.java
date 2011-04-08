@@ -20,6 +20,8 @@ import org.nema.medical.mint.metadata.*;
 /**
 * @author Uli Bubenheimer
 */
+//TODO refactor/rename to potentially make visitor pattern more explicit and better documented
+//TODO also add javadoc comments to each method describing what is tested
 public class StudyTraversals {
 
     StudyTraversals() {
@@ -49,41 +51,43 @@ public class StudyTraversals {
 
     public static void allAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws TraversalException {
-        hierarchicalAttributeStoreTraverser(study, action);
+        hierarchicalAttributeContainerTraverser(study, action);
 
         for (final Series series: Iter.iter(study.seriesIterator())) {
-            hierarchicalAttributeStoreTraverser(series, action);
+            hierarchicalAttributeContainerTraverser(series, action);
 
             for (final Attribute attr: Iter.iter(series.normalizedInstanceAttributeIterator())) {
                 hierarchicalAttributeTraverser(attr, action);
             }
 
             for (final Instance instance: Iter.iter(series.instanceIterator())) {
-                hierarchicalAttributeStoreTraverser(instance, action);
+                hierarchicalAttributeContainerTraverser(instance, action);
             }
         }
     }
 
     public static void flatStudyAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws TraversalException {
-        flatAttributeStoreTraverser(study, action);
+        flatAttributeContainerTraverser(study, action);
     }
 
     public static void flatSeriesAttributeTraverser(final StudyMetadata study, final AttributeAction action)
             throws TraversalException {
         for (final Series series: Iter.iter(study.seriesIterator())) {
-            flatAttributeStoreTraverser(series, action);
+            flatAttributeContainerTraverser(series, action);
         }
     }
 
-    public static void flatAttributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
+    public static void flatAttributeContainerTraverser(final AttributeContainer attributes,
+                                                       final AttributeAction action)
             throws TraversalException {
         for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
             action.doAction(attr);
         }
     }
 
-    public static void hierarchicalAttributeStoreTraverser(final AttributeStore attributes, final AttributeAction action)
+    public static void hierarchicalAttributeContainerTraverser(final AttributeContainer attributes,
+                                                               final AttributeAction action)
             throws TraversalException {
         for (final Attribute attr: Iter.iter(attributes.attributeIterator())) {
             hierarchicalAttributeTraverser(attr, action);

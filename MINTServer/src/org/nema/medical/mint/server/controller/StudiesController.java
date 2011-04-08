@@ -46,78 +46,91 @@ public class StudiesController {
 
 	@Autowired
 	protected File studiesRoot;
-	
+
 	@Autowired
 	protected StudyDAO studyDAO = null;
 
     @RequestMapping("/studies")
     public void studies(final HttpServletResponse res,
-    		@RequestParam(value = "studyInstanceUID", required = false) String studyInstanceUID,
-    		@RequestParam(value = "accessionNumber", required = false) String accessionNumber,
-    		@RequestParam(value = "accessionNumberIssuer", required = false) String accessionNumberIssuer,
-    		@RequestParam(value = "patientID", required = false) String patientID,
-    		@RequestParam(value = "patientIDIssuer", required = false) String patientIDIssuer,
-            @RequestParam(value = "minStudyDateTime", required = false) String minStudyDateTime,
-            @RequestParam(value = "minStudyDate", required = false) String minStudyDate,
-            @RequestParam(value = "maxStudyDateTime", required = false) String maxStudyDateTime,
-            @RequestParam(value = "maxStudyDate", required = false) String maxStudyDate,
+    		@RequestParam(value = "studyInstanceUID", required = false) final String studyInstanceUID,
+    		@RequestParam(value = "accessionNumber", required = false) final String accessionNumber,
+    		@RequestParam(value = "accessionNumberIssuer", required = false) final String accessionNumberIssuer,
+    		@RequestParam(value = "patientID", required = false) final String patientID,
+    		@RequestParam(value = "patientIDIssuer", required = false) final String patientIDIssuer,
+            @RequestParam(value = "minStudyDateTime", required = false) final String minStudyDateTime,
+            @RequestParam(value = "minStudyDate", required = false) final String minStudyDate,
+            @RequestParam(value = "maxStudyDateTime", required = false) final String maxStudyDateTime,
+            @RequestParam(value = "maxStudyDate", required = false) final String maxStudyDate,
     		@RequestParam(value = "limit", required = false) Integer limit,
     		@RequestParam(value = "offset", required = false) Integer offset)
             throws IOException, JiBXException {
 
 		// TODO read limit from a config file
-        if (limit == null) limit = 50;
-        if (offset == null) offset = 1;
-    	
+        if (limit == null) {
+            limit = 50;
+        }
+        if (offset == null) {
+            offset = 1;
+        }
+
         // TODO return error if request parameter not supported is provided
 
     	try {
-        	Timestamp dateTimeFrom = null;
-        	Timestamp dateTimeTo = null;
+        	final Date dateTimeFrom;
+        	final Date dateTimeTo;
+            final Date dateFrom;
+            final Date dateTo;
             if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-                Date testParse = DateUtils.parseISO8601Date(minStudyDate);
+                dateFrom = DateUtils.parseISO8601Date(minStudyDate);
+            } else {
+                dateFrom = null;
             }
         	if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-                dateTimeFrom = new Timestamp((DateUtils.parseISO8601(minStudyDateTime)).getTime());
-        	}
+                dateTimeFrom = DateUtils.parseISO8601(minStudyDateTime);
+        	} else {
+                dateTimeFrom = null;
+            }
             if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-                Date testParse = DateUtils.parseISO8601Date(maxStudyDate);
+                dateTo = DateUtils.parseISO8601Date(maxStudyDate);
+            } else {
+                dateTo = null;
             }
             if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-                dateTimeTo = new Timestamp(DateUtils.parseISO8601(maxStudyDateTime).getTime());
+                dateTimeTo = DateUtils.parseISO8601(maxStudyDateTime);
+            } else {
+                dateTimeTo = null;
             }
-	        List<MINTStudy> studies = studyDAO.findStudies(studyInstanceUID, accessionNumber,
-                    accessionNumberIssuer, patientID, patientIDIssuer, minStudyDateTime,
-                    minStudyDate, maxStudyDateTime, maxStudyDate, limit, offset);
+	        final List<MINTStudy> studies = studyDAO.findStudies(studyInstanceUID, accessionNumber,
+                    accessionNumberIssuer, patientID, patientIDIssuer, dateTimeFrom, dateFrom, dateTimeTo, dateTo,
+                    limit, offset);
 
-        	SearchResults searchResults = new SearchResults(studyInstanceUID, accessionNumber, accessionNumberIssuer,
-        			patientID, patientIDIssuer, minStudyDate, dateTimeFrom, maxStudyDate, dateTimeTo, StudyDAO.GMT.getID(),
-        			offset, limit);
-            
-        	for (MINTStudy foundStudy : studies){
-        		Timestamp lastUpdated;
-        		if (foundStudy.getLastModified() != null){
+        	final SearchResults searchResults = new SearchResults(studyInstanceUID, accessionNumber,
+                    accessionNumberIssuer, patientID, patientIDIssuer, minStudyDate,
+                    dateTimeFrom == null ? null : new Timestamp(dateTimeFrom.getTime()), maxStudyDate,
+                    dateTimeTo == null ? null : new Timestamp(dateTimeTo.getTime()), StudyDAO.GMT.getID(), offset,
+                    limit);
+
+        	for (final MINTStudy foundStudy: studies) {
+        		final Timestamp lastUpdated;
+        		if (foundStudy.getLastModified() != null) {
         			lastUpdated = foundStudy.getLastModified();
-        		}
-        		else {
+        		} else {
         			lastUpdated = foundStudy.getDateTime();
         		}
-        		SearchResultStudy studySearchResult = new SearchResultStudy(
-        				foundStudy.getID(), lastUpdated,
-        				Integer.parseInt(foundStudy.getStudyVersion()));
+                final SearchResultStudy studySearchResult = new SearchResultStudy(
+                        foundStudy.getID(), lastUpdated,
+                        Integer.parseInt(foundStudy.getStudyVersion()));
         		searchResults.addStudy(studySearchResult);
         	}
-    		IBindingFactory bfact = BindingDirectory.getFactory("studySearchResults",SearchResults.class);
-    		IMarshallingContext mctx = bfact.createMarshallingContext();
+    		final IBindingFactory bfact = BindingDirectory.getFactory("studySearchResults", SearchResults.class);
+    		final IMarshallingContext mctx = bfact.createMarshallingContext();
     		mctx.setIndent(2);
     		mctx.startDocument("UTF-8", null, res.getOutputStream());
     		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
     		mctx.marshalDocument(searchResults);
     		mctx.endDocument();
-
-        } catch (ParseException e){
+        } catch (final ParseException e) {
         	res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
-
     }
 }

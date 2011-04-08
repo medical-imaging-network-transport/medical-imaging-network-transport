@@ -34,8 +34,34 @@ import org.nema.medical.mint.metadata.GPB.ItemData;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class Item implements AttributeStore {
-    private final Map<Integer, Attribute> attributeMap = new TreeMap<Integer, Attribute>();
+public class Item implements AttributeContainer, Cloneable {
+    private Map<Integer, Attribute> attributeMap = new TreeMap<Integer, Attribute>();
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        final Item clone = (Item) super.clone();
+        clone.attributeMap = new TreeMap<Integer, Attribute>(attributeMap);
+        for (final Map.Entry<Integer, Attribute> entry: attributeMap.entrySet()) {
+            clone.attributeMap.put(entry.getKey(), (Attribute) entry.getValue().clone());
+        }
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return attributeMap.equals(((Item)o).attributeMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return attributeMap.hashCode();
+    }
 
     /**
      * @param tag

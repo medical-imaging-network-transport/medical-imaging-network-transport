@@ -15,6 +15,7 @@
  */
 package org.nema.medical.mint.server.processor;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.changelog.ChangeOperation;
 import org.nema.medical.mint.datadictionary.MetadataType;
@@ -36,7 +37,8 @@ public class StudyCreateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String remoteUser, remoteHost, principal;
+	private final String remoteUser;
+    private final String remoteHost;
 	private final JobInfoDAO jobInfoDAO;
 	private final StudyDAO studyDAO;
 	private final ChangeDAO updateDAO;
@@ -58,14 +60,13 @@ public class StudyCreateProcessor extends TimerTask {
 	 *            needed to update the database
 	 */
 	public StudyCreateProcessor(File jobFolder, File studyFolder, MetadataType dataDictionary,String remoteUser,
-                                String remoteHost, String principal, JobInfoDAO jobInfoDAO, StudyDAO studyDAO,
+                                String remoteHost, JobInfoDAO jobInfoDAO, StudyDAO studyDAO,
                                 ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
 		this.studyFolder = studyFolder;
         this.dataDictionary = dataDictionary;
 		this.remoteUser = remoteUser;
 		this.remoteHost = remoteHost;
-		this.principal = principal;
 		this.jobInfoDAO = jobInfoDAO;
 		this.studyDAO = studyDAO;
 		this.updateDAO = updateDAO;
@@ -128,11 +129,11 @@ public class StudyCreateProcessor extends TimerTask {
 			binaryRoot.mkdirs();
 
 			LOG.info("moving binary items for " + jobID + " ");
-			StudyUtils.moveBinaryItems(jobFolder, binaryRoot);
+			StorageUtil.moveBinaryItems(jobFolder, binaryRoot);
 			LOG.info("moving binary items for " + jobID + " complete");
 			
 			//delete job folder
-			StudyUtils.deleteFolder(jobFolder);
+			FileUtils.deleteDirectory(jobFolder);
 
 			//update database
 			MINTStudy studyData = new MINTStudy();
@@ -152,7 +153,6 @@ public class StudyCreateProcessor extends TimerTask {
 			updateInfo.setType("DICOM");
 			updateInfo.setRemoteUser(remoteUser);
 			updateInfo.setRemoteHost(remoteHost);
-			updateInfo.setPrincipal(principal);
 			updateInfo.setIndex(0);
             updateInfo.setOperation(ChangeOperation.CREATE);
 			updateDAO.saveChange(updateInfo);
