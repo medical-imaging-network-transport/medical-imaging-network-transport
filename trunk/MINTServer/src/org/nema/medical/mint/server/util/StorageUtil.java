@@ -15,6 +15,7 @@
  */
 package org.nema.medical.mint.server.util;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.nema.medical.mint.datadictionary.MetadataType;
 import org.nema.medical.mint.metadata.StudyMetadata;
@@ -24,10 +25,7 @@ import org.nema.medical.mint.utils.StudyValidation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Rex
@@ -83,18 +81,19 @@ public final class StorageUtil {
     /**
      * This method will shift all binary item IDs found in the binaryDirectory
      * by the provided the shiftAmount and will also update the provided StudyMetadata
-     * accordingly. It will return true if everything happened all right, false
-     * if something weird happened. Depending on the type of failure, the data
+     * accordingly. It will throw an exception if something did not work.
+     * Depending on the type of failure, the data
      * may be left in an inconsistent state, there is not guarantee that this
      * method will revert changes that have already been written.
      *
      * @param study
      * @param binaryDirectory
      * @param shiftAmount
+     * @throws Exception if something went wrong
      */
-    public static void shiftItemIds(StudyMetadata study, File binaryDirectory, int shiftAmount)
-    {
-    	if(shiftAmount == 0) {
+    public static void shiftItemIds(final StudyMetadata study, final File binaryDirectory, final int shiftAmount)
+            throws Exception {
+    	if (shiftAmount == 0) {
     		return;
     	}
 
@@ -103,46 +102,75 @@ public final class StorageUtil {
         StudyUtils.shiftStudyBids(study, shiftAmount);
     }
 
+    private static final class NumberFileNameComparator implements Comparator<String> {
+        @Override
+        public int compare(final String s1, final String s2) {
+            final int ext1Idx = s1.indexOf('.');
+            final int ext2Idx = s2.indexOf('.');
+            if (ext1Idx == -1 || ext2Idx == -1) {
+                return s1.compareTo(s2);
+            }
+            final int number1;
+            final int number2;
+            try {
+                number1 = Integer.parseInt(s1.substring(0, ext1Idx));
+                number2 = Integer.parseInt(s2.substring(0, ext2Idx));
+            } catch (final NumberFormatException e) {
+                return s1.compareTo(s2);
+            }
+            if (number1 < number2) {
+                return -1;
+            } else if (number1 == number2) {
+                return s1.compareTo(s2);
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    private static final NumberFileNameComparator numberFileNameComparator = new NumberFileNameComparator();
+
     /**
      * Will return true always unless something catastrophically unexpected
      * occurs.
      *
      * @param directory
      * @param shiftAmount
+     * @throws Exception
      */
-    private static void shiftBinaryFiles(File directory, int shiftAmount)
-    {
-        File[] files = directory.listFiles();
+    private static void shiftBinaryFiles(final File directory, final int shiftAmount) throws Exception {
+        final String[] fileNames = directory.list();
+        //Sort file names so that we start renaming the highest index to be sure that the new name does not yet exist
+        Arrays.sort(fileNames, numberFileNameComparator);
+        ArrayUtils.reverse(fileNames);
+        for (final String name: fileNames) {
+            if (name.endsWith(BINARY_FILE_EXTENSION) || name.endsWith(EXCLUDED_BINARY_FILE_EXTENSION)) {
+                if (!name.startsWith("metadata")) {
+                    try {
+                        final int oldBid;
+                        final int extStart = name.indexOf('.');
+                        if (extStart > 0) {
+                        	oldBid = Integer.parseInt(name.substring(0, extStart));
+                        } else {
+                        	oldBid = Integer.parseInt(name);
+                        }
+                        final int newBid = oldBid + shiftAmount;
 
-        for(File f : files)
-        {
-            String name = f.getName();
-
-            if(name.endsWith(BINARY_FILE_EXTENSION) || name.endsWith(EXCLUDED_BINARY_FILE_EXTENSION))
-            {
-                if(!name.startsWith("metadata"))
-                {
-                    try
-                    {
-                        int bid;
-                        int extStart = name.indexOf('.');
-                        if(extStart > 0)
-                        	bid = Integer.parseInt(name.substring(0,extStart));
-                        else
-                        	bid = Integer.parseInt(name);
-
-                        bid += shiftAmount;
-
-                        String newName = bid + "." + BINARY_FILE_EXTENSION;
+                        final String newName = newBid + "." + BINARY_FILE_EXTENSION;
 
                         //It is a binary file, shift it!
-                        f.renameTo(new File(directory, newName));
-                    }catch(NumberFormatException e){
+                        final File oldFile = new File(directory, name);
+                        final File newFile = new File(directory, newName);
+                        if (!oldFile.renameTo(newFile)) {
+                            final String errorText = "Error moving/renaming file '" + oldFile.getPath() + " to "
+                                    + newFile.getPath();
+                            LOG.error(errorText);
+                            throw new Exception(errorText);
+                        }
+                    } catch (final NumberFormatException e){
                         LOG.warn("Detected binary item file whose name was not an integer as was expected.", e);
                     }
                 }
-            }else{
-                //Not a binary file
             }
         }
     }
@@ -250,7 +278,7 @@ public final class StorageUtil {
 	//TODO from code review of StudyUtils where this method used to live: this method doesn't belong in here - the rest of the methods operate on metadata. this belongs in a store
     public static void moveBinaryItems(final File jobFolder, final File studyBinaryFolder) throws IOException {
         for (final File file: jobFolder.listFiles()) {
-            //Don't move metadata because has no purpose in the destination
+            //Don't move metadata because it has no purpose in the destination
             final String fileName = file.getName();
             if (!fileName.startsWith("metadata")) {
                 final File permfile = new File(studyBinaryFolder, fileName);
@@ -258,9 +286,11 @@ public final class StorageUtil {
                 // is using the same MINT_ROOT for temp and perm storage
                 // other implementations may want to copy/delete the file
                 // if the temp storage is on a different device
-                if(!file.renameTo(permfile)) {
-                    throw new IOException(
-                            "Unable to move/rename file '" + file.getPath() + " to " + permfile.getPath());
+                if (!file.renameTo(permfile)) {
+                    final String message =
+                            "Unable to move/rename file '" + file.getPath() + " to " + permfile.getPath();
+                    LOG.error(message);
+                    throw new IOException(message);
                 }
             }
         }

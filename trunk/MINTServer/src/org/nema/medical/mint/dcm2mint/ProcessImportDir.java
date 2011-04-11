@@ -259,7 +259,7 @@ public final class ProcessImportDir {
     }
 
     /**
-     * @throws IOException
+     * @throws Exception
      */
     public void handleSends() throws Exception {
         if (!jobIDInfo.isEmpty()) {
