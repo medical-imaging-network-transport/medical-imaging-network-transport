@@ -169,8 +169,8 @@ public class StudyUpdateProcessor extends TimerTask {
 				 * with existing data files when merging. This also means updating
 				 * the new study document.
 				 */
-				int maxExistingItemNumber = StorageUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
-				StorageUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber+1);
+				final int maxExistingItemNumber = StorageUtil.getHighestNumberedBinaryItem(existingBinaryFolder);
+				StorageUtil.shiftItemIds(newStudy, jobFolder, maxExistingItemNumber + 1);
 
 				/*
 				 * Write metadata update message to change log folder.
