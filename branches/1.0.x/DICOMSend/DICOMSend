@@ -1,0 +1,2 @@
+#/bin/sh
+java -Xms32m -Xmx256m -jar build/DICOMSend.jar $@

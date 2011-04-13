@@ -1,0 +1,27 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="changelog">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="study-change" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:attribute name="studyUUID" type="xsd:string" use="required"/>
+            <xsd:attribute name="changeNumber" type="xsd:integer" use="required"/>
+            <xsd:attribute name="type" type="xsd:string" use="required"/>
+            <xsd:attribute name="dateTime" type="xsd:dateTime" use="required"/>
+            <xsd:attribute name="operation" use="required">
+              <xsd:simpleType>
+                  <xsd:restriction base="xsd:token">
+                      <xsd:enumeration value="CREATE"/>
+                      <xsd:enumeration value="UPDATE"/>
+                      <xsd:enumeration value="DELETE"/>
+                  </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="remoteHost" type="xsd:string" use="required"/>
+            <xsd:attribute name="remoteUser" type="xsd:string" use="optional"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
