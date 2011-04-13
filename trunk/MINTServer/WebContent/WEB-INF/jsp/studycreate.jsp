@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="org.nema.medical.mint.jobs.JobConstants"%><html>
+<%@page import="org.apache.commons.lang.StringUtils"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <title>Create Study</title>
