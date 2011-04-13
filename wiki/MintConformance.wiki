@@ -161,7 +161,7 @@ To see all the differences the application should be run twice, switching the co
 
 *Issues Discovered*
    * MINT only stores VRs of OB, OW, and UN as binary.
-   * MINT was stripping Part 10 header tags (corrected)
+   * MINT was stripping Part 10 private header tags (corrected)
    * MINT strips group length tags (except for 0002000)
    * Some external DICOM applications strip padding from text tags
    * MINT does not reflect float types with exact precision
