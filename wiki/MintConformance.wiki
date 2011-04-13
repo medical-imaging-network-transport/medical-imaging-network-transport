@@ -167,7 +167,8 @@ To see all the differences the application should be run twice, switching the co
    * MINT does not reflect float types with exact precision
    * MINT2DICOM stores SQ lengths as undefined (-1) 
    * MINT2DICOM sometimes adds additional tags to SOP Instances
-   * MINT2DICOM was removing items from sequence records (corrected) 
+   * MINT2DICOM was removing items from sequence records (corrected)
+   * MINT Data Dictionary does not match DCM4CHEE Data Dictionary (in work) 
 
 *Completed Tasks*
 
