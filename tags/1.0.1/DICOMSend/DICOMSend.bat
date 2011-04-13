@@ -1,0 +1,1 @@
+@java -Xms32m -Xmx256m -jar build/DICOMSend.jar %1 %2 %3 %4 %5 %6 %7 %8 %9

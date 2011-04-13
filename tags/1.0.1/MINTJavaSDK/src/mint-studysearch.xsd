@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="studySearchResults">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="study">
+          <xsd:complexType>
+            <xsd:attribute name="studyUUID" type="xsd:string" use="required" />
+            <xsd:attribute name="lastModified" type="xsd:dateTime" use="required" />
+            <xsd:attribute name="version" type="xsd:integer" use="required" />
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="studyInstanceUID" type="xsd:string"/>
+      <xsd:attribute name="accessionNumber" type="xsd:string"/>
+      <xsd:attribute name="accessionNumberIssuer" type="xsd:string"/>
+      <xsd:attribute name="patientID" type="xsd:string"/>
+      <xsd:attribute name="patientIDIssuer" type="xsd:string"/>
+      <xsd:attribute name="minStudyDate" type="xsd:dateTime"/>
+      <xsd:attribute name="minStudyDateTime" type="xsd:dateTime"/>
+      <xsd:attribute name="maxStudyDate" type="xsd:dateTime"/>
+      <xsd:attribute name="maxStudyDateTime" type="xsd:dateTime"/>
+      <xsd:attribute name="timeZone" type="xsd:string"/>
+      <xsd:attribute name="offset" type="xsd:integer"/>
+      <xsd:attribute name="limit" type="xsd:integer"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
+
+
+
