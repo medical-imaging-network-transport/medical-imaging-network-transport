@@ -26,7 +26,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.datadictionary.MetadataType;
-import org.nema.medical.mint.jobs.JobConstants;
+import org.nema.medical.mint.jobs.HttpMessagePart;
 import org.nema.medical.mint.server.domain.*;
 import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
@@ -185,26 +185,24 @@ public class JobsController {
 			return;
 		}
 
-		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_STUDYUUID)) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
-                    + JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
+		if (!params.containsKey(HttpMessagePart.STUDY_UUID.toString())) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter " + HttpMessagePart.STUDY_UUID);
 			return;
 		}
 
-		final String studyUUID = params.get(JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
+		final String studyUUID = params.get(HttpMessagePart.STUDY_UUID.toString());
 
         final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, studyUUID, res, studyDAO);
         if (studyStatus != Utils.StudyStatus.OK) {
             return;
         }
 
-        if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_OLDVERSION)) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
-                    + JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
+        if (!params.containsKey(HttpMessagePart.OLD_VERSION.toString())) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter " + HttpMessagePart.OLD_VERSION);
             return;
         }
 
-        final String oldVersion = params.get(JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
+        final String oldVersion = params.get(HttpMessagePart.OLD_VERSION.toString());
 
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);

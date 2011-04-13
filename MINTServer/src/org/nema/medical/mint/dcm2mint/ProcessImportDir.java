@@ -35,7 +35,7 @@ import org.dcm4che2.data.TransferSyntax;
 import org.dcm4che2.io.DicomInputStream;
 import org.dcm4che2.io.StopTagInputHandler;
 import org.nema.medical.mint.datadictionary.*;
-import org.nema.medical.mint.jobs.JobConstants;
+import org.nema.medical.mint.jobs.HttpMessagePart;
 import org.nema.medical.mint.metadata.StudyIO;
 import org.nema.medical.mint.metadata.StudyMetadata;
 import org.nema.medical.mint.utils.StudyTraversals;
@@ -415,13 +415,14 @@ public final class ProcessImportDir {
         final MultipartEntity entity = new MultipartEntity();
 
         if (studyQueryInfo != null) {
-            entity.addPart(JobConstants.HTTP_MESSAGE_PART_STUDYUUID, new StringBody(studyQueryInfo.studyUUID));
+            entity.addPart(HttpMessagePart.STUDY_UUID.toString(), new StringBody(studyQueryInfo.studyUUID));
         }
 
-        final StudyMetadata study = useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
+        final StudyMetadata study =
+                useXMLNotGPB ? StudyIO.parseFromXML(metadataFile) : StudyIO.parseFromGPB(metadataFile);
         if (studyQueryInfo != null) {
             //Specify current study version
-            entity.addPart(JobConstants.HTTP_MESSAGE_PART_OLDVERSION, new StringBody(studyQueryInfo.studyVersion));
+            entity.addPart(HttpMessagePart.OLD_VERSION.toString(), new StringBody(studyQueryInfo.studyVersion));
         }
 
         //Pretty significant in-memory operations, so scoping to get references released ASAP
