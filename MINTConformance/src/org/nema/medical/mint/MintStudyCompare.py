@@ -118,7 +118,7 @@ class MintStudyCompare():
                   s1.numAttributes(), 
                   s2.numAttributes())
 
-       numAttributes = s1.numAttributes()
+       numAttributes = min(s1.numAttributes(), s2.numAttributes)
        for n in range(0, numAttributes):
            attr1 = s1.attribute(n)
            attr2 = s2.attributeByTag(attr1.tag())
@@ -129,7 +129,7 @@ class MintStudyCompare():
                   s1.numSeries(), 
                   s2.numSeries())
 
-       numSeries = s1.numSeries()
+       numSeries = min(s1.numSeries(), s2.numSeries())
        for n in range(0, numSeries):
            series1 = s1.series(n)
            series2 = s2.seriesByUID(series1.seriesInstanceUID())
@@ -175,7 +175,7 @@ class MintStudyCompare():
        # ---
        if self.__count != 0:
           if self.__output == None:
-             print self.__count, "difference(s) found."
+             print "%10d difference(s) found." % (self.__count)
           else:
              self.__output.write("%10d difference(s) found.\n" % (self.__count))
 
@@ -274,14 +274,16 @@ class MintStudyCompare():
                   series1.numAttributes(), 
                   series2.numAttributes())
                   
-       numAttributes = series1.numAttributes()
+       numAttributes = min(series1.numAttributes(), series2.numAttributes())
        for n in range(0, numAttributes):
            attr1 = series1.attribute(n)
            attr2 = series2.attributeByTag(attr1.tag())
            self.__checkAttributes(series+" Attribute", attr1, attr2)
            self.__seriesAttributesCompared += 1
 
-       numNormalizedInstanceAttributes = series1.numNormalizedInstanceAttributes()
+       numNormalizedInstanceAttributes = min(series1.numNormalizedInstanceAttributes(),
+                                             series2.numNormalizedInstanceAttributes())
+
        for n in range(0, numNormalizedInstanceAttributes):
            attr1 = series1.normalizedInstanceAttribute(n)
            attr2 = series2.normalizedInstanceAttributeByTag(attr1.tag())
@@ -292,7 +294,7 @@ class MintStudyCompare():
                   series1.numInstances(), 
                   series2.numInstances())
 
-       numInstances = series1.numInstances()
+       numInstances = min(series1.numInstances(), series2.numInstances())
        for n in range(0, numInstances):
            instance1 = series1.instance(n)
            instance2 = None
@@ -318,7 +320,7 @@ class MintStudyCompare():
                   instance1.transferSyntaxUID(), 
                   instance2.transferSyntaxUID()) 
                   
-       numAttributes = instance1.numAttributes()
+       numAttributes = min(instance1.numAttributes(), instance2.numAttributes())
        for n in range(0, numAttributes):
            attr1 = instance1.attribute(n)
            attr2 = instance2.attributeByTag(attr1.tag())

@@ -34,15 +34,16 @@ import traceback
 
 from os.path import join
 
-from org.nema.medical.mint.DataDictionary import DataDictionary
-from org.nema.medical.mint.DicomSeries    import DicomSeries
-from org.nema.medical.mint.DicomInstance  import DicomInstance
+from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
+from org.nema.medical.mint.MINT_Dictionary    import MINT_Dictionary
+from org.nema.medical.mint.DicomSeries        import DicomSeries
+from org.nema.medical.mint.DicomInstance      import DicomInstance
 
 # -----------------------------------------------------------------------------
 # DicomStudy
 # -----------------------------------------------------------------------------
 class DicomStudy():
-   def __init__(self, dcmDir, dataDictionaryUrl):
+   def __init__(self, dcmDir, dataDictionary):
    
        if not os.path.isdir(dcmDir):
           raise IOError("Directory does not exist - "+dcmDir)
@@ -51,7 +52,7 @@ class DicomStudy():
        self.__studyInstanceUID = ""
        self.__series = {}
        self.__seriesInstanceUIDs = []
-       self.__dataDictionary = DataDictionary(dataDictionaryUrl)
+       self.__dataDictionary = dataDictionary
        self.__output = None
  
        self.__read()
@@ -122,16 +123,15 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "d:o:h")
-    
+    (options, args)=getopt.getopt(sys.argv[1:], "p:o:h")
+         
     # ---
-    # Check for data dictionary.
+    # Check for output option.
     # ---
-    dataDictionaryUrl = DataDictionary.DCM4CHE_URL
-    for opt in options:
-        if opt[0] == "-d":
-           dataDictionaryUrl = opt[1]
-           
+    port = "8080"
+    for option in options:
+        if option[0] == "-p": port = option[1]
+      
     # ---
     # Check for output option.
     # ---
@@ -149,19 +149,21 @@ def main():
            help = True
            
     try:
-       if help or len(args) < 1:
+       if help or len(args) < 2:
 
-          print "Usage", progName, "[options] <dicom_dir>"
-          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
-	  print "  -o <output>:              output filename (defaults to stdout)"
-	  print "  -h:                       displays usage"
+          print "Usage", progName, "[options] <dicom_dir> <hostname>"
+          print "  -p <port>:   defaults to 8080"
+	  print "  -o <output>: output filename (defaults to stdout)"
+	  print "  -h:          displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
        dcmDir = args[0];
-       study = DicomStudy(dcmDir, dataDictionaryUrl)
+       hostname = args[1]
+       dataDictionary = MINT_Dictionary(hostname, port)
+       study = DicomStudy(dcmDir, dataDictionary)
        study.setOutput(output)
        study.debug()
        study.tidy()
