@@ -36,13 +36,13 @@ import traceback
 from os.path import join
 from struct import unpack
 
-from org.nema.medical.mint.DataDictionary import DataDictionary
-from org.nema.medical.mint.DicomAttribute import DicomAttribute
-from org.nema.medical.mint.DicomStudy     import DicomStudy
-from org.nema.medical.mint.DicomSeries    import DicomSeries
-from org.nema.medical.mint.DicomInstance  import DicomInstance
-from org.nema.medical.mint.MintAttribute  import MintAttribute
-from org.nema.medical.mint.MintStudy      import MintStudy
+from org.nema.medical.mint.MINT_Dictionary import MINT_Dictionary
+from org.nema.medical.mint.DicomAttribute  import DicomAttribute
+from org.nema.medical.mint.DicomStudy      import DicomStudy
+from org.nema.medical.mint.DicomSeries     import DicomSeries
+from org.nema.medical.mint.DicomInstance   import DicomInstance
+from org.nema.medical.mint.MintAttribute   import MintAttribute
+from org.nema.medical.mint.MintStudy       import MintStudy
 
 # -----------------------------------------------------------------------------
 # MintDicomCompare
@@ -465,16 +465,8 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "d:o:p:vlh")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:p:vlh")
 
-    # ---
-    # Check for data dictionary.
-    # ---
-    dictionaryURL = DataDictionary.DCM4CHE_URL
-    for opt in options:
-        if opt[0] == "-d":
-           dictionaryURL = opt[1]
-           
     # ---
     # Check for output option.
     # ---
@@ -522,7 +514,6 @@ def main():
        argc = len(args)
        if help or argc < 3:
           print "Usage:", progName, "[options] <dicom_study_dir> <hostname> <uuid>"
-          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
           print "  -o <output>:              output filename (defaults to stdout)"
           print "  -p <port>:                defaults to 8080"
           print "  -v:                       verbose"
@@ -536,8 +527,10 @@ def main():
        dicomStudyDir = args[0];
        hostname      = args[1];
        uuid          = args[2];
+
+       dataDictionary = MINT_Dictionary(hostname, port)
        
-       dicomStudy = DicomStudy(dicomStudyDir, dictionaryURL)
+       dicomStudy = DicomStudy(dicomStudyDir, dataDictionary)
        mintStudy  = MintStudy(hostname, port, uuid)  
        
        studies = MintDicomCompare(dicomStudy, mintStudy)
