@@ -74,7 +74,6 @@ Running the tool with no arguments displays the usage:
 {{{
 > python %PYTHONPATH%\org\nema\medical\mint\MintDicomCompare.py
 Usage: MintDicomCompare.py [options] <dicom_study_dir> <hostname> <uuid>
-  -d <data_dictionary_url>: defaults to DCM4CHE
   -o <output>:              output filename (defaults to stdout)
   -p <port>:                defaults to 8080
   -v:                       verbose
@@ -109,14 +108,14 @@ Running the tool with no arguments displays the usage:
 
 {{{
 > python %PYTHONPATH%\org\nema\medical\mint\DicomStudyCompare.py
-Usage: DicomStudyCompare.py [options] <ref_dicom_study_dir> <new_dicom_study_dir>
-  -d <data_dictionary_url>: defaults to DCM4CHE
-  -o <output>:              output filename (defaults to stdout)
-  -x <exclude>:             list of tags to exclude, ie. "08590030,600001nn"
-  -v:                       verbose
-  -l:                       lazy check (skips binary content)
-  -w:                       show warnings
-  -h:                       displays usage
+Usage: DicomStudyCompare.py [options] <ref_dicom_study_dir> <new_dicom_study_dir
+>
+  -o <output>:  output filename (defaults to stdout)
+  -x <exclude>: list of tags to exclude, ie. "08590030,600001nn"
+  -v:           verbose
+  -l:           lazy check (skips binary content)
+  -w:           show warnings
+  -h:           displays usage
 }}}
 
 The data dictionary is required for looking up implicit VRs based on the group-element tag. The output option is for specifying an output file to capture the summary results (useful for automated testing). The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging.
@@ -160,6 +159,7 @@ To see all the differences the application should be run twice, switching the co
 = Status =
 
 *Issues Discovered*
+
    * MINT only stores VRs of OB, OW, and UN as binary.
    * MINT was stripping Part 10 private header tags (corrected)
    * MINT strips group length tags (except for 0002000)
@@ -168,7 +168,7 @@ To see all the differences the application should be run twice, switching the co
    * MINT2DICOM stores SQ lengths as undefined (-1) 
    * MINT2DICOM sometimes adds additional tags to SOP Instances
    * MINT2DICOM was removing items from sequence records (corrected)
-   * MINT Data Dictionary does not match DCM4CHEE Data Dictionary (in work) 
+   * MINT Data Dictionary does not match DCM4CHEE Data Dictionary (corrected) 
 
 *Completed Tasks*
 
@@ -188,6 +188,7 @@ To see all the differences the application should be run twice, switching the co
    * Added logic for comparing floats within an epsilon.
    * Created DicomSeries class that is a collection of DicomInstances.
    * Added output option to DataDictionary to support integration testing.
+   * Uses MINT Dictionary when comparing studies on a MINTServer and DCM4CHE when comparing studies on the file system.
 
 *To Do*
 
@@ -196,4 +197,3 @@ To see all the differences the application should be run twice, switching the co
    * Add flag for changing the floating point precision
    * Comparisons before and after DICOM2MINT update
    * Support multi-frame DICOM
-   * Consider using the MINT DataDictionary instead of the DCM4CHE
