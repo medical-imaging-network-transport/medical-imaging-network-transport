@@ -74,11 +74,11 @@ Running the tool with no arguments displays the usage:
 {{{
 > python %PYTHONPATH%\org\nema\medical\mint\MintDicomCompare.py
 Usage: MintDicomCompare.py [options] <dicom_study_dir> <hostname> <uuid>
-  -o <output>:              output filename (defaults to stdout)
-  -p <port>:                defaults to 8080
-  -v:                       verbose
-  -l:                       lazy check (skips binary content)
-  -h:                       displays usage
+  -o <output>: output filename (defaults to stdout)
+  -p <port>:   defaults to 8080
+  -v:          verbose
+  -l:          lazy check (skips binary content)
+  -h:          displays usage
 }}}
 
 The data dictionary is required for looking up implicit VRs based on the group-element tag. The output option is for specifying an output file to capture the summary results (useful for automated testing). The verbose flag turns on output to show how many tags and bytes were compared. Otherwise nothing is displayed when there are no differences. You can optionally skip checking the binary to save time when debugging.
