@@ -81,22 +81,22 @@ public class StudiesController {
             final Date dateFrom;
             final Date dateTo;
             if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-                dateFrom = DateUtils.parseISO8601Date(minStudyDate);
+                dateFrom = DateUtils.parseISO8601DateBasic(minStudyDate);
             } else {
                 dateFrom = null;
             }
         	if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-                dateTimeFrom = DateUtils.parseISO8601(minStudyDateTime);
+                dateTimeFrom = DateUtils.parseISO8601Basic(minStudyDateTime);
         	} else {
                 dateTimeFrom = null;
             }
             if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-                dateTo = DateUtils.parseISO8601Date(maxStudyDate);
+                dateTo = DateUtils.parseISO8601DateBasic(maxStudyDate);
             } else {
                 dateTo = null;
             }
             if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-                dateTimeTo = DateUtils.parseISO8601(maxStudyDateTime);
+                dateTimeTo = DateUtils.parseISO8601Basic(maxStudyDateTime);
             } else {
                 dateTimeTo = null;
             }
