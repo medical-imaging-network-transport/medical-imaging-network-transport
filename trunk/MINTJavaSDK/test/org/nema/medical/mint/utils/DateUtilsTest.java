@@ -25,203 +25,458 @@ import java.util.TimeZone;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests different date formats from ISO8601, some supported by our implementation, some not supported
+ */
 public class DateUtilsTest {
+
+    final TimeZone utcTZ = TimeZone.getTimeZone("Etc/UTC");
+    final TimeZone localTZ = TimeZone.getDefault();
+    final TimeZone utcLess5TZ = TimeZone.getTimeZone("GMT-5:00");
+    final TimeZone utcPlus530TZ = TimeZone.getTimeZone("GMT+5:30");
+    final TimeZone utcPlus4TZ = TimeZone.getTimeZone("GMT+4:00");
+
+    final Calendar utcCal = Calendar.getInstance(utcTZ);
+    final Calendar localCal = Calendar.getInstance(localTZ);
+    final Calendar utcLess5Cal = Calendar.getInstance(utcLess5TZ);
+    final Calendar utcPlus530Cal = Calendar.getInstance(utcPlus530TZ);
+    final Calendar utcPlus4Cal = Calendar.getInstance(utcPlus4TZ);
 
     //TODO add the rest of the UTC formats that ISO8601 supports
 
     @Test
 	public void testBasic() throws ParseException {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
-		Calendar calendar = Calendar.getInstance();
+		localCal.setTime(DateUtils.parseISO8601Basic("20100818T115959.999"));
+		assertEquals(2010, localCal.get(Calendar.YEAR));
+		assertEquals(7, localCal.get(Calendar.MONTH));
+		assertEquals(18, localCal.get(Calendar.DAY_OF_MONTH));
+		assertEquals(11, localCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, localCal.get(Calendar.MINUTE));
+		assertEquals(59, localCal.get(Calendar.SECOND));
+		assertEquals(999, localCal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959.999"));
-		assertEquals(2010,calendar.get(Calendar.YEAR));
-		assertEquals(7,calendar.get(Calendar.MONTH));
-		assertEquals(18,calendar.get(Calendar.DAY_OF_MONTH));
-		assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+		utcCal.setTime(DateUtils.parseISO8601Basic("20100818T115959.999Z"));
+		assertEquals(11, utcCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(999, utcCal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959.999Z"));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+		utcLess5Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959.999-0500"));
+		assertEquals(11, utcLess5Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(999, utcLess5Cal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959.999-0500"));
-		assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959.999+0530"));
-		assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(29,calendar.get(Calendar.MINUTE));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+		utcPlus530Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959.999+0530"));
+		assertEquals(11, utcPlus530Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcPlus530Cal.get(Calendar.MINUTE));
+		assertEquals(999, utcPlus530Cal.get(Calendar.MILLISECOND));
 
 		// test hack for space instead of plus for URL mapping
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959.999 0530"));
-		assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(29,calendar.get(Calendar.MINUTE));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+		utcPlus530Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959.999 0530"));
+		assertEquals(11, utcPlus530Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcPlus530Cal.get(Calendar.MINUTE));
+		assertEquals(999, utcPlus530Cal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959Z"));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		utcCal.setTime(DateUtils.parseISO8601Basic("20100818T115959Z"));
+		assertEquals(11, utcCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcCal.get(Calendar.MINUTE));
+		assertEquals(59, utcCal.get(Calendar.SECOND));
+		assertEquals(0, utcCal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959-0500"));
-		assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		utcLess5Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959-0500"));
+		assertEquals(11, utcLess5Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcLess5Cal.get(Calendar.MINUTE));
+		assertEquals(59, utcLess5Cal.get(Calendar.SECOND));
+		assertEquals(0, utcLess5Cal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959+0530"));
-		assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(29,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		utcPlus530Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959+0530"));
+		assertEquals(11, utcPlus530Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcPlus530Cal.get(Calendar.MINUTE));
+		assertEquals(59, utcPlus530Cal.get(Calendar.SECOND));
+		assertEquals(0, utcPlus530Cal.get(Calendar.MILLISECOND));
 
 		// test hack for space instead of plus for URL mapping
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959 0530"));
-		assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(29,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		utcPlus530Cal.setTime(DateUtils.parseISO8601Basic("20100818T115959 0530"));
+		assertEquals(11, utcPlus530Cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcPlus530Cal.get(Calendar.MINUTE));
+		assertEquals(59, utcPlus530Cal.get(Calendar.SECOND));
+		assertEquals(0, utcPlus530Cal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601Basic("20100818T115959"));
-		assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-		calendar.setTime(DateUtils.parseISO8601Date("20100819"));
-		assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(0,calendar.get(Calendar.MINUTE));
-		assertEquals(0,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		localCal.setTime(DateUtils.parseISO8601Basic("20100818T115959"));
+		assertEquals(11, localCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, localCal.get(Calendar.MINUTE));
+		assertEquals(59, localCal.get(Calendar.SECOND));
+		assertEquals(0, localCal.get(Calendar.MILLISECOND));
 	}
 
     @Test
 	public void testBasicUTC() throws ParseException {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
-		final Calendar calendar = Calendar.getInstance();
+		utcCal.setTime(DateUtils.parseISO8601BasicUTC("20100818T115959.999Z"));
+		assertEquals(2010, utcCal.get(Calendar.YEAR));
+		assertEquals(7, utcCal.get(Calendar.MONTH));
+		assertEquals(18, utcCal.get(Calendar.DAY_OF_MONTH));
+		assertEquals(11, utcCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcCal.get(Calendar.MINUTE));
+		assertEquals(59, utcCal.get(Calendar.SECOND));
+		assertEquals(999, utcCal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601BasicUTC("20100818T115959.999Z"));
-		assertEquals(2010,calendar.get(Calendar.YEAR));
-		assertEquals(7,calendar.get(Calendar.MONTH));
-		assertEquals(18,calendar.get(Calendar.DAY_OF_MONTH));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+        utcCal.setTime(DateUtils.parseISO8601BasicUTC("20100818T115959.999+0000"));
+        assertEquals(2010, utcCal.get(Calendar.YEAR));
+        assertEquals(7, utcCal.get(Calendar.MONTH));
+        assertEquals(18, utcCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(11, utcCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(59, utcCal.get(Calendar.MINUTE));
+        assertEquals(59, utcCal.get(Calendar.SECOND));
+        assertEquals(999, utcCal.get(Calendar.MILLISECOND));
 
-		calendar.setTime(DateUtils.parseISO8601BasicUTC("20100818T115959Z"));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-		calendar.setTime(DateUtils.parseISO8601Date("20100819"));
-		assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(0,calendar.get(Calendar.MINUTE));
-		assertEquals(0,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+		utcCal.setTime(DateUtils.parseISO8601BasicUTC("20100818T115959Z"));
+		assertEquals(11, utcCal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(59, utcCal.get(Calendar.MINUTE));
+		assertEquals(59, utcCal.get(Calendar.SECOND));
+		assertEquals(0, utcCal.get(Calendar.MILLISECOND));
 	}
 
     @Test
-    public void testExtended() throws ParseException {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59.999"));
-        assertEquals(2010,calendar.get(Calendar.YEAR));
-        assertEquals(7,calendar.get(Calendar.MONTH));
-        assertEquals(18,calendar.get(Calendar.DAY_OF_MONTH));
-        assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(59,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59.999Z"));
-        assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59.999-05:00"));
-        assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59.999+05:30"));
-        assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(29,calendar.get(Calendar.MINUTE));
-        assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-        // test hack for space instead of plus for URL mapping
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59.999 05:30"));
-        assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(29,calendar.get(Calendar.MINUTE));
-        assertEquals(999,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59Z"));
-        assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(59,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59-05:00"));
-        assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(59,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59+05:30"));
-        assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(29,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-        // test hack for space instead of plus for URL mapping
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59 05:30"));
-        assertEquals(1,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(29,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Extended("2010-08-18T11:59:59"));
-        assertEquals(11,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(59,calendar.get(Calendar.MINUTE));
-        assertEquals(59,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
-
-        calendar.setTime(DateUtils.parseISO8601Date("2010-08-19"));
-        assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals(0,calendar.get(Calendar.MINUTE));
-        assertEquals(0,calendar.get(Calendar.SECOND));
-        assertEquals(0,calendar.get(Calendar.MILLISECOND));
+	public void testDateBasic() throws ParseException {
+        localCal.setTime(DateUtils.parseISO8601DateBasic("20100819"));
+        assertEquals(0, localCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(0, localCal.get(Calendar.MINUTE));
+        assertEquals(0, localCal.get(Calendar.SECOND));
+        assertEquals(0, localCal.get(Calendar.MILLISECOND));
     }
 
-	@Test
-	public void testExtendedUTC() throws ParseException {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-5:00"));
-		final Calendar calendar = Calendar.getInstance();
+    //Verify that we are not supporting ISO8601 extended format for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic0() throws ParseException {
+        DateUtils.parseISO8601DateBasic("2010-08-19");
+    }
 
-		calendar.setTime(DateUtils.parseISO8601ExtendedUTC("2010-08-18T11:59:59.999Z"));
-		assertEquals(2010,calendar.get(Calendar.YEAR));
-		assertEquals(7,calendar.get(Calendar.MONTH));
-		assertEquals(18,calendar.get(Calendar.DAY_OF_MONTH));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(999,calendar.get(Calendar.MILLISECOND));
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic01() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+0020100819");
+    }
 
-		calendar.setTime(DateUtils.parseISO8601ExtendedUTC("2010-08-18T11:59:59Z"));
-		assertEquals(6,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(59,calendar.get(Calendar.MINUTE));
-		assertEquals(59,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic011() throws ParseException {
+        DateUtils.parseISO8601DateBasic("-0020100819");
+    }
 
-		calendar.setTime(DateUtils.parseISO8601Date("2010-08-19"));
-		assertEquals(0,calendar.get(Calendar.HOUR_OF_DAY));
-		assertEquals(0,calendar.get(Calendar.MINUTE));
-		assertEquals(0,calendar.get(Calendar.SECOND));
-		assertEquals(0,calendar.get(Calendar.MILLISECOND));
-	}
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic02() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+020100819");
+    }
+
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic03() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+002010-08-19");
+    }
+
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic04() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+002010-08");
+    }
+
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic05() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+002010");
+    }
+
+    //Verify that we are not supporting ISO8601 expanded representations for dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic06() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+0010");
+    }
+
+    //Verify that we are not supporting ISO8601 representations with reduced accuracy
+    @Test(expected = ParseException.class)
+	public void testDateBasic1() throws ParseException {
+        DateUtils.parseISO8601DateBasic("201008");
+    }
+
+    //Verify that we are not supporting ISO8601 representations with reduced accuracy
+    @Test(expected = ParseException.class)
+	public void testDateBasic2() throws ParseException {
+        DateUtils.parseISO8601DateBasic("2010-08");
+    }
+
+    //Verify that we are not supporting ISO8601 representations with reduced accuracy
+    @Test(expected = ParseException.class)
+	public void testDateBasic3() throws ParseException {
+        DateUtils.parseISO8601DateBasic("2010");
+    }
+
+    //Verify that we are not supporting ISO8601 representations with reduced accuracy
+    @Test(expected = ParseException.class)
+	public void testDateBasic4() throws ParseException {
+        DateUtils.parseISO8601DateBasic("10");
+    }
+
+    //Verify that we are not supporting ISO8601 Ordinal Dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic5() throws ParseException {
+        DateUtils.parseISO8601DateBasic("2010110");
+    }
+
+    //TODO currently broken; this is an invalid date and should not be accepted; re-enable after Joda Time refactoring
+    //Verify that we are not supporting ISO8601 Ordinal Dates
+//    @Test(expected = ParseException.class)
+//	public void testDateBasic51() throws ParseException {
+//        DateUtils.parseISO8601DateBasic("2010-110");
+//    }
+
+    //Verify that we are not supporting ISO8601 Ordinal Dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic52() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+002010110");
+    }
+
+    //Verify that we are not supporting ISO8601 Ordinal Dates
+    @Test(expected = ParseException.class)
+	public void testDateBasic53() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+002010-110");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic6() throws ParseException {
+        DateUtils.parseISO8601DateBasic("1985W155");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic61() throws ParseException {
+        DateUtils.parseISO8601DateBasic("1985-W15-5");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic62() throws ParseException {
+        DateUtils.parseISO8601DateBasic("1985W15");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic63() throws ParseException {
+        DateUtils.parseISO8601DateBasic("1985-W15");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic64() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+001985W155");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic65() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+001985-W15-5");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic66() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+001985W15");
+    }
+
+    //Verify that we are not supporting ISO8601 week date
+    @Test(expected = ParseException.class)
+	public void testDateBasic67() throws ParseException {
+        DateUtils.parseISO8601DateBasic("+001985-W15");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test
+	public void testDateTimeBasic1() throws ParseException {
+        localCal.setTime(DateUtils.parseISO8601Basic("19850412T101530"));
+        assertEquals(1985, localCal.get(Calendar.YEAR));
+        assertEquals(3, localCal.get(Calendar.MONTH));
+        assertEquals(12, localCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, localCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, localCal.get(Calendar.MINUTE));
+        assertEquals(30, localCal.get(Calendar.SECOND));
+        assertEquals(0, localCal.get(Calendar.MILLISECOND));
+        utcCal.setTime(DateUtils.parseISO8601Basic("19850412T101530Z"));
+        assertEquals(1985, utcCal.get(Calendar.YEAR));
+        assertEquals(3, utcCal.get(Calendar.MONTH));
+        assertEquals(12, utcCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, utcCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, utcCal.get(Calendar.MINUTE));
+        assertEquals(30, utcCal.get(Calendar.SECOND));
+        assertEquals(0, utcCal.get(Calendar.MILLISECOND));
+        utcPlus4Cal.setTime(DateUtils.parseISO8601Basic("19850412T101530+0400"));
+        assertEquals(1985, utcPlus4Cal.get(Calendar.YEAR));
+        assertEquals(3, utcPlus4Cal.get(Calendar.MONTH));
+        assertEquals(12, utcPlus4Cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, utcPlus4Cal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, utcPlus4Cal.get(Calendar.MINUTE));
+        assertEquals(30, utcPlus4Cal.get(Calendar.SECOND));
+        assertEquals(0, utcPlus4Cal.get(Calendar.MILLISECOND));
+        DateUtils.parseISO8601Basic("19850412T101530+04");
+        assertEquals(1985, utcPlus4Cal.get(Calendar.YEAR));
+        assertEquals(3, utcPlus4Cal.get(Calendar.MONTH));
+        assertEquals(12, utcPlus4Cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, utcPlus4Cal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, utcPlus4Cal.get(Calendar.MINUTE));
+        assertEquals(30, utcPlus4Cal.get(Calendar.SECOND));
+        assertEquals(0, utcPlus4Cal.get(Calendar.MILLISECOND));
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic21() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15:30");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic22() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15:30Z");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic23() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15:30+04:00");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic24() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15:30+04");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic31() throws ParseException {
+        DateUtils.parseISO8601Basic("19850412T1015");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic32() throws ParseException {
+        DateUtils.parseISO8601Basic("19850412T1015Z");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic33() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic34() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-04-12T10:15Z");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic41() throws ParseException {
+        DateUtils.parseISO8601Basic("1985W155T1015+0400");
+    }
+
+    //Verify support for ISO8601 date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasic42() throws ParseException {
+        DateUtils.parseISO8601Basic("1985-W15-5T10:15+04");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test
+	public void testDateTimeBasicUTC1() throws ParseException {
+        utcCal.setTime(DateUtils.parseISO8601BasicUTC("19850412T101530Z"));
+        assertEquals(1985, utcCal.get(Calendar.YEAR));
+        assertEquals(3, utcCal.get(Calendar.MONTH));
+        assertEquals(12, utcCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, utcCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, utcCal.get(Calendar.MINUTE));
+        assertEquals(30, utcCal.get(Calendar.SECOND));
+        assertEquals(0, utcCal.get(Calendar.MILLISECOND));
+        utcCal.setTime(DateUtils.parseISO8601BasicUTC("19850412T101530+0000"));
+        assertEquals(1985, utcCal.get(Calendar.YEAR));
+        assertEquals(3, utcCal.get(Calendar.MONTH));
+        assertEquals(12, utcCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(10, utcCal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(15, utcCal.get(Calendar.MINUTE));
+        assertEquals(30, utcCal.get(Calendar.SECOND));
+        assertEquals(0, utcCal.get(Calendar.MILLISECOND));
+        //TODO currently broken; this is a valid ISO8601 date/time string; re-enable after Joda Time refactoring
+//        utcCal.setTime(DateUtils.parseISO8601BasicUTC("19850412T101530+00"));
+//        assertEquals(1985, utcCal.get(Calendar.YEAR));
+//        assertEquals(3, utcCal.get(Calendar.MONTH));
+//        assertEquals(12, utcCal.get(Calendar.DAY_OF_MONTH));
+//        assertEquals(10, utcCal.get(Calendar.HOUR_OF_DAY));
+//        assertEquals(15, utcCal.get(Calendar.MINUTE));
+//        assertEquals(30, utcCal.get(Calendar.SECOND));
+//        assertEquals(0, utcCal.get(Calendar.MILLISECOND));
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC2() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T101530");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC3() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T101530+0400");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC4() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T101530+04");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC5() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T101530-0000");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC61() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("1985-04-12T10:15:30Z");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC62() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("1985-04-12T10:15:30+0000");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC63() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("1985-04-12T10:15:30+00");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC71() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T1015Z");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC72() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T1015+0000");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC73() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("19850412T1015+00");
+    }
+
+    //Verify support for ISO8601 UTC date/time
+    @Test(expected = ParseException.class)
+	public void testDateTimeBasicUTC81() throws ParseException {
+        DateUtils.parseISO8601BasicUTC("1985W155T1015Z");
+    }
 }
