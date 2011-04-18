@@ -248,7 +248,6 @@ public class JobsController {
 			Map<String, String> params) throws IOException, FileUploadException {
 
 		byte buf[] = new byte[32 * 1024];
-		int bid = 0;
 
 		int fileCount = 0;
 		LOG.info("creating local files");
@@ -269,9 +268,10 @@ public class JobsController {
 			} else {
 				File file;
 
+                final String msgFileName = item.getName();
 				// special handling for first file - must be metadata!
 				if (files.isEmpty()) {
-					String filename = item.getName();
+					String filename = msgFileName;
 
 					LOG.info("loading metadata from " + filename);
 					for (String extension : supportedMetadataExtensions) {
@@ -296,9 +296,24 @@ public class JobsController {
 
 					file = new File(jobFolder, filename);
 				} else {
-					file = new File(jobFolder, String.format("%d.dat", bid++));
+                    try {
+                        if (!msgFileName.startsWith("binary")) {
+                            throw new Exception();
+                        }
+                        final String itemIdStr =  msgFileName.substring("binary".length());
+                        final int itemId = Integer.parseInt(itemIdStr);
+                        file = new File(jobFolder, String.format("%d.dat", itemId));
+                    } catch (final Exception e) {
+                        LOG.error("Invalid message binary file name '" + msgFileName + "'");
+                        throw new IOException("Invalid message binary file name '" + msgFileName
+                                + "'; must start with 'binary', followed by a number" );
+                    }
 				}
 
+                if (file.exists()) {
+                    LOG.error("Pre-existing message part file name '" + msgFileName + "'");
+                    throw new IOException("Pre-existing message part file name '" + msgFileName + "'");
+                }
 				FileOutputStream out = null;
 				out = new FileOutputStream(file);
 				try {

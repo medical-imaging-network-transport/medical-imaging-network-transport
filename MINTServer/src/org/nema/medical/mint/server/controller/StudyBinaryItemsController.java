@@ -77,7 +77,8 @@ public class StudyBinaryItemsController {
         }
 
         if (!itemList.hasNext()) {
-        	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive binary items. See server log for details.");
+        	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Unable to retrieve binary items. See server log for details.");
             LOG.error("Unable to locate binary items: " + seq + " or there are no binary items.");
             return;
         }
@@ -88,16 +89,23 @@ public class StudyBinaryItemsController {
         final OutputStream out = res.getOutputStream();
         
         int i = itemList.next();
-        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.BINARY_FILE_EXTENSION);
+
+        File file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "."
+                + StorageUtil.BINARY_FILE_EXTENSION);
         if (!file.exists() || !file.canRead()) {
-        	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+        	final File newFile =
+                    new File(studyRoot + "/" + type + "/binaryitems/" + i + "."
+                            + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+            if (newFile.exists() && newFile.canRead()) {
+                file = newFile;
+            } else {
+                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Unable to retrieve requested binary items. See server error log.");
+                LOG.error("BinaryItemsFile " + file + " does not exist");
+                return;
+            }
         }
-        
-        if (!file.exists() || !file.canRead()) {
-        	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
-            LOG.error("BinaryItemsFile " + file + " does not exist");
-            return;
-        }
+
 
         // write the appropriate header
         final boolean multipart = itemList.hasNext();
@@ -128,15 +136,20 @@ public class StudyBinaryItemsController {
         	
         	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.BINARY_FILE_EXTENSION);
             if (!file.exists() || !file.canRead()) {
-            	file = new File(studyRoot + "/" + type + "/binaryitems/" + i + "." + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+            	final File newFile =
+                        new File(studyRoot + "/" + type + "/binaryitems/" + i + "."
+                                + StorageUtil.EXCLUDED_BINARY_FILE_EXTENSION);
+                if (newFile.exists() && newFile.canRead()) {
+                    file = newFile;
+                } else {
+                    res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            "Unable to retrieve requested binary items. See server error log.");
+                    LOG.error("BinaryItemsFile " + file + " does not exist");
+                    return;
+                }
+
             }
             
-            if (!file.exists() || !file.canRead()) {
-            	res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to retreive requested binary items. See server error log.");
-                LOG.error("BinaryItemsFile " + file + " does not exist");
-                return;
-            }
-        	
             final long itemsize = file.length();
             String index = Integer.toString(i);
             out.write("\nContent-Type: application/octet-stream\n".getBytes());
