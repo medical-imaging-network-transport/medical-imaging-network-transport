@@ -445,8 +445,12 @@ public final class ProcessImportDir {
 
         //We support only one type
         assert binaryData instanceof BinaryDcmData;
-        for (final InputStream binaryStream: iter(((BinaryDcmData) binaryData).streamIterator())) {
-            entity.addPart("binary", new InputStreamBody(binaryStream, "binary"));
+        {
+            int i = 0;
+            for (final InputStream binaryStream: iter(((BinaryDcmData) binaryData).streamIterator())) {
+                final String fileName = "binary" + i++;
+                entity.addPart(fileName, new InputStreamBody(binaryStream, fileName));
+            }
         }
 
         //Debugging only
