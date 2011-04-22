@@ -268,51 +268,52 @@ public class JobsController {
 			} else {
 				File file;
 
-                final String msgFileName = item.getName();
 				// special handling for first file - must be metadata!
 				if (files.isEmpty()) {
-					String filename = msgFileName;
+					String filename = item.getName();
 
 					LOG.info("loading metadata from " + filename);
-					for (String extension : supportedMetadataExtensions) {
-						if (filename.endsWith(extension)) {
-							filename = "metadata" + extension;
-							break;
-						}
-					}
+                    outer: {
+                        for (String extension : supportedMetadataExtensions) {
+                            if (filename.endsWith(extension)) {
+                                filename = "metadata" + extension;
+                                break outer;
+                            }
+                        }
 
-					// last resort, use content type!
-					String contentType = item.getContentType();
-					if ("text/xml".equals(contentType)) {
-						filename = "metadata.xml";
-					} else if ("application/octet-stream".equals(contentType)) {
-						filename = "metadata.gpb";
-					} else {
-						// dump out and write the content... will fail later
-						LOG.error("unable to determine metadata type for "
-								+ item.getName());
-						filename = "metadata.dat";
-					}
+                        //At this point, no proper filename has been established. Last resort, use content type!
+                        String contentType = item.getContentType();
+                        if ("text/xml".equals(contentType)) {
+                            filename = "metadata.xml";
+                        } else if ("application/octet-stream".equals(contentType)) {
+                            filename = "metadata.gpb";
+                        } else {
+                            // dump out and write the content... will fail later
+                            LOG.error("unable to determine metadata type for "
+                                    + item.getName());
+                            filename = "metadata.dat";
+                        }
+                    }
+
 
 					file = new File(jobFolder, filename);
 				} else {
+                    final String msgPartName = item.getFieldName();
                     try {
-                        if (!msgFileName.startsWith("binary")) {
+                        if (!msgPartName.startsWith("binary")) {
                             throw new Exception();
                         }
-                        final String itemIdStr =  msgFileName.substring("binary".length());
+                        final String itemIdStr = msgPartName.substring("binary".length());
                         final int itemId = Integer.parseInt(itemIdStr);
                         file = new File(jobFolder, String.format("%d.dat", itemId));
                     } catch (final Exception e) {
-                        LOG.error("Invalid message binary file name '" + msgFileName + "'");
-                        throw new IOException("Invalid message binary file name '" + msgFileName
-                                + "'; must start with 'binary', followed by a number" );
+                        throw new IOException("Invalid message part name for binary data: '" + msgPartName
+                                + "'; must start with 'binary', followed by a number");
                     }
 				}
 
                 if (file.exists()) {
-                    LOG.error("Pre-existing message part file name '" + msgFileName + "'");
-                    throw new IOException("Pre-existing message part file name '" + msgFileName + "'");
+                    throw new IOException("File for message part already exists: '" + file.getName() + "'");
                 }
 				FileOutputStream out = null;
 				out = new FileOutputStream(file);
