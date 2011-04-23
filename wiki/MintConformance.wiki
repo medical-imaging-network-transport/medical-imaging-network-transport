@@ -189,9 +189,11 @@ To see all the differences the application should be run twice, switching the co
    * Created DicomSeries class that is a collection of DicomInstances.
    * Added output option to DataDictionary to support integration testing.
    * Uses MINT Dictionary when comparing studies on a MINTServer and DCM4CHE when comparing studies on the file system.
+   * Fixed DicomTransfer to use ExplicitVR encoding for compressed images.
 
 *To Do*
 
+   * Provide support for undefined lengths for OW, OB, and UN tags. 
    * Consider cases for multiple VRs
    * SAX parsing for large metadata files
    * Add flag for changing the floating point precision
