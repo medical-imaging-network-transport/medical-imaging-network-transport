@@ -35,7 +35,6 @@ import traceback
 from os.path import join
 
 from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
-from org.nema.medical.mint.MINT_Dictionary    import MINT_Dictionary
 from org.nema.medical.mint.DicomSeries        import DicomSeries
 from org.nema.medical.mint.DicomInstance      import DicomInstance
 
@@ -123,15 +122,8 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "p:o:h")
-         
-    # ---
-    # Check for output option.
-    # ---
-    port = "8080"
-    for option in options:
-        if option[0] == "-p": port = option[1]
-      
+    (options, args)=getopt.getopt(sys.argv[1:], "o:h")
+               
     # ---
     # Check for output option.
     # ---
@@ -149,9 +141,9 @@ def main():
            help = True
            
     try:
-       if help or len(args) < 2:
+       if help or len(args) < 1:
 
-          print "Usage", progName, "[options] <dicom_dir> <hostname>"
+          print "Usage", progName, "[options] <dicom_dir>"
           print "  -p <port>:   defaults to 8080"
 	  print "  -o <output>: output filename (defaults to stdout)"
 	  print "  -h:          displays usage"
@@ -161,8 +153,7 @@ def main():
        # Read dicom.
        # ---
        dcmDir = args[0];
-       hostname = args[1]
-       dataDictionary = MINT_Dictionary(hostname, port)
+       dataDictionary = DCM4CHE_Dictionary()
        study = DicomStudy(dcmDir, dataDictionary)
        study.setOutput(output)
        study.debug()

@@ -31,9 +31,9 @@ import string
 import sys
 import traceback
 
-from org.nema.medical.mint.MINT_Dictionary import MINT_Dictionary
-from org.nema.medical.mint.DicomAttribute  import DicomAttribute
-from org.nema.medical.mint.DicomTransfer   import DicomTransfer
+from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
+from org.nema.medical.mint.DicomAttribute     import DicomAttribute
+from org.nema.medical.mint.DicomTransfer      import DicomTransfer
 
 STUDY_INSTANCE_UID_TAG  = "0020000d"
 SERIES_INSTANCE_UID_TAG = "0020000e" 
@@ -149,14 +149,7 @@ class DicomInstance():
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "p:h")
-    
-    # ---
-    # Check for output option.
-    # ---
-    port = "8080"
-    for option in options:
-        if option[0] == "-p": port = option[1]
+    (options, args)=getopt.getopt(sys.argv[1:], "h")
     
     # ---
     # Check for help option.
@@ -167,18 +160,16 @@ def main():
            help = True
     
     try:
-       if len(args) < 2 or help:
-          print "Usage", progName, "[options] <dicom_file> <hostname>"
-          print "  -p <port>: defaults to 8080"
-          print "  -h:        displays usage"
+       if len(args) < 1 or help:
+          print "Usage", progName, "[options] <dicom_file>"
+          print "  -h: displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
        dcmName = args[0];
-       hostname = args[1]
-       dataDictionary = MINT_Dictionary(hostname, port)
+       dataDictionary = DCM4CHE_Dictionary()
        instance = DicomInstance(dcmName, dataDictionary)
        instance.debug()
                         
