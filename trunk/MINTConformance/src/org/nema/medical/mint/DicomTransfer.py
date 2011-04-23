@@ -51,10 +51,12 @@ class DicomTransfer():
           self.__implicit = False
           self.__littleEndian = False
        elif transferSyntaxUI[0:20] == self.JPEG_COMPRESSION:
+          self.__implicit = False
           # xx = 50-64: Lossy JPEG
           # xx = 65-70: Lossless JPEG
           pass
        elif transferSyntaxUI == self.LOSSLESS_RUN_LENGTH_ENCODING:
+          self.__implicit = False
           pass
        else:
           raise IOError("Unknown transfer syntax UI "+transferSyntaxUI)
