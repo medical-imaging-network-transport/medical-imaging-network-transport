@@ -77,99 +77,11 @@ public final class DateUtils {
         return parseDate(dateStr, xsdDateTime);
     }
 
-    /**
-     * Parses a string formatted according to the ISO8601 "extended" date format,
-     * the standard xsd:dateTime format used in XML.  This method is not actually used
-     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
-     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing
-     * due to special character issues.
-     * @param dateStr formatted according to the ISO 8601 "extended" date format
-     * @return Date a the date represented by the provided string
-     * @throws java.text.ParseException if the date is not properly formatted
-     */
-    public static Date parseISO8601Extended(final String dateStr) throws ParseException {
-        return parseISO8601Extended(dateStr, false);
-    }
-
-    /**
-     * Parses a string formatted according to the ISO8601 "extended" date format,
-     * the standard xsd:dateTime format used in XML. This method is not actually used
-     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
-     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing
-     * due to special character issues, and further restricted to only UTC time strings
-     * (with an appended 'Z' character)
-     * @param dateStr formatted according to the ISO 8601 "basic" date format, with appended 'Z' character.
-     * @return Date a the date represented by the provided string
-     * @throws java.text.ParseException if the date is not properly formatted
-     */
-    public static Date parseISO8601ExtendedUTC(final String dateStr) throws ParseException {
-        return parseISO8601Extended(dateStr, true);
-    }
-
-    private static Date parseISO8601Extended(String dateStr, final boolean utcOnly) throws ParseException {
-        final String[] xsdDateTime;
-        if (utcOnly) {
-            xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz", "yyyy-MM-dd'T'HH:mm:ssz"};
-        } else {
-    	    xsdDateTime = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSSz", "yyyy-MM-dd'T'HH:mm:ssz",
-                    "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd'T'HH:mm:ss"};
-        }
-    	// fix issue where + is replaced with ' ' in a URL
-    	dateStr = dateStr.replace(' ', '+');
-        final int dateStrLen = dateStr.length();
-        //this is zero time so we need to add that TZ indicator for UTC
-        //These are the ways to explicitly express UTC. "-00:00" or "-00" are not valid according to ISO8601:2004
-        if (utcOnly && !dateStr.endsWith("Z") && !dateStr.endsWith("+00:00") && !dateStr.endsWith("+00")) {
-            throw new ParseException("Date/time string lacks UTC designator", dateStrLen);
-        }
-        //this is zero time so we need to add that TZ indicator for
-        if (dateStr.endsWith("Z")) {
-        	dateStr = dateStr.substring(0, dateStrLen - 1) + "GMT-00:00";
-        } else if (dateStr.contains("T")) {
-			final int timeIndex = dateStr.indexOf('T');
-			int signIndex = dateStr.lastIndexOf('+');
-        	if (signIndex == -1) {
-                signIndex = dateStr.lastIndexOf('-');
-            }
-
-			if (signIndex > timeIndex) {
-                final String s0 = dateStr.substring( 0, signIndex);
-                final String s1 = dateStr.substring( signIndex, dateStr.length() );
-                dateStr = s0 + "GMT" + s1;
-        	}
-        }
-    	return parseDate(dateStr, xsdDateTime);
-    }
-
-    public static Date parseISO8601(final String dateStr) throws ParseException {
-        return parseISO8601(dateStr, false);
-    }
-
-    public static Date parseISO8601UTC(final String dateStr) throws ParseException {
-        return parseISO8601(dateStr, true);
-    }
-
-    private static Date parseISO8601(final String dateStr, final boolean utcOnly) throws ParseException {
-        if (dateStr.contains(":")) {
-            return parseISO8601Extended(dateStr, utcOnly);
-        } else {
-            return parseISO8601Basic(dateStr, utcOnly);
-        }
-    }
-
-    public static Date parseISO8601Date(final String dateStr) throws ParseException {
-        final String[] xsdDate;
-        if (dateStr.contains("-")) {
-            if (dateStr.length() == 10){
-                xsdDate = new String[]{"yyyy-MM-dd"};
-            } else {
-                throw new ParseException("Invalid date:" + dateStr, 0);
-            }
-        } else if (dateStr.length() == 8) {
-            xsdDate = new String[]{"yyyyMMdd"};
-        } else {
+    public static Date parseISO8601DateBasic(final String dateStr) throws ParseException {
+        if (dateStr.length() != 8) {
             throw new ParseException("Invalid date: " + dateStr, 0);
         }
+        final String[] xsdDate = new String[]{"yyyyMMdd"};
         return parseDate(dateStr, xsdDate);
     }
 
