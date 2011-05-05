@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="studyRoot">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="type">
+          <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="required" />
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="studyUUID" type="xsd:string" use="required" />
+      <xsd:attribute name="lastUpdate" type="xsd:string" use="required" />
+      <xsd:attribute name="version" type="xsd:integer" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

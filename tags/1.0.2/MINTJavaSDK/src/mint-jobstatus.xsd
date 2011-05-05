@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="jobStatus">
+    <xsd:complexType>
+      <xsd:attribute name="jobID" type="xsd:string"/>
+      <xsd:attribute name="studyUUID" type="xsd:string"/>
+      <xsd:attribute name="jobStatus" type="xsd:string"/>
+      <xsd:attribute name="jobCreated" type="xsd:dateTime"/>
+      <xsd:attribute name="jobUpdated" type="xsd:dateTime"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

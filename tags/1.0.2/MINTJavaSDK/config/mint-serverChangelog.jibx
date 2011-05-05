@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<binding xmlns:tns="http://medical.nema.org/mint" name="serverChangelog" trim-whitespace="true">
+	<namespace uri="http://medical.nema.org/mint" default="elements" />
+	<mapping name="changelog" class="org.nema.medical.mint.changelog.ChangeSet">
+		<collection iter-method="changeIterator" add-method="addChange"
+		    item-type="org.nema.medical.mint.changelog.Change"/>
+	</mapping>
+	<mapping name="change" class="org.nema.medical.mint.changelog.Change">
+		<value style="attribute" name="studyUUID" get-method="getStudyUUID" set-method="setStudyUUID"/>
+		<value style="attribute" name="changeNumber" get-method="getChangeNumber" set-method="setChangeNumber"/>
+		<value style="attribute" name="type" get-method="getType" set-method="setType"/>
+		<value style="attribute" name="dateTime" get-method="getDateTime" set-method="setDateTime"/>
+        <value style="attribute" name="operation" get-method="getOperation" set-method="setOperation"/>
+		<value style="attribute" name="remoteHost" get-method="getRemoteHost" set-method="setRemoteHost"/>
+		<value style="attribute" name="remoteUser" get-method="getRemoteUser" set-method="setRemoteUser"
+		    usage="optional"/>
+	</mapping>
+</binding>

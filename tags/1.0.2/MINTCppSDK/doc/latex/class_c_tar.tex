@@ -1,0 +1,304 @@
+\hypertarget{class_c_tar}{
+\section{CTar Class Reference}
+\label{class_c_tar}\index{CTar@{CTar}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_c_tar_af488e71eb35ff1884427fe2bf5cdb281}{
+{\bfseries CTar} (string \hyperlink{struct_tar_file}{TarFile})}
+\label{class_c_tar_af488e71eb35ff1884427fe2bf5cdb281}
+
+\item 
+\hypertarget{class_c_tar_a2f10d4d57528e42bfda76f16f4bcef4d}{
+{\bfseries CTar} (\hyperlink{class_c_tar_callback}{CTarCallback} $\ast$TarCallback)}
+\label{class_c_tar_a2f10d4d57528e42bfda76f16f4bcef4d}
+
+\item 
+\hypertarget{class_c_tar_a019f18df37a290a89dfe4541250bfdde}{
+string {\bfseries GetLastError} (void)}
+\label{class_c_tar_a019f18df37a290a89dfe4541250bfdde}
+
+\item 
+\hypertarget{class_c_tar_a96f0fbba6502e35e47c4610d0cbf31b2}{
+int {\bfseries AddFile} (void $\ast$File, string ObjectName, unsigned int FileSize)}
+\label{class_c_tar_a96f0fbba6502e35e47c4610d0cbf31b2}
+
+\item 
+\hypertarget{class_c_tar_a677c39780f32a6b41cb8164c7b57a07a}{
+int {\bfseries AddFile} (string \hyperlink{struct_filename}{Filename}, string ObjectName)}
+\label{class_c_tar_a677c39780f32a6b41cb8164c7b57a07a}
+
+\item 
+\hypertarget{class_c_tar_a54c3783d371dc78546029996223e7805}{
+int {\bfseries DeleteFile} (string ObjectName)}
+\label{class_c_tar_a54c3783d371dc78546029996223e7805}
+
+\item 
+\hypertarget{class_c_tar_adfdf0617e7403e40fff89e4ee41bee0c}{
+\_\-\_\-int64 {\bfseries GetTarSize} (void)}
+\label{class_c_tar_adfdf0617e7403e40fff89e4ee41bee0c}
+
+\item 
+\hypertarget{class_c_tar_adea70d2616c95fca3064d11149d4f909}{
+int {\bfseries GetNumFiles} (void)}
+\label{class_c_tar_adea70d2616c95fca3064d11149d4f909}
+
+\item 
+\hypertarget{class_c_tar_a679f409c4f835d363a507702c0512fef}{
+bool {\bfseries Verify} (string ObjectName=\char`\"{}\char`\"{})}
+\label{class_c_tar_a679f409c4f835d363a507702c0512fef}
+
+\item 
+\hypertarget{class_c_tar_a21ba8b1b1d071fad3a9add2e2493c22e}{
+void {\bfseries FreeFileMemory} (void $\ast$\&File)}
+\label{class_c_tar_a21ba8b1b1d071fad3a9add2e2493c22e}
+
+\item 
+\hypertarget{class_c_tar_a8af549ddea27e3ba3e0ddd53a1219ed9}{
+int {\bfseries ReadNextFile} (void $\ast$\&File, string \&ObjectName, int \&FileSize)}
+\label{class_c_tar_a8af549ddea27e3ba3e0ddd53a1219ed9}
+
+\item 
+\hypertarget{class_c_tar_a920413976480315483f36f0207c7b879}{
+int {\bfseries ReadNextFile} (string \&ObjectName, string Path, int WhatFile=NEXT)}
+\label{class_c_tar_a920413976480315483f36f0207c7b879}
+
+\item 
+\hypertarget{class_c_tar_ae7d5f7bad40be60dac31b4ff98f6dce9}{
+int {\bfseries ReadNextFile} (iostream \&File, string \&ObjectName)}
+\label{class_c_tar_ae7d5f7bad40be60dac31b4ff98f6dce9}
+
+\item 
+\hypertarget{class_c_tar_a1ea487a4c42ba4a0478df3fa5acad6e9}{
+int {\bfseries ReadFirstFile} (void $\ast$\&File, string \&ObjectName, int \&FileSize)}
+\label{class_c_tar_a1ea487a4c42ba4a0478df3fa5acad6e9}
+
+\item 
+\hypertarget{class_c_tar_af29222aed442829266b861e67f43e357}{
+int {\bfseries ReadFirstFile} (string \&ObjectName, string Path)}
+\label{class_c_tar_af29222aed442829266b861e67f43e357}
+
+\item 
+\hypertarget{class_c_tar_abc068d5e0d70d566c931df3eb88d129f}{
+int {\bfseries ReadFile} (void $\ast$\&File, string ObjectName, int \&FileSize)}
+\label{class_c_tar_abc068d5e0d70d566c931df3eb88d129f}
+
+\item 
+\hypertarget{class_c_tar_a5bd2440642a048123b8b79c287cd5b7e}{
+int {\bfseries ReadFile} (string \&ObjectName, string Path)}
+\label{class_c_tar_a5bd2440642a048123b8b79c287cd5b7e}
+
+\item 
+\hypertarget{class_c_tar_acfae0bec803ff71f94fdf0b303d6173e}{
+int {\bfseries ReadVerifiedChunk} (void $\ast$Memory, unsigned int FileSize, bool First=false)}
+\label{class_c_tar_acfae0bec803ff71f94fdf0b303d6173e}
+
+\item 
+\hypertarget{class_c_tar_a95e4ba103e93671685b5f70057365bc8}{
+int {\bfseries ReadFirstVerifiedChunk} (void $\ast$Memory, unsigned int FileSize)}
+\label{class_c_tar_a95e4ba103e93671685b5f70057365bc8}
+
+\item 
+\hypertarget{class_c_tar_aba1e5ce30e82b5169ad905e94d61a790}{
+void {\bfseries StartStream} (void)}
+\label{class_c_tar_aba1e5ce30e82b5169ad905e94d61a790}
+
+\item 
+\hypertarget{class_c_tar_a0f92155d18c76c19ea819922740532bc}{
+int {\bfseries AddChunk} (void $\ast$Memory, unsigned int Size)}
+\label{class_c_tar_a0f92155d18c76c19ea819922740532bc}
+
+\item 
+\hypertarget{class_c_tar_abdf2006005930057f3f6a84677bde3f7}{
+char $\ast$ {\bfseries GetFirstFileName} ()}
+\label{class_c_tar_abdf2006005930057f3f6a84677bde3f7}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_c_tar_a5f4c1748962f3d75ba6eb799e9dcc0af}{
+void {\bfseries Init} (void)}
+\label{class_c_tar_a5f4c1748962f3d75ba6eb799e9dcc0af}
+
+\item 
+\hypertarget{class_c_tar_a1971a08f2da36cde1ed250304eb15898}{
+void {\bfseries ProcessException} (\hyperlink{struct_tar_exception}{TarException\_\-t} Error)}
+\label{class_c_tar_a1971a08f2da36cde1ed250304eb15898}
+
+\item 
+\hypertarget{class_c_tar_a1ab5349ef99326bb21c599d6423f36e1}{
+int {\bfseries OpenFile} (\hyperlink{struct_tar_file}{TarFile\_\-t} \&File, bool Create=DONT\_\-CREATE, bool Share=DONT\_\-SHARE)}
+\label{class_c_tar_a1ab5349ef99326bb21c599d6423f36e1}
+
+\item 
+\hypertarget{class_c_tar_a6b256f74265b145e2f18d006d2fb5dd6}{
+int {\bfseries OpenTar} (bool Create=DONT\_\-CREATE)}
+\label{class_c_tar_a6b256f74265b145e2f18d006d2fb5dd6}
+
+\item 
+\hypertarget{class_c_tar_a3f0fae27806137f2270c10c932c9ad93}{
+void {\bfseries CloseFile} (\hyperlink{struct_tar_file}{TarFile\_\-t} \&File)}
+\label{class_c_tar_a3f0fae27806137f2270c10c932c9ad93}
+
+\item 
+\hypertarget{class_c_tar_a773ad2528ad70d962e89ef7bcc1a512e}{
+void {\bfseries CloseTar} (void)}
+\label{class_c_tar_a773ad2528ad70d962e89ef7bcc1a512e}
+
+\item 
+\hypertarget{class_c_tar_afef7227673ca9b33d68ee300dc9f3a47}{
+\hyperlink{struct_filename}{Filename\_\-t} $\ast$ {\bfseries AddFilenameToList} (string ObjectName, \_\-\_\-int64 Offset)}
+\label{class_c_tar_afef7227673ca9b33d68ee300dc9f3a47}
+
+\item 
+\hypertarget{class_c_tar_a1082fd5413ffd4e92ffa48d9604a141b}{
+\hyperlink{struct_filename}{Filename\_\-t} $\ast$ {\bfseries UpdateFilenameOffset} (string ObjectName, \_\-\_\-int64 Offset, bool StripChecksum=false)}
+\label{class_c_tar_a1082fd5413ffd4e92ffa48d9604a141b}
+
+\item 
+\hypertarget{class_c_tar_a0fd9381e3416a6d44f37792280da3ed7}{
+void {\bfseries DeleteFilenameFromList} (string ObjectName)}
+\label{class_c_tar_a0fd9381e3416a6d44f37792280da3ed7}
+
+\item 
+\hypertarget{class_c_tar_ae8aa32f49aad569c5cb3bfe86a509f0f}{
+int {\bfseries FillFilenameList} ()}
+\label{class_c_tar_ae8aa32f49aad569c5cb3bfe86a509f0f}
+
+\item 
+\hypertarget{class_c_tar_aa357d0bf026ae53a552fdc96a2deef8d}{
+\_\-\_\-int64 {\bfseries GetOffsetFromFilenameList} (string ObjectName)}
+\label{class_c_tar_aa357d0bf026ae53a552fdc96a2deef8d}
+
+\item 
+\hypertarget{class_c_tar_a3714c1a94df1b33a210658062c22e82e}{
+void {\bfseries WriteTarFile} (\hyperlink{struct_header}{Header\_\-t} \hyperlink{struct_header}{Header}, void $\ast$File, unsigned int FileSize)}
+\label{class_c_tar_a3714c1a94df1b33a210658062c22e82e}
+
+\item 
+\hypertarget{class_c_tar_a2a3f09254ef1a05b1ec6c3e70679abaf}{
+int {\bfseries OverwriteCurrentFile} (\hyperlink{struct_header}{Header\_\-t} \hyperlink{struct_header}{Header})}
+\label{class_c_tar_a2a3f09254ef1a05b1ec6c3e70679abaf}
+
+\item 
+\hypertarget{class_c_tar_a3b14695f515ccbbea70e39873b60a617}{
+UINT32 {\bfseries GetChecksum} (void $\ast$Memory, unsigned int FileSize)}
+\label{class_c_tar_a3b14695f515ccbbea70e39873b60a617}
+
+\item 
+\hypertarget{class_c_tar_ab6dfb5df43713056ea20057319229b66}{
+bool {\bfseries VerifyChecksum} (void $\ast$Memory, unsigned int FileSize, UINT32 Checksum)}
+\label{class_c_tar_ab6dfb5df43713056ea20057319229b66}
+
+\item 
+\hypertarget{class_c_tar_af03a2b20f839e0d419f62f49bb88b857}{
+bool {\bfseries VerifyHeader} (\hyperlink{struct_header}{Header\_\-t} \hyperlink{struct_header}{Header})}
+\label{class_c_tar_af03a2b20f839e0d419f62f49bb88b857}
+
+\item 
+\hypertarget{class_c_tar_aaedef8cb03dc83687b252708a4707bbb}{
+int {\bfseries ReadVerifyHeader} (\hyperlink{struct_header}{Header\_\-t} \&\hyperlink{struct_header}{Header})}
+\label{class_c_tar_aaedef8cb03dc83687b252708a4707bbb}
+
+\item 
+\hypertarget{class_c_tar_a1f6df09773f21d35e3c52f728a8b5843}{
+void {\bfseries SkipFileToNextHeader} (char $\ast$FileSize)}
+\label{class_c_tar_a1f6df09773f21d35e3c52f728a8b5843}
+
+\item 
+\hypertarget{class_c_tar_a67ddb380fb3a80e3fa8742be1b24c931}{
+bool {\bfseries VerifyFile} (void $\ast$\&File, long Filesize, char $\ast$ObjectName)}
+\label{class_c_tar_a67ddb380fb3a80e3fa8742be1b24c931}
+
+\item 
+\hypertarget{class_c_tar_abda0c27ddb29c1440a4635c5b53e8656}{
+int {\bfseries ReadVerifyFile} (void $\ast$\&File, \hyperlink{struct_header}{Header\_\-t} \hyperlink{struct_header}{Header})}
+\label{class_c_tar_abda0c27ddb29c1440a4635c5b53e8656}
+
+\item 
+\hypertarget{class_c_tar_a5fb201d240464f33f02ca138852da619}{
+void {\bfseries FillHeader} (\hyperlink{struct_header}{Header\_\-t} \&\hyperlink{struct_header}{Header}, string ObjectName, unsigned int FileSize, UINT32 FileChecksum)}
+\label{class_c_tar_a5fb201d240464f33f02ca138852da619}
+
+\item 
+\hypertarget{class_c_tar_a9bd167ec1dfc8b9e11c15f29c20c9287}{
+int {\bfseries ReadFileData} (\hyperlink{struct_file_data}{FileData\_\-t} \&File, bool First=false)}
+\label{class_c_tar_a9bd167ec1dfc8b9e11c15f29c20c9287}
+
+\item 
+\hypertarget{class_c_tar_a594e6d5fec979606a4dbc1d8ef3c3fc7}{
+unsigned int {\bfseries TarMemCpy} (long \&Offset, void $\ast$\&Dest, unsigned int \&Remaining, void $\ast$Source, unsigned int Len, bool StreamFlow)}
+\label{class_c_tar_a594e6d5fec979606a4dbc1d8ef3c3fc7}
+
+\item 
+\hypertarget{class_c_tar_a2214c4d96e83e2f905164ad2d7dc9acf}{
+unsigned int {\bfseries CopyChunk} (\hyperlink{struct_file_data}{FileData\_\-t} \&\hyperlink{struct_file_data}{FileData}, void $\ast$\&Chunk, unsigned int Remaining, bool StreamFlow=FILE\_\-INTO\_\-CHUNK)}
+\label{class_c_tar_a2214c4d96e83e2f905164ad2d7dc9acf}
+
+\item 
+\hypertarget{class_c_tar_af1dca590228891b902ea282e9e20a9d8}{
+void {\bfseries ResetFile} (\hyperlink{struct_file_data}{FileData\_\-t} \&\hyperlink{struct_file_data}{FileData}, bool FreeFile=FREE\_\-FILE)}
+\label{class_c_tar_af1dca590228891b902ea282e9e20a9d8}
+
+\item 
+\hypertarget{class_c_tar_aa4eb1b409db6a2ff858280e054de60db}{
+bool {\bfseries FileReady} (unsigned int Remaining)}
+\label{class_c_tar_aa4eb1b409db6a2ff858280e054de60db}
+
+\item 
+\hypertarget{class_c_tar_a4254585dd5208c1b965091d008b0533c}{
+void {\bfseries CreateSubDir} (string Path, string ObjectName)}
+\label{class_c_tar_a4254585dd5208c1b965091d008b0533c}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_c_tar_aee92304fb92ad16dfce088332372e219}{
+string {\bfseries m\_\-LastError}}
+\label{class_c_tar_aee92304fb92ad16dfce088332372e219}
+
+\item 
+\hypertarget{class_c_tar_abd6210a19feecf391b4c03dcd1755833}{
+\hyperlink{struct_tar_file}{TarFile\_\-t} {\bfseries m\_\-TarFile}}
+\label{class_c_tar_abd6210a19feecf391b4c03dcd1755833}
+
+\item 
+\hypertarget{class_c_tar_a4799b2d092e461a2020404e1ea5e0ec3}{
+\hyperlink{struct_filename}{Filename\_\-t} $\ast$ {\bfseries m\_\-FilenameList}}
+\label{class_c_tar_a4799b2d092e461a2020404e1ea5e0ec3}
+
+\item 
+\hypertarget{class_c_tar_a5f3b8169d18e59040f828afeb66c38a9}{
+char {\bfseries m\_\-NULLBLOCK} \mbox{[}TAR\_\-BLOCK\_\-SIZE\mbox{]}}
+\label{class_c_tar_a5f3b8169d18e59040f828afeb66c38a9}
+
+\item 
+\hypertarget{class_c_tar_afe7211f96f921270d87ff42116e9859a}{
+\hyperlink{struct_file_data}{FileData\_\-t} {\bfseries m\_\-ReadFile}}
+\label{class_c_tar_afe7211f96f921270d87ff42116e9859a}
+
+\item 
+\hypertarget{class_c_tar_aada26e7040056ff06dfbfed44795ad6e}{
+\hyperlink{struct_file_data}{FileData\_\-t} {\bfseries m\_\-ReadChunk}}
+\label{class_c_tar_aada26e7040056ff06dfbfed44795ad6e}
+
+\item 
+\hypertarget{class_c_tar_a2f7cb844486b63929ebde21cb216a575}{
+\hyperlink{struct_file_data}{FileData\_\-t} {\bfseries m\_\-ChunkStream}}
+\label{class_c_tar_a2f7cb844486b63929ebde21cb216a575}
+
+\item 
+\hypertarget{class_c_tar_a0a927560663b50a70d9d9d0fbcdc82b8}{
+\hyperlink{class_c_tar_callback}{CTarCallback} $\ast$ {\bfseries m\_\-TarCallback}}
+\label{class_c_tar_a0a927560663b50a70d9d9d0fbcdc82b8}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+mintcpp/branches/development/DICOM2MINTImport/tarlib.h\item 
+mintcpp/branches/development/DICOM2MINTImport/tarlib.cpp\end{DoxyCompactItemize}

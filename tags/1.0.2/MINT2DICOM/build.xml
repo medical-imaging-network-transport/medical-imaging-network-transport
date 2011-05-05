@@ -1,0 +1,59 @@
+<!DOCTYPE project>
+<project basedir="." default="doc" name="MINT2DICOM">
+    <property file="build.properties" />
+
+    <property name="javasdk.project.basedir" value="${basedir}/../MINTJavaSDK" />
+    <available file="${javasdk.project.basedir}" type="dir" property="javasdk.project.available" />
+    <fail message="Must have the MINTJavaSDK project in the same parent folder as this project" unless="javasdk.project.available" />
+
+    <property name="common.project.basedir" value="${basedir}/../MINTServer" />
+    <available file="${common.project.basedir}" type="dir" property="common.project.available" />
+    <fail message="Must have the MINTServer project in the same parent folder as this project" unless="common.project.available" />
+
+    <import file="../build-common.xml" />
+
+    <path id="compile.classpath">
+        <fileset dir="${javasdk.project.basedir}/lib" includes="*.jar" />
+        <fileset dir="${javasdk.project.basedir}/build" includes="*.jar" />
+        <fileset dir="${common.project.basedir}/WebContent/WEB-INF/lib" includes="*.jar" />
+        <pathelement location="${common.project.basedir}/build/classes" />
+    </path>
+
+    <!-- Override to first build MINTServer & sdk projects -->
+    <target name="compile">
+        <ant dir="${common.project.basedir}" target="compile" inheritall="false" />
+
+        <antcall target="build-common.compile" />
+    </target>
+
+    <target name="jar" depends="compile" description="Make JAR of compiled classes">
+        <jar destfile="${build.dir}/${ant.project.name}.jar">
+            <fileset dir="${build.classes.dir}" />
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+            <fileset dir="${common.project.basedir}/build/classes" />
+            <fileset dir="${javasdk.project.basedir}/build/classes" />
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/dcm4che-core-2.0.23.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
+            <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/build/mint-1.0.2.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/lib/jibx-run-1.2.2.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/lib/protobuf-java-2.3.0.jar"/>
+
+            <manifest>
+	    	<attribute name="Main-Class" value="org.nema.medical.mint.MINT2DICOM" />
+	    </manifest>
+        </jar>
+    </target>
+
+    <target name="doc" depends="jar" description="Make JavaDoc archives">
+        <mkdir dir="${build.dir}/doc" />
+        <javadoc sourcepath="${basedir}/src" destdir="${build.dir}/doc" author="true" version="true" use="true" source="1.6">
+            <bottom>Copyright &#169; 2010 MINT Working Group. All Rights Reserved.</bottom>
+            <classpath refid="compile.classpath" />
+            <doctitle>MINT2DICOM</doctitle>
+        </javadoc>
+        <jar destfile="${build.dir}/${ant.project.name}-javadoc.jar" basedir="${build.dir}/doc" includes="**" />
+        <jar destfile="${build.dir}/${ant.project.name}-sources.jar" basedir="${basedir}/src" includes="**" />
+    </target>
+</project>
