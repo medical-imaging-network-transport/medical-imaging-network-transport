@@ -31,9 +31,9 @@ import string
 import sys
 import traceback
 
-from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
-from org.nema.medical.mint.DicomAttribute     import DicomAttribute
-from org.nema.medical.mint.DicomTransfer      import DicomTransfer
+from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomAttribute import DicomAttribute
+from org.nema.medical.mint.DicomTransfer  import DicomTransfer
 
 STUDY_INSTANCE_UID_TAG  = "0020000d"
 SERIES_INSTANCE_UID_TAG = "0020000e" 
@@ -149,7 +149,15 @@ class DicomInstance():
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "h")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:h")
+    
+    # ---
+    # Check for data dictionary.
+    # ---
+    dataDictionaryUrl = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dataDictionaryUrl = opt[1]
     
     # ---
     # Check for help option.
@@ -160,16 +168,17 @@ def main():
            help = True
     
     try:
-       if len(args) < 1 or help:
+       if len(args) != 1 or help:
           print "Usage", progName, "[options] <dicom_file>"
-          print "  -h: displays usage"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+          print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
        # Read dicom.
        # ---
        dcmName = args[0];
-       dataDictionary = DCM4CHE_Dictionary()
+       dataDictionary = DataDictionary(dataDictionaryUrl)
        instance = DicomInstance(dcmName, dataDictionary)
        instance.debug()
                         

@@ -510,9 +510,6 @@
 		<element tag="00181403" keyword="CassetteSize" vr="CS" vm="1" ret="">Cassette Size</element>
 		<element tag="00181404" keyword="ExposuresOnPlate" vr="US" vm="1" ret="">Exposures on Plate</element>
 		<element tag="00181405" keyword="RelativeXRayExposure" vr="IS" vm="1" ret="">Relative X-Ray Exposure</element>
-                <element tag="00181411" keyword="ExposureIndex" vr="DS" vm="1" ret="">Exposure Index</element>
-                <element tag="00181412" keyword="TargetExposureIndex" vr="DS" vm="1" ret="">Target Exposure Index</element>
-                <element tag="00181413" keyword="DeviationIndex" vr="DS" vm="1" ret="">Deviation Index</element>
 		<element tag="00181450" keyword="ColumnAngulation" vr="DS" vm="1" ret="">Column Angulation</element>
 		<element tag="00181460" keyword="TomoLayerHeight" vr="DS" vm="1" ret="">Tomo Layer Height</element>
 		<element tag="00181470" keyword="TomoAngle" vr="DS" vm="1" ret="">Tomo Angle</element>

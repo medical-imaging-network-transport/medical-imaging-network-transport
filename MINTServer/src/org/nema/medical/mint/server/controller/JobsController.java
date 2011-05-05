@@ -26,7 +26,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.nema.medical.mint.datadictionary.MetadataType;
-import org.nema.medical.mint.jobs.HttpMessagePart;
+import org.nema.medical.mint.jobs.JobConstants;
 import org.nema.medical.mint.server.domain.*;
 import org.nema.medical.mint.server.processor.StudyCreateProcessor;
 import org.nema.medical.mint.server.processor.StudyUpdateProcessor;
@@ -185,24 +185,26 @@ public class JobsController {
 			return;
 		}
 
-		if (!params.containsKey(HttpMessagePart.STUDY_UUID.toString())) {
-			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter " + HttpMessagePart.STUDY_UUID);
+		if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_STUDYUUID)) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
+                    + JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
 			return;
 		}
 
-		final String studyUUID = params.get(HttpMessagePart.STUDY_UUID.toString());
+		final String studyUUID = params.get(JobConstants.HTTP_MESSAGE_PART_STUDYUUID);
 
         final Utils.StudyStatus studyStatus = Utils.validateStudyStatus(studiesRoot, studyUUID, res, studyDAO);
         if (studyStatus != Utils.StudyStatus.OK) {
             return;
         }
 
-        if (!params.containsKey(HttpMessagePart.OLD_VERSION.toString())) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter " + HttpMessagePart.OLD_VERSION);
+        if (!params.containsKey(JobConstants.HTTP_MESSAGE_PART_OLDVERSION)) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing parameter "
+                    + JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
             return;
         }
 
-        final String oldVersion = params.get(HttpMessagePart.OLD_VERSION.toString());
+        final String oldVersion = params.get(JobConstants.HTTP_MESSAGE_PART_OLDVERSION);
 
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);
@@ -248,6 +250,7 @@ public class JobsController {
 			Map<String, String> params) throws IOException, FileUploadException {
 
 		byte buf[] = new byte[32 * 1024];
+		int bid = 0;
 
 		int fileCount = 0;
 		LOG.info("creating local files");
@@ -273,48 +276,31 @@ public class JobsController {
 					String filename = item.getName();
 
 					LOG.info("loading metadata from " + filename);
-                    outer: {
-                        for (String extension : supportedMetadataExtensions) {
-                            if (filename.endsWith(extension)) {
-                                filename = "metadata" + extension;
-                                break outer;
-                            }
-                        }
+					for (String extension : supportedMetadataExtensions) {
+						if (filename.endsWith(extension)) {
+							filename = "metadata" + extension;
+							break;
+						}
+					}
 
-                        //At this point, no proper filename has been established. Last resort, use content type!
-                        String contentType = item.getContentType();
-                        if ("text/xml".equals(contentType)) {
-                            filename = "metadata.xml";
-                        } else if ("application/octet-stream".equals(contentType)) {
-                            filename = "metadata.gpb";
-                        } else {
-                            // dump out and write the content... will fail later
-                            LOG.error("unable to determine metadata type for "
-                                    + item.getName());
-                            filename = "metadata.dat";
-                        }
-                    }
-
+					// last resort, use content type!
+					String contentType = item.getContentType();
+					if ("text/xml".equals(contentType)) {
+						filename = "metadata.xml";
+					} else if ("application/octet-stream".equals(contentType)) {
+						filename = "metadata.gpb";
+					} else {
+						// dump out and write the content... will fail later
+						LOG.error("unable to determine metadata type for "
+								+ item.getName());
+						filename = "metadata.dat";
+					}
 
 					file = new File(jobFolder, filename);
 				} else {
-                    final String msgPartName = item.getFieldName();
-                    try {
-                        if (!msgPartName.startsWith("binary")) {
-                            throw new Exception();
-                        }
-                        final String itemIdStr = msgPartName.substring("binary".length());
-                        final int itemId = Integer.parseInt(itemIdStr);
-                        file = new File(jobFolder, String.format("%d.dat", itemId));
-                    } catch (final Exception e) {
-                        throw new IOException("Invalid message part name for binary data: '" + msgPartName
-                                + "'; must start with 'binary', followed by a number");
-                    }
+					file = new File(jobFolder, String.format("%d.dat", bid++));
 				}
 
-                if (file.exists()) {
-                    throw new IOException("File for message part already exists: '" + file.getName() + "'");
-                }
 				FileOutputStream out = null;
 				out = new FileOutputStream(file);
 				try {

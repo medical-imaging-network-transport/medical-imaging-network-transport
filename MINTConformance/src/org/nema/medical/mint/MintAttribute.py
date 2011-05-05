@@ -84,9 +84,6 @@ class MintAttribute():
    def itemAttribute(self, i, j): return self.item(i)[j]
    
    def isBinary(self): return self.__vr in MintAttribute.binaryVRs
-
-   def toString(self):
-       return self.tag()+" "+self.vr()+" "+self.bid()+" "+self.bytes()+" "+self.bsize()
        
    def debug(self, indent=""):
        print indent+"tag =", self.__tag, "vr =", self.__vr,

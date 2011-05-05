@@ -19,18 +19,11 @@ package org.nema.medical.mint.jobs;
 /**
  * @author Uli Bubenheimer
  */
-public enum HttpMessagePart {
-    STUDY_UUID("studyUUID"),
-    OLD_VERSION("oldVersion");
+public final class JobConstants {
+    public static final String HTTP_MESSAGE_PART_STUDYUUID = "studyUUID";
+    public static final String HTTP_MESSAGE_PART_OLDVERSION = "oldVersion";
 
-    private final String partId;
-
-    HttpMessagePart(final String partId) {
-        this.partId = partId;
-    }
-
-    @Override
-    public String toString() {
-        return partId;
+    private JobConstants() {
+        throw new RuntimeException("Class should not be instantiated.");
     }
 }

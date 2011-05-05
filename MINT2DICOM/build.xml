@@ -36,7 +36,7 @@
             <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-api-1.6.0.jar"/>
             <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/slf4j-log4j12-1.6.0.jar"/>
             <zipfileset src="${common.project.basedir}//WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
-            <zipfileset src="${javasdk.project.basedir}/build/mint-1.0.1.jar"/>
+            <zipfileset src="${javasdk.project.basedir}/build/mint-1.0.2.jar"/>
             <zipfileset src="${javasdk.project.basedir}/lib/jibx-run-1.2.2.jar"/>
             <zipfileset src="${javasdk.project.basedir}/lib/protobuf-java-2.3.0.jar"/>
 

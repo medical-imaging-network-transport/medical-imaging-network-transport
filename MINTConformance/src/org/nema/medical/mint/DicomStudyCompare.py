@@ -36,10 +36,12 @@ import traceback
 from os.path import join
 from struct import unpack
 
-from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
-from org.nema.medical.mint.DicomStudy         import DicomStudy
-from org.nema.medical.mint.DicomSeries        import DicomSeries
-from org.nema.medical.mint.DicomInstance      import DicomInstance
+from org.nema.medical.mint.DataDictionary import DataDictionary
+from org.nema.medical.mint.DicomStudy     import DicomStudy
+from org.nema.medical.mint.DicomSeries    import DicomSeries
+from org.nema.medical.mint.DicomInstance  import DicomInstance
+from org.nema.medical.mint.MintAttribute  import MintAttribute
+from org.nema.medical.mint.MintStudy      import MintStudy
 
 # -----------------------------------------------------------------------------
 # DicomStudyCompare
@@ -209,7 +211,7 @@ class DicomStudyCompare():
           print "ERROR:", msg, ":", obj1, "!=", obj2
        
    def __warn(self, msg, obj1, obj2, series="", sop=""):
-       if obj1 != obj2 and self.__warnings:
+       if obj1 != obj2:
           self.__warningCount += 1
           print "- Study Instance UID", self.__studyInstanceUID
           if series != "":
@@ -282,7 +284,7 @@ class DicomStudyCompare():
           # ---
           # Warn if trailing characters are different.
           # ---
-          if (val1 == val2):
+          if (val1 == val2) and self.__warnings:
              self.__warn(attr1.tag()+" Value",
                          attr1.val(),
                          attr2.val(),
@@ -442,8 +444,16 @@ def main():
     # Get options.
     # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "o:x:vlwh")
+    (options, args)=getopt.getopt(sys.argv[1:], "d:o:x:vlwh")
 
+    # ---
+    # Check for data dictionary.
+    # ---
+    dictionaryURL = DataDictionary.DCM4CHE_URL
+    for opt in options:
+        if opt[0] == "-d":
+           dictionaryURL = opt[1]
+           
     # ---
     # Check for output option.
     # ---
@@ -500,12 +510,13 @@ def main():
        argc = len(args)
        if help or argc < 2:
           print "Usage:", progName, "[options] <ref_dicom_study_dir> <new_dicom_study_dir>"
-          print "  -o <output>:  output filename (defaults to stdout)"
-          print "  -x <exclude>: list of tags to exclude, ie. \"08590030,600001nn\""
-          print "  -v:           verbose"
-          print "  -l:           lazy check (skips binary content)"
-          print "  -w:           show warnings"
-          print "  -h:           displays usage"
+          print "  -d <data_dictionary_url>: defaults to DCM4CHE"
+          print "  -o <output>:              output filename (defaults to stdout)"
+          print "  -x <exclude>:             list of tags to exclude, ie. \"08590030,600001nn\""
+          print "  -v:                       verbose"
+          print "  -l:                       lazy check (skips binary content)"
+          print "  -w:                       show warnings"
+          print "  -h:                       displays usage"
           sys.exit(1)
           
        # ---
@@ -513,11 +524,9 @@ def main():
        # ---
        refDicomStudyDir = args[0];
        newDicomStudyDir = args[1];
-
-       dataDictionary = DCM4CHE_Dictionary()
      
-       refDicomStudy = DicomStudy(refDicomStudyDir, dataDictionary)
-       newDicomStudy = DicomStudy(newDicomStudyDir, dataDictionary)
+       refDicomStudy = DicomStudy(refDicomStudyDir, dictionaryURL)
+       newDicomStudy = DicomStudy(newDicomStudyDir, dictionaryURL)
      
        studies = DicomStudyCompare(refDicomStudy, newDicomStudy)
        studies.setVerbose(verbose)
