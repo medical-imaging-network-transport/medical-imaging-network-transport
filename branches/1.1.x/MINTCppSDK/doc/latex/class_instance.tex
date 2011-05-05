@@ -1,0 +1,267 @@
+\hypertarget{class_instance}{
+\section{Instance Class Reference}
+\label{class_instance}\index{Instance@{Instance}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_instance_a399506c7e75ab9ab78fbc34a25932bbd}{
+\hyperlink{class_instance_a399506c7e75ab9ab78fbc34a25932bbd}{Instance} ()}
+\label{class_instance_a399506c7e75ab9ab78fbc34a25932bbd}
+
+\begin{DoxyCompactList}\small\item\em The default constructor for \hyperlink{class_instance}{Instance} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_instance_ada89b585181d0798259a37dbcd817147}{Instance} (std::string transferSyntaxUID)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for \hyperlink{class_instance}{Instance} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_instance_ac4d05edff24e60813e93b52e82148678}{Instance} (std::string transferSyntaxUID, AttributeMapType attributeMap)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for \hyperlink{class_instance}{Instance} class. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_instance_a79ca7221b9c9277194b5af3c6f15b5ea}{SetTransferSyntaxUID} (std::string transferSyntaxUID)
+\begin{DoxyCompactList}\small\item\em Function to set the Transfer Syntax UID of the instance. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_instance_ad46f30e59b49c6fe7cceca3460af21cf}{GetTransferSyntaxUID} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the Transfer Syntax UID of the instance. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_instance_a4b780d68dcd3aa84942b1e992d099824}{SetSOPInstanceUID} (std::string sopInstanceUID)
+\begin{DoxyCompactList}\small\item\em Function to set the SOP \hyperlink{class_instance}{Instance} UID of the instance. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_instance_a35a9cd8b48d2eba38700b321a51ed12f}{GetSOPInstanceUID} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the SOP \hyperlink{class_instance}{Instance} UID. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_instance_ad97f3face6817278f20fbed72c93d5b2}{SetAttributeMap} (AttributeMapType attributeMap)
+\begin{DoxyCompactList}\small\item\em Function to set the attribute map. \item\end{DoxyCompactList}\item 
+AttributeMapType \hyperlink{class_instance_ab9785ffebb086e9b928bebf58151d1c1}{GetAttributeMap} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the attribute map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_instance_a6ddc309cf7037f08336db5e2964f3566}{PutAttribute} (\hyperlink{class_attribute}{Attribute} $\ast$attr)
+\begin{DoxyCompactList}\small\item\em Function to insert an attribute to the map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_instance_a465d0b6377061587052fa2445707308c}{RemoveAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to remove an attribute from the map. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute}{Attribute} $\ast$ \hyperlink{class_instance_a3304ed8db502a458b3c253cd606dd07f}{GetAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get the attribute corresponding to the tag. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_instance_ad9e7878c2b1a9fea65b1c4b590af552f}{GetValueForAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get the value of the attribute corresponding to the tag. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_instance_ada89b585181d0798259a37dbcd817147}{
+\index{Instance@{Instance}!Instance@{Instance}}
+\index{Instance@{Instance}!Instance@{Instance}}
+\subsubsection[{Instance}]{\setlength{\rightskip}{0pt plus 5cm}Instance::Instance (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ transferSyntaxUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ada89b585181d0798259a37dbcd817147}
+
+
+Overloaded constructor for \hyperlink{class_instance}{Instance} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transferSyntaxUID} & The Transfer Syntax UID to be used for this instance \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_instance_ac4d05edff24e60813e93b52e82148678}{
+\index{Instance@{Instance}!Instance@{Instance}}
+\index{Instance@{Instance}!Instance@{Instance}}
+\subsubsection[{Instance}]{\setlength{\rightskip}{0pt plus 5cm}Instance::Instance (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ transferSyntaxUID, }
+\item[{AttributeMapType}]{ attributeMap}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ac4d05edff24e60813e93b52e82148678}
+
+
+Overloaded constructor for \hyperlink{class_instance}{Instance} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transferSyntaxUID} & The Transfer Syntax UID to be used for this instance \\
+\hline
+{\em attributeMap} & The map of tags to attributes to be used \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_instance_a3304ed8db502a458b3c253cd606dd07f}{
+\index{Instance@{Instance}!GetAttribute@{GetAttribute}}
+\index{GetAttribute@{GetAttribute}!Instance@{Instance}}
+\subsubsection[{GetAttribute}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Attribute} $\ast$ Instance::GetAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a3304ed8db502a458b3c253cd606dd07f}
+
+
+Function to get the attribute corresponding to the tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to get \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+attr The attribute corresponding to the tag 
+\end{DoxyReturn}
+\hypertarget{class_instance_ab9785ffebb086e9b928bebf58151d1c1}{
+\index{Instance@{Instance}!GetAttributeMap@{GetAttributeMap}}
+\index{GetAttributeMap@{GetAttributeMap}!Instance@{Instance}}
+\subsubsection[{GetAttributeMap}]{\setlength{\rightskip}{0pt plus 5cm}AttributeMapType Instance::GetAttributeMap (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ab9785ffebb086e9b928bebf58151d1c1}
+
+
+Function to get the attribute map. 
+
+\begin{DoxyReturn}{Returns}
+attributeMap The map of tags to attributes being used 
+\end{DoxyReturn}
+\hypertarget{class_instance_a35a9cd8b48d2eba38700b321a51ed12f}{
+\index{Instance@{Instance}!GetSOPInstanceUID@{GetSOPInstanceUID}}
+\index{GetSOPInstanceUID@{GetSOPInstanceUID}!Instance@{Instance}}
+\subsubsection[{GetSOPInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}std::string Instance::GetSOPInstanceUID (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a35a9cd8b48d2eba38700b321a51ed12f}
+
+
+Function to get the SOP \hyperlink{class_instance}{Instance} UID. 
+
+\begin{DoxyReturn}{Returns}
+sopInstanceUID The SOP \hyperlink{class_instance}{Instance} UID being used 
+\end{DoxyReturn}
+\hypertarget{class_instance_ad46f30e59b49c6fe7cceca3460af21cf}{
+\index{Instance@{Instance}!GetTransferSyntaxUID@{GetTransferSyntaxUID}}
+\index{GetTransferSyntaxUID@{GetTransferSyntaxUID}!Instance@{Instance}}
+\subsubsection[{GetTransferSyntaxUID}]{\setlength{\rightskip}{0pt plus 5cm}std::string Instance::GetTransferSyntaxUID (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ad46f30e59b49c6fe7cceca3460af21cf}
+
+
+Function to get the Transfer Syntax UID of the instance. 
+
+\begin{DoxyReturn}{Returns}
+transferSyntaxUID The Transfer Syntax UID being used 
+\end{DoxyReturn}
+\hypertarget{class_instance_ad9e7878c2b1a9fea65b1c4b590af552f}{
+\index{Instance@{Instance}!GetValueForAttribute@{GetValueForAttribute}}
+\index{GetValueForAttribute@{GetValueForAttribute}!Instance@{Instance}}
+\subsubsection[{GetValueForAttribute}]{\setlength{\rightskip}{0pt plus 5cm}std::string Instance::GetValueForAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ad9e7878c2b1a9fea65b1c4b590af552f}
+
+
+Function to get the value of the attribute corresponding to the tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to get the value of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value The value of the attribute 
+\end{DoxyReturn}
+\hypertarget{class_instance_a6ddc309cf7037f08336db5e2964f3566}{
+\index{Instance@{Instance}!PutAttribute@{PutAttribute}}
+\index{PutAttribute@{PutAttribute}!Instance@{Instance}}
+\subsubsection[{PutAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Instance::PutAttribute (
+\begin{DoxyParamCaption}
+\item[{{\bf Attribute} $\ast$}]{ attr}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a6ddc309cf7037f08336db5e2964f3566}
+
+
+Function to insert an attribute to the map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attr} & The attribute to be inserted into the map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_instance_a465d0b6377061587052fa2445707308c}{
+\index{Instance@{Instance}!RemoveAttribute@{RemoveAttribute}}
+\index{RemoveAttribute@{RemoveAttribute}!Instance@{Instance}}
+\subsubsection[{RemoveAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Instance::RemoveAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a465d0b6377061587052fa2445707308c}
+
+
+Function to remove an attribute from the map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to be removed \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_instance_ad97f3face6817278f20fbed72c93d5b2}{
+\index{Instance@{Instance}!SetAttributeMap@{SetAttributeMap}}
+\index{SetAttributeMap@{SetAttributeMap}!Instance@{Instance}}
+\subsubsection[{SetAttributeMap}]{\setlength{\rightskip}{0pt plus 5cm}void Instance::SetAttributeMap (
+\begin{DoxyParamCaption}
+\item[{AttributeMapType}]{ attributeMap}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_ad97f3face6817278f20fbed72c93d5b2}
+
+
+Function to set the attribute map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attributeMap} & The map of tags to attributes to be used \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_instance_a4b780d68dcd3aa84942b1e992d099824}{
+\index{Instance@{Instance}!SetSOPInstanceUID@{SetSOPInstanceUID}}
+\index{SetSOPInstanceUID@{SetSOPInstanceUID}!Instance@{Instance}}
+\subsubsection[{SetSOPInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}void Instance::SetSOPInstanceUID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ sopInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a4b780d68dcd3aa84942b1e992d099824}
+
+
+Function to set the SOP \hyperlink{class_instance}{Instance} UID of the instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sopInstanceUID} & The SOP \hyperlink{class_instance}{Instance} UID to be used \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_instance_a79ca7221b9c9277194b5af3c6f15b5ea}{
+\index{Instance@{Instance}!SetTransferSyntaxUID@{SetTransferSyntaxUID}}
+\index{SetTransferSyntaxUID@{SetTransferSyntaxUID}!Instance@{Instance}}
+\subsubsection[{SetTransferSyntaxUID}]{\setlength{\rightskip}{0pt plus 5cm}void Instance::SetTransferSyntaxUID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ transferSyntaxUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_instance_a79ca7221b9c9277194b5af3c6f15b5ea}
+
+
+Function to set the Transfer Syntax UID of the instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em transferSyntaxUID} & The Transfer Syntax UID to be used \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+mintcpp/branches/development/MINTMetadata/Instance.h\item 
+mintcpp/branches/development/MINTMetadata/Instance.cpp\end{DoxyCompactItemize}

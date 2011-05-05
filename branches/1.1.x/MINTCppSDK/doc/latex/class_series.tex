@@ -1,0 +1,434 @@
+\hypertarget{class_series}{
+\section{Series Class Reference}
+\label{class_series}\index{Series@{Series}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_series_ab0cc5b39ed4d0f70fd17121c52d758e3}{
+\hyperlink{class_series_ab0cc5b39ed4d0f70fd17121c52d758e3}{Series} ()}
+\label{class_series_ab0cc5b39ed4d0f70fd17121c52d758e3}
+
+\begin{DoxyCompactList}\small\item\em The default constructor for the \hyperlink{class_series}{Series} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_series_a6421860eef145b416c096c9fa6d67d43}{Series} (std::string seriesInstanceUID)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_series}{Series} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_series_a6f188baef7b4ff3a6ed52162f2129775}{Series} (std::string seriesInstanceUID, AttributeMapType attributes)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_series}{Series} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_series_a6756c4f6bb8664980a437ae73fd18909}{Series} (std::string seriesInstanceUID, AttributeMapType attributes, InstanceMapType instances)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_series}{Series} class. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a659b1383b35d3948f936605627bb7ffb}{SetSeriesInstanceUID} (std::string seriesInstanceUID)
+\begin{DoxyCompactList}\small\item\em Function to set the series instance UID. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_series_a70b342c95387d5296a47b5ee3889e6a7}{GetSeriesInstanceUID} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the series instance UID. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a484423abfdf029cf55cb198fd930661c}{SetAttributes} (AttributeMapType attributes)
+\begin{DoxyCompactList}\small\item\em Function to set the attributes. \item\end{DoxyCompactList}\item 
+AttributeMapType \hyperlink{class_series_ac092ee2e77b02c7db1eecc3092a63507}{GetAttributes} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the attributes. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a097ba94fe78e7171b72188612ca37258}{SetNormalizedInstanceAttributes} (AttributeMapType normalizedAttributes)
+\begin{DoxyCompactList}\small\item\em Function to set the normalized instance attributes. \item\end{DoxyCompactList}\item 
+AttributeMapType \hyperlink{class_series_a161fd29df0c0d94a25f9fe32b5d7417d}{GetNormalizedInstanceAttributes} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the normalized instance attributes. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a9311b0104e5d084cb1f39e0d0dd0f5c0}{SetInstances} (InstanceMapType instances)
+\begin{DoxyCompactList}\small\item\em Function to set the instances map. \item\end{DoxyCompactList}\item 
+InstanceMapType \hyperlink{class_series_a477adb122bfcd6a3d5bb13f6c0f1020c}{GetInstances} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the instances map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_af83d6cca57fe8fdf40825119dbaf885c}{PutAttribute} (\hyperlink{class_attribute}{Attribute} $\ast$attr)
+\begin{DoxyCompactList}\small\item\em Function to insert an attribute to the attribute map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a60b4d0753384cccc6f118eb231f6e3be}{RemoveAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to remove an attribute from the attribute map. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute}{Attribute} $\ast$ \hyperlink{class_series_ad87d11b1791521af0b9b68bc024ac4cd}{GetAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get an attribute given a tag. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a73306c9b62629112b88a8022845e44ae}{PutNormalizedAttribute} (\hyperlink{class_attribute}{Attribute} $\ast$attr)
+\begin{DoxyCompactList}\small\item\em Function to insert a normalized attribute. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_a603d150125d57d98d065f64b5c4b916e}{RemoveNormalizedAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to remove an attribute from the normalized attribute map. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute}{Attribute} $\ast$ \hyperlink{class_series_a228485b49a8d0fdbda468eff2afbf210}{GetNormalizedAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get a normalized attribute given a tag. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_aff2950b2f2908cdc034b06035a9b7348}{PutInstance} (\hyperlink{class_instance}{Instance} $\ast$inst)
+\begin{DoxyCompactList}\small\item\em Function to insert an instance into the instances map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_series_ab2f7db40b62197a8c4ab1cddcccbb994}{RemoveInstance} (std::string sopInstanceUID)
+\begin{DoxyCompactList}\small\item\em Function to remove an instance given a sopInstanceUID. \item\end{DoxyCompactList}\item 
+\hyperlink{class_instance}{Instance} $\ast$ \hyperlink{class_series_ab446ebfab415ae00c1acc5a38d293502}{GetInstance} (std::string sopInstanceUID)
+\begin{DoxyCompactList}\small\item\em Function to get an instance given a sopInstanceUID. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_series_a6421860eef145b416c096c9fa6d67d43}{
+\index{Series@{Series}!Series@{Series}}
+\index{Series@{Series}!Series@{Series}}
+\subsubsection[{Series}]{\setlength{\rightskip}{0pt plus 5cm}Series::Series (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ seriesInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a6421860eef145b416c096c9fa6d67d43}
+
+
+Overloaded constructor for the \hyperlink{class_series}{Series} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seriesInstanceUID} & The \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a6f188baef7b4ff3a6ed52162f2129775}{
+\index{Series@{Series}!Series@{Series}}
+\index{Series@{Series}!Series@{Series}}
+\subsubsection[{Series}]{\setlength{\rightskip}{0pt plus 5cm}Series::Series (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ seriesInstanceUID, }
+\item[{AttributeMapType}]{ attributes}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a6f188baef7b4ff3a6ed52162f2129775}
+
+
+Overloaded constructor for the \hyperlink{class_series}{Series} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seriesInstanceUID} & The \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+{\em attribute} & The attributes map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a6756c4f6bb8664980a437ae73fd18909}{
+\index{Series@{Series}!Series@{Series}}
+\index{Series@{Series}!Series@{Series}}
+\subsubsection[{Series}]{\setlength{\rightskip}{0pt plus 5cm}Series::Series (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ seriesInstanceUID, }
+\item[{AttributeMapType}]{ attributes, }
+\item[{InstanceMapType}]{ instances}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a6756c4f6bb8664980a437ae73fd18909}
+
+
+Overloaded constructor for the \hyperlink{class_series}{Series} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seriesInstanceUID} & The \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+{\em attribute} & The attributes map \\
+\hline
+{\em instances} & The instances map \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_series_ad87d11b1791521af0b9b68bc024ac4cd}{
+\index{Series@{Series}!GetAttribute@{GetAttribute}}
+\index{GetAttribute@{GetAttribute}!Series@{Series}}
+\subsubsection[{GetAttribute}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Attribute} $\ast$ Series::GetAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_ad87d11b1791521af0b9b68bc024ac4cd}
+
+
+Function to get an attribute given a tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to get \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+attribute The attribute 
+\end{DoxyReturn}
+\hypertarget{class_series_ac092ee2e77b02c7db1eecc3092a63507}{
+\index{Series@{Series}!GetAttributes@{GetAttributes}}
+\index{GetAttributes@{GetAttributes}!Series@{Series}}
+\subsubsection[{GetAttributes}]{\setlength{\rightskip}{0pt plus 5cm}AttributeMapType Series::GetAttributes (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_ac092ee2e77b02c7db1eecc3092a63507}
+
+
+Function to get the attributes. 
+
+\begin{DoxyReturn}{Returns}
+attributes The attributes map 
+\end{DoxyReturn}
+\hypertarget{class_series_ab446ebfab415ae00c1acc5a38d293502}{
+\index{Series@{Series}!GetInstance@{GetInstance}}
+\index{GetInstance@{GetInstance}!Series@{Series}}
+\subsubsection[{GetInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Instance} $\ast$ Series::GetInstance (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ sopInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_ab446ebfab415ae00c1acc5a38d293502}
+
+
+Function to get an instance given a sopInstanceUID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sopInstanceUID} & SOP \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{class_instance}{Instance} The instance that corresponds to the give sopInstanceUID 
+\end{DoxyReturn}
+\hypertarget{class_series_a477adb122bfcd6a3d5bb13f6c0f1020c}{
+\index{Series@{Series}!GetInstances@{GetInstances}}
+\index{GetInstances@{GetInstances}!Series@{Series}}
+\subsubsection[{GetInstances}]{\setlength{\rightskip}{0pt plus 5cm}InstanceMapType Series::GetInstances (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a477adb122bfcd6a3d5bb13f6c0f1020c}
+
+
+Function to get the instances map. 
+
+\begin{DoxyReturn}{Returns}
+instances The instances map 
+\end{DoxyReturn}
+\hypertarget{class_series_a228485b49a8d0fdbda468eff2afbf210}{
+\index{Series@{Series}!GetNormalizedAttribute@{GetNormalizedAttribute}}
+\index{GetNormalizedAttribute@{GetNormalizedAttribute}!Series@{Series}}
+\subsubsection[{GetNormalizedAttribute}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Attribute} $\ast$ Series::GetNormalizedAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a228485b49a8d0fdbda468eff2afbf210}
+
+
+Function to get a normalized attribute given a tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the normalized attribute to get \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+attribute The normalized attribute 
+\end{DoxyReturn}
+\hypertarget{class_series_a161fd29df0c0d94a25f9fe32b5d7417d}{
+\index{Series@{Series}!GetNormalizedInstanceAttributes@{GetNormalizedInstanceAttributes}}
+\index{GetNormalizedInstanceAttributes@{GetNormalizedInstanceAttributes}!Series@{Series}}
+\subsubsection[{GetNormalizedInstanceAttributes}]{\setlength{\rightskip}{0pt plus 5cm}AttributeMapType Series::GetNormalizedInstanceAttributes (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a161fd29df0c0d94a25f9fe32b5d7417d}
+
+
+Function to get the normalized instance attributes. 
+
+\begin{DoxyReturn}{Returns}
+normalizedAttributes The normalized attributes map 
+\end{DoxyReturn}
+\hypertarget{class_series_a70b342c95387d5296a47b5ee3889e6a7}{
+\index{Series@{Series}!GetSeriesInstanceUID@{GetSeriesInstanceUID}}
+\index{GetSeriesInstanceUID@{GetSeriesInstanceUID}!Series@{Series}}
+\subsubsection[{GetSeriesInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}std::string Series::GetSeriesInstanceUID (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a70b342c95387d5296a47b5ee3889e6a7}
+
+
+Function to get the series instance UID. 
+
+\begin{DoxyReturn}{Returns}
+seriesInstanceUID \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID 
+\end{DoxyReturn}
+\hypertarget{class_series_af83d6cca57fe8fdf40825119dbaf885c}{
+\index{Series@{Series}!PutAttribute@{PutAttribute}}
+\index{PutAttribute@{PutAttribute}!Series@{Series}}
+\subsubsection[{PutAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Series::PutAttribute (
+\begin{DoxyParamCaption}
+\item[{{\bf Attribute} $\ast$}]{ attr}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_af83d6cca57fe8fdf40825119dbaf885c}
+
+
+Function to insert an attribute to the attribute map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attr} & The attribute to insert \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_aff2950b2f2908cdc034b06035a9b7348}{
+\index{Series@{Series}!PutInstance@{PutInstance}}
+\index{PutInstance@{PutInstance}!Series@{Series}}
+\subsubsection[{PutInstance}]{\setlength{\rightskip}{0pt plus 5cm}void Series::PutInstance (
+\begin{DoxyParamCaption}
+\item[{{\bf Instance} $\ast$}]{ inst}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_aff2950b2f2908cdc034b06035a9b7348}
+
+
+Function to insert an instance into the instances map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em inst} & The instance to insert \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a73306c9b62629112b88a8022845e44ae}{
+\index{Series@{Series}!PutNormalizedAttribute@{PutNormalizedAttribute}}
+\index{PutNormalizedAttribute@{PutNormalizedAttribute}!Series@{Series}}
+\subsubsection[{PutNormalizedAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Series::PutNormalizedAttribute (
+\begin{DoxyParamCaption}
+\item[{{\bf Attribute} $\ast$}]{ attr}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a73306c9b62629112b88a8022845e44ae}
+
+
+Function to insert a normalized attribute. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attr} & The attribute to insert \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a60b4d0753384cccc6f118eb231f6e3be}{
+\index{Series@{Series}!RemoveAttribute@{RemoveAttribute}}
+\index{RemoveAttribute@{RemoveAttribute}!Series@{Series}}
+\subsubsection[{RemoveAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Series::RemoveAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a60b4d0753384cccc6f118eb231f6e3be}
+
+
+Function to remove an attribute from the attribute map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to remove \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_ab2f7db40b62197a8c4ab1cddcccbb994}{
+\index{Series@{Series}!RemoveInstance@{RemoveInstance}}
+\index{RemoveInstance@{RemoveInstance}!Series@{Series}}
+\subsubsection[{RemoveInstance}]{\setlength{\rightskip}{0pt plus 5cm}void Series::RemoveInstance (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ sopInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_ab2f7db40b62197a8c4ab1cddcccbb994}
+
+
+Function to remove an instance given a sopInstanceUID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sopInstanceUID} & SOP \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a603d150125d57d98d065f64b5c4b916e}{
+\index{Series@{Series}!RemoveNormalizedAttribute@{RemoveNormalizedAttribute}}
+\index{RemoveNormalizedAttribute@{RemoveNormalizedAttribute}!Series@{Series}}
+\subsubsection[{RemoveNormalizedAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Series::RemoveNormalizedAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a603d150125d57d98d065f64b5c4b916e}
+
+
+Function to remove an attribute from the normalized attribute map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to remove \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a484423abfdf029cf55cb198fd930661c}{
+\index{Series@{Series}!SetAttributes@{SetAttributes}}
+\index{SetAttributes@{SetAttributes}!Series@{Series}}
+\subsubsection[{SetAttributes}]{\setlength{\rightskip}{0pt plus 5cm}void Series::SetAttributes (
+\begin{DoxyParamCaption}
+\item[{AttributeMapType}]{ attributes}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a484423abfdf029cf55cb198fd930661c}
+
+
+Function to set the attributes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attributes} & The attributes map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a9311b0104e5d084cb1f39e0d0dd0f5c0}{
+\index{Series@{Series}!SetInstances@{SetInstances}}
+\index{SetInstances@{SetInstances}!Series@{Series}}
+\subsubsection[{SetInstances}]{\setlength{\rightskip}{0pt plus 5cm}void Series::SetInstances (
+\begin{DoxyParamCaption}
+\item[{InstanceMapType}]{ instances}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a9311b0104e5d084cb1f39e0d0dd0f5c0}
+
+
+Function to set the instances map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instances} & The instances map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a097ba94fe78e7171b72188612ca37258}{
+\index{Series@{Series}!SetNormalizedInstanceAttributes@{SetNormalizedInstanceAttributes}}
+\index{SetNormalizedInstanceAttributes@{SetNormalizedInstanceAttributes}!Series@{Series}}
+\subsubsection[{SetNormalizedInstanceAttributes}]{\setlength{\rightskip}{0pt plus 5cm}void Series::SetNormalizedInstanceAttributes (
+\begin{DoxyParamCaption}
+\item[{AttributeMapType}]{ normalizedAttributes}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a097ba94fe78e7171b72188612ca37258}
+
+
+Function to set the normalized instance attributes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em normalizedAttributes} & The normalized attributes map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_series_a659b1383b35d3948f936605627bb7ffb}{
+\index{Series@{Series}!SetSeriesInstanceUID@{SetSeriesInstanceUID}}
+\index{SetSeriesInstanceUID@{SetSeriesInstanceUID}!Series@{Series}}
+\subsubsection[{SetSeriesInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}void Series::SetSeriesInstanceUID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ seriesInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_series_a659b1383b35d3948f936605627bb7ffb}
+
+
+Function to set the series instance UID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seriesInstanceUID} & \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+mintcpp/branches/development/MINTMetadata/Series.h\item 
+mintcpp/branches/development/MINTMetadata/Series.cpp\end{DoxyCompactItemize}

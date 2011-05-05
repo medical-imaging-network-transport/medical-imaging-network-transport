@@ -1,0 +1,396 @@
+\hypertarget{class_study}{
+\section{Study Class Reference}
+\label{class_study}\index{Study@{Study}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_study_a0ca2ff6c5edc00f78b8be3ffb8fa73ea}{
+\hyperlink{class_study_a0ca2ff6c5edc00f78b8be3ffb8fa73ea}{Study} ()}
+\label{class_study_a0ca2ff6c5edc00f78b8be3ffb8fa73ea}
+
+\begin{DoxyCompactList}\small\item\em The default constructor for the \hyperlink{class_study}{Study} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_study_ae350a639ded16eb47a2858244ef4da59}{Study} (std::string studyInstanceUID)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_study}{Study} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_study_a99e20c7b346b2ac4a8af41200aea3706}{Study} (std::string studyInstanceUID, AttributeMapType attributes)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_study}{Study} class. \item\end{DoxyCompactList}\item 
+\hyperlink{class_study_abed05c1c4c501f4d338d10002bc6e2cf}{Study} (std::string studyInstanceUID, AttributeMapType attributes, SeriesMapType series)
+\begin{DoxyCompactList}\small\item\em Overloaded constructor for the \hyperlink{class_study}{Study} class. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a54fe32603906f9739067aa2dc1c0cd3c}{SetStudyInstanceUID} (std::string studyInstanceUID)
+\begin{DoxyCompactList}\small\item\em Function to set the study instance UID. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_study_a2dd55074d91e732627f2cf6c20877837}{GetStudyInstanceUID} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the study instance UID. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a9aee71c49a1f5a0b3970a5a7fcfebef3}{SetVersion} (std::string version)
+\begin{DoxyCompactList}\small\item\em Function to set the version of the study. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_study_a3189a0bcd3ae8bb6d27e9243604f0a5d}{GetVersion} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the version of the study. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a56e83863d750f0dacc1b21b18b5ca786}{SetAttributes} (AttributeMapType attributes)
+\begin{DoxyCompactList}\small\item\em Function to set the attributes to a given map. \item\end{DoxyCompactList}\item 
+AttributeMapType \hyperlink{class_study_aa9e4971ca1fc5a76a5d63a70964a8b7e}{GetAttributes} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the attributes map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_aad4bfc77ec8d50da4e2c4fc2b8ce5e7b}{SetSeries} (SeriesMapType series)
+\begin{DoxyCompactList}\small\item\em Function to set the series map. \item\end{DoxyCompactList}\item 
+SeriesMapType \hyperlink{class_study_a872e67ac16b5f020645548ce3f7e284d}{GetSeries} (void)
+\begin{DoxyCompactList}\small\item\em Function to get the series map. \item\end{DoxyCompactList}\item 
+\hyperlink{class_attribute}{Attribute} $\ast$ \hyperlink{class_study_abe27af4586178f00f6f659e39c792553}{GetAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get an attribute given a tag. \item\end{DoxyCompactList}\item 
+std::string \hyperlink{class_study_af43635fba7ca4163a9b9b52fde75658f}{GetValueForAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to get the value of an attribute given a tag. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a68c5bd043810e4eebd6e2c208234e431}{PutAttribute} (\hyperlink{class_attribute}{Attribute} $\ast$attr)
+\begin{DoxyCompactList}\small\item\em Function to insert an attribute into the attribute map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a873719dccb168fc765fc0266e040db98}{RemoveAttribute} (std::string tag)
+\begin{DoxyCompactList}\small\item\em Function to remove an attribute from the map given a tag. \item\end{DoxyCompactList}\item 
+\hyperlink{class_series}{Series} $\ast$ \hyperlink{class_study_af72357f07be61edd6de476fa1c3de7a8}{GetSeriesFromUID} (std::string uid)
+\begin{DoxyCompactList}\small\item\em Function to get a series given a series instance UID. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_a86204612597708bab9c669b09ef34fb1}{PutSeries} (\hyperlink{class_series}{Series} $\ast$series)
+\begin{DoxyCompactList}\small\item\em Function to insert a series into the series map. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_study_ac6a0ec4e09a1f470f4da641e21aaee20}{RemoveSeries} (std::string uid)
+\begin{DoxyCompactList}\small\item\em Function to remove a series from the map given a UID. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_study_ae350a639ded16eb47a2858244ef4da59}{
+\index{Study@{Study}!Study@{Study}}
+\index{Study@{Study}!Study@{Study}}
+\subsubsection[{Study}]{\setlength{\rightskip}{0pt plus 5cm}Study::Study (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ studyInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_ae350a639ded16eb47a2858244ef4da59}
+
+
+Overloaded constructor for the \hyperlink{class_study}{Study} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em studyInstanceUID} & \hyperlink{class_study}{Study} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a99e20c7b346b2ac4a8af41200aea3706}{
+\index{Study@{Study}!Study@{Study}}
+\index{Study@{Study}!Study@{Study}}
+\subsubsection[{Study}]{\setlength{\rightskip}{0pt plus 5cm}Study::Study (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ studyInstanceUID, }
+\item[{AttributeMapType}]{ attributes}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a99e20c7b346b2ac4a8af41200aea3706}
+
+
+Overloaded constructor for the \hyperlink{class_study}{Study} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em studyInstanceUID} & \hyperlink{class_study}{Study} \hyperlink{class_instance}{Instance} UID \\
+\hline
+{\em attributes} & The map of attributes \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_abed05c1c4c501f4d338d10002bc6e2cf}{
+\index{Study@{Study}!Study@{Study}}
+\index{Study@{Study}!Study@{Study}}
+\subsubsection[{Study}]{\setlength{\rightskip}{0pt plus 5cm}Study::Study (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ studyInstanceUID, }
+\item[{AttributeMapType}]{ attributes, }
+\item[{SeriesMapType}]{ series}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_abed05c1c4c501f4d338d10002bc6e2cf}
+
+
+Overloaded constructor for the \hyperlink{class_study}{Study} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em studyInstanceUID} & \hyperlink{class_study}{Study} \hyperlink{class_instance}{Instance} UID \\
+\hline
+{\em attributes} & The map of attributes \\
+\hline
+{\em series} & The map of series \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_study_abe27af4586178f00f6f659e39c792553}{
+\index{Study@{Study}!GetAttribute@{GetAttribute}}
+\index{GetAttribute@{GetAttribute}!Study@{Study}}
+\subsubsection[{GetAttribute}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Attribute} $\ast$ Study::GetAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_abe27af4586178f00f6f659e39c792553}
+
+
+Function to get an attribute given a tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the desired \hyperlink{class_attribute}{Attribute} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{class_attribute}{Attribute} The desired \hyperlink{class_attribute}{Attribute} 
+\end{DoxyReturn}
+\hypertarget{class_study_aa9e4971ca1fc5a76a5d63a70964a8b7e}{
+\index{Study@{Study}!GetAttributes@{GetAttributes}}
+\index{GetAttributes@{GetAttributes}!Study@{Study}}
+\subsubsection[{GetAttributes}]{\setlength{\rightskip}{0pt plus 5cm}AttributeMapType Study::GetAttributes (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_aa9e4971ca1fc5a76a5d63a70964a8b7e}
+
+
+Function to get the attributes map. 
+
+\begin{DoxyReturn}{Returns}
+attributes The map of attributes 
+\end{DoxyReturn}
+\hypertarget{class_study_a872e67ac16b5f020645548ce3f7e284d}{
+\index{Study@{Study}!GetSeries@{GetSeries}}
+\index{GetSeries@{GetSeries}!Study@{Study}}
+\subsubsection[{GetSeries}]{\setlength{\rightskip}{0pt plus 5cm}SeriesMapType Study::GetSeries (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a872e67ac16b5f020645548ce3f7e284d}
+
+
+Function to get the series map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em series} & The map of series \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_af72357f07be61edd6de476fa1c3de7a8}{
+\index{Study@{Study}!GetSeriesFromUID@{GetSeriesFromUID}}
+\index{GetSeriesFromUID@{GetSeriesFromUID}!Study@{Study}}
+\subsubsection[{GetSeriesFromUID}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Series} $\ast$ Study::GetSeriesFromUID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ uid}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_af72357f07be61edd6de476fa1c3de7a8}
+
+
+Function to get a series given a series instance UID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em uid} & \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{class_series}{Series} The series that corresponds to the given series instance UID 
+\end{DoxyReturn}
+\hypertarget{class_study_a2dd55074d91e732627f2cf6c20877837}{
+\index{Study@{Study}!GetStudyInstanceUID@{GetStudyInstanceUID}}
+\index{GetStudyInstanceUID@{GetStudyInstanceUID}!Study@{Study}}
+\subsubsection[{GetStudyInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}std::string Study::GetStudyInstanceUID (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a2dd55074d91e732627f2cf6c20877837}
+
+
+Function to get the study instance UID. 
+
+\begin{DoxyReturn}{Returns}
+studyInstanceUID \hyperlink{class_study}{Study} \hyperlink{class_instance}{Instance} UID 
+\end{DoxyReturn}
+\hypertarget{class_study_af43635fba7ca4163a9b9b52fde75658f}{
+\index{Study@{Study}!GetValueForAttribute@{GetValueForAttribute}}
+\index{GetValueForAttribute@{GetValueForAttribute}!Study@{Study}}
+\subsubsection[{GetValueForAttribute}]{\setlength{\rightskip}{0pt plus 5cm}std::string Study::GetValueForAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_af43635fba7ca4163a9b9b52fde75658f}
+
+
+Function to get the value of an attribute given a tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the desired \hyperlink{class_attribute}{Attribute} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value The desired Attribute's value 
+\end{DoxyReturn}
+\hypertarget{class_study_a3189a0bcd3ae8bb6d27e9243604f0a5d}{
+\index{Study@{Study}!GetVersion@{GetVersion}}
+\index{GetVersion@{GetVersion}!Study@{Study}}
+\subsubsection[{GetVersion}]{\setlength{\rightskip}{0pt plus 5cm}std::string Study::GetVersion (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a3189a0bcd3ae8bb6d27e9243604f0a5d}
+
+
+Function to get the version of the study. 
+
+\begin{DoxyReturn}{Returns}
+version The version of the study 
+\end{DoxyReturn}
+\hypertarget{class_study_a68c5bd043810e4eebd6e2c208234e431}{
+\index{Study@{Study}!PutAttribute@{PutAttribute}}
+\index{PutAttribute@{PutAttribute}!Study@{Study}}
+\subsubsection[{PutAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Study::PutAttribute (
+\begin{DoxyParamCaption}
+\item[{{\bf Attribute} $\ast$}]{ attr}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a68c5bd043810e4eebd6e2c208234e431}
+
+
+Function to insert an attribute into the attribute map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attr} & The attribute to insert \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a86204612597708bab9c669b09ef34fb1}{
+\index{Study@{Study}!PutSeries@{PutSeries}}
+\index{PutSeries@{PutSeries}!Study@{Study}}
+\subsubsection[{PutSeries}]{\setlength{\rightskip}{0pt plus 5cm}void Study::PutSeries (
+\begin{DoxyParamCaption}
+\item[{{\bf Series} $\ast$}]{ series}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a86204612597708bab9c669b09ef34fb1}
+
+
+Function to insert a series into the series map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em series} & The series to insert \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a873719dccb168fc765fc0266e040db98}{
+\index{Study@{Study}!RemoveAttribute@{RemoveAttribute}}
+\index{RemoveAttribute@{RemoveAttribute}!Study@{Study}}
+\subsubsection[{RemoveAttribute}]{\setlength{\rightskip}{0pt plus 5cm}void Study::RemoveAttribute (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ tag}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a873719dccb168fc765fc0266e040db98}
+
+
+Function to remove an attribute from the map given a tag. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tag} & The tag of the attribute to remove from the map \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_ac6a0ec4e09a1f470f4da641e21aaee20}{
+\index{Study@{Study}!RemoveSeries@{RemoveSeries}}
+\index{RemoveSeries@{RemoveSeries}!Study@{Study}}
+\subsubsection[{RemoveSeries}]{\setlength{\rightskip}{0pt plus 5cm}void Study::RemoveSeries (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ uid}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_ac6a0ec4e09a1f470f4da641e21aaee20}
+
+
+Function to remove a series from the map given a UID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em uid} & \hyperlink{class_series}{Series} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a56e83863d750f0dacc1b21b18b5ca786}{
+\index{Study@{Study}!SetAttributes@{SetAttributes}}
+\index{SetAttributes@{SetAttributes}!Study@{Study}}
+\subsubsection[{SetAttributes}]{\setlength{\rightskip}{0pt plus 5cm}void Study::SetAttributes (
+\begin{DoxyParamCaption}
+\item[{AttributeMapType}]{ attributes}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a56e83863d750f0dacc1b21b18b5ca786}
+
+
+Function to set the attributes to a given map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attributes} & The map of attributes to set to \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_aad4bfc77ec8d50da4e2c4fc2b8ce5e7b}{
+\index{Study@{Study}!SetSeries@{SetSeries}}
+\index{SetSeries@{SetSeries}!Study@{Study}}
+\subsubsection[{SetSeries}]{\setlength{\rightskip}{0pt plus 5cm}void Study::SetSeries (
+\begin{DoxyParamCaption}
+\item[{SeriesMapType}]{ series}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_aad4bfc77ec8d50da4e2c4fc2b8ce5e7b}
+
+
+Function to set the series map. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em series} & The map of series to set to \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a54fe32603906f9739067aa2dc1c0cd3c}{
+\index{Study@{Study}!SetStudyInstanceUID@{SetStudyInstanceUID}}
+\index{SetStudyInstanceUID@{SetStudyInstanceUID}!Study@{Study}}
+\subsubsection[{SetStudyInstanceUID}]{\setlength{\rightskip}{0pt plus 5cm}void Study::SetStudyInstanceUID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ studyInstanceUID}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a54fe32603906f9739067aa2dc1c0cd3c}
+
+
+Function to set the study instance UID. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em studyInstanceUID} & \hyperlink{class_study}{Study} \hyperlink{class_instance}{Instance} UID \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_study_a9aee71c49a1f5a0b3970a5a7fcfebef3}{
+\index{Study@{Study}!SetVersion@{SetVersion}}
+\index{SetVersion@{SetVersion}!Study@{Study}}
+\subsubsection[{SetVersion}]{\setlength{\rightskip}{0pt plus 5cm}void Study::SetVersion (
+\begin{DoxyParamCaption}
+\item[{std::string}]{ version}
+\end{DoxyParamCaption}
+)}}
+\label{class_study_a9aee71c49a1f5a0b3970a5a7fcfebef3}
+
+
+Function to set the version of the study. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em version} & The version of the study \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+mintcpp/branches/development/MINTMetadata/Study.h\item 
+mintcpp/branches/development/MINTMetadata/Study.cpp\end{DoxyCompactItemize}
