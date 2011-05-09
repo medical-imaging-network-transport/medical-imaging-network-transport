@@ -1,0 +1,99 @@
+//------------------------------------------------------------------------------
+//
+//   Copyright 2010 MINT Working Group
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//------------------------------------------------------------------------------
+
+package mint.metadata;
+option java_package = "org.nema.medical.mint.metadata";
+option java_outer_classname = "GPB";
+option optimize_for = SPEED;
+
+//------------------------------------------------------------------------------
+message StudyData
+{
+    // identifier
+    optional string study_instance_uid = 1;
+    
+    // used for validation against data dictionary
+    optional string type = 4;
+    optional string version = 5;
+
+    // computed by server on outbound, if provided on inbound must be correct
+    optional uint32 instance_count = 6;    
+    
+    // studies contain attributes and series
+    repeated AttributeData attributes = 2;
+    repeated SeriesData series = 3;
+}
+
+//------------------------------------------------------------------------------
+message SeriesData
+{
+    // identifier
+    optional string series_instance_uid = 1;
+
+    // used only in updates when removing attributes
+    optional string exclude = 2;  
+
+    // computed by server on outbound, if provided on inbound must be correct
+    optional uint32 instance_count = 6;
+    
+    // series contain series-level and normalized attributes, and instances
+    repeated AttributeData attributes = 3;
+    repeated AttributeData normalized_instance_attributes = 4;
+    repeated InstanceData instances = 5;
+}
+
+//------------------------------------------------------------------------------
+message InstanceData
+{
+    // identifier
+    optional string sop_instance_uid = 1;
+    
+    // used only in updates when removing attributes
+    optional string exclude = 2;
+    
+    // instances include the transfer syntax and attributes
+    optional string transfer_syntax_uid = 3;
+    repeated AttributeData attributes = 4;
+}
+
+//------------------------------------------------------------------------------
+message AttributeData
+{
+    // identifier
+    optional uint32 tag = 1;
+    
+    // used only in updates when removing attributes
+    optional string exclude = 2;  
+    
+    // 2-character VR
+    optional string vr = 3;
+    
+    // attributes contain either a value, reference to a binary item, or items
+    optional string string_value = 4;    // if a "normal" attribute
+    optional uint32 binary_item_id = 5;  // if a binary item
+    optional uint32 binary_item_size = 9;
+    optional uint32 frame_count = 8;     // if a binary item, default is 1
+    optional bytes bytes = 7;            // if an embedded binary item
+    repeated ItemData items = 6;         // if a "sequence" attribute
+}
+
+//------------------------------------------------------------------------------
+message ItemData
+{
+    // items are used within sequence attributes and contain other attributes
+    repeated AttributeData attributes = 1;
+}

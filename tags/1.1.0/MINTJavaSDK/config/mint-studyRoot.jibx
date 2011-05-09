@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<binding xmlns:tns="http://medical.nema.org/mint" name="studyRoot" trim-whitespace="true">
+  <namespace uri="http://medical.nema.org/mint" default="elements"/>
+  <mapping name="studyRoot" class="org.nema.medical.mint.studies.StudyRoot">
+    <value style="attribute" name="studyUUID" get-method="getStudyUUID" set-method="setStudyUUID"/>
+    <value style="attribute" name="lastUpdate" get-method="getLastModified" set-method="setLastModified"/>
+    <value style="attribute" name="version" get-method="getVersion" set-method="setVersion"/>
+    <collection iter-method="typeIterator" add-method="addType" item-type="java.lang.String"/>
+  </mapping>
+  <mapping name="type" class="java.lang.String">
+    <value style="text"/>
+  </mapping>
+</binding>
