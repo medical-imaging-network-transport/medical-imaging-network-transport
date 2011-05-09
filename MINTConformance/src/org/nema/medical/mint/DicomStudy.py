@@ -107,11 +107,8 @@ class DicomStudy():
            if self.__studyInstanceUID == "":
               self.__studyInstanceUID = instance.studyInstanceUID()
            else:
-              if self.__studyInstanceUID != instance.studyInstanceUID():
-                 raise IOError("Study Instance UID do not match - " +
-                               self.__studyInstanceUID + " != " +
-                               instance.studyInstanceUID())
-
+              assert self.__studyInstanceUID == instance.studyInstanceUID()
+	   
            seriesInstanceUID = instance.seriesInstanceUID()
            if self.__series.has_key(seriesInstanceUID):
               self.__series[seriesInstanceUID].append(instance)
@@ -147,6 +144,7 @@ def main():
        if help or len(args) < 1:
 
           print "Usage", progName, "[options] <dicom_dir>"
+          print "  -p <port>:   defaults to 8080"
 	  print "  -o <output>: output filename (defaults to stdout)"
 	  print "  -h:          displays usage"
           sys.exit(1)
