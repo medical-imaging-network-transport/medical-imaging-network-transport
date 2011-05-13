@@ -21,7 +21,8 @@ package org.nema.medical.mint.jobs;
  */
 public enum HttpMessagePart {
     STUDY_UUID("studyUUID"),
-    OLD_VERSION("oldVersion");
+    OLD_VERSION("oldVersion"),
+    METADATA("metadata");
 
     private final String partId;
 
