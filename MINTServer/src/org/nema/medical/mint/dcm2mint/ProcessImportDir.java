@@ -17,7 +17,6 @@
 package org.nema.medical.mint.dcm2mint;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +26,7 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.dcm4che2.data.DicomObject;
@@ -54,6 +54,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.util.*;
 import java.util.Map.Entry;
@@ -104,6 +105,18 @@ public final class ProcessImportDir {
         this.deletePhysicalInstanceFiles = deletePhysicalInstanceFiles;
         this.forceCreate = forceCreate;
         this.binaryInlineThreshold = binaryInlineThreshold;
+    }
+
+    /**
+     * Set the default proxy from the JRE on the passed {@code httpClient}.
+     * @param httpClient the client to modify.
+     */
+    public static void applyDefaultProxySelector(final DefaultHttpClient httpClient) {
+        //From HttpClient tutorial
+        final ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
+                httpClient.getConnectionManager().getSchemeRegistry(),
+                ProxySelector.getDefault());
+        httpClient.setRoutePlanner(routePlanner);
     }
 
     public void processDir() throws IOException{
@@ -542,7 +555,11 @@ public final class ProcessImportDir {
         public Collection<File> studyInstanceFiles;
     }
 
-    private final HttpClient httpClient = new DefaultHttpClient();
+    private final DefaultHttpClient httpClient = new DefaultHttpClient();
+    {
+        applyDefaultProxySelector(httpClient);
+    }
+
     private final File importDir;
     private final SortedSet<File> handledFiles = new ConcurrentSkipListSet<File>();
     private final URI createURI;
