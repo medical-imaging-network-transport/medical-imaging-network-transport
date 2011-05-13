@@ -452,8 +452,8 @@ public final class ProcessImportDir {
             }
             final ByteArrayInputStream metaIn = new ByteArrayInputStream(metaInBuffer);
             //We must distinguish MIME types for GPB vs. XML so that the server can handle them properly
-            entity.addPart(metadataFile.getName(), new InputStreamBody(
-                    metaIn, useXMLNotGPB ? "text/xml" : "application/octet-stream", metadataFile.getName()));
+            entity.addPart(HttpMessagePart.METADATA.toString(), new InputStreamBody(metaIn,
+                    useXMLNotGPB ? "text/xml" : "application/octet-stream", metadataFile.getName()));
         }
 
         //We support only one type
