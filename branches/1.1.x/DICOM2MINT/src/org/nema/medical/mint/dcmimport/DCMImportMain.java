@@ -16,17 +16,23 @@
 
 package org.nema.medical.mint.dcmimport;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
+import org.nema.medical.mint.dcm2mint.ProcessImportDir;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.nema.medical.mint.dcm2mint.ProcessImportDir;
 
 /**
  * @author Scott DeJarnette
@@ -253,11 +259,22 @@ public class DCMImportMain {
             urlName += '/';
         }
         try {
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con = (HttpURLConnection) new URL(urlName).openConnection();
-            con.setRequestMethod("HEAD");
-            return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-        } catch (Exception e) {
+            final HttpHead httpHead = new HttpHead(urlName);
+            final DefaultHttpClient httpClient = new DefaultHttpClient();
+            ProcessImportDir.applyDefaultProxySelector(httpClient);
+            final HttpParams httpParams = httpClient.getParams();
+            httpParams.setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
+            try {
+                return httpClient.execute(httpHead, new ResponseHandler<Boolean>() {
+                    @Override
+                    public Boolean handleResponse(final HttpResponse httpResponse) throws IOException {
+                        return httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+                    }
+                });
+            } catch (final UnknownHostException e) {
+                return false;
+            }
+        } catch (final Exception e) {
             fatalError(e, "");
             return false;
         }
