@@ -25,7 +25,6 @@ import org.nema.medical.mint.changelog.ChangeSet;
 import org.nema.medical.mint.server.domain.Change;
 import org.nema.medical.mint.server.domain.ChangeDAO;
 import org.nema.medical.mint.server.domain.StudyDAO;
-import org.nema.medical.mint.utils.DateUtils;
 import org.nema.medical.mint.utils.ISO8601DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -89,8 +88,8 @@ public class ChangeLogController {
 
 		if (since != null) {
 			final Date date;
-			final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.DateUtils();
 			try {
+				final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.JodaDateUtils();
                 date = dateUtil.parseISO8601Basic(since);
 			} catch (final ParseException e) {
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);

@@ -9,7 +9,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-public class DateUtils implements ISO8601DateUtils {
+public class JodaDateUtils implements ISO8601DateUtils {
 
 	private final static DateTimeFormatter[] timezone_formatters = 
 			{ISODateTimeFormat.basicDateTimeNoMillis(), ISODateTimeFormat.basicDateTime()};
@@ -91,7 +91,7 @@ public class DateUtils implements ISO8601DateUtils {
 		return calendar.getTime();
 	}
 
-	public DateUtils() {
+	public JodaDateUtils() {
 		
 	}
 }

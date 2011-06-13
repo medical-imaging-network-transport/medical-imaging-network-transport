@@ -24,7 +24,7 @@ import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.studies.SearchResultStudy;
 import org.nema.medical.mint.studies.SearchResults;
-import org.nema.medical.mint.utils.DateUtils;
+import org.nema.medical.mint.utils.JodaDateUtils;
 import org.nema.medical.mint.utils.ISO8601DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -81,7 +81,7 @@ public class StudiesController {
         	final Date dateTimeTo;
             final Date dateFrom;
             final Date dateTo;
-            final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.DateUtils();
+            final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.JodaDateUtils();
             if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
                 dateFrom = dateUtil.parseISO8601DateBasic(minStudyDate);
             } else {
