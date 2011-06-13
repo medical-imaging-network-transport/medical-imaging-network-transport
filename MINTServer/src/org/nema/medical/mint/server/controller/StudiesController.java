@@ -25,6 +25,7 @@ import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.studies.SearchResultStudy;
 import org.nema.medical.mint.studies.SearchResults;
 import org.nema.medical.mint.utils.DateUtils;
+import org.nema.medical.mint.utils.ISO8601DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,23 +81,24 @@ public class StudiesController {
         	final Date dateTimeTo;
             final Date dateFrom;
             final Date dateTo;
+            final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.DateUtils();
             if (minStudyDate != null && StringUtils.isNotBlank(minStudyDate)){
-                dateFrom = DateUtils.parseISO8601DateBasic(minStudyDate);
+                dateFrom = dateUtil.parseISO8601DateBasic(minStudyDate);
             } else {
                 dateFrom = null;
             }
         	if (minStudyDateTime != null && StringUtils.isNotBlank(minStudyDateTime)){
-                dateTimeFrom = DateUtils.parseISO8601Basic(minStudyDateTime);
+                dateTimeFrom = dateUtil.parseISO8601Basic(minStudyDateTime);
         	} else {
                 dateTimeFrom = null;
             }
             if (maxStudyDate != null && StringUtils.isNotBlank(maxStudyDate)){
-                dateTo = DateUtils.parseISO8601DateBasic(maxStudyDate);
+                dateTo = dateUtil.parseISO8601DateBasic(maxStudyDate);
             } else {
                 dateTo = null;
             }
             if (maxStudyDateTime != null && StringUtils.isNotBlank(maxStudyDateTime)){
-                dateTimeTo = DateUtils.parseISO8601Basic(maxStudyDateTime);
+                dateTimeTo = dateUtil.parseISO8601Basic(maxStudyDateTime);
             } else {
                 dateTimeTo = null;
             }
