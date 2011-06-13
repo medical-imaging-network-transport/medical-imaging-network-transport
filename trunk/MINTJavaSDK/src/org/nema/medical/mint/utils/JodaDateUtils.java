@@ -65,7 +65,7 @@ public class JodaDateUtils implements ISO8601DateUtils {
 		}
 		
 		//dateStr not in valid format
-		throw new ParseException("Invalid date: ", 0);
+		throw new ParseException("Invalid date: ", dateStr.length()-1);
 	}
 
 	@Override
@@ -89,9 +89,5 @@ public class JodaDateUtils implements ISO8601DateUtils {
 	private Date getDate(DateTime dt) {
 		Calendar calendar = dt.toCalendar(null);
 		return calendar.getTime();
-	}
-
-	public JodaDateUtils() {
-		
 	}
 }
