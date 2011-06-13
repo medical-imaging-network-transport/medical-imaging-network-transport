@@ -1,110 +1,97 @@
-/*
- *   Copyright 2010 MINT Working Group
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
 package org.nema.medical.mint.utils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
-//TODO Some of this needs to be refactored, as the parsing code is somewhat flawed. Joda Time is something to look into
-//as a replacement.
-public final class DateUtils {
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
-    /**
-     * Parses a string formatted according to the ISO8601 "extended" date format,
-     * the standard xsd:dateTime format used in XML.  This method isn't actually used
-     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
-     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing
-     * due to special character issues.
-     * @param dateStr formatted according to the ISO 8601 "extended" date format
-     * @return Date a the date represented by the provided string
-     * @throws java.text.ParseException if the date is not properly formatted
-     */
-    public static Date parseISO8601Basic(final String dateStr) throws ParseException {
-        return parseISO8601Basic(dateStr, false);
-    }
+public class DateUtils implements ISO8601DateUtils {
 
-    /**
-     * Parses a string formatted according to the ISO8601 "extended" date format,
-     * the standard xsd:dateTime format used in XML. The XML approach is not actually used
-     * in our code (JiBX provides xml marshalling/unmarshalling) and we decided
-     * to use the ISO8601 "basic" format (no dashes/colons) for URL parsing
-     * due to special character issues, and further restricted to only UTC time strings
-     * (with an appended 'Z' character)
-     * @param dateStr formatted according to the ISO 8601 "basic" date format, with appended 'Z' character.
-     * @return Date a the date represented by the provided string
-     * @throws java.text.ParseException if the date is not properly formatted
-     */
-    public static Date parseISO8601BasicUTC(String dateStr) throws ParseException {
-        return parseISO8601Basic(dateStr, true);
-    }
+	private final static DateTimeFormatter[] timezone_formatters = 
+			{ISODateTimeFormat.basicDateTimeNoMillis(), ISODateTimeFormat.basicDateTime()};
+	private final static DateTimeFormatter[] local_formatters = 
+			{DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSS"), DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss")};
 
-    private static Date parseISO8601Basic(String dateStr, final boolean utcOnly) throws ParseException {
-    	final String[] xsdDateTime;
-        if (utcOnly) {
-            xsdDateTime = new String[]{"yyyyMMdd'T'HHmmss.SSSZ", "yyyyMMdd'T'HHmmssZ"};
-        } else {
-            xsdDateTime = new String[]{
-                    "yyyyMMdd'T'HHmmss.SSSZ", "yyyyMMdd'T'HHmmssZ", "yyyyMMdd'T'HHmmss.SSS", "yyyyMMdd'T'HHmmss"};
+	@Override
+	public Date parseISO8601Basic(String dateStr) throws ParseException {	
+		return parseISO8601(dateStr, false);
+	}
+
+	@Override
+	public Date parseISO8601BasicUTC(String dateStr) throws ParseException {
+		//These are the ways to explicitly express UTC. "-0000" or "-00" are not valid according to ISO8601:2004	
+        if (!dateStr.endsWith("Z") && !dateStr.endsWith("+0000") && !dateStr.endsWith("+00")) {
+            throw new ParseException("Date/time string lacks UTC designator", dateStr.length());
         }
+        
+		return parseISO8601(dateStr, true);
+	}
+	
+	/**
+	 * Parse a date string according to ISO8601 basic format
+	 * @param dateStr 
+	 * 				the string to parse in the format yyyyMMdd'T'HHmmss.SSS'Z' or yyyyMMdd'T'HHmmss'Z' where Z 
+	 * 				represents the timezone offset if available.
+	 * @param utcOnly
+	 * 				whether or not the string should be parsed with formatters that handle timezones
+	 * @return the fully parsed ISO8601 string as a Java Date object
+	 * @throws ParseException
+	 */
+	private Date parseISO8601(String dateStr, boolean utcOnly) throws ParseException {		
 
-    	// fix issue where + is replaced with ' ' in a URL
-        dateStr = dateStr.replace(' ', '+');
-        final int dateStrLen = dateStr.length();
-        //These are the ways to explicitly express UTC. "-0000" or "-00" are not valid according to ISO8601:2004
-        if (utcOnly && !dateStr.endsWith("Z") && !dateStr.endsWith("+0000") && !dateStr.endsWith("+00")) {
-            throw new ParseException("Date/time string lacks UTC designator", dateStrLen);
-        }
-        //this is zero time so we need to add that TZ indicator for UTC
-        if (dateStr.endsWith("Z")) {
-            dateStr = dateStr.substring(0, dateStrLen - 1) + "+0000";
-        }
-        return parseDate(dateStr, xsdDateTime);
-    }
+		dateStr = dateStr.replace(' ', '+');
+		//run through parsers that handle timezones
+		for(DateTimeFormatter formatter : timezone_formatters) {
+			try{
+				return getDate(formatter.parseDateTime(dateStr));	
+			} catch(IllegalArgumentException e) {
+				//do nothing, try other formats
+			}
+		}
 
-    public static Date parseISO8601DateBasic(final String dateStr) throws ParseException {
-        if (dateStr.length() != 8) {
-            throw new ParseException("Invalid date: " + dateStr, 0);
-        }
-        final String[] xsdDate = new String[]{"yyyyMMdd"};
-        return parseDate(dateStr, xsdDate);
-    }
+		if(!utcOnly){
+			//run through rest of parsers without timezones
+			for(DateTimeFormatter formatter : local_formatters) {
+				try{
+					return getDate(formatter.parseDateTime(dateStr));				
+				} catch(IllegalArgumentException e) {
+					//do nothing, try other formats
+				}
+			}
+		}
+		
+		//dateStr not in valid format
+		throw new ParseException("Invalid date: ", 0);
+	}
 
-    private static Date parseDate(final String dateStr, final String[] formats)
-            throws ParseException {
-        if (formats.length == 0) {
-            throw new AssertionError("Must have at least one format to parse");
-        }
+	@Override
+	public Date parseISO8601DateBasic(String dateStr) throws ParseException {
+		if(dateStr.startsWith("+") || dateStr.startsWith("-")) {
+			throw new ParseException("Invalid date: ", 0);
+		}
+		final DateTimeFormatter formatter = ISODateTimeFormat.basicDate();
+		try{
+			return getDate(formatter.parseDateTime(dateStr));
+		} catch(IllegalArgumentException e) {
+			throw new ParseException("Invalid date: " + dateStr, 0);
+		}
+	}
+	
+	/**
+	 * Converts the given Joda DateTime object into a Java Date object
+	 * @param dt the Joda DateTime object to convert
+	 * @return the equivalent Java Date object 
+	 */
+	private Date getDate(DateTime dt) {
+		Calendar calendar = dt.toCalendar(null);
+		return calendar.getTime();
+	}
 
-        ParseException ex = null;
-        for (final String format: formats) {
-            try {
-                return new SimpleDateFormat(format).parse(dateStr);
-            } catch (final ParseException e) {
-                // try next format, but throw the last error
-                ex = e;
-            }
-        }
-
-        throw ex;
-    }
-
-    private DateUtils() {
-        throw new AssertionError("Instantiation not allowed");
-    }
+	public DateUtils() {
+		
+	}
 }
