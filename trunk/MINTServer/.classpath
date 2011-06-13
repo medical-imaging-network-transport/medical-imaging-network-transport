@@ -24,12 +24,6 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.springframework.web-3.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/org.springframework.web.servlet-3.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-fileupload-1.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="/MINTJavaSDK/ant-lib/junit-4.8.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/shu18/httpcomponents-core-4.1.1/lib/httpcore-4.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/shu18/dcm4che-2.0.25/lib/dcm4che-core-2.0.25.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/shu18/Documents/MINT/MINTServer/WebContent/WEB-INF/lib/httpclient-4.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/shu18/Documents/MINT/MINTServer/WebContent/WEB-INF/lib/httpmime-4.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/shu18/Documents/MINT/MINTServer/WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="C:/Users/shu18/Documents/MINT/MINTServer/WebContent/WEB-INF/lib/apache-mime4j-0.6.jar"/>
+	<classpathentry kind="lib" path="/MINTJavaSDK/ant-lib/junit-4.8.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

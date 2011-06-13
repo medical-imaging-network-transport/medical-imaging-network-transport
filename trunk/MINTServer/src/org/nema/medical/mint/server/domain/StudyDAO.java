@@ -25,7 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.nema.medical.mint.utils.DateUtils;
+import org.nema.medical.mint.utils.JodaDateUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class StudyDAO extends HibernateDaoSupport {

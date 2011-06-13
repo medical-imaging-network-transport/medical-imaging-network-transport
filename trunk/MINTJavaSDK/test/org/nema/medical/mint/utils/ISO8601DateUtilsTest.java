@@ -9,8 +9,8 @@ import java.util.TimeZone;
 import org.junit.Test;
 
 
-public class DateUtilsTest {
-	final ISO8601DateUtils dateUtil = new DateUtils();
+public class ISO8601DateUtilsTest {
+	final ISO8601DateUtils dateUtil = new JodaDateUtils();
 	
     final TimeZone utcTZ = TimeZone.getTimeZone("Etc/UTC");
     final TimeZone localTZ = TimeZone.getDefault();
