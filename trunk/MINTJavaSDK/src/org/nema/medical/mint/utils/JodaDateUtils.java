@@ -17,17 +17,16 @@ public class JodaDateUtils implements ISO8601DateUtils {
 			{DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSS"), DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss")};
 
 	@Override
-	public Date parseISO8601Basic(String dateStr) throws ParseException {	
+	public Date parseISO8601Basic(String dateStr) throws DateTimeParseException {	
 		return parseISO8601(dateStr, false);
 	}
 
 	@Override
-	public Date parseISO8601BasicUTC(String dateStr) throws ParseException {
+	public Date parseISO8601BasicUTC(String dateStr) throws DateTimeParseException {
 		//These are the ways to explicitly express UTC. "-0000" or "-00" are not valid according to ISO8601:2004	
         if (!dateStr.endsWith("Z") && !dateStr.endsWith("+0000") && !dateStr.endsWith("+00")) {
-            throw new ParseException("Date/time string lacks UTC designator", dateStr.length());
-        }
-        
+            throw new DateTimeParseException("Invalid date: " + dateStr);
+        }        
 		return parseISO8601(dateStr, true);
 	}
 	
@@ -41,15 +40,17 @@ public class JodaDateUtils implements ISO8601DateUtils {
 	 * @return the fully parsed ISO8601 string as a Java Date object
 	 * @throws ParseException
 	 */
-	private Date parseISO8601(String dateStr, boolean utcOnly) throws ParseException {		
+	private Date parseISO8601(String dateStr, boolean utcOnly) throws DateTimeParseException {		
 
 		dateStr = dateStr.replace(' ', '+');
+		Exception lastException = null;
 		//run through parsers that handle timezones
 		for(DateTimeFormatter formatter : timezone_formatters) {
 			try{
 				return getDate(formatter.parseDateTime(dateStr));	
 			} catch(IllegalArgumentException e) {
-				//do nothing, try other formats
+				//save last exception, try other formats
+				lastException = e;
 			}
 		}
 
@@ -59,25 +60,26 @@ public class JodaDateUtils implements ISO8601DateUtils {
 				try{
 					return getDate(formatter.parseDateTime(dateStr));				
 				} catch(IllegalArgumentException e) {
-					//do nothing, try other formats
+					//save last exception, try other formats
+					lastException = e;
 				}
 			}
 		}
 		
 		//dateStr not in valid format
-		throw new ParseException("Invalid date: ", dateStr.length()-1);
+		throw new DateTimeParseException(lastException.getMessage());
 	}
 
 	@Override
-	public Date parseISO8601DateBasic(String dateStr) throws ParseException {
+	public Date parseISO8601DateBasic(String dateStr) throws DateTimeParseException {
 		if(dateStr.startsWith("+") || dateStr.startsWith("-")) {
-			throw new ParseException("Invalid date: ", 0);
+			throw new DateTimeParseException("Invalid date: " + dateStr);
 		}
 		final DateTimeFormatter formatter = ISODateTimeFormat.basicDate();
 		try{
 			return getDate(formatter.parseDateTime(dateStr));
 		} catch(IllegalArgumentException e) {
-			throw new ParseException("Invalid date: " + dateStr, 0);
+			throw new DateTimeParseException(e.getMessage());
 		}
 	}
 	

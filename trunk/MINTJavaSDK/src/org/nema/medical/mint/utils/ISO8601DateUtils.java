@@ -12,7 +12,7 @@ public interface ISO8601DateUtils {
 	 * @return the Date object represented by the string
 	 * @throws ParseException
 	 */
-    public Date parseISO8601Basic(final String dateStr) throws ParseException;
+    public Date parseISO8601Basic(final String dateStr) throws DateTimeParseException;
     
     /**
      * Parses an ISO8601 basic format string for utc times 
@@ -22,7 +22,7 @@ public interface ISO8601DateUtils {
      * @return the Date object represented by the string
      * @throws ParseException
      */
-    public Date parseISO8601BasicUTC(String dateStr) throws ParseException;
+    public Date parseISO8601BasicUTC(String dateStr) throws DateTimeParseException;
     /**
      * Parses an ISO8601 basic format date string
      * @param dateStr
@@ -30,5 +30,5 @@ public interface ISO8601DateUtils {
      * @return the Date object represented by the string
      * @throws ParseException
      */
-    public Date parseISO8601DateBasic(final String dateStr) throws ParseException;
+    public Date parseISO8601DateBasic(final String dateStr) throws DateTimeParseException;
 }

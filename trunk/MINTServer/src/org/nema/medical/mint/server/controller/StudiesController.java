@@ -24,6 +24,7 @@ import org.nema.medical.mint.server.domain.MINTStudy;
 import org.nema.medical.mint.server.domain.StudyDAO;
 import org.nema.medical.mint.studies.SearchResultStudy;
 import org.nema.medical.mint.studies.SearchResults;
+import org.nema.medical.mint.utils.DateTimeParseException;
 import org.nema.medical.mint.utils.JodaDateUtils;
 import org.nema.medical.mint.utils.ISO8601DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +132,7 @@ public class StudiesController {
     		mctx.getXmlWriter().writePI("xml-stylesheet", xmlStylesheet);
     		mctx.marshalDocument(searchResults);
     		mctx.endDocument();
-        } catch (final ParseException e) {
+        } catch (final DateTimeParseException e) {
         	res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
