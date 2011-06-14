@@ -67,7 +67,7 @@ public class JodaDateUtils implements ISO8601DateUtils {
 		}
 		
 		//dateStr not in valid format
-		throw new DateTimeParseException(lastException.getMessage());
+		throw new DateTimeParseException(dateStr, lastException);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class JodaDateUtils implements ISO8601DateUtils {
 		try{
 			return getDate(formatter.parseDateTime(dateStr));
 		} catch(IllegalArgumentException e) {
-			throw new DateTimeParseException(e.getMessage());
+			throw new DateTimeParseException(dateStr, e);
 		}
 	}
 	
