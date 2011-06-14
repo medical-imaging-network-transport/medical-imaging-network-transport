@@ -15,7 +15,6 @@
  */
 package org.nema.medical.mint.server.domain;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.nema.medical.mint.utils.DateTimeParseException;
 import org.nema.medical.mint.utils.JodaDateUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -45,7 +45,7 @@ public class StudyDAO extends HibernateDaoSupport {
                                 final String accessionNumberIssuer, final String patientID,
                                 final String patientIDIssuer, final Date minStudyDateTime, final Date minStudyDate,
                                 final Date maxStudyDateTime, final Date maxStudyDate, final int limit,
-                                final int offset) throws ParseException {
+                                final int offset) throws DateTimeParseException {
 
         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(MINTStudy.class);
         detachedCriteria.addOrder(Order.desc("lastModified"));

@@ -2,7 +2,6 @@ package org.nema.medical.mint.utils;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -27,7 +26,7 @@ public class ISO8601DateUtilsTest {
     //TODO add the rest of the UTC formats that ISO8601 supports
 
     @Test
-	public void testBasic() throws ParseException {
+	public void testBasic() throws DateTimeParseException {
 		localCal.setTime(dateUtil.parseISO8601Basic("20100818T115959.999"));
 		assertEquals(2010, localCal.get(Calendar.YEAR));
 		assertEquals(7, localCal.get(Calendar.MONTH));
@@ -89,7 +88,7 @@ public class ISO8601DateUtilsTest {
 	}
 
     @Test
-	public void testBasicUTC() throws ParseException {
+	public void testBasicUTC() throws DateTimeParseException {
 		utcCal.setTime(dateUtil.parseISO8601BasicUTC("20100818T115959.999Z"));
 		assertEquals(2010, utcCal.get(Calendar.YEAR));
 		assertEquals(7, utcCal.get(Calendar.MONTH));	
@@ -116,7 +115,7 @@ public class ISO8601DateUtilsTest {
 	}
 
     @Test
-	public void testDateBasic() throws ParseException {
+	public void testDateBasic() throws DateTimeParseException {
         localCal.setTime(dateUtil.parseISO8601DateBasic("20100819"));
         assertEquals(0, localCal.get(Calendar.HOUR_OF_DAY));
         assertEquals(0, localCal.get(Calendar.MINUTE));
@@ -125,152 +124,152 @@ public class ISO8601DateUtilsTest {
     }
 
     //Verify that we are not supporting ISO8601 extended format for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic0() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic0() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("2010-08-19");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic01() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic01() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+0020100819");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic011() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic011() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("-0020100819");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic02() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic02() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+020100819");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic03() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic03() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+002010-08-19");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic04() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic04() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+002010-08");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic05() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic05() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+002010");
     }
 
     //Verify that we are not supporting ISO8601 expanded representations for dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic06() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic06() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+0010");
     }
 
     //Verify that we are not supporting ISO8601 representations with reduced accuracy
-    @Test(expected = ParseException.class)
-	public void testDateBasic1() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic1() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("201008");
     }
 
     //Verify that we are not supporting ISO8601 representations with reduced accuracy
-    @Test(expected = ParseException.class)
-	public void testDateBasic2() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic2() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("2010-08");
     }
 
     //Verify that we are not supporting ISO8601 representations with reduced accuracy
-    @Test(expected = ParseException.class)
-	public void testDateBasic3() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic3() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("2010");
     }
 
     //Verify that we are not supporting ISO8601 representations with reduced accuracy
-    @Test(expected = ParseException.class)
-	public void testDateBasic4() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic4() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("10");
     }
 
     //Verify that we are not supporting ISO8601 Ordinal Dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic5() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic5() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("2010110");
     }
 
     //Verify that we are not supporting ISO8601 Ordinal Dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic51() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic51() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("2010-110");
     }
 
     //Verify that we are not supporting ISO8601 Ordinal Dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic52() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic52() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+002010110");
     }
 
     //Verify that we are not supporting ISO8601 Ordinal Dates
-    @Test(expected = ParseException.class)
-	public void testDateBasic53() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic53() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+002010-110");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic6() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic6() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("1985W155");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic61() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic61() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("1985-W15-5");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic62() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic62() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("1985W15");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic63() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic63() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("1985-W15");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic64() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic64() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+001985W155");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic65() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic65() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+001985-W15-5");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic66() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic66() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+001985W15");
     }
 
     //Verify that we are not supporting ISO8601 week date
-    @Test(expected = ParseException.class)
-	public void testDateBasic67() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateBasic67() throws DateTimeParseException {
         dateUtil.parseISO8601DateBasic("+001985-W15");
     }
 
     //Verify support for ISO8601 date/time
     @Test
-	public void testDateTimeBasic1() throws ParseException {
+	public void testDateTimeBasic1() throws DateTimeParseException {
         localCal.setTime(dateUtil.parseISO8601Basic("19850412T101530"));
         assertEquals(1985, localCal.get(Calendar.YEAR));
         assertEquals(3, localCal.get(Calendar.MONTH));	
@@ -306,68 +305,68 @@ public class ISO8601DateUtilsTest {
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic21() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic21() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15:30");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic22() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic22() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15:30Z");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic23() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic23() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15:30+04:00");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic24() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic24() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15:30+04");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic31() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic31() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("19850412T1015");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic32() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic32() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("19850412T1015Z");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic33() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic33() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic34() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic34() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-04-12T10:15Z");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic41() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic41() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985W155T1015+0400");
     }
 
     //Verify support for ISO8601 date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasic42() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasic42() throws DateTimeParseException {
         dateUtil.parseISO8601Basic("1985-W15-5T10:15+04");
     }
 
     //Verify support for ISO8601 UTC date/time
     @Test
-	public void testDateTimeBasicUTC1() throws ParseException {
+	public void testDateTimeBasicUTC1() throws DateTimeParseException {
         utcCal.setTime(dateUtil.parseISO8601BasicUTC("19850412T101530Z"));
         assertEquals(1985, utcCal.get(Calendar.YEAR));
         assertEquals(3, utcCal.get(Calendar.MONTH));	
@@ -395,68 +394,68 @@ public class ISO8601DateUtilsTest {
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC2() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC2() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T101530");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC3() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC3() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T101530+0400");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC4() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC4() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T101530+04");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC5() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC5() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T101530-0000");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC61() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC61() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("1985-04-12T10:15:30Z");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC62() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC62() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("1985-04-12T10:15:30+0000");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC63() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC63() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("1985-04-12T10:15:30+00");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC71() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC71() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T1015Z");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC72() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC72() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T1015+0000");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC73() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC73() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("19850412T1015+00");
     }
 
     //Verify support for ISO8601 UTC date/time
-    @Test(expected = ParseException.class)
-	public void testDateTimeBasicUTC81() throws ParseException {
+    @Test(expected = DateTimeParseException.class)
+	public void testDateTimeBasicUTC81() throws DateTimeParseException {
         dateUtil.parseISO8601BasicUTC("1985W155T1015Z");
     }
 }
