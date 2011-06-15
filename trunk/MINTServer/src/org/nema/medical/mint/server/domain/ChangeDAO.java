@@ -19,7 +19,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -59,6 +64,27 @@ public class ChangeDAO extends HibernateDaoSupport {
 			return list;
 		}
 		return null;
+	}
+	
+	/**
+	 * Get a list of the most recent changes for each study
+	 * @return the list of changes
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Change> findLastChanges() {
+		List<Change> changes;
+		
+		final DetachedCriteria subquery = 
+			DetachedCriteria.forClass(Change.class, "change2")
+			.add(Property.forName("change2.studyID").eqProperty("change1.studyID"))
+			.add(Property.forName("change2.changeIndex").gtProperty("change1.changeIndex"))
+			.setProjection(Projections.property("studyID"));
+		final DetachedCriteria detachedCriteria =
+			DetachedCriteria.forClass(Change.class, "change1")
+			.add(Subqueries.notExists(subquery));
+
+		changes = getHibernateTemplate().findByCriteria(detachedCriteria);
+		return changes;
 	}
 	
     @SuppressWarnings("unchecked")

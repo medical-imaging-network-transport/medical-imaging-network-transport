@@ -66,11 +66,14 @@ public class ChangeLogController {
 	@Autowired
 	protected Integer fileStreamBufferSize;
 
+	private static final Boolean istrue = Boolean.TRUE;
+	
 	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) final String since,
             @RequestParam(value = "limit", required = false) Integer limit,
             @RequestParam(value = "offset", required = false) Integer offset,
+            @RequestParam(value = "consolidate", required = false, defaultValue = "true") boolean consolidate,
 			final HttpServletResponse res) throws IOException, JiBXException {
 
 		final List<org.nema.medical.mint.changelog.Change> changes = new ArrayList<org.nema.medical.mint.changelog.Change>();
@@ -86,34 +89,39 @@ public class ChangeLogController {
 
         final List<Change> changesFound;
 
-		if (since != null) {
-			final Date date;
-			try {
-				final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.JodaDateUtils();
-                date = dateUtil.parseISO8601Basic(since);
-			} catch (final DateTimeParseException e) {
-				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
-				return;
+        if(consolidate) {
+        	//only get a list of most recent changes for each study
+    		changesFound = changeDAO.findLastChanges();
+        } else {
+			if (since != null) {
+				final Date date;
+				try {
+					final ISO8601DateUtils dateUtil = new org.nema.medical.mint.utils.JodaDateUtils();
+	                date = dateUtil.parseISO8601Basic(since);
+				} catch (final DateTimeParseException e) {
+					res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date: " + since);
+					return;
+				}
+	            if (date.getTime() > System.currentTimeMillis()) {
+	                LOG.warn(String.format("Changelog requested with invalid future start date %s",
+	                        DateFormat.getDateTimeInstance().format(date)));
+	                res.setStatus(HttpServletResponse.SC_NO_CONTENT);
+	                return;
+	            }
+				changesFound = changeDAO.findChanges(date, firstIndex, limit);
+			} else {
+				changesFound = changeDAO.findChanges(firstIndex, limit);
 			}
-            if (date.getTime() > System.currentTimeMillis()) {
-                LOG.warn(String.format("Changelog requested with invalid future start date %s",
-                        DateFormat.getDateTimeInstance().format(date)));
-                res.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                return;
-            }
-			changesFound = changeDAO.findChanges(date, firstIndex, limit);
-		} else {
-			changesFound = changeDAO.findChanges(firstIndex, limit);
-		}
-
+        }
+		
 		if (changesFound != null) {
 			for (final Change change : changesFound) {
 				changes.add(new org.nema.medical.mint.changelog.Change(
                         change.getStudyUUID(), change.getIndex(), change.getType(), change.getDateTime(),
                         change.getRemoteHost(), change.getRemoteUser(), change.getOperation()));
 			}
-		}
-
+		}	
+		
 		res.setBufferSize(fileResponseBufferSize);
 		final ChangeSet changeSet = new ChangeSet(changes);
 		final IBindingFactory bfact = BindingDirectory.getFactory("serverChangelog", ChangeSet.class);
