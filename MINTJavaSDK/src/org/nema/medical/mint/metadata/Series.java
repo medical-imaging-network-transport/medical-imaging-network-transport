@@ -76,6 +76,10 @@ public class Series implements AttributeContainer, Excludable
     public Iterator<Attribute> attributeIterator() {
         return attributeMap.values().iterator();
     }
+    
+    public boolean hasAttributes() {
+    	return !attributeMap.isEmpty();
+    }
 
     /**
      * @param tag
@@ -108,6 +112,10 @@ public class Series implements AttributeContainer, Excludable
         return normalizedInstanceAttributeMap.values().iterator();
     }
 
+    public boolean hasNormalizedInstanceAttributes() {
+    	return !normalizedInstanceAttributeMap.isEmpty();
+    }
+    
     /**
      * puts an Instance into the Series - instances are unique per xfer
      * @param inst
@@ -139,6 +147,10 @@ public class Series implements AttributeContainer, Excludable
         return instances.values().iterator();
     }
 
+    public boolean hasInstances() {
+    	return !instances.isEmpty();
+    }
+    
     /**
      * @return the number of Instances in the Series
      */

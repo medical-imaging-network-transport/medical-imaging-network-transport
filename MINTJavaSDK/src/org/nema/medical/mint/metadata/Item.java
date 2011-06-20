@@ -96,6 +96,10 @@ public class Item implements AttributeContainer, Cloneable {
         return attributeMap.values().iterator();
     }
 
+    public boolean hasAttributes() {
+    	return !attributeMap.isEmpty();
+    }
+    
     //
     // Google Protocol Buffer support - package protection intentional
     //

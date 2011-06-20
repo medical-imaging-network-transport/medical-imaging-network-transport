@@ -80,12 +80,16 @@ public class StudyMetadata implements AttributeContainer, StudySummary
     public void removeAttribute(final int tag) {
         attributeMap.remove(tag);
     }
-
+    
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#attributeIterator()
 	 */
     public Iterator<Attribute> attributeIterator() {
         return attributeMap.values().iterator();
+    }
+    
+    public boolean hasAttributes() {
+    	return !attributeMap.isEmpty();
     }
 
     /* (non-Javadoc)
@@ -116,6 +120,10 @@ public class StudyMetadata implements AttributeContainer, StudySummary
 	 */
     public Iterator<Series> seriesIterator() {
         return seriesMap.values().iterator();
+    }
+    
+    public boolean hasSeries() {
+    	return !seriesMap.isEmpty();
     }
 
     /* (non-Javadoc)
