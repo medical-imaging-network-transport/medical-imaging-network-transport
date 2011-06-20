@@ -79,6 +79,10 @@ public class Instance implements AttributeContainer, Excludable
         return attributeMap.values().iterator();
     }
 
+    public boolean hasAttributes() {
+    	return !attributeMap.isEmpty();
+    }
+    
     /**
      * Get the 'sopInstanceUID' attribute value.
      *

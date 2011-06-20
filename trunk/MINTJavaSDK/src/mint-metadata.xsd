@@ -4,92 +4,82 @@
 
 	<complexType name="StudyMetaType">
 		<sequence>
-			<element name="Attributes" type="tns:AttributesType"
-				maxOccurs="1" minOccurs="1" />
-			<element name="SeriesList" type="tns:SeriesListType"
-				maxOccurs="1" minOccurs="1" />
+			<element name="Attributes" type="tns:AttributesType" maxOccurs="1" minOccurs="0"/>
+			<element name="SeriesList" type="tns:SeriesListType" maxOccurs="1" minOccurs="0"/>
 		</sequence>
-		<attribute name="studyInstanceUID" type="string" use="required"></attribute>
-		<attribute name="type" type="string" use="required"></attribute>
-		<attribute name="version" type="string" use="optional"></attribute>
-		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
+		<attribute name="studyInstanceUID" type="string" use="required"/>
+		<attribute name="type" type="string" use="required"/>
+		<attribute name="version" type="string" use="optional"/>
+		<attribute name="instanceCount" type="unsignedInt" use="optional"/>
         <attribute name="updateDateTime" type="dateTime" use="optional"/>
 	</complexType>
 
 	<complexType name="AttributesType">
 		<sequence>
-			<element name="Attr" type="tns:AttrType" maxOccurs="unbounded"
-				minOccurs="1"></element>
+			<element name="Attr" type="tns:AttrType" maxOccurs="unbounded" minOccurs="0"/>
 		</sequence>
 	</complexType>
 
 	<complexType name="SeriesListType">
 		<sequence>
-			<element name="Series" type="tns:SeriesType" maxOccurs="unbounded"
-				minOccurs="0"></element>
+			<element name="Series" type="tns:SeriesType" maxOccurs="unbounded" minOccurs="0"/>
 		</sequence>
 	</complexType>
 
 	<complexType name="AttrType">
 		<sequence>
-			<element name="Item" type="tns:ItemType" maxOccurs="unbounded"
-				minOccurs="0"></element>
+			<element name="Item" type="tns:ItemType" maxOccurs="unbounded" minOccurs="0"/>
 		</sequence>
-		<attribute name="tag" type="string" use="required"></attribute>
-		<attribute name="vr" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
-		<attribute name="val" type="string" use="optional"></attribute>
-		<attribute name="bytes" type="string" use="optional"></attribute>
-		<attribute name="bid" type="unsignedInt" use="optional"></attribute>
-		<attribute name="frameCount" type="unsignedInt" use="optional"></attribute>
-		<attribute name="exclude" type="string" use="optional"></attribute>
+		<attribute name="tag" type="string" use="required"/>
+		<attribute name="vr" type="string" use="optional"/> <!-- required unless exclude has a value -->
+		<attribute name="val" type="string" use="optional"/>
+		<attribute name="bytes" type="string" use="optional"/>
+		<attribute name="bid" type="unsignedInt" use="optional"/>
+		<attribute name="frameCount" type="unsignedInt" use="optional"/>
+		<attribute name="exclude" type="string" use="optional"/>
 	</complexType>
 
 	<complexType name="SeriesType">
 		<sequence>
-			<element name="Attributes" type="tns:AttributesType"
-				maxOccurs="unbounded" minOccurs="1"></element>
-			<element name="NormalizedInstanceAttributes" type="tns:NormalizedInstanceAttributesType"
-				maxOccurs="unbounded" minOccurs="1">
-			</element>
-			<element name="Instances" type="tns:InstancesType" maxOccurs="unbounded"
-				minOccurs="1"></element>
+			<element name="Attributes" type="tns:AttributesType" maxOccurs="1" minOccurs="0"/>
+			<element name="NormalizedInstanceAttributes" type="tns:NormalizedInstanceAttributesType" maxOccurs="1" minOccurs="0"/>
+			<element name="Instances" type="tns:InstancesType" maxOccurs="1" minOccurs="0"/>
 		</sequence>
-		<attribute name="seriesInstanceUID" type="string" use="required"></attribute>
-		<attribute name="exclude" type="string" use="optional"></attribute>
-		<attribute name="instanceCount" type="unsignedInt" use="optional"></attribute>
+		<attribute name="seriesInstanceUID" type="string" use="required"/>
+		<attribute name="exclude" type="string" use="optional"/>
+		<attribute name="instanceCount" type="unsignedInt" use="optional"/>
 	</complexType>
 
 	<complexType name="ItemType">
 		<complexContent>
 			<extension base="tns:AttributesType">
-				<attribute name="id" type="unsignedInt" use="required"></attribute>
+				<attribute name="id" type="unsignedInt" use="required"/>
 			</extension>
 		</complexContent>
 	</complexType>
 
 	<complexType name="NormalizedInstanceAttributesType">
 		<complexContent>
-			<extension base="tns:AttributesType"></extension>
+			<extension base="tns:AttributesType"/>
 		</complexContent>
 	</complexType>
 
 	<complexType name="InstancesType">
 		<sequence>
-			<element name="Instance" type="tns:InstanceType" maxOccurs="unbounded"
-				minOccurs="1"></element>
+			<element name="Instance" type="tns:InstanceType" maxOccurs="unbounded" minOccurs="0"/>
 		</sequence>
 	</complexType>
 
 	<complexType name="InstanceType">
 		<sequence>
 			<element name="Attributes" type="tns:AttributesType"
-				maxOccurs="unbounded" minOccurs="0">
+				maxOccurs="1" minOccurs="0">
 			</element>
 		</sequence>
-		<attribute name="sopInstanceUID" type="string" use="required"></attribute>
-		<attribute name="transferSyntaxUID" type="string" use="optional"></attribute> <!-- required unless exclude has a value -->
-		<attribute name="exclude" type="string" use="optional"></attribute>
+		<attribute name="sopInstanceUID" type="string" use="required"/>
+		<attribute name="transferSyntaxUID" type="string" use="optional"/> <!-- required unless exclude has a value -->
+		<attribute name="exclude" type="string" use="optional"/>
 	</complexType>
 
-	<element name="Study" type="tns:StudyMetaType"></element>
+	<element name="Study" type="tns:StudyMetaType"/>
 </schema>
