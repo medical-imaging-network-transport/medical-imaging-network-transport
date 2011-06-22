@@ -57,14 +57,12 @@ public class StudyDAO extends HibernateDaoSupport {
             detachedCriteria.add(Restrictions.eq("accessionNumber", accessionNumber));
         }
         if (accessionNumberIssuer != null && StringUtils.isNotBlank(accessionNumberIssuer)) {
-            //TODO rename issuerOfAccessionNumber to accessionNumberIssuer
             detachedCriteria.add(Restrictions.eq("issuerOfAccessionNumber", accessionNumberIssuer));
         }
         if (patientID != null && StringUtils.isNotBlank(patientID)) {
             detachedCriteria.add(Restrictions.eq("patientID", patientID));
         }
         if (patientIDIssuer != null && StringUtils.isNotBlank(patientIDIssuer)) {
-            //TODO rename issuerOfPatientID to patientIDIssuer
             detachedCriteria.add(Restrictions.eq("issuerOfPatientID", patientIDIssuer));
         }
         if (minStudyDateTime != null) {

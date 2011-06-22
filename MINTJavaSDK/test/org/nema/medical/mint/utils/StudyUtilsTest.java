@@ -81,10 +81,8 @@ public class StudyUtilsTest {
     public void testNormalizeSameAttributes() throws IOException {
         final String xml =
                 "<study xmlns='http://medical.nema.org/mint' studyInstanceUID='1' type='DICOM'>" +
-                        "  <attributes/>" +
                         "  <seriesList>" +
                         "    <series seriesInstanceUID='2'>" +
-                        "      <attributes/>" +
                         "      <normalizedInstanceAttributes/>" +
                         "      <instances>" +
                         "        <instance sopInstanceUID='3' transferSyntaxUID='1.2.840.10008.1.2'>" +
@@ -123,11 +121,8 @@ public class StudyUtilsTest {
     public void testNormalizeChangingNonBinaryVR() throws IOException {
         final String xml =
                 "<study xmlns='http://medical.nema.org/mint' studyInstanceUID='1' type='DICOM'>" +
-                        "  <attributes/>" +
                         "  <seriesList>" +
                         "    <series seriesInstanceUID='2'>" +
-                        "      <attributes/>" +
-                        "      <normalizedInstanceAttributes/>" +
                         "      <instances>" +
                         "        <instance sopInstanceUID='3' transferSyntaxUID='1.2.840.10008.1.2'>" +
                         "          <attributes>" +
@@ -160,11 +155,8 @@ public class StudyUtilsTest {
     public void testNormalizeChangingBinaryNonBinaryVR() throws IOException {
         final String xml =
                 "<study xmlns='http://medical.nema.org/mint' studyInstanceUID='1' type='DICOM'>" +
-                        "  <attributes/>" +
                         "  <seriesList>" +
                         "    <series seriesInstanceUID='2'>" +
-                        "      <attributes/>" +
-                        "      <normalizedInstanceAttributes/>" +
                         "      <instances>" +
                         "        <instance sopInstanceUID='3' transferSyntaxUID='1.2.840.10008.1.2'>" +
                         "          <attributes>" +

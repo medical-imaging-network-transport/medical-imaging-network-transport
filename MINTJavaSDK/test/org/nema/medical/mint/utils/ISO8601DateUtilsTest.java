@@ -23,8 +23,6 @@ public class ISO8601DateUtilsTest {
     final Calendar utcPlus530Cal = Calendar.getInstance(utcPlus530TZ);
     final Calendar utcPlus4Cal = Calendar.getInstance(utcPlus4TZ);
     
-    //TODO add the rest of the UTC formats that ISO8601 supports
-
     @Test
 	public void testBasic() throws DateTimeParseException {
 		localCal.setTime(dateUtil.parseISO8601Basic("20100818T115959.999"));
