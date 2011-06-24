@@ -1,4 +1,4 @@
-#summary May 27,2011 Meeting Notes
+#summary June 10,2011 Meeting Notes
 
 = Attendees =
   * Jim Philbin
