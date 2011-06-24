@@ -1,24 +1,32 @@
 #summary June 24,2011 Meeting Notes
 
 = Attendees =
-  * Jim Philbin
-  * Gorkem Sevinc
+  * Tim Dawson
+  * Uli Bubenheimer
+  * Cyrus Trainor
   * Anna
   * Rafael
   * Sam
-  * Mahmaud
-  * Tim Dawson
-  * Uli Bubenheimer
-  * Dan Chaffee
+  * Josh Coleman
 
 = Agenda = 
+  * Review agenda
   * Status updates
   * Continue discussion of changes needed for MINT 2.0
 
 = Status Updates =
-  * 
+  * Uli
+    * has been working on recommendation for REST interface changes
+    * worked with Sam to get some RI changes implemented
+    * would like to discuss Series changelog in addition to Study changelog
+    * need use cases for binary items upload / naming of parts
+  * Cyrus
+    * doing his CompSci thesis at FAU, discovered us through the google site, interested in learning more
+    * has read David Clunie's blog
+  * Sam 
+    * working with Uli on RI changes, optional metadata tags, changelog changes
 
-= Changes needed for MINT 2.0 (continued from last time) =
+= remaining items to discuss for MINT 2.0 =
   * Binary data upload part naming
     * defer to next meeting
   * Client SDK
