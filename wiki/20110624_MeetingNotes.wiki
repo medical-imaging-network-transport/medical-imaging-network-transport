@@ -1,0 +1,37 @@
+#summary June 24,2011 Meeting Notes
+
+= Attendees =
+  * Jim Philbin
+  * Gorkem Sevinc
+  * Anna
+  * Rafael
+  * Sam
+  * Mahmaud
+  * Tim Dawson
+  * Uli Bubenheimer
+  * Dan Chaffee
+
+= Agenda = 
+  * Status updates
+  * Continue discussion of changes needed for MINT 2.0
+
+= Status Updates =
+  * 
+
+= Changes needed for MINT 2.0 (continued from last time) =
+  * Binary data upload part naming
+    * defer to next meeting
+  * Client SDK
+    * H2MI has implemented something, needs permission to release (Gorkem)
+  * Permanent vs. Temporary Updates & Types
+    * defer to next meeting 
+  * Error Handling (and inclusion within metadata)
+    * introduced the topic (issues when converting from DICOM)
+    * defer to next meeting
+  * Ability to make single-call pull of metadata + binary
+    * defer to next meeting
+  * Ability to request binary response with offsets instead of multipart-mime
+    * Performance test to compare and validate before finalizing change
+    * defer to next meeting
+  * Reference Impl changes (Storage API)
+    * defer to next meeting
