@@ -57,12 +57,14 @@ class MintDicomCompare():
        self.__offsets = {}          
        self.__count = 0
        self.__verbose = False
-       self.__inlineBinaryTagsCompared = 0
-       self.__binaryTagsCompared = 0
+       self.__seriesCompared = 0
+       self.__instancesCompared = 0
        self.__textTagsCompared = 0
-       self.__fpTagsCompared = 0
-       self.__bytesCompared = 0
+       self.__sequencesCompared = 0
        self.__itemsCompared = 0
+       self.__inlineBinaryCompared = 0
+       self.__binaryItemsCompared = 0
+       self.__bytesCompared = 0
        self.__lazy= False
        self.__output = None
 
@@ -88,8 +90,8 @@ class MintDicomCompare():
        dicm = self.__dicom
        mint = self.__mint
               
-       seriesCompared = 0
-       instancesCompared = 0
+       self.__seriesCompared = 0
+       self.__instancesCompared = 0
        
        self.__check("Number of series",
                     dicm.numSeries(), 
@@ -109,31 +111,31 @@ class MintDicomCompare():
            for m in range(0, numInstances):
                instance = dicomSeries.instance(m)
                self.__compareInstances(instance, mint)
-               instancesCompared += 1
+               self.__instancesCompared += 1
                
-           seriesCompared += 1
+           self.__seriesCompared += 1
 
        # ---
        # Print out stats if verbose.
        # ---     
        if self.__verbose:
           if self.__output == None:
-             print "%10d series compared." % (seriesCompared)
-             print "%10d instance(s) compared." % (instancesCompared)
-             print "%10d text tag(s) compared." % (self.__textTagsCompared)
-             print "%10d floating point tag(s) compared." % (self.__fpTagsCompared)
-             print "%10d items(s) compared." % (self.__itemsCompared)
-             print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
-             print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
-             print "%10d byte(s) compared." % (self.__bytesCompared)          
+             print "%10d series compared." % (self.__seriesCompared)
+             print "%10d instance(s) compared." % (self.__instancesCompared)
+             print "%10d text tags(s) compared." % (self.__textTagsCompared) 
+             print "%10d sequence(s) compared." % (self.__sequencesCompared)
+             print "%10d item(s) compared." % (self.__itemsCompared)
+             print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
+             print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
+             print "%10d byte(s) compared." % (self.__bytesCompared)    
           else:
-             self.__output.write("%10d series compared.\n" % (seriesCompared))
-             self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
+             self.__output.write("%10d series compared.\n" % (self.__seriesCompared))
+             self.__output.write("%10d instance(s) compared.\n" % (self.__instancesCompared))
              self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
-             self.__output.write("%10d floating point tag(s) compared.\n" % (self.__fpTagsCompared))
+             self.__output.write("%10d sequence(s) compared.\n" % (self.__sequencesCompared))
              self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
-             self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
-             self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
+             self.__output.write("%10d inline binary item(s) compared.\n" % (self.__inlineBinaryCompared))
+             self.__output.write("%10d binary item(s) compared.\n" % (self.__binaryItemsCompared))
              self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
 
        # ---
@@ -260,8 +262,6 @@ class MintDicomCompare():
        # ---
        if dicomAttr.isBinary():
           self.__checkBinary(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
-       elif attr.vr() == "FL" or attr.vr() == "FD":
-          self.__checkFloatingPoint(dicomAttr, attr, seriesInstanceUID, sopInstanceUID)
        else:
           self.__check(dicomAttr.tag()+" Value",
                        dicomAttr.val(),
@@ -269,7 +269,11 @@ class MintDicomCompare():
                        seriesInstanceUID, 
                        sopInstanceUID)
           self.__textTagsCompared += 1
-          
+        
+       # Check for sequence  
+       if dicomAttr.vr() == "SQ":
+          self.__sequencesCompared += 1
+       
        # ---
        # Check number of items.
        # ---
@@ -306,45 +310,7 @@ class MintDicomCompare():
                      self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
            
               self.__itemsCompared += 1
-           
-   def __checkFloatingPoint(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
 
-       # Convert to floats
-       floats1 = string.split(dicomAttr.val(), "\\")
-       floats2 = string.split(attr.val(), "\\")
-
-       # ---
-       # Check number of items.
-       # ---
-       numFloats1 = len(floats1)
-       numFloats2 = len(floats2)
-       self.__check(dicomAttr.tag()+" Number of floats",
-                    numFloats1,
-                    numFloats2,
-                    seriesInstanceUID,
-                    sopInstanceUID)
-       
-       numFloats = min(numFloats1, numFloats2)
-       for i in range(0, numFloats):
-              
-           val1 = float(floats1[i])
-           val2 = float(floats2[i])
-
-           # Set precision to 6 decimal places
-           precision = 100000.0
-       
-           # Round       
-           rval1 = int(val1*precision+0.5)/precision
-           rval2 = int(val2*precision+0.5)/precision
-        
-           # Compare
-           self.__check(dicomAttr.tag()+" Floating Point",
-                        rval1,
-                        rval2,
-                        seriesInstanceUID, 
-                        sopInstanceUID)
-       
-       self.__fpTagsCompared += 1
          
    def __checkBinary(self, dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID):
 
@@ -444,17 +410,17 @@ class MintDicomCompare():
              
        bid1.close()
        bid2.close()
-       self.__binaryTagsCompared += 1
+       self.__binaryItemsCompared += 1
 
    def __checkInlineBinary(self, dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID):
 
        self.__check(dicomAttr.tag()+" <Binary>",
-                    dicomAttr.val(),
+                    dicomAttr.bytes(),
                     mintAttr.bytes(),
                     seriesInstanceUID, 
                     sopInstanceUID)
 
-       self.__inlineBinaryTagsCompared += 1
+       self.__inlineBinaryCompared += 1
  
 # -----------------------------------------------------------------------------
 # main
