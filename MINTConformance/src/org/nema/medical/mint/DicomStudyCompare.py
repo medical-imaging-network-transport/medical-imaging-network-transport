@@ -52,14 +52,17 @@ class DicomStudyCompare():
        self.__studyInstanceUID = self.__dicom1.studyInstanceUID()
        self.__dicom2 = newDicomStudy
        self.__count = 0
-       self.__warningCount = 0
        self.__verbose = False
-       self.__binaryTagsCompared = 0
+       self.__seriesCompared = 0
+       self.__instancesCompared = 0
        self.__textTagsCompared = 0
-       self.__inlineBinaryTagsCompared = 0
-       self.__bytesCompared = 0
+       self.__sequencesCompared = 0
        self.__itemsCompared = 0
+       self.__inlineBinaryCompared = 0
+       self.__binaryItemsCompared = 0
+       self.__bytesCompared = 0
        self.__excludedTags = 0
+       self.__warningCount = 0
        self.__lazy= False
        self.__warnings=False
        self.__output = None
@@ -114,32 +117,34 @@ class DicomStudyCompare():
                instance1 = series1.instance(m)
                instance2 = series2.instanceByUID(instance1.sopInstanceUID())
                self.__compareInstances(instance1, instance2)
-               instancesCompared += 1
+               self.__instancesCompared += 1
            
-           seriesCompared += 1
+           self.__seriesCompared += 1
        
        # ---
        # Print out stats if verbose.
        # ---       
        if self.__verbose:
           if self.__output == None:
-             print "%10d series compared." % (seriesCompared)
-             print "%10d instance(s) compared." % (instancesCompared)
-             print "%10d text tag(s) compared." % (self.__textTagsCompared)
-             print "%10d items(s) compared." % (self.__itemsCompared)
-             print "%10d inline binary tag(s) compared." % (self.__inlineBinaryTagsCompared)
-             print "%10d binary tag(s) compared." % (self.__binaryTagsCompared)
-             print "%10d byte(s) compared." % (self.__bytesCompared)          
+             print "%10d series compared." % (self.__seriesCompared)
+             print "%10d instance(s) compared." % (self.__instancesCompared)
+             print "%10d text tags(s) compared." % (self.__textTagsCompared) 
+             print "%10d sequence(s) compared." % (self.__sequencesCompared)
+             print "%10d item(s) compared." % (self.__itemsCompared)
+             print "%10d inline binary item(s) compared." % (self.__inlineBinaryCompared)
+             print "%10d binary item(s) compared." % (self.__binaryItemsCompared)
+             print "%10d byte(s) compared." % (self.__bytesCompared)             
              print "%10d excluded tag(s)." % (self.__excludedTags)
           else:
-            self.__output.write("%10d series compared.\n" % (seriesCompared))
-            self.__output.write("%10d instance(s) compared.\n" % (instancesCompared))
-            self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
-            self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
-            self.__output.write("%10d inline binary tag(s) compared.\n" % (self.__inlineBinaryTagsCompared))
-            self.__output.write("%10d binary tag(s) compared.\n" % (self.__binaryTagsCompared))
-            self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
-            self.__output.write("%10d excluded tag(s).\n" % (self.__excludedTags))
+             self.__output.write("%10d series compared.\n" % (self.__seriesCompared))
+             self.__output.write("%10d instance(s) compared.\n" % (self.__instancesCompared))
+             self.__output.write("%10d text tag(s) compared.\n" % (self.__textTagsCompared))
+             self.__output.write("%10d sequence(s) compared.\n" % (self.__sequencesCompared))
+             self.__output.write("%10d items(s) compared.\n" % (self.__itemsCompared))
+             self.__output.write("%10d inline binary item(s) compared.\n" % (self.__inlineBinaryCompared))
+             self.__output.write("%10d binary item(s) compared.\n" % (self.__binaryItemsCompared))
+             self.__output.write("%10d byte(s) compared.\n" % (self.__bytesCompared))
+             self.__output.write("%10d excluded tag(s).\n" % (self.__excludedTags))
 
        # ---
        # Print warnings if they want.
@@ -289,6 +294,10 @@ class DicomStudyCompare():
                          seriesInstanceUID, 
                          sopInstanceUID)
 
+       # Check for sequence  
+       if attr1.vr() == "SQ":
+          self.__sequencesCompared += 1
+
        # ---
        # Check number of items.
        # ---
@@ -421,7 +430,7 @@ class DicomStudyCompare():
              
        bid1.close()
        bid2.close()
-       self.__binaryTagsCompared += 1
+       self.__binaryItemsCompared += 1
  
    def __checkInlineBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
  
@@ -431,7 +440,7 @@ class DicomStudyCompare():
                     seriesInstanceUID, 
                     sopInstanceUID)
  
-       self.__inlineBinaryTagsCompared += 1
+       self.__inlineBinaryCompared += 1
 
 # -----------------------------------------------------------------------------
 # main

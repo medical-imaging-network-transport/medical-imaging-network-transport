@@ -69,7 +69,7 @@ class DicomAttribute():
    SQ_DELIMITATION_TAG         = "fffee0dd"
    
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
-   binaryVRs   = ("OB", "OW", "UN")
+   binaryVRs   = ("OB", "OW", "UN", "FL", "FD")
    
    # Other Binary VRs that are represented as text for clarity
    # ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT")
@@ -80,6 +80,7 @@ class DicomAttribute():
        self.__vr     = ""
        self.__vl     = -1
        self.__val    = ""
+       self.__bytes  = ""
        self.__dicom  = ""
        self.__offset = -1
        self.__items  = []
@@ -151,6 +152,7 @@ class DicomAttribute():
    def vr (self)      : return self.__vr
    def vl (self)      : return self.__vl
    def val(self)      : return self.__val
+   def bytes(self)    : return self.__bytes
    def bytesRead(self): return self.__bytesRead
    def hasBinary(self): return self.__dicom != ""
 
@@ -166,12 +168,12 @@ class DicomAttribute():
        return binary
 
    def valstr(self):
-       if self.isPixelData()      : return "<Pixel Data>"
-       elif self.isBinary()       : return "<Binary Data>"
-       elif self.isUnknown()      : return "<Unknown>"
-       elif self.isSequenceStart(): return "<Sequence Data>"
-       elif self.__val != ""      : return self.__val
-       else                       : return "None"
+       if self.isPixelData()                         : return "<Pixel Data>"
+       elif self.isBinary() and self.__val == None   : return "<Binary Data>"
+       elif self.isUnknown()                         : return "<Unknown>"
+       elif self.isSequenceStart()                   : return "<Sequence Data>"
+       elif self.__val != ""                         : return self.__val
+       else                                          : return "None"
 
    def tagName(self):
        element = self.__dataDictionary.elementByTag(self.__tag)
@@ -213,9 +215,10 @@ class DicomAttribute():
        # ---
        # If the promotion changes the val from inline binary to text, we need to unpack again.
        # ---
-       if self.__val != "":
-          self.__val = base64.b64decode(self.__val)
+       if self.__bytes != "":
+          self.__val = base64.b64decode(self.__bytes)
           self.__unpackToString()
+          self.__bytes = ""
 
    def debug(self, output=None, indent=""):
 
@@ -223,7 +226,7 @@ class DicomAttribute():
           print indent+"tag =", self.__tag, "vr =", self.__vr, "vl = %7d" % self.__vl,
        else:
           output.write(indent+"tag = "+self.__tag+" vr = "+self.__vr+" vl = %7d " % self.__vl)
-       if self.__val != "": 
+       if self.__val != "" or self.__bytes != "": 
           if output==None:
              print "val =", self.valstr(),
           else:
@@ -327,11 +330,17 @@ class DicomAttribute():
           # Store small binaries as inline base64
           if self.__vl <= self.MAX_BINARY_LENGTH:
              val = self.__readDicom(dcm, self.__vl)
-             self.__val = base64.b64encode(val)
-             
+             self.__bytes = base64.b64encode(val)
+             if self.__vr == "FD" or self.__vr == "FL": 
+                self.__val = val
+                self.__unpackToString()
+             else:
+                self.__val = None
+            
           # Store long binaries as a filename and an offset
-          else:
-             self.__val = None    
+          else:    
+             self.__val = None
+             self.__bytes = None
              self.__dicom = dcm.name             
              self.__offset = dcm.tell()             
              self.__bytesRead += self.__vl
@@ -416,3 +425,4 @@ class DicomAttribute():
            val = self.__transferSyntax.unpack(type, self.__val[i:i+size])
            vals += str(format % val)+"\\"    
        return vals[0:-1]
+
