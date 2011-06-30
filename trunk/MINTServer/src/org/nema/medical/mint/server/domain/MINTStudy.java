@@ -118,7 +118,7 @@ public class MINTStudy implements Serializable {
 	
 	// Current version of study.
 	@Column(nullable = false)
-	private String studyVersion;
+	private int studyVersion;
 
 	// DICOM StudyInstanceUID (0020,0010) T1
 	// Unique identifier for the Study.
@@ -171,7 +171,7 @@ public class MINTStudy implements Serializable {
 		return dateTime;
 	}
 	
-	public String getStudyVersion() {
+	public int getStudyVersion() {
 		return studyVersion;
 	}
 
@@ -212,7 +212,7 @@ public class MINTStudy implements Serializable {
 		this.dateTime = dateTime;
 	}
 	
-	public void setStudyVersion(String studyVersion) {
+	public void setStudyVersion(int studyVersion) {
 		this.studyVersion = studyVersion;
 	}
 

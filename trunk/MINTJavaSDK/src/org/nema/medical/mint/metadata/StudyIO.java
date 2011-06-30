@@ -207,23 +207,23 @@ public class StudyIO {
 		data.writeTo(out);
 	}
 
-    // used to convert Attribute.tag int to hex
+    // used to convert int to hex for a DICOM tag
 	static public String int2hex(int tag) {
-        return String.format("%08x", tag);
+        return String.format("%08X", tag);
     }
 
-    // used to convert Attribute.tag hex to int
+    // used to convert hex to int for a DICOM tag
 	static public int hex2int(String hex) {
-        if (hex.length()>8) throw new NumberFormatException("max value is 32 bytes (unsigned)");
+        if (hex.length()>8) throw new NumberFormatException("max value is 32 bits (unsigned)");
         return (int)Long.parseLong(hex,16);
     }
 
-    // used to convert Attribute.tag int to hex
+    // used to convert Attribute.bid int to String
 	static public String int2bid(int tag) {
         return (tag >= 0) ? String.format("%d", tag) : "";
     }
 
-    // used to convert Attribute.tag hex to int
+    // used to convert Attribute.bid String to int
 	static public int bid2int(String bid) {
 		if (bid == null || bid.length() == 0) {
 			return -1;
@@ -232,12 +232,12 @@ public class StudyIO {
 		}
     }
 	
-	// used to convert Attribute.tag int to hex
+	// used to convert Attribute.bsize int to String
 	static public String int2bsize(int tag) {
         return (tag >= 0) ? String.format("%d", tag) : "";
     }
 
-    // used to convert Attribute.tag hex to int
+    // used to convert Attribute.bsize String to int
 	static public int bsize2int(String bsize) {
 		if (bsize == null || bsize.length() == 0) {
 			return -1;
@@ -255,4 +255,30 @@ public class StudyIO {
 	static public String base64encode(byte[] bytes) {
 		return new String(Base64.encodeBase64(bytes));
     }
+	
+    // used to convert Metadata.version int to String
+	static public String int2version(int version) {
+        return (version >= 0) ? String.format("%d", version) : "";
+    }
+
+    // used to convert Metadata.version String to int
+	static public int version2int(String version) {
+		if (version == null || version.length() == 0) {
+			return -1;
+		} else {
+	        return Integer.parseInt(version);		
+		}
+    }
+	
+	static public String boolean2ret(boolean ret) {
+		return ret ? "RET" : "";
+	}
+	
+	static public boolean ret2boolean(String ret) {
+		if(null == ret || ret.length() == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }

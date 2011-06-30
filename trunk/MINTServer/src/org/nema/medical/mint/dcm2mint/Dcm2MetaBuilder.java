@@ -16,6 +16,7 @@
 package org.nema.medical.mint.dcm2mint;
 
 import org.dcm4che2.data.*;
+import org.nema.medical.mint.datadictionary.LevelAttributes;
 import org.nema.medical.mint.metadata.*;
 import org.nema.medical.mint.utils.StudyUtils;
 
@@ -23,7 +24,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import static org.nema.medical.mint.utils.Iter.iter;
 
@@ -120,8 +120,8 @@ public final class Dcm2MetaBuilder {
    precedence.
     */
    public Dcm2MetaBuilder(
-           final Set<Integer> studyLevelTags,
-           final Set<Integer> seriesLevelTags,
+           final LevelAttributes studyLevelTags,
+           final LevelAttributes seriesLevelTags,
            final MetaBinaryPair metaBinaryPair) {
        this.studyLevelTags = studyLevelTags;
        this.seriesLevelTags = seriesLevelTags;
@@ -226,13 +226,13 @@ public final class Dcm2MetaBuilder {
     private void handleTopElems(final File dcmPath, final DicomObject dcmObj, final Series series,
             final Instance instance, final DicomElement dcmElement, final TransferSyntax transferSyntax) {
         final int tag = dcmElement.tag();
-         if (studyLevelTags.contains(tag)) {
+         if (studyLevelTags.containsTag(tag)) {
              if (metaBinaryPair.getMetadata().getAttribute(tag) == null) {
                  handleDICOMElement(dcmPath, dcmElement, dcmObj, metaBinaryPair.getMetadata(), emptyTagPath,
                                     transferSyntax);
              }
          }
-         else if (seriesLevelTags.contains(tag)) {
+         else if (seriesLevelTags.containsTag(tag)) {
              if (series.getAttribute(tag) == null) {
                  handleDICOMElement(dcmPath, dcmElement, dcmObj, series, emptyTagPath, transferSyntax);
              }
@@ -531,8 +531,8 @@ public final class Dcm2MetaBuilder {
 
      private static final int[] emptyTagPath = new int[0];
 
-     private final Set<Integer> studyLevelTags;
-     private final Set<Integer> seriesLevelTags;
+     private final LevelAttributes studyLevelTags;
+     private final LevelAttributes seriesLevelTags;
      private final MetaBinaryPair metaBinaryPair;
      private int binaryInlineThreshold = 256;
      private boolean p10Aware = true;

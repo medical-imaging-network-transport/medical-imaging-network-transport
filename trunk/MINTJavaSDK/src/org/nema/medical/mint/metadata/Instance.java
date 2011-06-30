@@ -40,7 +40,7 @@ public class Instance implements AttributeContainer, Excludable
     private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
     private String sopInstanceUID;
     private String transferSyntaxUID;
-    private String exclude;
+    private boolean excluded;
 
     /**
      * @param tag
@@ -126,17 +126,17 @@ public class Instance implements AttributeContainer, Excludable
      * @return value
      */
     @Override
-    public String getExclude() {
-        return exclude;
+    public boolean isExcluded() {
+        return excluded;
     }
 
     /**
      * Set the 'exclude' attribute value.
      *
-     * @param exclude
+     * @param excluded
      */
-    public void setExclude(String exclude) {
-        this.exclude = exclude;
+    public void setExcluded(boolean excluded) {
+        this.excluded = excluded;
     }
 
     //
@@ -146,7 +146,7 @@ public class Instance implements AttributeContainer, Excludable
         Instance instance = new Instance();
         if (data.hasSopInstanceUid()) instance.setSOPInstanceUID(data.getSopInstanceUid());
         if (data.hasTransferSyntaxUid()) instance.setTransferSyntaxUID(data.getTransferSyntaxUid());
-        if (data.hasExclude()) instance.setExclude(data.getExclude());
+        if (data.hasExcluded()) instance.setExcluded(data.getExcluded());
         for (AttributeData attrData : data.getAttributesList()) {
             instance.putAttribute(Attribute.fromGPB(attrData));
         }
@@ -161,9 +161,7 @@ public class Instance implements AttributeContainer, Excludable
         if (this.transferSyntaxUID != null) {
             builder.setTransferSyntaxUid(this.transferSyntaxUID);
         }
-        if (this.exclude != null) {
-            builder.setExclude(this.exclude);
-        }
+        builder.setExcluded(this.excluded);
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
         }

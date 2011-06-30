@@ -121,8 +121,7 @@ public class StudiesController {
         			lastUpdated = foundStudy.getDateTime();
         		}
                 final SearchResultStudy studySearchResult = new SearchResultStudy(
-                        foundStudy.getID(), lastUpdated,
-                        Integer.parseInt(foundStudy.getStudyVersion()));
+                        foundStudy.getID(), lastUpdated, foundStudy.getStudyVersion());
         		searchResults.addStudy(studySearchResult);
         	}
     		final IBindingFactory bfact = BindingDirectory.getFactory("studySearchResults", SearchResults.class);

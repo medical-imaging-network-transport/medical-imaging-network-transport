@@ -16,8 +16,7 @@
 
 package org.nema.medical.mint.datadictionary;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.math.BigDecimal;
 
 /**
  * Schema fragment(s) for this class:
@@ -29,29 +28,17 @@ import java.util.HashSet;
  *     &lt;xs:element type="ns:series-attributesType" name="series-attributes" minOccurs="1"/>
  *   &lt;/xs:sequence>
  *   &lt;xs:attribute type="xs:string" name="type"/>
- *   &lt;xs:attribute type="xs:float" name="version"/>
+ *   &lt;xs:attribute type="xs:decimal" name="version"/>
  * &lt;/xs:complexType>
  * </pre>
  */
 public class MetadataType
 {
     private AttributesType attributes;
-    private StudyAttributesType studyAttributes;
-    private SeriesAttributesType seriesAttributes;
+    private LevelAttributes studyAttributes;
+    private LevelAttributes seriesAttributes;
     private String type;
-    private Float version;
-
-    /**
-     * Convenience method
-     */
-    //TODO Should really refactor StudyAttributesType & SeriesAttributesType so that we don't need this method
-    public static final Collection<Integer> extractTagSet(final Collection<AttributeType> attributes) {
-        final Collection<Integer> attributeTags = new HashSet<Integer>(attributes.size());
-        for (final AttributeType attributeType: attributes) {
-            attributeTags.add(Integer.valueOf(attributeType.getTag(), 16));
-        }
-        return attributeTags;
-    }
+    private BigDecimal version;
 
     /**
      * Get the 'attributes' element value.
@@ -76,16 +63,16 @@ public class MetadataType
      * 
      * @return value
      */
-    public StudyAttributesType getStudyAttributes() {
+    public LevelAttributes getStudyAttributes() {
         return studyAttributes;
     }
 
     /** 
-     * Set the 'study-attributes' element value.
+     * List the 'study-attributes' element value.
      * 
      * @param studyAttributes
      */
-    public void setStudyAttributes(StudyAttributesType studyAttributes) {
+    public void setStudyAttributes(LevelAttributes studyAttributes) {
         this.studyAttributes = studyAttributes;
     }
 
@@ -94,7 +81,7 @@ public class MetadataType
      * 
      * @return value
      */
-    public SeriesAttributesType getSeriesAttributes() {
+    public LevelAttributes getSeriesAttributes() {
         return seriesAttributes;
     }
 
@@ -103,7 +90,7 @@ public class MetadataType
      * 
      * @param seriesAttributes
      */
-    public void setSeriesAttributes(SeriesAttributesType seriesAttributes) {
+    public void setSeriesAttributes(LevelAttributes seriesAttributes) {
         this.seriesAttributes = seriesAttributes;
     }
 
@@ -130,7 +117,7 @@ public class MetadataType
      * 
      * @return value
      */
-    public float getVersion() {
+    public BigDecimal getVersion() {
         return version;
     }
 
@@ -139,7 +126,7 @@ public class MetadataType
      * 
      * @param version
      */
-    public void setVersion(float version) {
+    public void setVersion(BigDecimal version) {
         this.version = version;
     }
 }

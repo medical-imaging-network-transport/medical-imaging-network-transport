@@ -47,7 +47,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	private final File jobFolder;
 	private final File studyFolder;
 	
-	private final String oldVersion;
+	private final int oldVersion;
     private final String remoteUser;
     private final String remoteHost;
 	private final JobInfoDAO jobInfoDAO;
@@ -64,7 +64,7 @@ public class StudyUpdateProcessor extends TimerTask {
 	 * @param studyDAO needed to update the database
 	 */
 	public StudyUpdateProcessor(final File jobFolder, final File studyFolder,
-                                final Map<String, MetadataType> availableTypes, final String oldVersion,
+                                final Map<String, MetadataType> availableTypes, final int oldVersion,
                                 final String remoteUser, final String remoteHost,
                                 final JobInfoDAO jobInfoDAO, final StudyDAO studyDAO, final ChangeDAO updateDAO) {
 		this.jobFolder = jobFolder;
@@ -123,9 +123,9 @@ public class StudyUpdateProcessor extends TimerTask {
                     throw new RuntimeException("Invalid study type " + typeName);
                 }
 
-                if (newStudy.getVersion() != null) {
+                if (newStudy.getVersion() >= 0) {
                     throw new RuntimeException(
-                            "Study update data specifies a version; versions are controlled by server, not client");
+                            "Study update data specifies a version [" + newStudy.getVersion() + "]; versions are controlled by server, not client");
                 }
 
                 try {
@@ -157,8 +157,8 @@ public class StudyUpdateProcessor extends TimerTask {
                  * update is for a version that is not the most recent and
                  * should not be applied.
                  */
-                if (existingStudy != null && (existingStudy.getVersion() == null
-                        || !existingStudy.getVersion().equals(oldVersion))) {
+                if (existingStudy != null && (existingStudy.getVersion() < 0
+                        || existingStudy.getVersion() != oldVersion)) {
                     throw new RuntimeException("Study update data is of a different version than the current study, " +
                             "cannot update if versions do not match. (" + existingStudy.getVersion() + " : "
                             + oldVersion + ")");
@@ -207,7 +207,7 @@ public class StudyUpdateProcessor extends TimerTask {
                     StudyUtils.mergeStudy(existingStudy, newStudy, excludedBids);
 
                     // Get next version number
-                    existingStudy.setVersion(StudyUtils.getNextVersion(existingStudy.getVersion()));
+                    existingStudy.setVersion(existingStudy.getVersion() + 1);
 		        } else {
 					/*
 					 * If no existing study, new study becomes the existing

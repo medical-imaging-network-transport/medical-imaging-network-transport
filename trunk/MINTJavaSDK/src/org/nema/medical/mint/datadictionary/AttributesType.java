@@ -16,8 +16,9 @@
 
 package org.nema.medical.mint.datadictionary;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.nema.medical.mint.metadata.StudyIO;
+
+import java.util.*;
 
 /** 
  * Schema fragment(s) for this class:
@@ -30,27 +31,59 @@ import java.util.List;
  * &lt;/xs:complexType>
  * </pre>
  */
-public class AttributesType
+public class AttributesType implements Iterable<ElementType>
 {
-    private List<ElementType> elementList = new ArrayList<ElementType>();
-    private String unknownAttributes;
+    private Map<Integer, ElementType> elementMap = new HashMap<Integer, ElementType>();
+    private UnknownAttribute unknownAttributes;
 
-    /** 
-     * Get the list of 'element' element items.
-     * 
-     * @return list
-     */
-    public List<ElementType> getElements() {
-        return elementList;
+    public enum UnknownAttribute {
+        REJECT, ACCEPT
     }
 
     /** 
-     * Set the list of 'element' element items.
+     * Get the {@link ElementType} elements in this type.
      * 
-     * @param list
+     * @return list
      */
-    public void setElements(List<ElementType> list) {
-        elementList = list;
+    @Override
+    public Iterator<ElementType> iterator() {
+        return elementMap.values().iterator();
+    }
+
+    public boolean containsElement(final int tag) {
+        return elementMap.containsKey(tag);
+    }
+
+    public ElementType getElement(final int tag) {
+        return elementMap.get(tag);
+    }
+
+    /**
+     * Add an element item. The element tag may be a regular tag or a template such as "002031xx".
+     * 
+     * @param element
+     */
+    public void addElement(final ElementType element) {
+        addElements(element.getStringTag().toCharArray(), 0, element);
+    }
+
+    private void addElements(final char[] chars, final int curPos, final ElementType element) {
+        if (curPos == chars.length) {
+            //Parse as a long, then chop off the top 32 bits to arrive at the right (possibly negative) int value
+            elementMap.put(StudyIO.hex2int(String.valueOf(chars)), element);
+        } else if (chars[curPos] == 'x') {
+            for (char curChar = '0'; curChar <= '9'; ++curChar) {
+                chars[curPos] = curChar;
+                addElements(chars, curPos + 1, element);
+            }
+            for (char curChar = 'A'; curChar <= 'F'; ++curChar) {
+                chars[curPos] = curChar;
+                addElements(chars, curPos + 1, element);
+            }
+            chars[curPos] = 'x';
+        } else {
+            addElements(chars, curPos + 1, element);
+        }
     }
 
     /** 
@@ -58,7 +91,7 @@ public class AttributesType
      * 
      * @return value
      */
-    public String getUnknownAttributes() {
+    public UnknownAttribute getUnknownAttributes() {
         return unknownAttributes;
     }
 
@@ -67,7 +100,7 @@ public class AttributesType
      * 
      * @param unknownAttributes
      */
-    public void setUnknownAttributes(String unknownAttributes) {
+    public void setUnknownAttributes(final UnknownAttribute unknownAttributes) {
         this.unknownAttributes = unknownAttributes;
     }
 }

@@ -79,7 +79,7 @@ public class StudyDAO extends HibernateDaoSupport {
         }
 
         //Eliminate deleted studies from search results
-        detachedCriteria.add(Restrictions.ne("studyVersion", "-1"));
+        detachedCriteria.add(Restrictions.ne("studyVersion", -1));
 
         int firstResult = (offset-1) * limit;
         final List<MINTStudy> list = (List<MINTStudy>)getHibernateTemplate().findByCriteria(detachedCriteria,firstResult,limit);

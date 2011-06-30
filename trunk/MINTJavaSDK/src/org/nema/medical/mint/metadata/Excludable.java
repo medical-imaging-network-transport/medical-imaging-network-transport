@@ -28,5 +28,5 @@ public interface Excludable {
      *
      * @return exclude value
      */
-    public String getExclude();
+    public boolean isExcluded();
 }
