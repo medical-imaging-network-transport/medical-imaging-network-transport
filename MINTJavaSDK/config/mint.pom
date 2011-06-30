@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nema-medical</groupId>
   <artifactId>mint</artifactId>
-  <name>log4j</name>
-  <version>1.0.1</version>
+  <name>mint</name>
+  <version>1.2.0</version>
   <url>http://code.google.com/p/medical-imaging-network-transport/</url>
   <description>Medical Imaging Network Transport Java SDK</description>
   <licenses>
