@@ -78,7 +78,7 @@ public class Utils {
         final MINTStudy study = studyDAO.findStudy(studyUUID);
 
         if (study != null) {
-            if (study.getStudyVersion().equals("-1")) {
+            if (study.getStudyVersion() == -1) {
                 LOG.error("Requested study has previously been deleted: " + studyUUID);
                 response.sendError(HttpServletResponse.SC_GONE, "Invalid study requested: deleted");
                 return Utils.StudyStatus.DELETED;

@@ -52,65 +52,64 @@ public class Attribute implements Cloneable, Excludable {
     private int bsize = -1;
     private int frameCount = 1; // index must be a positive integer
     private byte[] bytes;
-    //TODO unclear what the contents of the exclude String are supposed to mean; currently used in just a boolean fashion
-    private String exclude;
+    private boolean excluded;
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final Attribute attribute = (Attribute) o;
-
-        if (tag != attribute.tag) {
-            return false;
-        }
-        if (vr != attribute.vr && (vr == null || !vr.equals(attribute.vr))) {
-            return false;
-        }
-        if (!Arrays.equals(bytes, attribute.bytes)) {
-            return false;
-        }
-        if (val != attribute.val && (val == null || !val.equals(attribute.val))) {
-            return false;
-        }
-        if (bid != attribute.bid) {
-            return false;
-        }
-        if (bsize != attribute.bsize) {
-            return false;
-        }
-        if (frameCount != attribute.frameCount) {
-            return false;
-        }
-        if (exclude != attribute.exclude && (exclude == null || !exclude.equals(attribute.exclude))) {
-            return false;
-        }
-        if (!items.equals(attribute.items)) {
-            return false;
-        }
-
-        return true;
-    }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Attribute other = (Attribute) obj;
+		if (bid != other.bid)
+			return false;
+		if (bsize != other.bsize)
+			return false;
+		if (!Arrays.equals(bytes, other.bytes))
+			return false;
+		if (excluded != other.excluded)
+			return false;
+		if (frameCount != other.frameCount)
+			return false;
+		if (items == null) {
+			if (other.items != null)
+				return false;
+		} else if (!items.equals(other.items))
+			return false;
+		if (tag != other.tag)
+			return false;
+		if (val == null) {
+			if (other.val != null)
+				return false;
+		} else if (!val.equals(other.val))
+			return false;
+		if (vr == null) {
+			if (other.vr != null)
+				return false;
+		} else if (!vr.equals(other.vr))
+			return false;
+		return true;
+	}
 
     @Override
-    public int hashCode() {
-        int result = items.hashCode();
-        result = 31 * result + tag;
-        result = 31 * result + (vr != null ? vr.hashCode() : 0);
-        result = 31 * result + (val != null ? val.hashCode() : 0);
-        result = 31 * result + bid;
-        result = 31 * result + bsize;
-        result = 31 * result + frameCount;
-        result = 31 * result + (bytes != null ? Arrays.hashCode(bytes) : 0);
-        result = 31 * result + (exclude != null ? exclude.hashCode() : 0);
-        return result;
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + bid;
+		result = prime * result + bsize;
+		result = prime * result + Arrays.hashCode(bytes);
+		result = prime * result + (excluded ? 1231 : 1237);
+		result = prime * result + frameCount;
+		result = prime * result + ((items == null) ? 0 : items.hashCode());
+		result = prime * result + tag;
+		result = prime * result + ((val == null) ? 0 : val.hashCode());
+		result = prime * result + ((vr == null) ? 0 : vr.hashCode());
+		return result;
+	}
 
+    
     @Override
     public Object clone() throws CloneNotSupportedException {
         final Attribute clone = (Attribute) super.clone();
@@ -291,17 +290,17 @@ public class Attribute implements Cloneable, Excludable {
      * @return exclude
      */
     @Override
-    public String getExclude() {
-        return exclude;
+    public boolean isExcluded() {
+        return excluded;
     }
 
     /**
      * Set the 'exclude' attribute value.
      *
-     * @param exclude
+     * @param excluded
      */
-    public void setExclude(String exclude) {
-        this.exclude = exclude;
+    public void setExcluded(boolean excluded) {
+        this.excluded = excluded;
     }
 
     //
@@ -312,7 +311,7 @@ public class Attribute implements Cloneable, Excludable {
         attr.setTag(attrData.getTag());
         attr.setVr(attrData.getVr());
         if (attrData.hasStringValue()) attr.setVal(attrData.getStringValue());
-        if (attrData.hasExclude()) attr.setExclude(attrData.getStringValue());
+        if (attrData.hasExcluded()) attr.setExcluded(attrData.getExcluded());
         if (attrData.hasBinaryItemId()) { attr.setBid(attrData.getBinaryItemId()); }
         if (attrData.hasBinaryItemSize()) { attr.setBinarySize(attrData.getBinaryItemSize()); }
         if (attrData.hasFrameCount()) { attr.setFrameCount(attrData.getFrameCount()); }
@@ -331,7 +330,7 @@ public class Attribute implements Cloneable, Excludable {
         if (this.frameCount > 1) builder.setFrameCount(this.frameCount);
         if (this.vr != null) builder.setVr(this.vr);
         if (this.val != null) builder.setStringValue(this.val);
-        if (this.exclude != null) builder.setExclude(this.val);
+        builder.setExcluded(this.excluded);
         if (this.bytes != null) builder.setBytes(ByteString.copyFrom(this.bytes));
         for (Item item : this.items) {
             builder.addItems(item.toGPB());

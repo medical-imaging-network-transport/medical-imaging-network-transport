@@ -15,15 +15,13 @@
  */
 package org.nema.medical.mint.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class StudyIOTest {
 
@@ -78,8 +76,8 @@ public class StudyIOTest {
 	
 	@Test
 	public void textHex2Int() {
-		assertEquals("7fffffff", StudyIO.int2hex(Integer.MAX_VALUE));
-		assertEquals(Integer.MAX_VALUE,StudyIO.hex2int("7fffffff"));
+		assertEquals("7FFFFFFF", StudyIO.int2hex(Integer.MAX_VALUE));
+		assertEquals(Integer.MAX_VALUE,StudyIO.hex2int("7FFFFFFF"));
 		
 		assertEquals("80000000", StudyIO.int2hex(Integer.MIN_VALUE));
 		assertEquals(Integer.MIN_VALUE,StudyIO.hex2int("80000000"));
@@ -90,29 +88,21 @@ public class StudyIOTest {
 		assertEquals("00000001", StudyIO.int2hex(1));
 		assertEquals(1,StudyIO.hex2int("00000001"));
 
-		assertEquals("ffffffff", StudyIO.int2hex(-1));
+		assertEquals("FFFFFFFF", StudyIO.int2hex(-1));
 		assertEquals(-1,StudyIO.hex2int("FFFFFFFF"));
 		
-		assertEquals("7cdea9ff", StudyIO.int2hex(2094967295));
-		assertEquals(2094967295,StudyIO.hex2int("7cdea9ff"));
+		assertEquals("7CDEA9FF", StudyIO.int2hex(2094967295));
+		assertEquals(2094967295,StudyIO.hex2int("7CDEA9FF"));
 		
-		assertEquals("0000000b", StudyIO.int2hex(11));
-		assertEquals(11,StudyIO.hex2int("0000000b"));		
+		assertEquals("0000000B", StudyIO.int2hex(11));
+		assertEquals(11,StudyIO.hex2int("0000000B"));
 	}
 
-	@Test //(expected=NumberFormatException.class)
+	@Test(expected=NumberFormatException.class)
 	public void testHex2IntOverflow() {
-		try {
-			StudyIO.hex2int("1ffffffff");
-			// necessary because maven surefire ignores expected annotation param
-			fail("expected NumberFormatException.class");
-		} catch (NumberFormatException e){
-			// expected
-		}
+        StudyIO.hex2int("1FFFFFFFF");
 	}
 
-	
-	
 	private static File createTempFile(String prefix, String suffix) {
 		File tempFile = null;
 		try {

@@ -18,6 +18,7 @@ package org.nema.medical.mint.datadictionary;
 import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import org.junit.Test;
 
@@ -46,82 +47,50 @@ public class DataDictionaryIOTest {
 		//Set up the <metadata> tag
 		MetadataType dataDictionary = new MetadataType();
 		dataDictionary.setType("DICOM");
-		dataDictionary.setVersion(1.0f);
+		dataDictionary.setVersion(new BigDecimal(1.0));
 		AttributesType attributes = new AttributesType();
-		attributes.setUnknownAttributes("accept");
+		attributes.setUnknownAttributes(AttributesType.UnknownAttribute.ACCEPT);
 
 		//Set up the <metadata><attributes> tag
 		ArrayList<ElementType> elements = new ArrayList<ElementType>();
 		
 		//Set up the <metadata><attributes><elements> tags
 		ElementType et1 = new ElementType();
-		et1.setTag("00000000");
+		et1.setTag(0x00000000);
 		et1.setKeyword("CommandGroupLength");
 		et1.setVr("UL");
 		et1.setVm("1");
-		et1.setRet("");
+		et1.setRetired(false);
 		et1.setString("Command Group Length");
+        attributes.addElement(et1);
 		
 		ElementType et2 = new ElementType();
-		et2.setTag("00000001");
+		et2.setTag(0x00000001);
 		et2.setKeyword("CommandLengthToEnd");
 		et2.setVr("UL");
 		et2.setVm("1");
-		et2.setRet("RET");
+		et2.setRetired(true);
 		et2.setString("Length to End");
-		
-		elements.add(et1);
-		elements.add(et2);
-		attributes.setElements(elements);
-		
-		
+		attributes.addElement(et2);
+
 		//Set up the <metadata><study-attributes> tag
-		StudyAttributesType studyAttributes = new StudyAttributesType();
+		LevelAttributes studyAttributes = new LevelAttributes();
 		
 		//Set up the <metadata><study-attributes><attribute> tags
-		ArrayList<AttributeType> studyAttributesList = new ArrayList<AttributeType>();
-		AttributeType at1 = new AttributeType();
-		at1.setTag("00080020");
-		at1.setDesc("Study Date");
-	    at1.setString("");
-	    
-		AttributeType at2 = new AttributeType();
-		at2.setTag("00080030");
-		at2.setDesc("Study Time");
-		at2.setString("");
-		
-		studyAttributesList.add(at1);
-		studyAttributesList.add(at2);
-		
-		studyAttributes.setAttributes(studyAttributesList);
-		
-		
+        studyAttributes.addAttributeType(0x00080020, "Study Date");
+        studyAttributes.addAttributeType(0x00080030, "Study Time");
+
 		//Set up the <metadata><series-attributes> tag
-		SeriesAttributesType seriesAttributes = new SeriesAttributesType();
+		LevelAttributes seriesAttributes = new LevelAttributes();
 		
 		//Set up the <metadata><series-attributes><attribute> tags
-		ArrayList<AttributeType> seriesAttributesList = new ArrayList<AttributeType>();
-		AttributeType at11 = new AttributeType();
-		at11.setTag("00080020");
-		at11.setDesc("Study Date");
-		at11.setString("");
-		
-		AttributeType at22 = new AttributeType();
-		at22.setTag("00080030");
-		at22.setDesc("Study Time");
-		at22.setString("");
-		
-		seriesAttributesList.add(at11);
-		seriesAttributesList.add(at22);
-		
-		seriesAttributes.setAttributes(seriesAttributesList);
-		
-		
+        seriesAttributes.addAttributeType(0x00080020, "Study Date");
+        seriesAttributes.addAttributeType(0x00080030, "Study Time");
+
 		dataDictionary.setAttributes(attributes);
 		dataDictionary.setStudyAttributes(studyAttributes);
 		dataDictionary.setSeriesAttributes(seriesAttributes);
-		
-		
+
 		return dataDictionary;
 	}
 	

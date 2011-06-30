@@ -83,20 +83,13 @@ public class StudyValidationTest {
                 "</study>";
         study = StudyIO.parseFromXML(new ByteArrayInputStream(xml.getBytes()));
 
-        final StudyAttributesType studyAttrType = new StudyAttributesType();
-        final List<AttributeType> studyAttributes = createAttributeTypes(Arrays.asList("00080020","00080051"));
-        studyAttrType.setAttributes(studyAttributes);
+        final LevelAttributes studyAttrType = createAttributeTypes(Arrays.asList(0x00080020, 0x00080051));
+        final LevelAttributes seriesAttrType = createAttributeTypes(Arrays.asList(0x00080021,0x00081072));
 
-        final SeriesAttributesType seriesAttrType = new SeriesAttributesType();
-        final List<AttributeType> seriesAttributes = createAttributeTypes(Arrays.asList("00080021","00081072"));
-        seriesAttrType.setAttributes(seriesAttributes);
-
-        final AttributesType attrType = new AttributesType();
-        attrType.setUnknownAttributes("reject");
-        final List<ElementType> attrs = createElementTypes(Arrays.asList(
-                "00020010","00080008","00080013","00080020","00080021",
-                "00080051","00081072","00081140","00081150","7fe00010"));
-        attrType.setElements(attrs);
+        final AttributesType attrType = createAttributesType(Arrays.asList(
+                0x00020010, 0x00080008, 0x00080013, 0x00080020, 0x00080021,
+                0x00080051, 0x00081072, 0x00081140, 0x00081150, 0x7fe00010));
+        attrType.setUnknownAttributes(AttributesType.UnknownAttribute.REJECT);
 
         metadataType = new MetadataType();
         metadataType.setType("DICOM");
@@ -111,22 +104,20 @@ public class StudyValidationTest {
         metadataType = null;
     }
 
-    private List<ElementType> createElementTypes(final Collection<String> tags) {
-        final List<ElementType> elementTypes = new ArrayList<ElementType>(tags.size());
-        for (final String tag: tags) {
+    private AttributesType createAttributesType(final Collection<Integer> tags) {
+        final AttributesType attrType = new AttributesType();
+        for (final Integer tag: tags) {
             final ElementType elemType = new ElementType();
             elemType.setTag(tag);
-            elementTypes.add(elemType);
+            attrType.addElement(elemType);
         }
-        return elementTypes;
+        return attrType;
     }
 
-    private List<AttributeType> createAttributeTypes(final Collection<String> tags) {
-        final List<AttributeType> attributeTypes = new ArrayList<AttributeType>(tags.size());
-        for (final String tag: tags) {
-            final AttributeType attrType = new AttributeType();
-            attrType.setTag(tag);
-            attributeTypes.add(attrType);
+    private LevelAttributes createAttributeTypes(final Collection<Integer> tags) {
+        final LevelAttributes attributeTypes = new LevelAttributes();
+        for (final int tag: tags) {
+            attributeTypes.addAttributeType(tag, null);
         }
         return attributeTypes;
     }
@@ -162,7 +153,7 @@ public class StudyValidationTest {
         final Attribute attr = new Attribute();
         attr.setTag(0x00010003);
         study.putAttribute(attr);
-        metadataType.getAttributes().setUnknownAttributes("accept");
+        metadataType.getAttributes().setUnknownAttributes(AttributesType.UnknownAttribute.ACCEPT);
         StudyValidation.validateUnknownAttributes(study, metadataType);
     }
 

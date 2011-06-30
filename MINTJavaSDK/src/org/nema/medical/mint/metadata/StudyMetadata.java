@@ -48,7 +48,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
     private String studyInstanceUID;
     private String type;
-    private String version;
+    private int version = -1;
 
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getAttribute(int)
@@ -161,7 +161,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getVersion()
 	 */
-	public String getVersion() {
+	public int getVersion() {
 		return version;
 	}
 
@@ -170,10 +170,10 @@ public class StudyMetadata implements AttributeContainer, StudySummary
      *
      * @param version
      */
-	public void setVersion(String version) {
+	public void setVersion(int version) {
 		this.version = version;
 	}
-
+	
     /* (non-Javadoc)
 	 * @see org.nema.medical.mint.metadata.StudySummary#getInstanceCount()
 	 */
@@ -262,7 +262,11 @@ public class StudyMetadata implements AttributeContainer, StudySummary
         StudyMetadata study = new StudyMetadata();
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
-        if (studyData.hasVersion()) study.setVersion(studyData.getVersion());
+        if (studyData.hasVersion()) {
+            study.setVersion(studyData.getVersion());
+        } else {
+            study.setVersion(-1);
+        }
 
         for (AttributeData attrData : studyData.getAttributesList()) {
             Attribute attr = Attribute.fromGPB(attrData);
@@ -283,7 +287,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
         if (this.type != null) {
             builder.setType(this.type);
         }
-        if (this.version != null) {
+        if (this.version >= 0) {
             builder.setVersion(this.version);
         }
         builder.setInstanceCount(getInstanceCount());

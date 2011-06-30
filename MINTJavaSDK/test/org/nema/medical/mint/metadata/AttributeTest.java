@@ -17,12 +17,10 @@
 
 package org.nema.medical.mint.metadata;
 
-import org.junit.Test;
+import org.junit.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Uli Bubenheimer
@@ -125,20 +123,16 @@ public class AttributeTest {
         attribute2.setFrameCount(2);
         assertThat(attribute1, is(attribute2));
 
-        attribute1.setExclude("");
+        attribute1.setExcluded(true);
         assertThat(attribute1, is(not(attribute2)));
         assertThat(attribute2, is(not(attribute1)));
-        attribute2.setExclude("");
+        attribute2.setExcluded(true);
         assertThat(attribute1, is(attribute2));
-        attribute2.setExclude(null);
-        attribute1.setExclude("1");
+        attribute2.setExcluded(true);
+        attribute1.setExcluded(false);
         assertThat(attribute1, is(not(attribute2)));
         assertThat(attribute2, is(not(attribute1)));
-        attribute2.setExclude("");
-        assertThat(attribute1, is(not(attribute2)));
-        attribute2.setExclude("2");
-        assertThat(attribute1, is(not(attribute2)));
-        attribute2.setExclude("1");
+        attribute2.setExcluded(false);
         assertThat(attribute1, is(attribute2));
 
         final Item item1 = new Item();
@@ -166,7 +160,7 @@ public class AttributeTest {
         attr1.setBid(1);
         attr1.setBinarySize(2);
         attr1.setBytes(new byte[]{3, 4, 5});
-        attr1.setExclude("6");
+        attr1.setExcluded(true);
         attr1.setFrameCount(7);
         attr1.setTag(0x00100002);
         attr1.setVal("8");
@@ -180,7 +174,7 @@ public class AttributeTest {
         attr2.setBid(1);
         attr2.setBinarySize(2);
         attr2.setBytes(new byte[]{3, 4, 5});
-        attr2.setExclude("6");
+        attr2.setExcluded(true);
         attr2.setFrameCount(7);
         attr2.setTag(0x00100002);
         attr2.setVal("8");
@@ -203,7 +197,7 @@ public class AttributeTest {
         attr1.setBid(1);
         attr1.setBinarySize(2);
         attr1.setBytes(new byte[]{3, 4, 5});
-        attr1.setExclude("6");
+        attr1.setExcluded(true);
         attr1.setFrameCount(7);
         attr1.setTag(0x00100002);
         attr1.setVal("8");

@@ -32,6 +32,7 @@ import org.nema.medical.mint.utils.StudyUtils;
  * @author Rex
  * 
  */
+//TODO these need to be rewritten
 public class StorageUtilTest {
 	static final Logger LOG = Logger.getLogger(StorageUtilTest.class);
 
@@ -87,30 +88,6 @@ public class StorageUtilTest {
 			LOG.info("Highest Item found in '" + binaryItems.getPath()
 					+ "' is: " + highestItem);
 		}
-	}
-
-	/**
-	 * Tests the version methods in StudyUtils.
-	 */
-	@Test
-	public void testVersion() {
-        String version = StudyUtils.getBaseVersion();
-
-		assertTrue(StringUtils.isNotBlank(version));
-
-		LOG.info("1st version is: " + version);
-
-        version = StudyUtils.getNextVersion(version);
-
-		assertTrue(StringUtils.isNotBlank(version));
-
-		LOG.info("2nd version is: " + version);
-
-        version = StudyUtils.getNextVersion(version);
-
-		assertTrue(StringUtils.isNotBlank(version));
-
-		LOG.info("3rd version is: " + version);
 	}
 
 	/**

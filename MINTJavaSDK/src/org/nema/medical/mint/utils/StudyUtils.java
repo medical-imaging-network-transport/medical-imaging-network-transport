@@ -31,7 +31,7 @@ import static org.nema.medical.mint.utils.Iter.iter;
 //find
 public final class StudyUtils {
 
-    public static final String INITIAL_VERSION = "0";
+    public static final int INITIAL_VERSION = 0;
 
     /**
      * This method should pull all data from sourceStudy into destinationStudy
@@ -109,7 +109,7 @@ public final class StudyUtils {
         for (Iterator<Attribute> i = excludeStudy.attributeIterator(); i.hasNext();) {
             Attribute attribute = i.next();
 
-            if (isExclude(attribute.getExclude())) {
+            if (attribute.isExcluded()) {
                 collectBidsInAttribute(currentStudy.getAttribute(attribute.getTag()), excludedBinaryIds);
 
                 //Non null exclude string means remove it
@@ -126,7 +126,7 @@ public final class StudyUtils {
             if (currentSeries == null)
                 continue;
 
-            if (isExclude(excludeSeries.getExclude())) {
+            if (excludeSeries.isExcluded()) {
                 collectBidsInSeries(currentSeries, excludedBinaryIds);
 
                 //Non null exclude string means exclude the series from the study
@@ -137,7 +137,7 @@ public final class StudyUtils {
                 for (Iterator<Attribute> ii = excludeSeries.attributeIterator(); ii.hasNext();) {
                     Attribute attribute = ii.next();
 
-                    if (isExclude(attribute.getExclude())) {
+                    if (attribute.isExcluded()) {
                         collectBidsInAttribute(currentSeries.getAttribute(attribute.getTag()), excludedBinaryIds);
 
                         //Non null exclude string means remove it
@@ -150,7 +150,7 @@ public final class StudyUtils {
                 for (Iterator<Attribute> ii = excludeSeries.normalizedInstanceAttributeIterator(); ii.hasNext();) {
                     Attribute attribute = ii.next();
 
-                    if (isExclude(attribute.getExclude())) {
+                    if (attribute.isExcluded()) {
                         //Non null exclude string means remove it
                         collectBidsInAttribute(currentSeries.getNormalizedInstanceAttribute(attribute.getTag()), excludedBinaryIds);
 
@@ -170,7 +170,7 @@ public final class StudyUtils {
                     if (currentInstance == null)
                         continue;
 
-                    if (isExclude(excludeInstance.getExclude())) {
+                    if (excludeInstance.isExcluded()) {
                         collectBidsInAttributeContainer(currentInstance, excludedBinaryIds);
 
                         currentSeries.removeInstance(excludeInstance.getSOPInstanceUID());
@@ -180,7 +180,7 @@ public final class StudyUtils {
                         for (Iterator<Attribute> iii = excludeInstance.attributeIterator(); iii.hasNext();) {
                             Attribute attribute = iii.next();
 
-                            if (isExclude(attribute.getExclude())) {
+                            if (attribute.isExcluded()) {
                                 //Non null exclude string means remove it
                                 collectBidsInAttribute(currentInstance.getAttribute(attribute.getTag()), excludedBinaryIds);
 
@@ -334,7 +334,7 @@ public final class StudyUtils {
         while (iter.hasNext()) {
             final Excludable element = iter.next();
 
-            if (isExclude(element.getExclude())) {
+            if (element.isExcluded()) {
                 iter.remove();
             }
         }
@@ -502,29 +502,8 @@ public final class StudyUtils {
     /**
      * @return the version to set a study to on creation
      */
-    public static String getBaseVersion() {
+    public static int getBaseVersion() {
         return INITIAL_VERSION;
-    }
-
-    /**
-     * Generates the next version string after the provided string.
-     * An example of this for a 0 based index version system would be to pass in "3" and get back "4".
-     * Values don't need to be sequential but the 'next' value should at least be bigger than the current.
-     *
-     * @param current
-     * @return the next version string
-     */
-    public static String getNextVersion(String current) {
-        String result = null;
-
-        try {
-            long l = Long.parseLong(current);
-            result = Long.toString(l + 1L);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Failed to generate next version number.");
-        }
-
-        return result;
     }
 
     public static String tagString(final int tag) {

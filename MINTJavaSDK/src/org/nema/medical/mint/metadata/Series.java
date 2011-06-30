@@ -44,7 +44,7 @@ public class Series implements AttributeContainer, Excludable
     private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new TreeMap<Integer,Attribute>();
     private final Map<String, Instance> instances = new TreeMap<String, Instance>();
     private String seriesInstanceUID;
-    private String exclude;
+    private boolean excluded;
 
     /**
      * @param tag
@@ -182,17 +182,17 @@ public class Series implements AttributeContainer, Excludable
      * @return value
      */
     @Override
-    public String getExclude() {
-        return exclude;
+    public boolean isExcluded() {
+        return excluded;
     }
 
     /**
      * Set the 'exclude' attribute value.
      *
-     * @param exclude
+     * @param excluded
      */
-    public void setExclude(String exclude) {
-        this.exclude = exclude;
+    public void setExcluded(boolean excluded) {
+        this.excluded = excluded;
     }
 
 	/**
@@ -218,8 +218,8 @@ public class Series implements AttributeContainer, Excludable
         if (data.hasSeriesInstanceUid()) {
             series.setSeriesInstanceUID(data.getSeriesInstanceUid());
         }
-        if (data.hasExclude()) {
-        	series.setExclude(data.getExclude());
+        if (data.hasExcluded()) {
+        	series.setExcluded(data.getExcluded());
         }
         for (AttributeData attrData : data.getAttributesList()) {
             series.putAttribute(Attribute.fromGPB(attrData));
@@ -238,9 +238,7 @@ public class Series implements AttributeContainer, Excludable
         if (this.seriesInstanceUID != null ) {
             builder.setSeriesInstanceUid(this.seriesInstanceUID);
         }
-        if (this.exclude != null) {
-            builder.setExclude(this.exclude);
-        }
+        builder.setExcluded(this.excluded);
         builder.setInstanceCount(this.getInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());

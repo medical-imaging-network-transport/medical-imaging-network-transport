@@ -49,12 +49,12 @@ public final class GPB {
     public boolean hasType() { return hasType; }
     public java.lang.String getType() { return type_; }
     
-    // optional string version = 5;
+    // optional uint32 version = 5;
     public static final int VERSION_FIELD_NUMBER = 5;
     private boolean hasVersion;
-    private java.lang.String version_ = "";
+    private int version_ = 0;
     public boolean hasVersion() { return hasVersion; }
-    public java.lang.String getVersion() { return version_; }
+    public int getVersion() { return version_; }
     
     // optional uint32 instance_count = 6;
     public static final int INSTANCE_COUNT_FIELD_NUMBER = 6;
@@ -109,7 +109,7 @@ public final class GPB {
         output.writeString(4, getType());
       }
       if (hasVersion()) {
-        output.writeString(5, getVersion());
+        output.writeUInt32(5, getVersion());
       }
       if (hasInstanceCount()) {
         output.writeUInt32(6, getInstanceCount());
@@ -141,7 +141,7 @@ public final class GPB {
       }
       if (hasVersion()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(5, getVersion());
+          .computeUInt32Size(5, getVersion());
       }
       if (hasInstanceCount()) {
         size += com.google.protobuf.CodedOutputStream
@@ -382,8 +382,8 @@ public final class GPB {
               setType(input.readString());
               break;
             }
-            case 42: {
-              setVersion(input.readString());
+            case 40: {
+              setVersion(input.readUInt32());
               break;
             }
             case 48: {
@@ -437,24 +437,21 @@ public final class GPB {
         return this;
       }
       
-      // optional string version = 5;
+      // optional uint32 version = 5;
       public boolean hasVersion() {
         return result.hasVersion();
       }
-      public java.lang.String getVersion() {
+      public int getVersion() {
         return result.getVersion();
       }
-      public Builder setVersion(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasVersion = true;
+      public Builder setVersion(int value) {
+        result.hasVersion = true;
         result.version_ = value;
         return this;
       }
       public Builder clearVersion() {
         result.hasVersion = false;
-        result.version_ = getDefaultInstance().getVersion();
+        result.version_ = 0;
         return this;
       }
       
@@ -624,12 +621,12 @@ public final class GPB {
     public boolean hasSeriesInstanceUid() { return hasSeriesInstanceUid; }
     public java.lang.String getSeriesInstanceUid() { return seriesInstanceUid_; }
     
-    // optional string exclude = 2;
-    public static final int EXCLUDE_FIELD_NUMBER = 2;
-    private boolean hasExclude;
-    private java.lang.String exclude_ = "";
-    public boolean hasExclude() { return hasExclude; }
-    public java.lang.String getExclude() { return exclude_; }
+    // optional bool excluded = 2;
+    public static final int EXCLUDED_FIELD_NUMBER = 2;
+    private boolean hasExcluded;
+    private boolean excluded_ = false;
+    public boolean hasExcluded() { return hasExcluded; }
+    public boolean getExcluded() { return excluded_; }
     
     // optional uint32 instance_count = 6;
     public static final int INSTANCE_COUNT_FIELD_NUMBER = 6;
@@ -686,8 +683,8 @@ public final class GPB {
       if (hasSeriesInstanceUid()) {
         output.writeString(1, getSeriesInstanceUid());
       }
-      if (hasExclude()) {
-        output.writeString(2, getExclude());
+      if (hasExcluded()) {
+        output.writeBool(2, getExcluded());
       }
       for (org.nema.medical.mint.metadata.GPB.AttributeData element : getAttributesList()) {
         output.writeMessage(3, element);
@@ -714,9 +711,9 @@ public final class GPB {
         size += com.google.protobuf.CodedOutputStream
           .computeStringSize(1, getSeriesInstanceUid());
       }
-      if (hasExclude()) {
+      if (hasExcluded()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getExclude());
+          .computeBoolSize(2, getExcluded());
       }
       for (org.nema.medical.mint.metadata.GPB.AttributeData element : getAttributesList()) {
         size += com.google.protobuf.CodedOutputStream
@@ -907,8 +904,8 @@ public final class GPB {
         if (other.hasSeriesInstanceUid()) {
           setSeriesInstanceUid(other.getSeriesInstanceUid());
         }
-        if (other.hasExclude()) {
-          setExclude(other.getExclude());
+        if (other.hasExcluded()) {
+          setExcluded(other.getExcluded());
         }
         if (other.hasInstanceCount()) {
           setInstanceCount(other.getInstanceCount());
@@ -960,8 +957,8 @@ public final class GPB {
               setSeriesInstanceUid(input.readString());
               break;
             }
-            case 18: {
-              setExclude(input.readString());
+            case 16: {
+              setExcluded(input.readBool());
               break;
             }
             case 26: {
@@ -1012,24 +1009,21 @@ public final class GPB {
         return this;
       }
       
-      // optional string exclude = 2;
-      public boolean hasExclude() {
-        return result.hasExclude();
+      // optional bool excluded = 2;
+      public boolean hasExcluded() {
+        return result.hasExcluded();
       }
-      public java.lang.String getExclude() {
-        return result.getExclude();
+      public boolean getExcluded() {
+        return result.getExcluded();
       }
-      public Builder setExclude(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasExclude = true;
-        result.exclude_ = value;
+      public Builder setExcluded(boolean value) {
+        result.hasExcluded = true;
+        result.excluded_ = value;
         return this;
       }
-      public Builder clearExclude() {
-        result.hasExclude = false;
-        result.exclude_ = getDefaultInstance().getExclude();
+      public Builder clearExcluded() {
+        result.hasExcluded = false;
+        result.excluded_ = false;
         return this;
       }
       
@@ -1250,12 +1244,12 @@ public final class GPB {
     public boolean hasSopInstanceUid() { return hasSopInstanceUid; }
     public java.lang.String getSopInstanceUid() { return sopInstanceUid_; }
     
-    // optional string exclude = 2;
-    public static final int EXCLUDE_FIELD_NUMBER = 2;
-    private boolean hasExclude;
-    private java.lang.String exclude_ = "";
-    public boolean hasExclude() { return hasExclude; }
-    public java.lang.String getExclude() { return exclude_; }
+    // optional bool excluded = 2;
+    public static final int EXCLUDED_FIELD_NUMBER = 2;
+    private boolean hasExcluded;
+    private boolean excluded_ = false;
+    public boolean hasExcluded() { return hasExcluded; }
+    public boolean getExcluded() { return excluded_; }
     
     // optional string transfer_syntax_uid = 3;
     public static final int TRANSFER_SYNTAX_UID_FIELD_NUMBER = 3;
@@ -1288,8 +1282,8 @@ public final class GPB {
       if (hasSopInstanceUid()) {
         output.writeString(1, getSopInstanceUid());
       }
-      if (hasExclude()) {
-        output.writeString(2, getExclude());
+      if (hasExcluded()) {
+        output.writeBool(2, getExcluded());
       }
       if (hasTransferSyntaxUid()) {
         output.writeString(3, getTransferSyntaxUid());
@@ -1310,9 +1304,9 @@ public final class GPB {
         size += com.google.protobuf.CodedOutputStream
           .computeStringSize(1, getSopInstanceUid());
       }
-      if (hasExclude()) {
+      if (hasExcluded()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getExclude());
+          .computeBoolSize(2, getExcluded());
       }
       if (hasTransferSyntaxUid()) {
         size += com.google.protobuf.CodedOutputStream
@@ -1487,8 +1481,8 @@ public final class GPB {
         if (other.hasSopInstanceUid()) {
           setSopInstanceUid(other.getSopInstanceUid());
         }
-        if (other.hasExclude()) {
-          setExclude(other.getExclude());
+        if (other.hasExcluded()) {
+          setExcluded(other.getExcluded());
         }
         if (other.hasTransferSyntaxUid()) {
           setTransferSyntaxUid(other.getTransferSyntaxUid());
@@ -1528,8 +1522,8 @@ public final class GPB {
               setSopInstanceUid(input.readString());
               break;
             }
-            case 18: {
-              setExclude(input.readString());
+            case 16: {
+              setExcluded(input.readBool());
               break;
             }
             case 26: {
@@ -1568,24 +1562,21 @@ public final class GPB {
         return this;
       }
       
-      // optional string exclude = 2;
-      public boolean hasExclude() {
-        return result.hasExclude();
+      // optional bool excluded = 2;
+      public boolean hasExcluded() {
+        return result.hasExcluded();
       }
-      public java.lang.String getExclude() {
-        return result.getExclude();
+      public boolean getExcluded() {
+        return result.getExcluded();
       }
-      public Builder setExclude(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasExclude = true;
-        result.exclude_ = value;
+      public Builder setExcluded(boolean value) {
+        result.hasExcluded = true;
+        result.excluded_ = value;
         return this;
       }
-      public Builder clearExclude() {
-        result.hasExclude = false;
-        result.exclude_ = getDefaultInstance().getExclude();
+      public Builder clearExcluded() {
+        result.hasExcluded = false;
+        result.excluded_ = false;
         return this;
       }
       
@@ -1707,12 +1698,12 @@ public final class GPB {
     public boolean hasTag() { return hasTag; }
     public int getTag() { return tag_; }
     
-    // optional string exclude = 2;
-    public static final int EXCLUDE_FIELD_NUMBER = 2;
-    private boolean hasExclude;
-    private java.lang.String exclude_ = "";
-    public boolean hasExclude() { return hasExclude; }
-    public java.lang.String getExclude() { return exclude_; }
+    // optional bool excluded = 2;
+    public static final int EXCLUDED_FIELD_NUMBER = 2;
+    private boolean hasExcluded;
+    private boolean excluded_ = false;
+    public boolean hasExcluded() { return hasExcluded; }
+    public boolean getExcluded() { return excluded_; }
     
     // optional string vr = 3;
     public static final int VR_FIELD_NUMBER = 3;
@@ -1780,8 +1771,8 @@ public final class GPB {
       if (hasTag()) {
         output.writeUInt32(1, getTag());
       }
-      if (hasExclude()) {
-        output.writeString(2, getExclude());
+      if (hasExcluded()) {
+        output.writeBool(2, getExcluded());
       }
       if (hasVr()) {
         output.writeString(3, getVr());
@@ -1817,9 +1808,9 @@ public final class GPB {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(1, getTag());
       }
-      if (hasExclude()) {
+      if (hasExcluded()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeStringSize(2, getExclude());
+          .computeBoolSize(2, getExcluded());
       }
       if (hasVr()) {
         size += com.google.protobuf.CodedOutputStream
@@ -2014,8 +2005,8 @@ public final class GPB {
         if (other.hasTag()) {
           setTag(other.getTag());
         }
-        if (other.hasExclude()) {
-          setExclude(other.getExclude());
+        if (other.hasExcluded()) {
+          setExcluded(other.getExcluded());
         }
         if (other.hasVr()) {
           setVr(other.getVr());
@@ -2070,8 +2061,8 @@ public final class GPB {
               setTag(input.readUInt32());
               break;
             }
-            case 18: {
-              setExclude(input.readString());
+            case 16: {
+              setExcluded(input.readBool());
               break;
             }
             case 26: {
@@ -2127,24 +2118,21 @@ public final class GPB {
         return this;
       }
       
-      // optional string exclude = 2;
-      public boolean hasExclude() {
-        return result.hasExclude();
+      // optional bool excluded = 2;
+      public boolean hasExcluded() {
+        return result.hasExcluded();
       }
-      public java.lang.String getExclude() {
-        return result.getExclude();
+      public boolean getExcluded() {
+        return result.getExcluded();
       }
-      public Builder setExclude(java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  result.hasExclude = true;
-        result.exclude_ = value;
+      public Builder setExcluded(boolean value) {
+        result.hasExcluded = true;
+        result.excluded_ = value;
         return this;
       }
-      public Builder clearExclude() {
-        result.hasExclude = false;
-        result.exclude_ = getDefaultInstance().getExclude();
+      public Builder clearExcluded() {
+        result.hasExcluded = false;
+        result.excluded_ = false;
         return this;
       }
       
@@ -2695,27 +2683,28 @@ public final class GPB {
     java.lang.String[] descriptorData = {
       "\n\nmint.proto\022\rmint.metadata\"\273\001\n\tStudyDat" +
       "a\022\032\n\022study_instance_uid\030\001 \001(\t\022\014\n\004type\030\004 " +
-      "\001(\t\022\017\n\007version\030\005 \001(\t\022\026\n\016instance_count\030\006" +
+      "\001(\t\022\017\n\007version\030\005 \001(\r\022\026\n\016instance_count\030\006" +
       " \001(\r\0220\n\nattributes\030\002 \003(\0132\034.mint.metadata" +
       ".AttributeData\022)\n\006series\030\003 \003(\0132\031.mint.me" +
-      "tadata.SeriesData\"\372\001\n\nSeriesData\022\033\n\023seri" +
-      "es_instance_uid\030\001 \001(\t\022\017\n\007exclude\030\002 \001(\t\022\026" +
-      "\n\016instance_count\030\006 \001(\r\0220\n\nattributes\030\003 \003" +
-      "(\0132\034.mint.metadata.AttributeData\022D\n\036norm" +
-      "alized_instance_attributes\030\004 \003(\0132\034.mint.",
-      "metadata.AttributeData\022.\n\tinstances\030\005 \003(" +
-      "\0132\033.mint.metadata.InstanceData\"\210\001\n\014Insta" +
-      "nceData\022\030\n\020sop_instance_uid\030\001 \001(\t\022\017\n\007exc" +
-      "lude\030\002 \001(\t\022\033\n\023transfer_syntax_uid\030\003 \001(\t\022" +
-      "0\n\nattributes\030\004 \003(\0132\034.mint.metadata.Attr" +
-      "ibuteData\"\315\001\n\rAttributeData\022\013\n\003tag\030\001 \001(\r" +
-      "\022\017\n\007exclude\030\002 \001(\t\022\n\n\002vr\030\003 \001(\t\022\024\n\014string_" +
-      "value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\030\n\020b" +
-      "inary_item_size\030\t \001(\r\022\023\n\013frame_count\030\010 \001" +
-      "(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005items\030\006 \003(\0132\027.mint.",
-      "metadata.ItemData\"<\n\010ItemData\0220\n\nattribu" +
-      "tes\030\001 \003(\0132\034.mint.metadata.AttributeDataB" +
-      "\'\n\036org.nema.medical.mint.metadataB\003GPBH\001"
+      "tadata.SeriesData\"\373\001\n\nSeriesData\022\033\n\023seri" +
+      "es_instance_uid\030\001 \001(\t\022\020\n\010excluded\030\002 \001(\010\022" +
+      "\026\n\016instance_count\030\006 \001(\r\0220\n\nattributes\030\003 " +
+      "\003(\0132\034.mint.metadata.AttributeData\022D\n\036nor" +
+      "malized_instance_attributes\030\004 \003(\0132\034.mint",
+      ".metadata.AttributeData\022.\n\tinstances\030\005 \003" +
+      "(\0132\033.mint.metadata.InstanceData\"\211\001\n\014Inst" +
+      "anceData\022\030\n\020sop_instance_uid\030\001 \001(\t\022\020\n\010ex" +
+      "cluded\030\002 \001(\010\022\033\n\023transfer_syntax_uid\030\003 \001(" +
+      "\t\0220\n\nattributes\030\004 \003(\0132\034.mint.metadata.At" +
+      "tributeData\"\316\001\n\rAttributeData\022\013\n\003tag\030\001 \001" +
+      "(\r\022\020\n\010excluded\030\002 \001(\010\022\n\n\002vr\030\003 \001(\t\022\024\n\014stri" +
+      "ng_value\030\004 \001(\t\022\026\n\016binary_item_id\030\005 \001(\r\022\030" +
+      "\n\020binary_item_size\030\t \001(\r\022\023\n\013frame_count\030" +
+      "\010 \001(\r\022\r\n\005bytes\030\007 \001(\014\022&\n\005items\030\006 \003(\0132\027.mi",
+      "nt.metadata.ItemData\"<\n\010ItemData\0220\n\nattr" +
+      "ibutes\030\001 \003(\0132\034.mint.metadata.AttributeDa" +
+      "taB\'\n\036org.nema.medical.mint.metadataB\003GP" +
+      "BH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2735,7 +2724,7 @@ public final class GPB {
           internal_static_mint_metadata_SeriesData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_SeriesData_descriptor,
-              new java.lang.String[] { "SeriesInstanceUid", "Exclude", "InstanceCount", "Attributes", "NormalizedInstanceAttributes", "Instances", },
+              new java.lang.String[] { "SeriesInstanceUid", "Excluded", "InstanceCount", "Attributes", "NormalizedInstanceAttributes", "Instances", },
               org.nema.medical.mint.metadata.GPB.SeriesData.class,
               org.nema.medical.mint.metadata.GPB.SeriesData.Builder.class);
           internal_static_mint_metadata_InstanceData_descriptor =
@@ -2743,7 +2732,7 @@ public final class GPB {
           internal_static_mint_metadata_InstanceData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_InstanceData_descriptor,
-              new java.lang.String[] { "SopInstanceUid", "Exclude", "TransferSyntaxUid", "Attributes", },
+              new java.lang.String[] { "SopInstanceUid", "Excluded", "TransferSyntaxUid", "Attributes", },
               org.nema.medical.mint.metadata.GPB.InstanceData.class,
               org.nema.medical.mint.metadata.GPB.InstanceData.Builder.class);
           internal_static_mint_metadata_AttributeData_descriptor =
@@ -2751,7 +2740,7 @@ public final class GPB {
           internal_static_mint_metadata_AttributeData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_mint_metadata_AttributeData_descriptor,
-              new java.lang.String[] { "Tag", "Exclude", "Vr", "StringValue", "BinaryItemId", "BinaryItemSize", "FrameCount", "Bytes", "Items", },
+              new java.lang.String[] { "Tag", "Excluded", "Vr", "StringValue", "BinaryItemId", "BinaryItemSize", "FrameCount", "Bytes", "Items", },
               org.nema.medical.mint.metadata.GPB.AttributeData.class,
               org.nema.medical.mint.metadata.GPB.AttributeData.Builder.class);
           internal_static_mint_metadata_ItemData_descriptor =

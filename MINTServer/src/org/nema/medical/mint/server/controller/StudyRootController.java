@@ -103,8 +103,7 @@ public class StudyRootController {
 			lastUpdated = study.getDateTime();
 		}
 		
-		StudyRoot studyRoot = new StudyRoot(study.getID(), lastUpdated,
-				Integer.parseInt(study.getStudyVersion()), studyTypeFileList);
+		StudyRoot studyRoot = new StudyRoot(study.getID(), lastUpdated, study.getStudyVersion(), studyTypeFileList);
 
 		IBindingFactory bfact = BindingDirectory.getFactory("studyRoot",StudyRoot.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
@@ -152,7 +151,7 @@ public class StudyRootController {
          final MINTStudy studyData = new MINTStudy();
          studyData.setID(uuid);
          studyData.setDateTime(MINTStudy.now());
-         studyData.setStudyVersion("-1");
+         studyData.setStudyVersion(-1);
          studyDAO.updateStudy(studyData);
      }
 

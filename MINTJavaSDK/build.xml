@@ -5,7 +5,7 @@
 
     <import file="../build-common.xml" />
 
-	<target name="protoc" depends="compile" description="generates protobuf class">
+	<target name="protoc" description="generates protobuf class">
 		<exec executable="protoc" failonerror="true">
 			<arg value="--proto_path=config" />
 			<arg value="--java_out=src" />

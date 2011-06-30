@@ -46,7 +46,7 @@ public interface StudySummary {
 	 *
 	 * @return value
 	 */
-	public String getVersion();
+	public int getVersion();
 
 	/**
 	 * @return number of instances in all series

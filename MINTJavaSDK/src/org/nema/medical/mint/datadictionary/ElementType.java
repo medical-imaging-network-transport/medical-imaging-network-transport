@@ -16,7 +16,9 @@
 
 package org.nema.medical.mint.datadictionary;
 
-/** 
+import org.nema.medical.mint.metadata.StudyIO;
+
+/**
  * Schema fragment(s) for this class:
  * <pre>
  * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="elementType">
@@ -39,7 +41,7 @@ public class ElementType
     private String keyword;
     private String vr;
     private String vm;
-    private String ret;
+    private boolean retired;
 
     /** 
      * Get the extension value.
@@ -59,21 +61,42 @@ public class ElementType
         this.string = string;
     }
 
-    /** 
+    /**
      * Get the 'tag' attribute value.
+     *
+     * @return value
+     * @exception  NumberFormatException if the tag is a template, i.e. it does not have an integer representation.
+     */
+    public int getTag() throws NumberFormatException {
+        return StudyIO.hex2int(tag);
+    }
+
+    /**
+     * Set the 'tag' attribute value.
+     *
+     * @param tag
+     */
+    public void setTag(int tag) {
+        this.tag = StudyIO.int2hex(tag);
+    }
+
+
+    /** 
+     * Get the 'tag' attribute value. Besides returning an actual tag, this may return a tag template, e.g. "002031xx".
      * 
      * @return value
      */
-    public String getTag() {
+    public String getStringTag() {
         return tag;
     }
 
     /** 
-     * Set the 'tag' attribute value.
+     * Set the 'tag' attribute value. This takes a string, as tag templates may be passed, e.g. "002031xx", besides
+     * regular tags.
      * 
      * @param tag
      */
-    public void setTag(String tag) {
+    public void setStringTag(String tag) {
         this.tag = tag;
     }
 
@@ -136,16 +159,16 @@ public class ElementType
      * 
      * @return value
      */
-    public String getRet() {
-        return ret;
+    public boolean getRetired() {
+        return retired;
     }
 
     /** 
      * Set the 'ret' attribute value.
      * 
-     * @param ret
+     * @param retired
      */
-    public void setRet(String ret) {
-        this.ret = ret;
+    public void setRetired(boolean retired) {
+        this.retired = retired;
     }
 }

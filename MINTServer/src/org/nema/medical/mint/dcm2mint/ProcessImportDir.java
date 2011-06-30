@@ -74,8 +74,8 @@ public final class ProcessImportDir {
     private final boolean forceCreate;
     private final int binaryInlineThreshold;
     private MetadataType dicomMetadataType = null;
-    private Set<Integer> studyLevelTags;
-    private Set<Integer> seriesLevelTags;
+    private LevelAttributes studyLevelTags;
+    private LevelAttributes seriesLevelTags;
     private static final XPath xPath = XPathFactory.newInstance().newXPath();
     private static final DocumentBuilder documentBuilder;
     static {
@@ -117,8 +117,8 @@ public final class ProcessImportDir {
     		String response = httpClient.execute(httpGet, new BasicResponseHandler());
         	InputStream in = new ByteArrayInputStream(response.getBytes());
         	this.dicomMetadataType = DataDictionaryIO.parseFromXML(in);
-        	this.studyLevelTags = getStudyTags(dicomMetadataType);
-        	this.seriesLevelTags = getSeriesTags(dicomMetadataType);
+        	this.studyLevelTags = dicomMetadataType.getStudyAttributes();
+        	this.seriesLevelTags = dicomMetadataType.getSeriesAttributes();
     	}
         LOG.info("Gathering files for allocation to studies.");
         final long fileGatherStart = System.currentTimeMillis();
@@ -511,27 +511,6 @@ public final class ProcessImportDir {
             throw new RuntimeException("File " + targetFile.getAbsolutePath()
                     + " is not a normal file and not a directory");
         }
-    }
-
-    private static Set<Integer> getSeriesTags(final MetadataType mt) {
-		final SeriesAttributesType seriesAttsParent = mt.getSeriesAttributes();
-		final List<AttributeType> seriesAtts = seriesAttsParent.getAttributes();
-        return getTags(seriesAtts);
-    }
-
-    private static Set<Integer> getStudyTags(final MetadataType mt) {
-		final StudyAttributesType studyAttsParent = mt.getStudyAttributes();
-		final List<AttributeType> studyAtts = studyAttsParent.getAttributes();
-        return getTags(studyAtts);
-    }
-
-    private static Set<Integer> getTags(final Collection<AttributeType> attributeTypes) {
-    	final Set<Integer> tagSet = new HashSet<Integer>();
-		for (final AttributeType att: attributeTypes) {
-			final int intTag = (int)Long.parseLong(att.getTag(), 16);
-            tagSet.add(intTag);
-		}
-    	return tagSet;
     }
 
     private static class MetaBinaryFiles {

@@ -9,6 +9,8 @@
           deserializer="org.nema.medical.mint.metadata.StudyIO.bsize2int"/>
   <format label="base64" type="byte[]" serializer="org.nema.medical.mint.metadata.StudyIO.base64encode"
           deserializer="org.nema.medical.mint.metadata.StudyIO.base64decode"/>
+  <format label="int.version" type="int" serializer="org.nema.medical.mint.metadata.StudyIO.int2version"
+  		  deserializer="org.nema.medical.mint.metadata.StudyIO.version2int"/>
   <mapping abstract="true" type-name="StudyMetaType" class="org.nema.medical.mint.metadata.StudyMetadata">
     <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator"
         item-type="org.nema.medical.mint.metadata.Attribute" usage="optional" test-method="hasAttributes">
@@ -20,7 +22,8 @@
     </collection>
     <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID"/>
     <value style="attribute" name="type" get-method="getType" set-method="setType"/>
-    <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
+    <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" format="int.version" 
+    	usage="optional" default="-1"/>
     <value style="attribute" name="instanceCount" get-method="getInstanceCount" set-method="setInstanceCount"
         usage="optional" default="-1"/>
   </mapping>
@@ -42,7 +45,7 @@
     <value style="attribute" name="framecount" get-method="getFrameCount" set-method="setFrameCount" usage="optional"
            default="1"/>
     <value style="attribute" name="bytes" get-method="getBytes" set-method="setBytes" format="base64" usage="optional"/>
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
+    <value style="attribute" name="exclude" field="excluded" usage="optional" default="false"/>
   </mapping>
   <mapping abstract="true" type-name="SeriesType" class="org.nema.medical.mint.metadata.Series">
     <collection name="attributes" add-method="putAttribute" iter-method="attributeIterator"
@@ -59,7 +62,7 @@
     	<structure name="instance" map-as="InstanceType"/>
     </collection>
     <value style="attribute" name="seriesInstanceUID" field="seriesInstanceUID"/>
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
+    <value style="attribute" name="exclude" field="excluded" usage="optional" default="false"/>
     <value style="attribute" name="instanceCount" get-method="getInstanceCount" set-method="setInstanceCount"
         usage="optional" default="-1"/>
   </mapping>
@@ -76,6 +79,6 @@
     </collection>
     <value style="attribute" name="sopInstanceUID" field="sopInstanceUID"/>
     <value style="attribute" name="transferSyntaxUID" field="transferSyntaxUID"/>
-    <value style="attribute" name="exclude" field="exclude" usage="optional"/>
+    <value style="attribute" name="exclude" field="excluded" usage="optional" default="false"/>
   </mapping>
 </binding>

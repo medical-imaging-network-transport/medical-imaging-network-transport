@@ -91,7 +91,7 @@ public class StudyCreateProcessor extends TimerTask {
 			StudyMetadata study = StudyIO.loadStudy(jobFolder);
 			LOG.info("job " + jobID + " loaded");
 
-            if (study.getVersion() != null) {
+            if (study.getVersion() >= 0) {
                 throw new RuntimeException(
                         "New study data specifies a version; versions are controlled by server, not client");
             }

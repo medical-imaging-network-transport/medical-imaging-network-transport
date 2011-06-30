@@ -1,8 +1,8 @@
 package org.nema.medical.mint.utils;
 
 import org.nema.medical.mint.datadictionary.AttributesType;
-import org.nema.medical.mint.datadictionary.ElementType;
 import org.nema.medical.mint.datadictionary.MetadataType;
+import org.nema.medical.mint.datadictionary.LevelAttributes;
 import org.nema.medical.mint.metadata.Attribute;
 import org.nema.medical.mint.metadata.Instance;
 import org.nema.medical.mint.metadata.Series;
@@ -10,8 +10,6 @@ import org.nema.medical.mint.metadata.StudyMetadata;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.nema.medical.mint.utils.Iter.iter;
 import static org.nema.medical.mint.utils.StudyUtils.tagString;
@@ -43,19 +41,14 @@ public class StudyValidation {
 
     static void validateUnknownAttributes(final StudyMetadata study, final MetadataType type)
             throws StudyTraversals.TraversalException {
-        if ("reject".equals(type.getAttributes().getUnknownAttributes())) {
+        if (AttributesType.UnknownAttribute.REJECT == type.getAttributes().getUnknownAttributes()) {
             final AttributesType attributesType = type.getAttributes();
-            final List<ElementType> elements = attributesType.getElements();
-            final Set<Integer> availableElementTags = new HashSet<Integer>();
-            for (final ElementType element: elements) {
-                availableElementTags.add(Integer.valueOf(element.getTag(), 16));
-            }
             StudyTraversals.allAttributeTraverser(study, new StudyTraversals.AttributeAction() {
                 @Override
                 public void doAction(final Attribute attribute) throws StudyTraversals.TraversalException {
-                    if (!availableElementTags.contains(attribute.getTag())) {
-                        throw new StudyTraversals.TraversalException("Invalid attribute " + tagString(attribute.getTag())
-                                + " for type " + type.getType());
+                    if (!attributesType.containsElement(attribute.getTag())) {
+                        throw new StudyTraversals.TraversalException("Invalid attribute "
+                                + tagString(attribute.getTag()) + " for type " + type.getType());
                     }
                 }
             });
@@ -64,14 +57,10 @@ public class StudyValidation {
 
     static void validateAttributeLevel(final StudyMetadata study, final MetadataType type)
             throws StudyTraversals.TraversalException {
-        final Collection<Integer> studyAttributeTags =
-                MetadataType.extractTagSet(type.getStudyAttributes().getAttributes());
-        final Collection<Integer> seriesAttributeTags =
-                MetadataType.extractTagSet(type.getSeriesAttributes().getAttributes());
         final class LevelCheck implements StudyTraversals.AttributeAction {
             private final String levelName;
-            private final Collection<Integer> levelTags;
-            public LevelCheck(final String levelName, final Collection<Integer> levelTags) {
+            private final LevelAttributes levelTags;
+            public LevelCheck(final String levelName, final LevelAttributes levelTags) {
                 this.levelName = levelName;
                 this.levelTags = levelTags;
             }
@@ -79,14 +68,15 @@ public class StudyValidation {
             @Override
             public void doAction(final Attribute attribute) throws StudyTraversals.TraversalException {
                 final int tag = attribute.getTag();
-                if (!levelTags.contains(tag)) {
-                    throw new StudyTraversals.TraversalException("Tag " + tagString(tag) + " invalid at " + levelName + " level");
+                if (!levelTags.containsTag(tag)) {
+                    throw new StudyTraversals.TraversalException("Tag " + tagString(tag) + " invalid at " + levelName
+                            + " level");
                 }
             }
         }
 
-        StudyTraversals.flatStudyAttributeTraverser(study, new LevelCheck("study", studyAttributeTags));
-        StudyTraversals.flatSeriesAttributeTraverser(study, new LevelCheck("series", seriesAttributeTags));
+        StudyTraversals.flatStudyAttributeTraverser(study, new LevelCheck("study", type.getStudyAttributes()));
+        StudyTraversals.flatSeriesAttributeTraverser(study, new LevelCheck("series", type.getSeriesAttributes()));
     }
 
     /**
@@ -131,8 +121,8 @@ public class StudyValidation {
     			final String instanceTransferSyntax = instance.getTransferSyntaxUID();
     			//This is the dicom tag attribute for transfer syntax
     			//<attr tag="00020010" vr="UI" val="456">
-    			final String instanceAttributeTransferSyntax =
-                        transferSyntaxNormalized ? normalizedTransferSyntax : instance.getValueForAttribute(TRANSFER_SYNTAX_TAG);
+    			final String instanceAttributeTransferSyntax = transferSyntaxNormalized ?
+                        normalizedTransferSyntax : instance.getValueForAttribute(TRANSFER_SYNTAX_TAG);
     			//The two different transfer syntaxes must be equal in every case or the entire study is invalid.
                 //An exception is the case where no transfer syntax attribute is available on the instance.
     			if (instanceAttributeTransferSyntax != null &&

@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -202,7 +203,8 @@ public class JobsController {
             return;
         }
 
-        final String oldVersion = params.get(HttpMessagePart.OLD_VERSION.toString());
+        final String oldVersionString = params.get(HttpMessagePart.OLD_VERSION.toString());
+        final int oldVersion = StringUtils.isBlank(oldVersionString) ? -1 : Integer.parseInt(oldVersionString);
 
 		JobInfo jobInfo = new JobInfo();
 		jobInfo.setId(jobID);

@@ -28,10 +28,10 @@ message StudyData
     
     // used for validation against data dictionary
     optional string type = 4;
-    optional string version = 5;
+    optional uint32 version = 5;
 
     // computed by server on outbound, if provided on inbound must be correct
-    optional uint32 instance_count = 6;    
+    optional uint32 instance_count = 6;
     
     // studies contain attributes and series
     repeated AttributeData attributes = 2;
@@ -45,7 +45,7 @@ message SeriesData
     optional string series_instance_uid = 1;
 
     // used only in updates when removing attributes
-    optional string exclude = 2;  
+    optional bool excluded = 2;
 
     // computed by server on outbound, if provided on inbound must be correct
     optional uint32 instance_count = 6;
@@ -63,7 +63,7 @@ message InstanceData
     optional string sop_instance_uid = 1;
     
     // used only in updates when removing attributes
-    optional string exclude = 2;
+    optional bool excluded = 2;
     
     // instances include the transfer syntax and attributes
     optional string transfer_syntax_uid = 3;
@@ -77,7 +77,7 @@ message AttributeData
     optional uint32 tag = 1;
     
     // used only in updates when removing attributes
-    optional string exclude = 2;  
+    optional bool excluded = 2;
     
     // 2-character VR
     optional string vr = 3;

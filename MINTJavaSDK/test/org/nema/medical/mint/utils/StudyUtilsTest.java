@@ -275,13 +275,7 @@ public class StudyUtilsTest {
     @Test
     public void testGetBaseVersion() {
         //We probably shouldn't just change what version a study starts with, so having a test for this makes sense
-        assertEquals("0", StudyUtils.getBaseVersion());
-    }
-
-    @Test
-    public void testGetNextVersion() {
-        assertEquals("1", StudyUtils.getNextVersion("0"));
-        assertEquals("10", StudyUtils.getNextVersion("9"));
+        assertEquals(0, StudyUtils.getBaseVersion());
     }
 
     @Test
