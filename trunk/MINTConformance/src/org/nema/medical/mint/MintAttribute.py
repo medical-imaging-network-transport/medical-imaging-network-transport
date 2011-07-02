@@ -35,7 +35,7 @@ class MintAttribute():
    binaryVRs = ("SS", "US", "SL", "UL", "FL", "FD", "OB", "OW", "OF", "AT")
 
    def __init__(self, node):
-       self.__tag     = node.attributeWithName("tag")
+       self.__tag     = node.attributeWithName("tag").lower()
        self.__vr      = node.attributeWithName("vr")
        self.__val     = node.attributeWithName("val")
        self.__bid     = node.attributeWithName("bid")
