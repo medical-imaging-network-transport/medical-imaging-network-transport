@@ -28,7 +28,8 @@ message StudyData
     
     // used for validation against data dictionary
     optional string type = 4;
-    optional uint32 version = 5;
+    //This is kept as a string for backward compatibility, but this really can contain only a non-negative integer (uint32)
+    optional string version = 5;
 
     // computed by server on outbound, if provided on inbound must be correct
     optional uint32 instance_count = 6;
@@ -45,7 +46,8 @@ message SeriesData
     optional string series_instance_uid = 1;
 
     // used only in updates when removing attributes
-    optional bool excluded = 2;
+    // this is kept as a string for backward compatibility, but it really is a boolean where its presence indicates true
+    optional string exclude = 2;
 
     // computed by server on outbound, if provided on inbound must be correct
     optional uint32 instance_count = 6;
@@ -63,7 +65,8 @@ message InstanceData
     optional string sop_instance_uid = 1;
     
     // used only in updates when removing attributes
-    optional bool excluded = 2;
+    // this is kept as a string for backward compatibility, but it really is a boolean where its presence indicates true
+    optional string exclude = 2;
     
     // instances include the transfer syntax and attributes
     optional string transfer_syntax_uid = 3;
@@ -77,7 +80,8 @@ message AttributeData
     optional uint32 tag = 1;
     
     // used only in updates when removing attributes
-    optional bool excluded = 2;
+    // this is kept as a string for backward compatibility, but it really is a boolean where its presence indicates true
+    optional string exclude = 2;
     
     // 2-character VR
     optional string vr = 3;

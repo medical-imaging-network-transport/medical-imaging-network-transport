@@ -311,7 +311,7 @@ public class Attribute implements Cloneable, Excludable {
         attr.setTag(attrData.getTag());
         attr.setVr(attrData.getVr());
         if (attrData.hasStringValue()) attr.setVal(attrData.getStringValue());
-        if (attrData.hasExcluded()) attr.setExcluded(attrData.getExcluded());
+        attr.setExcluded(attrData.hasExclude());
         if (attrData.hasBinaryItemId()) { attr.setBid(attrData.getBinaryItemId()); }
         if (attrData.hasBinaryItemSize()) { attr.setBinarySize(attrData.getBinaryItemSize()); }
         if (attrData.hasFrameCount()) { attr.setFrameCount(attrData.getFrameCount()); }
@@ -330,7 +330,7 @@ public class Attribute implements Cloneable, Excludable {
         if (this.frameCount > 1) builder.setFrameCount(this.frameCount);
         if (this.vr != null) builder.setVr(this.vr);
         if (this.val != null) builder.setStringValue(this.val);
-        builder.setExcluded(this.excluded);
+        if (this.excluded) builder.setExclude("");
         if (this.bytes != null) builder.setBytes(ByteString.copyFrom(this.bytes));
         for (Item item : this.items) {
             builder.addItems(item.toGPB());

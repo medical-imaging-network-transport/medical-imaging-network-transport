@@ -262,11 +262,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
         StudyMetadata study = new StudyMetadata();
         study.setStudyInstanceUID(studyData.getStudyInstanceUid());
         if (studyData.hasType()) study.setType(studyData.getType());
-        if (studyData.hasVersion()) {
-            study.setVersion(studyData.getVersion());
-        } else {
-            study.setVersion(-1);
-        }
+        if (studyData.hasVersion()) study.setVersion(Integer.parseInt(studyData.getVersion()));
 
         for (AttributeData attrData : studyData.getAttributesList()) {
             Attribute attr = Attribute.fromGPB(attrData);
@@ -288,7 +284,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
             builder.setType(this.type);
         }
         if (this.version >= 0) {
-            builder.setVersion(this.version);
+            builder.setVersion(Integer.toString(this.version));
         }
         builder.setInstanceCount(getInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {

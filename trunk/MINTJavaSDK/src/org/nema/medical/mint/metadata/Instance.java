@@ -146,7 +146,7 @@ public class Instance implements AttributeContainer, Excludable
         Instance instance = new Instance();
         if (data.hasSopInstanceUid()) instance.setSOPInstanceUID(data.getSopInstanceUid());
         if (data.hasTransferSyntaxUid()) instance.setTransferSyntaxUID(data.getTransferSyntaxUid());
-        if (data.hasExcluded()) instance.setExcluded(data.getExcluded());
+        instance.setExcluded(data.hasExclude());
         for (AttributeData attrData : data.getAttributesList()) {
             instance.putAttribute(Attribute.fromGPB(attrData));
         }
@@ -161,7 +161,9 @@ public class Instance implements AttributeContainer, Excludable
         if (this.transferSyntaxUID != null) {
             builder.setTransferSyntaxUid(this.transferSyntaxUID);
         }
-        builder.setExcluded(this.excluded);
+        if (this.excluded) {
+            builder.setExclude("");
+        }
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
         }
