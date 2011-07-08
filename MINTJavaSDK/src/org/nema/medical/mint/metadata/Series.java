@@ -218,9 +218,7 @@ public class Series implements AttributeContainer, Excludable
         if (data.hasSeriesInstanceUid()) {
             series.setSeriesInstanceUID(data.getSeriesInstanceUid());
         }
-        if (data.hasExcluded()) {
-        	series.setExcluded(data.getExcluded());
-        }
+        series.setExcluded(data.hasExclude());
         for (AttributeData attrData : data.getAttributesList()) {
             series.putAttribute(Attribute.fromGPB(attrData));
         }
@@ -238,7 +236,9 @@ public class Series implements AttributeContainer, Excludable
         if (this.seriesInstanceUID != null ) {
             builder.setSeriesInstanceUid(this.seriesInstanceUID);
         }
-        builder.setExcluded(this.excluded);
+        if (this.excluded) {
+            builder.setExclude("");
+        }
         builder.setInstanceCount(this.getInstanceCount());
         for (Attribute attr : this.attributeMap.values()) {
             builder.addAttributes(attr.toGPB());
