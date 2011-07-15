@@ -100,3 +100,4 @@ and manage change between implementation
     * vision, mission, goals first
       * Chris, Jim will each craft a document, distribute by Wednesday for review next Friday
     * revisit prioritization items above later
+	
