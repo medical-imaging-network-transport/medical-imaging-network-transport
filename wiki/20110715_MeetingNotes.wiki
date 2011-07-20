@@ -1,4 +1,4 @@
-#summary July 8,2011 Meeting Notes
+#summary July 15,2011 Meeting Notes
 
 = Attendees =
   * Tim Dawson
