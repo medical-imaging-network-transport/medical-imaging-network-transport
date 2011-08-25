@@ -13,4 +13,6 @@ The goals of the MINT standard are:
     Eliminate the need for DICOM routing and application specific caches
     Centralize Quality Control logic 
 
-For a high level technical overview of MINT, please see the following powerpoint: 
+For a high level technical overview of MINT V1.0, please see the following powerpoint:
+
+[http://code.google.com/p/medical-imaging-network-transport/downloads/detail?name=MINT%20Technical%20Overview%2009-26-2010%20rev%20c.ppt&can=2&q=#makechanges MINT Technical Overview]
