@@ -3016,7 +3016,7 @@
 		<attribute tag='00080030' desc="Study Time" />
 		<attribute tag='00080050' desc="Accession Number" />
 		<attribute tag='00080051' desc="Issuer Of Accession Number Sequence" />
-                <attribute tag="00080080" desc="Institution Name" />
+		<attribute tag='00080080' desc="Institution Name" />
 		<attribute tag='00080090' desc="Referring Physician Name" />
 		<attribute tag='00080096' desc="Referring Physician Identification Sequence" />
 		<attribute tag='00081030' desc="Study Description" />
@@ -3031,7 +3031,7 @@
 		<attribute tag='00081120' desc="Referenced Patient Sequence" />
 		<attribute tag='00100010' desc="Patient Name" />
 		<attribute tag='00100020' desc="Patient ID" />
-                <attribute tag='00100021' desc="Issuer of Patient ID" />
+		<attribute tag='00100021' desc="Issuer of Patient ID" />
 		<attribute tag='00100030' desc="Patient Birth Date" />
 		<attribute tag='00100032' desc="Patient Birth Time" />
 		<attribute tag='00100040' desc="Patient Sex" />
