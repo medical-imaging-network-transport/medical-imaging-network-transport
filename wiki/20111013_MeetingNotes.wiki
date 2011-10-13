@@ -2,7 +2,10 @@
 
 = Agenda =
 
-  * final review of REST 2.0 api
+  * final review of MINT 2.0 REST api
   * RSNA meeting venue, funding
   * MINT 2.0 ref impl resourcing
   * SIIM papers, etc.
+
+
+JIM edit
