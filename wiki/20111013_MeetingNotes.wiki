@@ -8,4 +8,10 @@
   * SIIM papers, etc.
 
 
-JIM edit
+= Attendees =
+  * Jim Philbin
+  * Tim Culp
+  * Dan Chaffee
+
+= Notes = 
+  *  Reviewed the proposed Version 2.0 operations and updated the document on downloads.  
