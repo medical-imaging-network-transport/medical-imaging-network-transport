@@ -6,7 +6,7 @@
   * MINT 2.0 implementation
   * DICOM meeting, WG27 meeting recap
 
-= RSNA meeting =
+= RSNA meeting recap =
 
   * three options:
     * working group meeting (notice via mint-user group)
