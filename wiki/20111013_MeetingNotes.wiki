@@ -1,0 +1,8 @@
+#summary MINT meeting Oct 13, 2011.
+
+= Agenda =
+
+  * final review of REST 2.0 api
+  * RSNA meeting venue, funding
+  * MINT 2.0 ref impl resourcing
+  * SIIM papers, etc.
