@@ -1,0 +1,15 @@
+#summary MINT meeting Oct 13, 2011.
+
+= Agenda =
+  * DICOM WG-27 update
+  * MINT Meeting @ RSNA 
+  * MINT 2.0 implementation
+
+= Attendees =
+  * Tim Culp
+  * Tim Dawson
+
+= Notes - DICOM WG27 = 
+  * paste in Tim's notes
+  * desired WG23 part 18 XML schema
+  * Clunie's multi-frame will have to define normalization schema as part of WG6; we will have to work with him on this.  Jim also has a paper on his single-pass normalization scheme
