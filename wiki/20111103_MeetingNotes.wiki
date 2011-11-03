@@ -17,4 +17,6 @@
   * define detailed agenda @ next meeting (Nov 17)
 
 = Notes - MINT 2.0 impl =
-  * Harris is looking to devote resources, at least 1 full time
+  * Harris is looking to devote resources, at least 1 full time, 1 part time
+  * Vital is planning to devote at least 1 full time, 2 part time resources
+  * Still looking for additional resources
