@@ -17,9 +17,36 @@
   * Non-DICOM types & hierarchy
     nested folder structures seems like a reasonable approach
 
+= Supplement 148 changes for RSNA - open issues =
+  * what metadata schema will we use? WG-27 desires use of part19
+    * concern of non-normalized metadata
+    * XPATH is problematic
+    * enh. multiframe conversion may attack this
+    * need a shorthand mapping of ID within a study to a UID representing an instance/frame
+  * returning a range of SOP instances
+    * do we need to specify multiple, or can we filter on a series?
+    * cannot do range of UIDs, need a list
+  * HTTP accept headers
+    * application/dicom vs. application/wado
+    * for transfer syntaxes? application/dicom/xferSyntax?
+  * private metadata
+    * how does 3.19 handle private XML tags?
+  * Metadata/info vs. XPath
+    * xpath puts burden on users to create XPath, on server to apply 
+    * performance impact
+    * cannot cache study info
+    * however, xpath does provide advantage of allowing client choice
+  * Parameters vs. resource
+    * URL length, caching resource
+
 = Notes - MINT @ RSNA =
   * Monday Nov 28, 11am-4pm @ Vital's suite
-  * define detailed agenda
+  * define goals for meeting
+    * finalize proposed MINT 2.0 REST API
+    * review/finalize recommendation for sup148
+    * performance implications / Jim present
+    * community discussion
+    * attendee list
   * open issues for MINT 2.0 
     * need to address type collision
     * discuss potential use of part19 XML
