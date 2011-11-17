@@ -1,22 +1,16 @@
 #summary MINT meeting Nov 17, 2011.
 
 = Agenda =
-  * DICOM WG-27 update
+  * Open items from email list
+  * Supplement 148 changes for RSNA
   * MINT Meeting @ RSNA
-  * MINT 2.0 implementation
 
-= Notes - DICOM WG27 = 
-  * paste in Tim's notes
-  * desired WG23 part 18 XML schema
-  * Clunie's multi-frame will have to define normalization schema as part of WG6; we will have to work with him on this.  Jim also has a paper on his single-pass normalization scheme
-  * Changelog discussion came up; probably not part of this work item but did get general consensus
-  * concern with maximum URL lengths
+= Open items from email list =
+  * Content negotiation
+  * HTTP caching & Accept header vs. REST resource
+  * DICOM UT value representation
+  * Non-DICOM types & hierarchy
 
 = Notes - MINT @ RSNA =
   * Monday Nov 28, 11am-4pm @ Vital's suite
   * define detailed agenda @ next meeting (Nov 17)
-
-= Notes - MINT 2.0 impl =
-  * Harris is looking to devote resources, at least 1 full time, 1 part time
-  * Vital is planning to devote 1 full time, 2 part time resources
-  * Still looking for additional resources
