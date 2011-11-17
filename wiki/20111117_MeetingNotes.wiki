@@ -7,10 +7,19 @@
 
 = Open items from email list =
   * Content negotiation
+    today cannot do this; must be optional, would allow vendor differentiation
   * HTTP caching & Accept header vs. REST resource
+    need to research different caches; Dan will send a link
+    one idea: allow accept header & redirect to REST resource
   * DICOM UT value representation
+    agree with Uli's recommendation...
+    Jonathan - look at UT tags in part19 XML
   * Non-DICOM types & hierarchy
+    nested folder structures seems like a reasonable approach
 
 = Notes - MINT @ RSNA =
   * Monday Nov 28, 11am-4pm @ Vital's suite
-  * define detailed agenda @ next meeting (Nov 17)
+  * define detailed agenda
+  * open issues for MINT 2.0 
+    * need to address type collision
+    * discuss potential use of part19 XML
