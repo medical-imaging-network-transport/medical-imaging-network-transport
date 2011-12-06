@@ -376,14 +376,9 @@ public final class Dcm2MetaBuilder {
                          basicOffsetTable = null;
                      } else {
                          basicOffsetTable = new int[numFrames];
-                         int byteIdx = 0;
-                         for (int i = 0; i < numFrames; ++i) {
+                         for (int i = 0, byteIdx = 0; i < numFrames; ++i, byteIdx += 4) {
                              //Assume Little-Endianness
-                             basicOffsetTable[i] =
-                                     basicOffsetTableBytes[byteIdx++]
-                                             | basicOffsetTableBytes[byteIdx++] << 8
-                                             | basicOffsetTableBytes[byteIdx++] << 16
-                                             | basicOffsetTableBytes[byteIdx++] << 24;
+                             basicOffsetTable[i] = littleEndianBytesToInt(basicOffsetTableBytes, byteIdx);
                          }
                      }
 
@@ -429,17 +424,21 @@ public final class Dcm2MetaBuilder {
                                      frameHasMoreFragments = (fragmentByteIdx < basicOffsetTable[i + 1]);
                                  } else {
                                      final byte[] nextFragmentBytes = elem.getFragment(fragmentIdx);
-                                     byte fragmentPeekByte = (byte) 0xFF;
-                                     for (int fragmentPeekIdx = 0;
-                                          fragmentPeekIdx < nextFragmentBytes.length
-                                                  && (fragmentPeekByte = nextFragmentBytes[fragmentPeekIdx++]) == 0xFF;);
-                                     switch (fragmentPeekByte) {
-                                         case (byte) 0xD8: //SOI
-                                         case (byte) 0x4F: //SOC (JPEG 2000)
-                                             frameHasMoreFragments = false;
-                                             break;
-                                         default:
-                                             frameHasMoreFragments = true;
+                                     if (nextFragmentBytes.length <= 1 || nextFragmentBytes[0] != 0xFF) {
+                                         frameHasMoreFragments = true;
+                                     } else {
+                                         byte fragmentPeekByte = (byte) 0xFF;
+                                         for (int fragmentPeekIdx = 1;
+                                              fragmentPeekIdx < nextFragmentBytes.length
+                                                      && (fragmentPeekByte = nextFragmentBytes[fragmentPeekIdx++]) == 0xFF;);
+                                         switch (fragmentPeekByte) {
+                                             case (byte) 0xD8: //SOI
+                                             case (byte) 0x4F: //SOC (JPEG 2000)
+                                                 frameHasMoreFragments = false;
+                                                 break;
+                                             default:
+                                                 frameHasMoreFragments = true;
+                                         }
                                      }
                                  }
                              } else {
@@ -528,6 +527,11 @@ public final class Dcm2MetaBuilder {
          attr.setVr(obj.vr().toString());
          return attr;
      }
+
+    static int littleEndianBytesToInt(final byte[] bytes, final int index) {
+        return bytes[index] & 0xFF | (bytes[index + 1] & 0xFF) << 8 |
+                (bytes[index + 2] & 0xFF) << 16 | (bytes[index + 3] & 0xFF) << 24;
+    }
 
      private static final int[] emptyTagPath = new int[0];
 
