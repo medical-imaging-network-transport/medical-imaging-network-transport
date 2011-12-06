@@ -2,7 +2,11 @@
 <dicomsend>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.51" xfersyntaxdesc="JPEG Extended (Process 2 &amp; 4)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.70" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.90" xfersyntaxdesc="JPEG 2000 Image Compression (Lossless Only)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1" sopclassdesc="Computed Radiography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.91" xfersyntaxdesc="JPEG 2000 Image Compression"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.1.1" sopclassdesc="Digital X-Ray Image Storage - For Presentation" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
 
@@ -11,7 +15,11 @@
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.2" xfersyntaxdesc="Explicit VR Big Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.51" xfersyntaxdesc="JPEG Extended (Process 2 &amp; 4)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.70" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.90" xfersyntaxdesc="JPEG 2000 Image Compression (Lossless Only)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2" sopclassdesc="CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.91" xfersyntaxdesc="JPEG 2000 Image Compression"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.2.1" sopclassdesc="Enhanced CT Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     
@@ -19,21 +27,33 @@
     
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.51" xfersyntaxdesc="JPEG Extended (Process 2 &amp; 4)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.57" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical (Process 14)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.70" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.90" xfersyntaxdesc="JPEG 2000 Image Compression (Lossless Only)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.4" sopclassdesc="MR Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.91" xfersyntaxdesc="JPEG 2000 Image Compression"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.70" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.90" xfersyntaxdesc="JPEG 2000 Image Compression (Lossless Only)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.6.1" sopclassdesc="Ultrasound Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.91" xfersyntaxdesc="JPEG 2000 Image Compression"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.51" xfersyntaxdesc="JPEG Extended (Process 2 &amp; 4)"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.70" xfersyntaxdesc="JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14 [Selection Value 1])"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.90" xfersyntaxdesc="JPEG 2000 Image Compression (Lossless Only)"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.7" sopclassdesc="Secondary Capture Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.91" xfersyntaxdesc="JPEG 2000 Image Compression"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.11.1" sopclassdesc="Grayscale Softcopy Presentation State Storage SOP Class" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.12.1" sopclassdesc="X-Ray Angiographic Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.12.1" sopclassdesc="X-Ray Angiographic Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
+    <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.12.1" sopclassdesc="X-Ray Angiographic Image Storage" xfersyntaxuid="1.2.840.10008.1.2.4.50" xfersyntaxdesc="JPEG Baseline (Process 1)"/>
 
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.128" sopclassdesc="Positron Emission Tomography Image Storage" xfersyntaxuid="1.2.840.10008.1.2" xfersyntaxdesc="Implicit VR Little Endian"/>
     <prezcontext sopclassuid="1.2.840.10008.5.1.4.1.1.128" sopclassdesc="Positron Emission Tomography Image Storage" xfersyntaxuid="1.2.840.10008.1.2.1" xfersyntaxdesc="Explicit VR Little Endian"/>
