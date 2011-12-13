@@ -1,4 +1,4 @@
-#summary MINT meeting Dec 8, 2011
+#summary MINT meeting Dec 13, 2011
 
 = Attendees =
   * Tony O'Sullivan, IBIS
