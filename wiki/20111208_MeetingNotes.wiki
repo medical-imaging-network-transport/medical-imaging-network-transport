@@ -1,4 +1,4 @@
-#summary Meeting notes for MINT conference call December 8, 2011.
+#summary MINT meeting Dec 8, 2011
 
 = Agenda =
   * Any open issues from RSNA meeting?
