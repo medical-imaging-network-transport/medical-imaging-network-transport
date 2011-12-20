@@ -1,3 +1,5 @@
+#summary MINT meeting Dec 20, 2011
+
 = Attendees =
  * Tim Dawson
  * Tim Culp
