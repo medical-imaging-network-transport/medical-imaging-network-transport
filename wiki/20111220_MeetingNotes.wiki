@@ -1,0 +1,25 @@
+= Attendees =
+ * Tim Dawson
+ * Tim Culp
+ * Uli Bubenheimer
+
+= Agenda =
+  * Transfer syntax for WADO-RS
+  * MINT 2.0 API
+  * F2F meeting in January
+
+= Transfer Syntax for pixel data =
+  * WADO uses URL parameter
+  * REST best practices use 'accept' header
+  * should WADO-RS accept either or both? if we allow URL, most people will use this
+  * regardless, response content-type will say what they're getting
+  * if no requested type, just gives what is specified in metadata
+  * similar to DICOM, support for multiple transfer syntaxes is optional, must support little-endian unless image is only available lossy
+
+= MINT 2.0 API =
+  * Append Study - (post to studies/{identifier}
+  * 
+  
+= Face to face meeting in January =
+  * January 9, 10 - in Orlando. Tim Culp to send details.
+  * Agenda: finalize MINT 2.0 API, discuss interface to DICOM (WADO-RS, QIDO, NADO), MINT reference implementation & community
