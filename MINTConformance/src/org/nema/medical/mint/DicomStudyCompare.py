@@ -347,7 +347,7 @@ class DicomStudyCompare():
        # ---
        bid1 = attr1.binary()
        if bid1 == None:
-          self.__check(dicomAttr.tag()+" missing binary",
+          self.__check(attr1.tag()+" missing binary",
                        "None",
                        "<Binary>",
                        seriesInstanceUID, 
@@ -359,7 +359,7 @@ class DicomStudyCompare():
        # ---
        bid2 = attr2.binary()
        if bid2 == None:
-          self.__check(dicomAttr.tag()+" missing binary",
+          self.__check(attr2.tag()+" missing binary",
                        "<Binary>",
                        "None",
                        seriesInstanceUID, 
