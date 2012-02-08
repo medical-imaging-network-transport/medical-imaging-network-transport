@@ -128,6 +128,7 @@ public final class ProcessImportDir {
         final SortedSet<File> resultFiles = new TreeSet<File>();
         findPlainFilesRecursive(importDir, resultFiles, handledFilesCopy);
         handledFiles.addAll(resultFiles);
+        int instancesProcessed = 0;
         final Map<String, Collection<File>> studyFileMap = new HashMap<String, Collection<File>>();
         for (final File plainFile: resultFiles) {
             try {
@@ -151,6 +152,10 @@ public final class ProcessImportDir {
                     studyFileMap.put(studyUID, dcmFileData);
                 }
                 dcmFileData.add(plainFile);
+                ++instancesProcessed;
+                if (instancesProcessed % 500 == 1) {
+                    LOG.info("Inspected " + instancesProcessed + " instances.");
+                }
             } catch (final IOException e) {
                 //Not a valid DICOM file?!
                 LOG.warn("Skipping file: " + plainFile);
@@ -158,8 +163,10 @@ public final class ProcessImportDir {
             }
         }
         final long fileGatherEnd = System.currentTimeMillis();
-        LOG.info("Gathering files and study allocation completed in "
+        LOG.info("Gathering " + instancesProcessed + " files and study allocation completed in "
                 + String.format("%.1f", (fileGatherEnd - fileGatherStart) / 1000.0f) + " seconds.");
+
+        instancesProcessed = 0;
 
         outerLoop:
         for (final Map.Entry<String, Collection<File>> studyFiles: studyFileMap.entrySet()) {
@@ -167,7 +174,7 @@ public final class ProcessImportDir {
             assert studyUID != null;
             final Collection<File> instanceFiles = studyFiles.getValue();
             final int instanceFileCount = instanceFiles.size();
-            LOG.info("Creating MINT for " + instanceFileCount + " instances of study instance UID " + studyUID + ".");
+            LOG.info("Creating MINT metadata for " + instanceFileCount + " instances of study instance UID " + studyUID + ".");
             final long mintConvertStart = System.currentTimeMillis();
             final BinaryData binaryData = new BinaryDcmData();
             final MetaBinaryPairImpl metaBinaryPair = new MetaBinaryPairImpl();

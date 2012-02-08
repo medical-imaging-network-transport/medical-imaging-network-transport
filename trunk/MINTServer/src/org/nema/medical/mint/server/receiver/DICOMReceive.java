@@ -190,11 +190,12 @@ public final class DICOMReceive {
             final String classUID = dcmReqObj.getString(Tag.AffectedSOPClassUID);
             final String instanceUID = dcmReqObj.getString(Tag.AffectedSOPInstanceUID);
             final File associationDir = getStorageRootDir();
-            final long instanceSerialNo = incrementInstanceCounter();
+            final Integer instanceSerialNo = incrementAssociationCounter(association);
             if (instanceSerialNo % 500 == 0) {
                 LOG.info("Received instance no. " + instanceSerialNo);
             }
-            final String serialNoStr = "SN" + String.format("%09d", instanceSerialNo);
+            final UUID assocUUID = associationDataMap.get(association);
+            final String serialNoStr = "SN" + String.format("%09d", instanceSerialNo) + assocUUID;
             final String prefixedFileName = serialNoStr + '-' + instanceUID;
             final String dicomFileBaseName = prefixedFileName + DICOM_FILE_EXTENSION;
             final File dicomFile = new File(associationDir, dicomFileBaseName + PARTIAL_FILE_EXTENSION);
@@ -216,14 +217,20 @@ public final class DICOMReceive {
 
         @Override
         public void associationAccepted(final AssociationAcceptEvent associationAcceptEvent) {
+            final UUID assocUUID = UUID.randomUUID();
             final Association association = associationAcceptEvent.getAssociation();
+            associationDataMap.put(association, assocUUID);
             LOG.info("Association created: " + association.toString());
         }
 
         @Override
         public void associationClosed(final AssociationCloseEvent associationCloseEvent) {
             final Association association = associationCloseEvent.getAssociation();
-            LOG.info("Association closed: " + association.toString());
+            associationDataMap.remove(association);
+            final Integer assocInstanceCnt = associationCounterMap.get(association);
+            LOG.info("Association closed: " + association.toString() + " after receiving " + assocInstanceCnt
+                + " instances.");
+            removeAssociationCounter(association);
         }
     }
 
@@ -261,10 +268,22 @@ public final class DICOMReceive {
     private final ExecutorService executor = new ThreadPoolExecutor(
             100, 100, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 
-    private long instanceCounter = 0L;
+    private final Map<Association, UUID> associationDataMap = new HashMap<Association, UUID>();
+    private final Map<Association, Integer> associationCounterMap = new HashMap<Association, Integer>();
 
-    private long incrementInstanceCounter() {
-        return instanceCounter++;
+    private Integer incrementAssociationCounter(final Association association) {
+        Integer oldVal = associationCounterMap.get(association);
+        //Reset if a new association or if our hardware unexpectedly has not started smoking after uninterrupted
+        //DICOM pushing for a year or so.
+        if (oldVal == null || oldVal >= 999999999) {
+            oldVal = 0;
+        }
+        associationCounterMap.put(association, oldVal + 1);
+        return oldVal;
+    }
+
+    private void removeAssociationCounter(final Association association) {
+        associationCounterMap.remove(association);
     }
 
     public final void start() throws IOException {
