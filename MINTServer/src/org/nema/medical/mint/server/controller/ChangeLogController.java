@@ -66,8 +66,6 @@ public class ChangeLogController {
 	@Autowired
 	protected Integer fileStreamBufferSize;
 
-	private static final Boolean istrue = Boolean.TRUE;
-	
 	@RequestMapping("/changelog")
 	public void changelogXML(
             @RequestParam(value = "since", required = false) final String since,
