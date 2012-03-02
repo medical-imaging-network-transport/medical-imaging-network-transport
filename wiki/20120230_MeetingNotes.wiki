@@ -1,9 +1,9 @@
 = Attendees =
 
-Tim Culp
-Dan Chaffee
-Jim Philbin
-Jonathan Whitby
+  * Tim Culp
+  * Dan Chaffee
+  * Jim Philbin
+  * Jonathan Whitby
 
 = Agenda =
 
@@ -44,7 +44,7 @@ Jonathan Whitby
     * MINT Conformance endian issues 
     * WADO-RS resources (GetFrames) 
 
----
+----
 
 = Decisions =
 
