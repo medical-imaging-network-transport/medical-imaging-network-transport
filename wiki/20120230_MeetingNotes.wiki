@@ -1,6 +1,6 @@
 #summary MINT meeting Mar 01, 2012
 
-= Attendees =
+= Attendees = 
 
   * Tim Culp
   * Dan Chaffee
