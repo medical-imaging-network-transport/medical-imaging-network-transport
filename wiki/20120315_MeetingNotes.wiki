@@ -1,12 +1,12 @@
 #summary MINT meeting Mar 15, 2012
 
-= Attendees =
+== Attendees ==
 
   * Tim Culp
   * Jonathan Whitby
   * Andy Wilson 
 
-= Agenda =
+== Agenda ==
 
   * Action Item Review
   * C#/.NET project suggestions
@@ -22,7 +22,7 @@
     * MINT Conformance endian issues 
     * WADO-RS resources (GetFrames)
 
-= Discussion =
+== Discussion ==
 
   * Jonathan is available for helping develop the MINT2.0 SDK.
   * Do we have any projects that could be done in C#/.NET? Chris Hafey is volunteering to help. Jon will check with Tim Dawson for ideas but a simple C#/.NET viewer for a PC, laptop, or mobile phone would be cool.
@@ -43,7 +43,7 @@
      * Jonathan says the DICOM standard is pretty explicit about removing commas from floating point numbers and using a period as the whole part fractional part separator.
      * This normalization needs to be done within the MINT Server.
 
-= Decisions =
+== Decisions ==
 
   * Provide resource for retrieving a Simple Frame List and a Calculated Frame List as documented in the DICOM WADO-RS Supplement.
   * MINT shall conform to DICOM Standard for decimal representation (ie, remove all commas and use period as the separator).
