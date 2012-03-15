@@ -20,5 +20,5 @@
 
 == 2012-02-16 ==
 
-~~Confirm with DICOM WG-27 on their meeting time~~
-~~Send out breakfast invitation~~
+  * ~~Confirm with DICOM WG-27 on their meeting time~~
+  * ~~Send out breakfast invitation~~
