@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # $Id$
 #
-# Copyright (C) 2010 MINT Working group. All rights reserved.
+# Copyright (C) 2010-2012 MINT Working group. All rights reserved.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -40,6 +40,7 @@ from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
 from org.nema.medical.mint.DicomStudy         import DicomStudy
 from org.nema.medical.mint.DicomSeries        import DicomSeries
 from org.nema.medical.mint.DicomInstance      import DicomInstance
+from org.nema.medical.mint.DicomTransfer      import DicomTransfer
 
 # -----------------------------------------------------------------------------
 # DicomStudyCompare
@@ -181,7 +182,7 @@ class DicomStudyCompare():
        # ---
        # Check Series Instance ID.
        # ---       
-       self.__check("Seriese Instance UID",
+       self.__check("Series Instance UID",
                     instance1.seriesInstanceUID(),
                     instance2.seriesInstanceUID(),
                     instance1.seriesInstanceUID())
@@ -196,12 +197,39 @@ class DicomStudyCompare():
                     instance1.sopInstanceUID())                  
 
        # ---
-       # Check tags.
+       # Check header size.
+       # ---
+       header1 = instance1.header()
+       header2 = instance2.header()
+       self.__check("Number of header tags",
+                    header1.numAttributes(),
+                    header2.numAttributes(),
+                    instance1.seriesInstanceUID(),
+                    instance1.sopInstanceUID())
+       
+       # ---
+       # Check header elements.
+       # ---
+       numAttributes = min(header1.numAttributes(), header2.numAttributes()) 
+       for n in range(0, numAttributes):
+           tag = header1.tag(n)
+           self.__checkTag(header1,
+                           header2,
+                           tag,
+                           instance1.seriesInstanceUID(),
+                           instance1.sopInstanceUID())
+           
+       # ---
+       # Check data elements.
        # ---
        numAttributes = instance1.numAttributes()       
        for n in range(0, numAttributes):
            tag = instance1.tag(n)
-           self.__checkTag(instance1, instance2, tag)
+           self.__checkTag(instance1,
+                           instance2,
+                           tag,
+                           instance1.seriesInstanceUID(),
+                           instance1.sopInstanceUID())
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
        if obj1 != obj2:
@@ -223,7 +251,16 @@ class DicomStudyCompare():
                 print "  - SOP Instance UID", sop
           print "WARNING:", msg, ":", obj1, "!=", obj2
        
-   def __checkTag(self, instance1, instance2, tag):
+   def __exception(self, msg, exception, series="", sop=""):
+       self.__count += 1
+       print "- Study Instance UID", self.__studyInstanceUID
+       if series != "":
+          print " - Series Instance UID", series
+          if sop != "":
+             print "  - SOP Instance UID", sop
+       print "EXCEPTION:", msg, exception
+       
+   def __checkTag(self, obj1, obj2, tag, series, sop):
    
        # ---
        # Optional and deprecated Group Length tags are not included so we don't need to look for them,
@@ -240,16 +277,16 @@ class DicomStudyCompare():
               self.__excludedTags += 1
               return
           
-       attr2 = instance2.attributeByTag(tag)
+       attr2 = obj2.attributeByTag(tag)
        if attr2 == None:
           self.__check("Data Element", 
                        tag, 
                        "None", 
-                       instance1.seriesInstanceUID(), 
-                       instance1.sopInstanceUID())
+                       series, 
+                       sop)
        else:
-          attr1 = instance1.attributeByTag(tag)
-          self.__checkAttribute(attr1, attr2, instance1.seriesInstanceUID(), instance1.sopInstanceUID())
+          attr1 = obj1.attributeByTag(tag)
+          self.__checkAttribute(attr1, attr2, series, sop)
              
    def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
           
@@ -272,6 +309,9 @@ class DicomStudyCompare():
           # ---
           val1 = attr1.val()
           val2 = attr2.val()
+          
+          if val1 == None: val1 = ""
+          if val2 == None: val2 = ""
           
           if len(val1) > 0 and not val1[-1].isalnum(): val1 = val1.rstrip(val1[-1])
           if len(val2) > 0 and not val2[-1].isalnum(): val2 = val1.rstrip(val2[-1])
@@ -333,7 +373,7 @@ class DicomStudyCompare():
                      self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
            
               self.__itemsCompared += 1
-           
+
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
 
        if not attr1.hasBinary():
@@ -366,18 +406,6 @@ class DicomStudyCompare():
                        sopInstanceUID)
           return
  
-       # ----
-       # Check binary sizes
-       # ---     
-       size1 = attr1.vl()
-       size2 = attr2.vl()
-       self.__check(attr1.tag()+" binary sizes differ",
-                    size1,
-                    size2,
-                    seriesInstanceUID, 
-                    sopInstanceUID)
-       if size1 != size2 : return
-       
        # ---
        # Read in a block.
        # ---
@@ -390,9 +418,29 @@ class DicomStudyCompare():
        buf2 = bid2.read(bufsize)
        bytesToRead -= len(buf1)
 
-       bytes1 = unpack('B'*len(buf1), buf1)
-       bytes2 = unpack('B'*len(buf2), buf2)
+       # ---
+       # Unpack the blocks.
+       # ---
+       bytes1 = []
+       bytes2 = []
+       try:
+          bytes1 = attr1.transferSyntax().unpackByteArray(buf1, attr1.transferSyntax())
+          bytes2 = attr2.transferSyntax().unpackByteArray(buf2, attr1.transferSyntax())
+       except IOError, e:
+          self.__exception(attr1.tag(), e, seriesInstanceUID, sopInstanceUID)
+
+       # ----
+       # Check binary sizes
+       # ---     
        n = len(bytes1)
+       m = len(bytes2)
+       self.__check(attr1.tag()+" binary sizes differ",
+                    n,
+                    m,
+                    seriesInstanceUID, 
+                    sopInstanceUID)
+       if n != m : return
+              
        while n > 0:       
 
           # ---
@@ -401,7 +449,7 @@ class DicomStudyCompare():
           diff = False
           for i in range(0, n):              
               if bytes1[i] != bytes2[i]:
-                 self.__check(attr1.tag()+"byte "+str(block*bufsize+i),
+                 self.__check(attr1.tag()+" byte "+str(block*bufsize+i),
                               hex(bytes1[i]),
                               hex(bytes2[i]),
                               seriesInstanceUID, 
@@ -423,8 +471,11 @@ class DicomStudyCompare():
              bytesToRead -= len(buf1)
              assert bytesToRead >= 0
 
-             bytes1 = unpack('B'*len(buf1), buf1)
-             bytes2 = unpack('B'*len(buf2), buf2)
+             try:
+                bytes1 = attr1.transferSyntax().unpackByteArray(buf1, attr1.transferSyntax())
+                bytes2 = attr2.transferSyntax().unpackByteArray(buf2, attr1.transferSyntax())
+             except IOError, e:
+                self.__exception(attr1.tag(), e, seriesInstanceUID, sopInstanceUID)
              n = len(bytes1)
              block += 1
              

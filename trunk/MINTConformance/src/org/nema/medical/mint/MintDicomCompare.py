@@ -171,6 +171,8 @@ class MintDicomCompare():
 
    def __compareInstances(self, instance, mint): 
 
+       self.__compareHeaders(instance, mint)
+
        # ---
        # Check Study Instance ID.
        # ---
@@ -210,8 +212,18 @@ class MintDicomCompare():
        # ---
        numAttributes = instance.numAttributes()       
        for n in range(0, numAttributes):
-           tag = instance.tag(n)
-           self.__checkTag(instance, mint, tag)
+           dicomAttr = instance.attribute(n)
+           self.__checkTag(instance, mint, dicomAttr)
+
+   def __compareHeaders(self, instance, mint):
+       
+       # ---
+       # Check tags.
+       # ---
+       numAttributes = instance.header().numAttributes()       
+       for n in range(0, numAttributes):
+           dicomAttr = instance.header().attribute(n)
+           self.__checkTag(instance, mint, dicomAttr)
                                   
    def __check(self, msg, obj1, obj2, series="", sop=""):
        if obj1 != obj2:
@@ -223,10 +235,12 @@ class MintDicomCompare():
                 print "  - SOP Instance UID", sop
           print "+++", msg, ":", obj1, "!=", obj2
        
-   def __checkTag(self, instance, mint, tag):
+   def __checkTag(self, instance, mint, dicomAttr):
+
+       tag = dicomAttr.tag()
 
        # ---
-       # Optional and deprecated Group Length tags are not included so we don't need to look for them,
+       # Optional and deprecated Group Length tags are not included so we don't look for them.
        # ---
        if tag[4:8] == "0000": return
        
@@ -238,9 +252,11 @@ class MintDicomCompare():
                        instance.seriesInstanceUID(), 
                        instance.sopInstanceUID())
        else:
-          dicomAttr = instance.attributeByTag(tag)
-          self.__checkAttribute(dicomAttr, attr, instance.seriesInstanceUID(), instance.sopInstanceUID())
-             
+          self.__checkAttribute(dicomAttr, 
+                                attr, 
+                                instance.seriesInstanceUID(), 
+                                instance.sopInstanceUID())
+
    def __checkAttribute(self, dicomAttr, attr, seriesInstanceUID, sopInstanceUID):
       
        # ---
@@ -419,7 +435,6 @@ class MintDicomCompare():
                     mintAttr.bytes(),
                     seriesInstanceUID, 
                     sopInstanceUID)
-
        self.__inlineBinaryCompared += 1
  
 # -----------------------------------------------------------------------------

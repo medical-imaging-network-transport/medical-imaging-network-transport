@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # $Id$
 #
-# Copyright (C) 2010 MINT Working group. All rights reserved.
+# Copyright (C) 2010-2012 MINT Working group. All rights reserved.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -32,6 +32,7 @@ import sys
 import traceback
 
 from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
+from org.nema.medical.mint.DicomHeader        import DicomHeader
 from org.nema.medical.mint.DicomAttribute     import DicomAttribute
 from org.nema.medical.mint.DicomTransfer      import DicomTransfer
 
@@ -48,17 +49,10 @@ class DicomInstance():
        self.__dcmName = dcmName
        self.__attributes = {}
        self.__tags = []
-       self.__transferSyntax = DicomTransfer()
        self.__dataDictionary = dataDictionary
-       
-       self.__open()
+       self.__header = DicomHeader(dataDictionary)
 
-   def isDicom(filename):
-       dcm = open(filename, "rb")
-       preamble=dcm.read(128)
-       dicm=dcm.read(4)
-       return (dicm == "DICM")
-   isDicom = staticmethod(isDicom)
+       self.__open()
 
    def studyInstanceUID(self):
        attr = self.attributeByTag(STUDY_INSTANCE_UID_TAG)
@@ -80,6 +74,9 @@ class DicomInstance():
           return attr.val()
        else:
           return ""
+
+   def header(self):
+       return self.__header
                         
    def numAttributes(self):
        return len(self.__tags)
@@ -89,7 +86,7 @@ class DicomInstance():
                         
    def attribute(self, n):
        """
-       Returns a MintAttribute at index n.
+       Returns a DicomAttribute at index n.
        """
        tag = self.__tags[n]
        return self.__attributes[tag]
@@ -107,7 +104,8 @@ class DicomInstance():
        if output == None:
           print ">>> Instance", self.sopInstanceUID()
        else:
-          output.write(">>> Instance "+self.sopInstanceUID()+"\n")       
+          output.write(">>> Instance "+self.sopInstanceUID()+"\n")
+       self.__header.debug(output)
        numAttributes = self.numAttributes()
        for n in range(0, numAttributes):
            tag = self.tag(n)
@@ -116,33 +114,28 @@ class DicomInstance():
 
    def __open(self):
        dcm = open(self.__dcmName, "rb")
-       
-       # ---
-       # Read the preamble
-       # ---
-       preamble=dcm.read(128)
-       dicm=dcm.read(4)
-       assert(dicm == "DICM")
+
+       self.__header.read(dcm)
+       transferSyntax = self.__header.transferSyntax()
        
        # ---
        # Read data elements
        # ---
-       attr = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+       attr = DicomAttribute(dcm, self.__dataDictionary, transferSyntax)
        while attr.isValid():
           self.__attributes[attr.tag()] = attr
-          if attr.isTransferSyntax(): self.__transferSyntax = DicomTransfer(attr.val()) 
-          attr = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          attr = DicomAttribute(dcm, self.__dataDictionary, transferSyntax)
 
        dcm.close()
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
           
-   def __attr(self, tag, index):
-       if self.__attrs.has_key(tag):
-          attrs = self.__attrs[tag]
-          return attrs[index]
-       else:
-          None
+#   def __attr(self, tag, index):
+#       if self.__attrs.has_key(tag):
+#          attrs = self.__attrs[tag]
+#          return attrs[index]
+#       else:
+#          None
        
 # -----------------------------------------------------------------------------
 # main
