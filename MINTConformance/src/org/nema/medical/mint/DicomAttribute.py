@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # $Id$
 #
-# Copyright (C) 2010 MINT Working group. All rights reserved.
+# Copyright (C) 2010-2012 MINT Working group. All rights reserved.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -155,6 +155,7 @@ class DicomAttribute():
    def bytes(self)    : return self.__bytes
    def bytesRead(self): return self.__bytesRead
    def hasBinary(self): return self.__dicom != ""
+   def transferSyntax(self): return self.__transferSyntax
 
    def binary(self):
        """

@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # $Id$
 #
-# Copyright (C) 2010 MINT Working group. All rights reserved.
+# Copyright (C) 2010-2012 MINT Working group. All rights reserved.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -37,6 +37,7 @@ from os.path import join
 from org.nema.medical.mint.DCM4CHE_Dictionary import DCM4CHE_Dictionary
 from org.nema.medical.mint.DicomSeries        import DicomSeries
 from org.nema.medical.mint.DicomInstance      import DicomInstance
+from org.nema.medical.mint.DicomHeader        import DicomHeader
 
 # -----------------------------------------------------------------------------
 # DicomStudy
@@ -98,7 +99,7 @@ class DicomStudy():
        for root, dirs, files in os.walk(self.__dcmDir, topdown=False):
            for name in files:
                filename = join(root, name)
-               if DicomInstance.isDicom(filename):
+               if DicomHeader.isDicom(filename):
                   dcmNames.append(filename)
 
        for dcmName in dcmNames:
