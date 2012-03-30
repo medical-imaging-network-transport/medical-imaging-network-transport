@@ -21,7 +21,7 @@
     * Unlimited text (UT) international char sets (utf-8 or binary) 
     * Pixel data big endian/little endian issues with unsigned 
     * MINT Conformance endian issues 
----
+----
 == Discussion ==
   * Had discussions with Chris Hafey regarding refreshing the ClearCanvas plugin. He also might consider building a C# MINT2.0 Server
   * Discussed MINT conformamce to DICOM Standard for decimal representation (ie, remove all commas and use period as the separator). It was suggested that we should encompass all DICOM encoding standards (date/time, etc). Jim suggested that we should have a single, normalized form for the server implementation, and then appropriately convert to whatever format on the edge.
