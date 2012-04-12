@@ -290,6 +290,12 @@ class DicomStudyCompare():
              
    def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
           
+       for exclude in self.__exclude:
+           search = re.search(exclude, attr1.tag())
+           if search != None:
+              self.__excludedTags += 1
+              return
+
        if attr1.vr() != "":
           self.__check(attr1.tag()+" VR",
                        attr1.vr(),
@@ -351,27 +357,9 @@ class DicomStudyCompare():
 
        if numItems1 == numItems2:
           for i in range(0, numItems1):
-          
-              # ---
-              # Check items.
-              # ---
-              numAttributes1 = attr1.numItemAttributes(i)
-              numAttributes2 = attr2.numItemAttributes(i)
-              self.__check(attr1.tag()+" number of item attributes",
-                           numAttributes1,
-                           numAttributes2,
-                           seriesInstanceUID, 
-                           sopInstanceUID)
-
-              # ---
-              # Check item attributes.
-              # ---
-              if numAttributes1 == numAttributes2:
-                 for j in range(0, numAttributes1):
-                     itemAttribute1 = attr1.itemAttribute(i, j)
-                     itemAttribute2 = attr2.itemAttribute(i, j)
-                     self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
-           
+              item1 = attr1.item(i)
+              item2 = attr2.item(i)
+              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID)          
               self.__itemsCompared += 1
 
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):

@@ -302,31 +302,11 @@ class MintDicomCompare():
                     sopInstanceUID)
        
        if numItems1 == numItems2:
-          for i in range(0, numItems1):
-          
-              # ---
-              # Check items.
-              # ---
-              attributeList = dicomAttr.item(i)
-              numAttributes1 = dicomAttr.numItemAttributes(i)
-              numAttributes2 = attr.numItemAttributes(i)
-              self.__check(dicomAttr.tag()+" number of item attributes",
-                           numAttributes1,
-                           numAttributes2,
-                           seriesInstanceUID,
-                           sopInstanceUID)
-
-              # ---
-              # Check item attributes.
-              # ---
-              if numAttributes1 == numAttributes2:
-                 for j in range(0, numAttributes1):
-                     itemAttribute1 = dicomAttr.itemAttribute(i, j)
-                     itemAttribute2 = attr.itemAttribute(i, j)
-                     self.__checkAttribute(itemAttribute1, itemAttribute2, seriesInstanceUID, sopInstanceUID)
-           
+          for i in range(0, numItems1):         
+              item1 = dicomAttr.item(i)
+              item2 = attr.item(i)
+              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID)
               self.__itemsCompared += 1
-
          
    def __checkBinary(self, dicomAttr, mintAttr, seriesInstanceUID, sopInstanceUID):
 

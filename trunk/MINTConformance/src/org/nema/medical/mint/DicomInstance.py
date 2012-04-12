@@ -44,8 +44,10 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 # DicomInstance
 # -----------------------------------------------------------------------------
 class DicomInstance():
-   def __init__(self, dcmName, dataDictionary):
-     
+   def __init__(self, dcmName, dataDictionary, skipPrivate=False):
+
+       DicomAttribute.setSkipPrivate(skipPrivate)
+       
        self.__dcmName = dcmName
        self.__attributes = {}
        self.__tags = []
@@ -129,33 +131,30 @@ class DicomInstance():
        dcm.close()
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
-          
-#   def __attr(self, tag, index):
-#       if self.__attrs.has_key(tag):
-#          attrs = self.__attrs[tag]
-#          return attrs[index]
-#       else:
-#          None
        
 # -----------------------------------------------------------------------------
 # main
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "h")
+    (options, args)=getopt.getopt(sys.argv[1:], "hp")
     
     # ---
     # Check for help option.
     # ---
     help = False
+    skipPrivate = False
     for opt in options:
         if opt[0] == "-h":
            help = True
+        if opt[0] == "-p":
+           skipPrivate = True
     
     try:
        if len(args) < 1 or help:
           print "Usage", progName, "[options] <dicom_file>"
           print "  -h: displays usage"
+          print "  -p: skip private tags"
           sys.exit(1)
           
        # ---
@@ -163,7 +162,7 @@ def main():
        # ---
        dcmName = args[0];
        dataDictionary = DCM4CHE_Dictionary()
-       instance = DicomInstance(dcmName, dataDictionary)
+       instance = DicomInstance(dcmName, dataDictionary, skipPrivate)
        instance.debug()
                         
     except Exception, exception:

@@ -208,17 +208,20 @@ class MintStudyCompare():
    def __checkAttributes(self, msg, attr1, attr2):
        if attr2 == None:
           self.check(msg, attr1.toString(), "None") 
-       elif attr1.vr() == "SQ":
-          self.__checkSequence(msg, attr1, attr2)
+       elif attr1.numItems() > 0:
+          self.__checkItems(msg, attr1, attr2)
+       elif attr1.vr() == "SQ" and attr1.numItems() == 0:
+          pass
        else:
           self.check(msg, str(attr1), str(attr2))
           if attr1.bytes() != "": self.__inlineBinaryCompared += 1
           else: self.__textTagsCompared += 1
           if attr1.bid() != "":
              self.__bids.append(attr1.bid())
-   
-   def __checkSequence(self, msg, attr1, attr2):
 
+       if attr1.vr() == "SQ": self.__sequencesCompared += 1
+   
+   def __checkItems(self, msg, attr1, attr2):
        numItems1 = attr1.numItems()
        numItems2 = attr2.numItems()
        self.check(msg+" number of items",
@@ -227,20 +230,10 @@ class MintStudyCompare():
                   
        if numItems1 == numItems2:
           for i in range(0, numItems1):
-              numItemAttributes1 = attr1.numItemAttributes(i)
-              numItemAttributes2 = attr2.numItemAttributes(i)
-              self.check(msg+" number of item attributes",
-                         numItemAttributes1, 
-                         numItemAttributes2)
-
-              if numItemAttributes1 == numItemAttributes2:
-                 for j in range(0, numItemAttributes1):
-                     a1 = attr1.itemAttribute(i, j)
-                     a2 = attr2.itemAttribute(i, j)
-                     self.__checkAttributes(msg+" Item "+str(i)+" Attribute", a1, a2)            
-                 self.__itemsCompared += 1
-       
-       self.__sequencesCompared += 1
+              item1 = attr1.item(i)
+              item2 = attr2.item(i)
+              self.__checkAttributes("item", item1, item2)
+              self.__itemsCompared += 1       
                                 
    def __compareSeries(self, series1, series2):
                  
