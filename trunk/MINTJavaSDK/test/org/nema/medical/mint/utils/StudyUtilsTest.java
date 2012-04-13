@@ -224,19 +224,19 @@ public class StudyUtilsTest {
     public void testReverse() {
         {
             final byte[] a = new byte[]{1,2,3};
-            StudyUtils.reverse(a);
+            StudyUtils.reverse(a, 0, 3);
             assertArrayEquals(new byte[]{3,2,1}, a);
         }
 
         {
             final byte[] a = new byte[]{1};
-            StudyUtils.reverse(a);
+            StudyUtils.reverse(a, 0, 1);
             assertArrayEquals(new byte[]{1}, a);
         }
 
         {
             final byte[] a = new byte[0];
-            StudyUtils.reverse(a);
+            StudyUtils.reverse(a, 0, 0);
             assertArrayEquals(new byte[0], a);
         }
     }
@@ -245,11 +245,11 @@ public class StudyUtilsTest {
     public void testStandardizedAttribute() {
         final Attribute attr1 = new Attribute();
         attr1.setVr("FL");
-        attr1.setBytes(new byte[] {1,2});
+        attr1.setBytes(new byte[] {1, 2, 3, 4});
         Attribute attr2;
         attr2 = StudyUtils.standardizedAttribute(attr1, true);
         assertThat(attr1, is(not(attr2)));
-        StudyUtils.reverse(attr2.getBytes());
+        StudyUtils.reverse(attr2.getBytes(), 0, 4);
         assertThat(attr1, is(attr2));
         attr2 = StudyUtils.standardizedAttribute(attr1, false);
         assertThat(attr1, is(attr2));
@@ -265,6 +265,19 @@ public class StudyUtilsTest {
         attr1.setBytes(new byte[]{1});
         attr2 = StudyUtils.standardizedAttribute(attr1, true);
         assertThat(attr1, is(attr2));
+
+        attr1.setVr("FL");
+        attr1.setBytes(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+        attr2 = StudyUtils.standardizedAttribute(attr1, true);
+        assertThat(attr2.getBytes(), is(new byte[] {4, 3, 2, 1, 8, 7, 6, 5}));
+
+        attr1.setVr("FD");
+        attr2 = StudyUtils.standardizedAttribute(attr1, true);
+        assertThat(attr2.getBytes(), is(new byte[] {8, 7, 6, 5, 4, 3, 2, 1}));
+
+        attr1.setBytes(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
+        attr2 = StudyUtils.standardizedAttribute(attr1, true);
+        assertThat(attr2.getBytes(), is(new byte[] {8, 7, 6, 5, 4, 3, 2, 1, 16, 15, 14, 13, 12, 11, 10, 9}));
     }
 
     @Test

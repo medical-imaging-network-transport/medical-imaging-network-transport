@@ -383,16 +383,18 @@ public final class StudyUtils {
     /**
      * Reverse array
      * @param value array to be reversed
+     * @param start index where to start reversing
+     * @param length length of character sequence to be reversed
      */
-    static void reverse(final byte[] value) {
-        final int byteCnt = value.length;
+    static void reverse(final byte[] value, final int start, final int length) {
         //Ignore center byte if an odd number of bytes
-        final int halfByteCnt = byteCnt >> 1;
-        for (int i = 0; i < halfByteCnt; ++i) {
-            final int otherIndex = byteCnt - 1 - i;
-            final byte buf = value[i];
-            value[i] = value[otherIndex];
-            value[otherIndex] = buf;
+        final int halfLength = length >> 1;
+        for (int i = 0; i < halfLength; ++i) {
+            final int leftIndex = start + i;
+            final int rightIndex = start + length - 1 - i;
+            final byte buf = value[leftIndex];
+            value[leftIndex] = value[rightIndex];
+            value[rightIndex] = buf;
         }
     }
 
@@ -403,7 +405,8 @@ public final class StudyUtils {
      * @return the potentially converted attribute.
      */
     public static Attribute standardizedAttribute(final Attribute attr, final boolean hasBigEndianTransferSyntax) {
-        if (!hasBigEndianTransferSyntax || !isNonBinaryFloatVR(attr.getVr()) || attr.getBytes() == null
+        final String vr = attr.getVr();
+        if (!hasBigEndianTransferSyntax || !isNonBinaryFloatVR(vr) || attr.getBytes() == null
                 || attr.getBytes().length <= 1) {
             return attr;
         } else {
@@ -414,7 +417,12 @@ public final class StudyUtils {
                 //Should never happen
                 throw new RuntimeException(e);
             }
-            reverse(normalizedAttr.getBytes());
+
+            final byte[] bytes = normalizedAttr.getBytes();
+            final int valueLen = "FL".equals(vr) ? 4 : 8;
+            for (int i = 0; i < bytes.length; i += valueLen) {
+                reverse(bytes, i, valueLen);
+            }
             return normalizedAttr;
         }
     }
