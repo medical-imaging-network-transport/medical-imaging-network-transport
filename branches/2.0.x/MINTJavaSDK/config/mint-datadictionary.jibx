@@ -1,0 +1,36 @@
+<binding xmlns:tns="http://medical.nema.org/mint" name="datadictionary" trim-whitespace="true">
+  <namespace uri="http://medical.nema.org/mint" default="elements" prefix="tns"/>
+  <format label="int.hex" type="int" serializer="org.nema.medical.mint.metadata.StudyIO.int2hex"
+          deserializer="org.nema.medical.mint.metadata.StudyIO.hex2int"/>
+  <format label="element.ret" type="boolean" serializer="org.nema.medical.mint.metadata.StudyIO.boolean2ret"
+  		  deserializer="org.nema.medical.mint.metadata.StudyIO.ret2boolean"/>
+  <mapping abstract="true" type-name="tns:elementType" class="org.nema.medical.mint.datadictionary.ElementType">
+    <value style="text" get-method="getString" set-method="setString"/>
+    <value style="attribute" name="tag" get-method="getStringTag" set-method="setStringTag"/>
+    <value style="attribute" name="keyword" get-method="getKeyword" set-method="setKeyword"/>
+    <value style="attribute" name="vr" get-method="getVr" set-method="setVr" usage="optional"/>
+    <value style="attribute" name="vm" get-method="getVm" set-method="setVm" usage="optional"/>
+    <value style="attribute" name="ret" get-method="getRetired" set-method="setRetired" format="element.ret" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:attributesType" class="org.nema.medical.mint.datadictionary.AttributesType">
+    <collection add-method="addElement" iter-method="iterator" item-type="org.nema.medical.mint.datadictionary.ElementType">
+      <structure map-as="tns:elementType" name="element"/>
+    </collection>
+    <value style="attribute" name="unknownAttributes" get-method="getUnknownAttributes" set-method="setUnknownAttributes" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:levelAttributes" class="org.nema.medical.mint.datadictionary.LevelAttributes">
+    <collection add-method="addAttributeType" iter-method="attributeIterator" item-type="org.nema.medical.mint.datadictionary.LevelAttribute">
+      <structure name="attribute">
+          <value style="attribute" name="tag" get-method="getTag" set-method="setTag" format="int.hex" usage="optional"/>
+          <value style="attribute" name="desc" get-method="getDesc" set-method="setDesc" usage="optional"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping class="org.nema.medical.mint.datadictionary.MetadataType" name="metadata">
+    <structure map-as="tns:attributesType" get-method="getAttributes" set-method="setAttributes" name="attributes"/>
+    <structure map-as="tns:levelAttributes" get-method="getStudyAttributes" set-method="setStudyAttributes" name="study-attributes"/>
+    <structure map-as="tns:levelAttributes" get-method="getSeriesAttributes" set-method="setSeriesAttributes" name="series-attributes"/>
+    <value style="attribute" name="type" get-method="getType" set-method="setType" usage="optional"/>
+    <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
+  </mapping>
+</binding>

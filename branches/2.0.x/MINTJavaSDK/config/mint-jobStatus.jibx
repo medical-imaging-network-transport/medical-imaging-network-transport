@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<binding xmlns:tns="http://medical.nema.org/mint" name="jobStatus" trim-whitespace="true">
+  <namespace uri="http://medical.nema.org/mint" default="elements"/>
+  <mapping name="jobStatus" class="org.nema.medical.mint.jobs.JobStatus">
+    <value style="attribute" name="jobID" get-method="getId" set-method="setId"/>
+    <value style="attribute" name="studyUUID" get-method="getStudyUUID" set-method="setStudyUUID"/>
+    <value style="attribute" name="jobStatus" get-method="getStatus" set-method="setStatus"/>    
+    <value style="attribute" name="jobCreated" get-method="getCreateTime" set-method="setCreateTime"/>    
+    <value style="attribute" name="jobUpdated" get-method="getUpdateTime" set-method="setUpdateTime"/>    
+  </mapping>
+</binding>
