@@ -5,7 +5,7 @@
       <xsd:sequence>
         <xsd:element name="study">
           <xsd:complexType>
-            <xsd:attribute name="studyUUID" type="xsd:string" use="required" />
+            <xsd:attribute name="studyInstanceUid" type="xsd:string" use="required" />
             <xsd:attribute name="lastModified" type="xsd:dateTime" use="required" />
             <xsd:attribute name="version" type="xsd:integer" use="required" />
           </xsd:complexType>

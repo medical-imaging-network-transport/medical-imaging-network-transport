@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<binding xmlns:tns="http://medical.nema.org/mint" name="studySearchResults"	trim-whitespace="true">
-	<namespace uri="http://medical.nema.org/mint" default="elements" />
-	<mapping name="studySearchResults" class="org.nema.medical.mint.studies.SearchResults">
-		<value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID" usage="optional"/>
-		<value style="attribute" name="accessionNumber" get-method="getAccessionNumber" set-method="setAccessionNumber" usage="optional"/>
-		<value style="attribute" name="accessionNumberIssuer" get-method="getIssuerOfAccessionNumber" set-method="setIssuerOfAccessionNumber" usage="optional"/>
-		<value style="attribute" name="patientID" get-method="getPatientID" set-method="setPatientID" usage="optional"/>
-		<value style="attribute" name="patientIDIssuer" get-method="getIssuerOfPatientID" set-method="setIssuerOfPatientID" usage="optional"/>
-		<value style="attribute" name="minStudyDate" get-method="getMinStudyDate" set-method="setMinStudyDate" usage="optional"/>
-		<value style="attribute" name="minStudyDateTime" get-method="getMinStudyDateTime" set-method="setMinStudyDateTime" usage="optional"/>
-		<value style="attribute" name="maxStudyDate" get-method="getMaxStudyDate" set-method="setMaxStudyDate" usage="optional"/>
-		<value style="attribute" name="maxStudyDateTime" get-method="getMaxStudyDateTime" set-method="setMaxStudyDateTime" usage="optional"/>
-		<value style="attribute" name="timeZone" get-method="getTimeZone" set-method="setTimeZone" usage="optional"/>
-		<value style="attribute" name="offset" get-method="getOffset" set-method="setOffset" usage="optional"/>
-		<value style="attribute" name="limit" get-method="getLimit" set-method="setLimit" usage="optional"/>
-		<collection add-method="addStudy" iter-method="resultsIterator" item-type="org.nema.medical.mint.studies.SearchResultStudy" />
-	</mapping>
-	<mapping name="study" class="org.nema.medical.mint.studies.SearchResultStudy">
-		<value style="attribute" name="studyUUID" get-method="getStudyUUID" set-method="setStudyUUID" />
-		<value style="attribute" name="lastModified" get-method="getLastModified" set-method="setLastModified" />
-		<value style="attribute" name="version" get-method="getVersion" set-method="setVersion" />
-	</mapping>
+<binding xmlns:tns="http://medical.nema.org/mint" name="studySearchResults" trim-whitespace="true">
+    <namespace uri="http://medical.nema.org/mint" default="elements" />
+    <mapping name="studySearchResults" class="org.nema.medical.mint.studies.SearchResults">
+        <value style="attribute" name="studyInstanceUID" get-method="getStudyInstanceUID" set-method="setStudyInstanceUID" usage="optional"/>
+        <value style="attribute" name="accessionNumber" get-method="getAccessionNumber" set-method="setAccessionNumber" usage="optional"/>
+        <value style="attribute" name="accessionNumberIssuer" get-method="getIssuerOfAccessionNumber" set-method="setIssuerOfAccessionNumber" usage="optional"/>
+        <value style="attribute" name="patientID" get-method="getPatientID" set-method="setPatientID" usage="optional"/>
+        <value style="attribute" name="patientIDIssuer" get-method="getIssuerOfPatientID" set-method="setIssuerOfPatientID" usage="optional"/>
+        <value style="attribute" name="minStudyDate" get-method="getMinStudyDate" set-method="setMinStudyDate" usage="optional"/>
+        <value style="attribute" name="minStudyDateTime" get-method="getMinStudyDateTime" set-method="setMinStudyDateTime" usage="optional"/>
+        <value style="attribute" name="maxStudyDate" get-method="getMaxStudyDate" set-method="setMaxStudyDate" usage="optional"/>
+        <value style="attribute" name="maxStudyDateTime" get-method="getMaxStudyDateTime" set-method="setMaxStudyDateTime" usage="optional"/>
+        <value style="attribute" name="timeZone" get-method="getTimeZone" set-method="setTimeZone" usage="optional"/>
+        <value style="attribute" name="offset" get-method="getOffset" set-method="setOffset" usage="optional"/>
+        <value style="attribute" name="limit" get-method="getLimit" set-method="setLimit" usage="optional"/>
+        <collection add-method="addStudy" iter-method="resultsIterator" item-type="org.nema.medical.mint.studies.SearchResultStudy" />
+    </mapping>
+    <mapping name="study" class="org.nema.medical.mint.studies.SearchResultStudy">
+        <value style="attribute" name="studyInstanceUid" get-method="getStudyInstanceUid" set-method="setStudyInstanceUid" />
+        <value style="attribute" name="lastModified" get-method="getLastModified" set-method="setLastModified" />
+        <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" />
+    </mapping>
 </binding>

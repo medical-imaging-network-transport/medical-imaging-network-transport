@@ -8,8 +8,6 @@
 			<element name="SeriesList" type="tns:SeriesListType" maxOccurs="1" minOccurs="0"/>
 		</sequence>
 		<attribute name="studyInstanceUID" type="string" use="required"/>
-		<attribute name="type" type="string" use="required"/>
-		<attribute name="version" type="int" use="optional"/>
 		<attribute name="instanceCount" type="unsignedInt" use="optional"/>
         <attribute name="updateDateTime" type="dateTime" use="optional"/>
 	</complexType>
