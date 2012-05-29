@@ -30,7 +30,6 @@
     <structure map-as="tns:attributesType" get-method="getAttributes" set-method="setAttributes" name="attributes"/>
     <structure map-as="tns:levelAttributes" get-method="getStudyAttributes" set-method="setStudyAttributes" name="study-attributes"/>
     <structure map-as="tns:levelAttributes" get-method="getSeriesAttributes" set-method="setSeriesAttributes" name="series-attributes"/>
-    <value style="attribute" name="type" get-method="getType" set-method="setType" usage="optional"/>
     <value style="attribute" name="version" get-method="getVersion" set-method="setVersion" usage="optional"/>
   </mapping>
 </binding>
