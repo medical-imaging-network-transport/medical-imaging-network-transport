@@ -234,7 +234,7 @@ public class StudyIO {
 	
 	// used to convert Attribute.bsize int to String
 	static public String int2bsize(int tag) {
-        return (tag >= 0) ? String.format("%d", tag) : "";
+        return (tag != -1) ? String.format("%d", tag & 0xFFFFFFFFL) : "";
     }
 
     // used to convert Attribute.bsize String to int
@@ -242,7 +242,7 @@ public class StudyIO {
 		if (bsize == null || bsize.length() == 0) {
 			return -1;
 		} else {
-	        return Integer.parseInt(bsize);		
+	        return (int) Long.parseLong(bsize);
 		}
     }
 
