@@ -177,7 +177,6 @@ public class Attribute implements Cloneable, Excludable {
     }
 
     public void setBinarySize(int size) {
-    	if (size < -1) size = -1;
     	this.bsize = size;
     }
 
