@@ -193,6 +193,7 @@ class DicomAttribute():
        # Read the val
        # ---
        self.__readVal(dcm)
+       if self.isTransferSyntax(): DicomTransfer(self.val()) # Validate TS
        if DicomAttribute.DEBUG: print self.valstr()
        
    def group(self)    : return self.__tag[0:4]
