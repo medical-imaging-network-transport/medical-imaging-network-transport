@@ -201,11 +201,11 @@ class DicomStudyCompare():
        # ---
        header1 = instance1.header()
        header2 = instance2.header()
-       self.__check("Number of header tags",
-                    header1.numAttributes(),
-                    header2.numAttributes(),
-                    instance1.seriesInstanceUID(),
-                    instance1.sopInstanceUID())
+       self.__warn("Number of header tags",
+                   header1.numAttributes(),
+                   header2.numAttributes(),
+                   instance1.seriesInstanceUID(),
+                   instance1.sopInstanceUID())
        
        # ---
        # Check header elements.
@@ -322,11 +322,18 @@ class DicomStudyCompare():
           if len(val1) > 0 and not val1[-1].isalnum(): val1 = val1.rstrip(val1[-1])
           if len(val2) > 0 and not val2[-1].isalnum(): val2 = val1.rstrip(val2[-1])
 
-          self.__check(attr1.tag()+" Value",
-                       val1,
-                       val2,
-                       seriesInstanceUID, 
-                       sopInstanceUID)
+          if attr1.isPart10Header():
+              self.__warn(attr1.tag()+" Value",
+                          val1,
+                          val2,
+                          seriesInstanceUID, 
+                          sopInstanceUID)
+          else:
+              self.__check(attr1.tag()+" Value",
+                           val1,
+                           val2,
+                           seriesInstanceUID, 
+                           sopInstanceUID)
 
           self.__textTagsCompared += 1
           
