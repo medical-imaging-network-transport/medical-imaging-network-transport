@@ -347,6 +347,7 @@ class DicomAttribute():
        done = False
        while not done:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): done = True
           if not done and not item.isGroupLength():
@@ -357,6 +358,7 @@ class DicomAttribute():
        sequenceBytesToRead = self.__vl
        while sequenceBytesToRead > 0:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           sequenceBytesToRead -= item.bytesRead()
           if not item.isGroupLength():
@@ -370,6 +372,7 @@ class DicomAttribute():
        DicomAttribute.skipItems = True
        while DicomAttribute.skipItems:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")          
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): 
              DicomAttribute.skipItems = False
@@ -390,6 +393,7 @@ class DicomAttribute():
        DicomAttribute.skipItems = True
        while DicomAttribute.skipItems:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): 
              DicomAttribute.skipItems = False
@@ -404,6 +408,7 @@ class DicomAttribute():
        done = False
        while not done:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isItemStop() or item.isSequenceStop(): done = True
           if not done and not item.isGroupLength():
@@ -415,8 +420,10 @@ class DicomAttribute():
        while itemBytesToRead > 0:
           if DicomAttribute.skipItems:
              item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax, itemBytesToRead)
+             if not item.isValid(): raise IOError("End of file found unexpectedly")
           else:
              item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+             if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           itemBytesToRead -= item.bytesRead()
           if not item.isGroupLength():
