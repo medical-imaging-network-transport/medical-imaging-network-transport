@@ -71,7 +71,7 @@ class DicomAttribute():
    ITEM_TAG                    = "fffee000"
    ITEM_DELIMITATION_TAG       = "fffee00d"
    SQ_DELIMITATION_TAG         = "fffee0dd"
-   SKIPPED_TAG                 = "11111111"
+   SKIPPED_TAG                 = "########"
    
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN", "FL", "FD")
@@ -177,9 +177,6 @@ class DicomAttribute():
        elif self.isPixelData() and self.__vl == self.UNDEFINED_LENGTH:
             self.__readCompressed(dcm)
 
-       elif self.isItemStart() and self.__vl == 4:
-            self.__readFragment(dcm)
-
        elif self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
             self.__readUndefinedItems(dcm)
 
@@ -276,10 +273,12 @@ class DicomAttribute():
 
    def debug(self, output=None, indent=""):
 
+       if self.__tag == self.SKIPPED_TAG: return
+
        # ---
        # Output tag information.
        # ---
-       if self.isItemStart():
+       if self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
           if output==None:
              print indent+"<item>",
           else:
@@ -293,7 +292,7 @@ class DicomAttribute():
        # ---
        # Output tag value.
        # ---
-       if self.isItemStart():
+       if self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
           pass
 
        elif self.isItemStop():
@@ -326,7 +325,7 @@ class DicomAttribute():
        # ---
        # Output tag description.
        # ---
-       if (self.isItemStart() and self.vl() != 0):
+       if (self.isItemStart() and self.vl() == self.UNDEFINED_LENGTH):
           if output==None:
              print indent+"</item>"
           else:
@@ -373,27 +372,6 @@ class DicomAttribute():
        while DicomAttribute.skipItems:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
           if not item.isValid(): raise IOError("End of file found unexpectedly")          
-          self.__bytesRead += item.bytesRead()
-          if item.isSequenceStop(): 
-             DicomAttribute.skipItems = False
-          else:
-             self.__items.append(item)
-
-   def __readFragment(self, dcm):
-
-       # ---
-       # Read frame number
-       # ---
-       vl=self.__readDicom(dcm, self.vl())
-       frameNumber = self.__transferSyntax.unpack("L", vl) # unsigned long
-       
-       # ---
-       # Skip over item
-       # ---
-       DicomAttribute.skipItems = True
-       while DicomAttribute.skipItems:
-          item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
-          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): 
              DicomAttribute.skipItems = False
