@@ -40,7 +40,7 @@ from org.nema.medical.mint.DataDictionary        import DataDictionary
 class DCM4CHE_Dictionary(DataDictionary):
    
    ROOT_TAG = "dictionary"
-   URL = "http://soft-trac.net/dicom/dictionary.xml"
+   URL = "http://soft-trac.net/dicom/dictionary_dcm4che-2.0.23.xml"
 
    def __init__(self):
        DataDictionary.__init__(self, self.ROOT_TAG, self.URL)
