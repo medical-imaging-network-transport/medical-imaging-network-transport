@@ -39,6 +39,7 @@ class DicomHeader():
        self.__tags = []
        self.__dataDictionary = dataDictionary
        self.__transferSyntax = DicomTransfer()
+       self.__transferSyntaxIsKnown = False
 
    def isDicom(filename):
        dcm = open(filename, "rb")
@@ -71,13 +72,25 @@ class DicomHeader():
        # ---
        while bytesLeft > 0:
           attr = DicomAttribute(dcm, self.__dataDictionary, littleEndian)
-          self.__attributes[attr.tag()] = attr
+          if attr.isTransferSyntax(): 
+             if not self.__transferSyntaxIsKnown:
+                self.__transferSyntax = DicomTransfer(attr.val())
+                self.__attributes[attr.tag()] = attr
+                self.__transferSyntaxIsKnown = True
+             else:
+                uid1 = self.__transferSyntax.uid()
+                uid2 = attr.val()
+                print "DicomHeader warning: Ignoring duplicate (0002,0010) Transfer Syntax", uid1, "and", uid2
+          else:
+             self.__attributes[attr.tag()] = attr
           bytesLeft -= attr.bytesRead()
-          if attr.isTransferSyntax(): self.__transferSyntax = DicomTransfer(attr.val())
 
        assert(bytesLeft == 0)
        self.__tags = self.__attributes.keys()
        self.__tags.sort()
+       
+       if not self.__transferSyntaxIsKnown:
+          print "DicomHeader warning: Missing (0002,0010) Transfer Syntax in File Meta Information" 
           
    def transferSyntax(self):
        return self.__transferSyntax

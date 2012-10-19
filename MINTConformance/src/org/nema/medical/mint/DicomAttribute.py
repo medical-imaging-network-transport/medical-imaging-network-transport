@@ -149,8 +149,19 @@ class DicomAttribute():
           # If this is private and the length is unknown promote to sequence
           # ---
           if self.isPrivate() and self.__vl == self.UNDEFINED_LENGTH:
-             self.promote("SQ")
-                
+             self.promote("SQ")                
+ 
+       # ---
+       # Promote standard DICOM tags
+       # ---
+       vrs = dataDictionary.vrs(self.__tag)
+       # TODO: What to do if multiple VRs are present?
+       vr=vrs[0] 
+       if self.__vr != vr:
+          if DicomAttribute.DEBUG: 
+             print "DicomAttribute: Info - Promoting ", self.__vr, "to", vr
+          self.promote(vr)
+
        if DicomAttribute.DEBUG:
           print self.__tag, self.__vr, self.__vl,
           if   self.isPrivate()     : print "<Private>",
@@ -189,7 +200,7 @@ class DicomAttribute():
        # ---
        # Read the val
        # ---
-       self.__readVal(dcm)
+       self.__readVal(dcm)       
        if self.isTransferSyntax(): DicomTransfer(self.val()) # Validate TS
        if DicomAttribute.DEBUG: print self.valstr()
        
@@ -257,16 +268,24 @@ class DicomAttribute():
        # Only promote unknown VR's.
        if self.__vr != "UN": return
 
-       # Promote the VR.      
-       self.__vr = vr    
-      
+       # ---
+       # 2011 PS3.5 Section 6.2.2 Unknown (UN) Value Representation
+       # 
+       # Note 2: If at some point an application knows the actual VR for an Attribute of VR UN
+       # (e.g. has its own applicable data dictionary), it can assume that the Value Field of the
+       # Attribute is encoded in Little Endian byte ordering with implicit VR encoding,
+       # irrespective of the current Transfer Syntax.
+       # ---
+       self.__vr = vr  
+       self.__transferSyntax = DicomTransfer(DicomTransfer.IMPLICIT_VR_LITTLE_ENDIAN)
+
        # If we are promoting from UN to another binary, we are done.
-       if self.isBinary(): return
+       if self.isBinary() and self.__bytes == "": return
        
        # ---
-       # If the promotion changes the val from inline binary to text, we need to unpack again.
+       # If the promotion changes the val from inline binary to text, we need to decode again.
        # ---
-       if self.__bytes != "":
+       if self.__bytes != "" and self.__bytes != None:
           self.__val = base64.b64decode(self.__bytes)
           self.__unpackToString()
           self.__bytes = ""

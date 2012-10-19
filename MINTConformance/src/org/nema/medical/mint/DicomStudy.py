@@ -63,13 +63,21 @@ class DicomStudy():
    def setOutput(self, output):
        if output == "": return
        if self.__output != None: self.__output.close()
-       if os.access(output, os.F_OK):
-          raise IOError("File already exists - "+output)
        self.__output = open(output, "w")
        
    def studyInstanceUID(self):
        return self.__studyInstanceUID
-       
+
+   def attributeByTag(self, tag):
+       attr = None
+       if self.numSeries() > 0:
+          series = self.series(0)
+          if series != None and series.numInstances() > 0:
+             instance = series.instance(0)
+             if instance != None:
+                attr = instance.attributeByTag(tag)
+       return attr
+      
    def numSeries(self):
        return len(self.__series)
        
@@ -83,6 +91,18 @@ class DicomStudy():
    def seriesByUID(self, seriesInstanceUID):
        return self.__seriesByUID[seriesInstanceUID]
        
+   def dataDictionary(self):
+       return self.__dataDictionary
+
+   def printTag(self, tag):
+       val = None
+       attr = self.attributeByTag(tag)
+       if attr != None: val = attr.val()
+       if self.__output == None:
+          print val
+       else:
+          self.__output.write(val)
+
    def debug(self):
        if self.__output == None:
           print "> Study", self.studyInstanceUID()
@@ -126,7 +146,7 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "o:h")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:t:h")
                
     # ---
     # Check for output option.
@@ -135,6 +155,16 @@ def main():
     for opt in options:
         if opt[0] == "-o":
            output = opt[1]
+           if os.access(output, os.F_OK):
+              raise IOError("File already exists - "+output)
+           
+    # ---
+    # Check for tag output option.
+    # ---
+    outputTag = ""
+    for opt in options:
+        if opt[0] == "-t":
+           outputTag = opt[1]
            
     # ---
     # Check for help option.
@@ -148,8 +178,9 @@ def main():
        if help or len(args) < 1:
 
           print "Usage", progName, "[options] <dicom_dir>"
-	  print "  -o <output>: output filename (defaults to stdout)"
-	  print "  -h:          displays usage"
+	  print "  -o <output>:     output filename (defaults to stdout)"
+	  print "  -t <output tag>: outputs tag (ie. -t 00020010)"
+	  print "  -h:              displays usage"
           sys.exit(1)
           
        # ---
@@ -159,7 +190,12 @@ def main():
        dataDictionary = DCM4CHE_Dictionary()
        study = DicomStudy(dcmDir, dataDictionary)
        study.setOutput(output)
-       study.debug()
+
+       if outputTag != "":
+          study.printTag(outputTag)
+       else:
+          study.debug()
+
        study.tidy()
        
     except Exception, exception:

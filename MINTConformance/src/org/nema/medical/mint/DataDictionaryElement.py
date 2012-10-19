@@ -25,6 +25,7 @@
 # -----------------------------------------------------------------------------
 
 import string
+import unicodedata
 
 from org.nema.medical.mint.XmlNode import XmlNode
 
@@ -39,7 +40,7 @@ class DataDictionaryElement():
        vrs            = node.attributeWithName("vr")
        self.__vm      = node.attributeWithName("vm")
        self.__ret     = node.attributeWithName("ret")
-       self.__name    = node.getText()
+       self.__name    = unicodedata.normalize('NFKD', node.getText()).encode('ascii', 'ignore')
        
        self.__vrs = vrs.split("|")
                            
@@ -60,11 +61,11 @@ class DataDictionaryElement():
           print "vr =", string.join(self.__vrs, "|"),
           print "vm =", self.__vm,
           print "ret =", self.__ret,
-          print "name =", self.__name.encode('ascii', 'replace')
+          print "name =", self.__name
        else:
           output.write("tag = "+self.__tag+" ")
           output.write("keyword = "+self.__keyword+" ")
           output.write("vr = "+string.join(self.__vrs, "|")+" ")
           output.write("vm = "+self.__vm+" ")
           output.write("ret = "+str(self.__ret)+" ")
-          output.write("name = "+self.__name.encode('ascii', 'replace')+"\n")
+          output.write("name = "+self.__name+"\n")

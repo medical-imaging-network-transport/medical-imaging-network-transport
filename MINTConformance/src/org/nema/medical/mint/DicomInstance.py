@@ -97,6 +97,10 @@ class DicomInstance():
        """
        Returns a DicomAttribute if tag is found, otherwise None.
        """
+       attr = self.header().attributeByTag(tag)
+       if attr != None:
+          return attr
+         
        if self.__attributes.has_key(tag):
           return self.__attributes[tag]
        else:
