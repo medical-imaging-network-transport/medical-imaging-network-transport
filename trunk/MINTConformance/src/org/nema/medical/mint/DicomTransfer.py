@@ -61,14 +61,14 @@ class DicomTransfer():
           assert self.isDeflated() == True
        elif transferSyntaxUI == self.EXPLICIT_VR_BIG_ENDIAN:
           self.__littleEndian = False
-       elif transferSyntaxUI[0:20] == self.JPEG_COMPRESSION:
+       elif transferSyntaxUI != None and transferSyntaxUI[0:20] == self.JPEG_COMPRESSION:
           self.__uncompressed = False
           # xx = 50-64: Lossy JPEG
           # xx = 65-70: Lossless JPEG
        elif transferSyntaxUI == self.LOSSLESS_RUN_LENGTH_ENCODING:
           self.__uncompressed = False
        else:
-          raise IOError("Unknown transfer syntax UI "+transferSyntaxUI)
+          raise IOError("Unknown Transfer Syntax UID - "+str(transferSyntaxUI))
        
    def isExplicit(self)       : return     self.__explicit
    def isImplicit(self)       : return not self.__explicit
@@ -79,6 +79,7 @@ class DicomTransfer():
    def isInflated(self)       : return not self.__deflated 
    def isUncompressed(self)   : return     self.__uncompressed
    def isCompressed(self)     : return not self.__uncompressed 
+   def uid(self)              : return     self.__transferSyntaxUI
        
    def unpack(self, type, bytes):
        unpacked = []
@@ -99,7 +100,7 @@ class DicomTransfer():
        # ---
        # If this is the same transfer syntax requested, we're done.
        # ---
-       if self == requestTransferSyntax:
+       if self.uid() == requestTransferSyntax.uid():
           return bytes2
 
        # ---
@@ -149,7 +150,7 @@ class DicomTransfer():
        return self.__transferSyntaxUI == other.__transferSyntaxUI
 
    def __nq__(self, other):
-       return not self.__eq__(other)
+       return self.__transferSyntaxUI != other.__transferSyntaxUI
 
    def test_unpackByteArray(bytes, transferSyntax, requestedTransferSyntax, expectedResults):
 

@@ -167,4 +167,5 @@ class XmlDocument(XmlNode):
 
         # Parse child nodes.
         self.parseChildNodes(doc, self)
+        doc.unlink()
         

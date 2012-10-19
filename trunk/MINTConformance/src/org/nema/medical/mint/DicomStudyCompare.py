@@ -81,8 +81,6 @@ class DicomStudyCompare():
    def setOutput(self, output):
        if output == "": return
        if self.__output != None: self.__output.close()
-       if os.access(output, os.F_OK):
-          raise IOError("File already exists - "+output)
        self.__output = open(output, "w")
        
    def setExclude(self, exclude):
@@ -218,7 +216,7 @@ class DicomStudyCompare():
                            tag,
                            instance1.seriesInstanceUID(),
                            instance1.sopInstanceUID())
-           
+
        # ---
        # Check data elements.
        # ---
@@ -231,7 +229,7 @@ class DicomStudyCompare():
                            instance1.seriesInstanceUID(),
                            instance1.sopInstanceUID())
                                   
-   def __check(self, msg, obj1, obj2, series="", sop=""):
+   def __check(self, msg, obj1, obj2, series="", sop="", parentTag=""):
        if obj1 != obj2:
           self.__count += 1
           print "- Study Instance UID", self.__studyInstanceUID
@@ -239,9 +237,11 @@ class DicomStudyCompare():
              print " - Series Instance UID", series
              if sop != "":
                 print "  - SOP Instance UID", sop
+                if parentTag != "":
+                   print "   - Tag", parentTag
           print "ERROR:", msg, ":", obj1, "!=", obj2
        
-   def __warn(self, msg, obj1, obj2, series="", sop=""):
+   def __warn(self, msg, obj1, obj2, series="", sop="", parentTag=""):
        if obj1 != obj2 and self.__warnings:
           self.__warningCount += 1
           print "- Study Instance UID", self.__studyInstanceUID
@@ -249,6 +249,8 @@ class DicomStudyCompare():
              print " - Series Instance UID", series
              if sop != "":
                 print "  - SOP Instance UID", sop
+                if parentTag != "":
+                   print "   - Tag", parentTag
           print "WARNING:", msg, ":", obj1, "!=", obj2
        
    def __exception(self, msg, exception, series="", sop=""):
@@ -288,7 +290,7 @@ class DicomStudyCompare():
           attr1 = obj1.attributeByTag(tag)
           self.__checkAttribute(attr1, attr2, series, sop)
              
-   def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
+   def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID, parentTag=""):
           
        for exclude in self.__exclude:
            search = re.search(exclude, attr1.tag())
@@ -296,12 +298,30 @@ class DicomStudyCompare():
               self.__excludedTags += 1
               return
 
+       # ---
+       # The new study may have a more explicit VR so promote
+       # original DICOM tag if necessary.
+       # ---
+       if attr1.vr() == "UN" and attr2.vr() != "UN":
+          vrs = self.__dicom1.dataDictionary().vrs(attr1.tag())
+          # TODO: What to do if multiple VRs are present?
+          vr = vrs[0]
+          if vr != "UN":
+             self.__warn("Promoting VR "+attr1.tag(),
+                         attr1.vr(),
+                         vr,
+                         seriesInstanceUID, 
+                         sopInstanceUID)
+
+             attr1.promote(vr)
+
        if attr1.vr() != "":
           self.__check(attr1.tag()+" VR",
                        attr1.vr(),
                        attr2.vr(),
                        seriesInstanceUID, 
-                       sopInstanceUID)
+                       sopInstanceUID,
+                       parentTag)
 
        # ---
        # Check binary items and values.
@@ -333,7 +353,8 @@ class DicomStudyCompare():
                            val1,
                            val2,
                            seriesInstanceUID, 
-                           sopInstanceUID)
+                           sopInstanceUID,
+                           parentTag)
 
           self.__textTagsCompared += 1
           
@@ -345,7 +366,8 @@ class DicomStudyCompare():
                          attr1.val(),
                          attr2.val(),
                          seriesInstanceUID, 
-                         sopInstanceUID)
+                         sopInstanceUID,
+                         parentTag)
 
        # Check for sequence  
        if attr1.vr() == "SQ":
@@ -360,13 +382,14 @@ class DicomStudyCompare():
                     numItems1,
                     numItems2,
                     seriesInstanceUID, 
-                    sopInstanceUID)
+                    sopInstanceUID,
+                    parentTag)
 
        if numItems1 == numItems2:
           for i in range(0, numItems1):
               item1 = attr1.item(i)
               item2 = attr2.item(i)
-              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID)          
+              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID, attr1.tag())          
               self.__itemsCompared += 1
 
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
@@ -506,6 +529,8 @@ def main():
     for opt in options:
         if opt[0] == "-o":
            output = opt[1]
+           if os.access(output, os.F_OK):
+              raise IOError("File already exists - "+output)
 
     # ---
     # Check for exclude option.
