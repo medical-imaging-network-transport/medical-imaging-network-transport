@@ -279,15 +279,15 @@ class DicomStudyCompare():
               self.__excludedTags += 1
               return
           
+       attr1 = obj1.attributeByTag(tag)
        attr2 = obj2.attributeByTag(tag)
        if attr2 == None:
           self.__check("Data Element", 
-                       tag, 
+                       attr1.tag()+" "+attr1.valstr(), 
                        "None", 
                        series, 
                        sop)
        else:
-          attr1 = obj1.attributeByTag(tag)
           self.__checkAttribute(attr1, attr2, series, sop)
              
    def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID, parentTag=""):
@@ -515,12 +515,8 @@ class DicomStudyCompare():
 # main
 # -----------------------------------------------------------------------------
 def main():
-   
-    # ---
-    # Get options.
-    # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "o:x:vlwh")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:s:x:lpvwh")
 
     # ---
     # Check for output option.
@@ -533,6 +529,14 @@ def main():
               raise IOError("File already exists - "+output)
 
     # ---
+    # Check for source option.
+    # ---
+    source = ""
+    for opt in options:
+        if opt[0] == "-s":
+           source = opt[1]
+
+    # ---
     # Check for exclude option.
     # ---
     exclude = []
@@ -540,36 +544,24 @@ def main():
         if opt[0] == "-x":
            patterns = opt[1].replace('n', '.')
            exclude = patterns.split(',')
-
-    # ---
-    # Check for verbose option.
-    # ---
-    verbose = False
-    for opt in options:
-        if opt[0] == "-v":
-           verbose = True
            
     # ---
-    # Check for lazy option.
+    # Check for switches.
     # ---
     lazy = False
+    skipPrivate = False
+    verbose = False
+    warnings = False
+    help = False
     for opt in options:
         if opt[0] == "-l":
            lazy = True
-           
-    # ---
-    # Check for warning option.
-    # ---
-    warnings = False
-    for opt in options:
+        if opt[0] == "-p":
+           skipPrivate = True
+        if opt[0] == "-v":
+           verbose = True
         if opt[0] == "-w":
            warnings = True
-           
-    # ---
-    # Check for help option.
-    # ---
-    help = False
-    for opt in options:
         if opt[0] == "-h":
            help = True
            
@@ -581,11 +573,14 @@ def main():
        if help or argc < 2:
           print "Usage:", progName, "[options] <ref_dicom_study_dir> <new_dicom_study_dir>"
           print "  -o <output>:  output filename (defaults to stdout)"
-          print "  -x <exclude>: list of tags to exclude, ie. \"08590030,600001nn\""
-          print "  -v:           verbose"
+          print "  -s <source>:  source of the reference DICOM file, ie. -s \"UV\""
+          print "  -x <exclude>: list of tags to exclude, ie. -x \"08590030,600001nn\""
           print "  -l:           lazy check (skips binary content)"
+          print "  -p:           skip private tags"
+          print "  -v:           verbose"
           print "  -w:           show warnings"
           print "  -h:           displays usage"
+
           sys.exit(1)
           
        # ---
@@ -596,8 +591,8 @@ def main():
 
        dataDictionary = DCM4CHE_Dictionary()
      
-       refDicomStudy = DicomStudy(refDicomStudyDir, dataDictionary)
-       newDicomStudy = DicomStudy(newDicomStudyDir, dataDictionary)
+       refDicomStudy = DicomStudy(refDicomStudyDir, dataDictionary, skipPrivate, source)
+       newDicomStudy = DicomStudy(newDicomStudyDir, dataDictionary, skipPrivate)
      
        studies = DicomStudyCompare(refDicomStudy, newDicomStudy)
        studies.setVerbose(verbose)

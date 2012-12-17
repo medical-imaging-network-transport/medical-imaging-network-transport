@@ -43,7 +43,7 @@ from org.nema.medical.mint.DicomHeader        import DicomHeader
 # DicomStudy
 # -----------------------------------------------------------------------------
 class DicomStudy():
-   def __init__(self, dcmDir, dataDictionary):
+   def __init__(self, dcmDir, dataDictionary, skipPrivate=False, source=""):
    
        if not os.path.isdir(dcmDir):
           raise IOError("Directory does not exist - "+dcmDir)
@@ -54,6 +54,8 @@ class DicomStudy():
        self.__seriesInstanceUIDs = []
        self.__dataDictionary = dataDictionary
        self.__output = None
+       self.__skipPrivate = skipPrivate
+       self.__source = source
  
        self.__read()
 
@@ -123,7 +125,7 @@ class DicomStudy():
                   dcmNames.append(filename)
 
        for dcmName in dcmNames:
-           instance = DicomInstance(dcmName, self.__dataDictionary)
+           instance = DicomInstance(dcmName, self.__dataDictionary, self.__skipPrivate, self.__source)
 	              
            if self.__studyInstanceUID == "":
               self.__studyInstanceUID = instance.studyInstanceUID()
@@ -146,7 +148,7 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "o:t:h")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:s:t:ph")
                
     # ---
     # Check for output option.
@@ -159,6 +161,14 @@ def main():
               raise IOError("File already exists - "+output)
            
     # ---
+    # Check for source option.
+    # ---
+    source = ""
+    for opt in options:
+        if opt[0] == "-s":
+           source = opt[1]
+
+    # ---
     # Check for tag output option.
     # ---
     outputTag = ""
@@ -167,20 +177,26 @@ def main():
            outputTag = opt[1]
            
     # ---
-    # Check for help option.
+    # Check for switches.
     # ---
+    skipPrivate = False
     help = False
     for opt in options:
         if opt[0] == "-h":
            help = True
-           
+        if opt[0] == "-p":
+           skipPrivate = True
+
     try:
        if help or len(args) < 1:
 
           print "Usage", progName, "[options] <dicom_dir>"
-	  print "  -o <output>:     output filename (defaults to stdout)"
+          print "  -o <output>:     output filename (defaults to stdout)"
+	  print "  -s <source>:     source of the DICOM file, ie. -s \"UV\""
 	  print "  -t <output tag>: outputs tag (ie. -t 00020010)"
+	  print "  -p:              skip private tags"
 	  print "  -h:              displays usage"
+
           sys.exit(1)
           
        # ---
@@ -188,7 +204,7 @@ def main():
        # ---
        dcmDir = args[0];
        dataDictionary = DCM4CHE_Dictionary()
-       study = DicomStudy(dcmDir, dataDictionary)
+       study = DicomStudy(dcmDir, dataDictionary, skipPrivate, source)
        study.setOutput(output)
 
        if outputTag != "":
