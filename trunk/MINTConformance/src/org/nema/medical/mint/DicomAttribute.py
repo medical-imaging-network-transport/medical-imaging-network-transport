@@ -63,6 +63,7 @@ class DicomAttribute():
    DEBUG = False
    skipPrivate = False
    skipItems = False
+   source = ""
    
    MAX_BINARY_LENGTH           = 256
    UNDEFINED_LENGTH            = 0xffffffff
@@ -75,13 +76,18 @@ class DicomAttribute():
    
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN", "FL", "FD")
-
+   allVRs = {"CS", "SH", "LO", "ST", "LT", "UT", "AE", "PN", "UI", "DA", "TM", "DT", "AS", "IS", "DS", "SS", "US", "SL", "UL", "AT", "FL", "FD", "OB", "OW", "OF", "SQ", "UN" }
+   
    # Other Binary VRs that are represented as text for clarity
    # ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT")
       
    def setSkipPrivate(skipPrivate):
        DicomAttribute.skipPrivate = skipPrivate
    setSkipPrivate = staticmethod(setSkipPrivate)
+
+   def setSource(source):
+       DicomAttribute.source = source
+   setSource = staticmethod(setSource)
 
    def __init__(self, dcm, dataDictionary, transferSyntax, bytesToRead=0):
           
@@ -127,11 +133,17 @@ class DicomAttribute():
           pass # no VR
        elif transferSyntax.isExplicit() or self.isPart10Header():
           self.__vr=self.__readDicom(dcm, 2)
-       
+
        # ---
-       # Read the length
+       # Read the VL
        # ---
-       if self.__vr in self.reservedVRs: # Explicit with reserve
+       if self.isTransferSyntax() and self.__vr not in DicomAttribute.allVRs and DicomAttribute.source=="UV":
+          print "Warning - corrupt VR in Transfer Syntax UID tag"
+          vl=self.__vr
+          self.__vr = "UN"
+          self.__readDicom(dcm, 2)
+          self.__vl = transferSyntax.unpack("h", vl) # short
+       elif self.__vr in self.reservedVRs: # Explicit with reserve
           self.__readDicom(dcm, 2) # throw away reserve
           vl=self.__readDicom(dcm, 4)
           self.__vl = transferSyntax.unpack("L", vl) # unsigned long
