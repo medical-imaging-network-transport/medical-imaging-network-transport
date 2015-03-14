@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="MINTServer WEB-INF/lib">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/MINTServer/WebContent/WEB-INF/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/MINTServer/WebContent/WEB-INF/lib" recursive="false" />
+  </library>
+</component>

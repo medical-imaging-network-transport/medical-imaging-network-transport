@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="MINTJavaSDK lib">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/MINTJavaSDK/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/MINTJavaSDK/lib" recursive="false" />
+  </library>
+</component>
