@@ -27,8 +27,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="MINTJavaSDK" />
         <module name="MINTServer" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="MINTJavaSDK" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>

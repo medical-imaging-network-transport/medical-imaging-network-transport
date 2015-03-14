@@ -53,7 +53,5 @@
       <xs:element type="tns:study-attributesType" name="study-attributes" minOccurs="1"/>
       <xs:element type="tns:series-attributesType" name="series-attributes" minOccurs="1"/>
     </xs:sequence>
-    <xs:attribute type="xs:string" name="type"/>
-    <xs:attribute type="xs:decimal" name="version"/>
   </xs:complexType>
 </xs:schema>

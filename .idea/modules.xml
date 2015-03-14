@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" filepath="$PROJECT_DIR$/MINT2DICOM/MINT2DICOM.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" filepath="$PROJECT_DIR$/MINTJavaSDK/MINTJavaSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/MINTServer/MINTServer.iml" filepath="$PROJECT_DIR$/MINTServer/MINTServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/medical-imaging-network-transport.iml" filepath="$PROJECT_DIR$/medical-imaging-network-transport.iml" />
     </modules>
   </component>
 </project>
