@@ -1,3 +1,7 @@
+# MINT
+
+[![Build Status](https://api.travis-ci.org/medical-imaging-network-transport/medical-imaging-network-transport.svg)](https://travis-ci.org/medical-imaging-network-transport/medical-imaging-network-transport)
+
 Mission Statement
 =================
 Our mission is to improve medical imaging by addressing the need for fast, easy and interoperable access to unified medical imaging records. We will achieve this by defining interim standards and creating production quality open source implementations that leverage web and other new technologies. We will collaborate with vendors to validate solutions in the real world, and work with existing industry standards bodies (DICOM, IHE, HL7) to incorporate and standardize these new approaches.

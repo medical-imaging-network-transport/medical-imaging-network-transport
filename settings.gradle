@@ -1,0 +1,3 @@
+rootProject.name = 'medical-imaging-network-transport'
+
+include 'MINTJavaSDK'
