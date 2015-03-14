@@ -8,6 +8,6 @@ The MINT Leadership team is currently working as part of DICOM WG-27 to define R
 
 MINT 1.0
 --------
-For information about MINT 1.0, please see the Historical page
+For information about MINT 1.0, please see the [release page](https://github.com/medical-imaging-network-transport/medical-imaging-network-transport/releases/tag/1.0.2)
 
 This github site serves as the official location for the specification of the MINT standard as well as source code for a reference implementation of the standard.
