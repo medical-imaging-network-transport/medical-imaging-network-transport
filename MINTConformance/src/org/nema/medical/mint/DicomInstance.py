@@ -44,9 +44,10 @@ SOP_INSTANCE_UID_TAG    = "00080018"
 # DicomInstance
 # -----------------------------------------------------------------------------
 class DicomInstance():
-   def __init__(self, dcmName, dataDictionary, skipPrivate=False):
+   def __init__(self, dcmName, dataDictionary, skipPrivate=False, source=""):
 
        DicomAttribute.setSkipPrivate(skipPrivate)
+       DicomAttribute.setSource(source)
        
        self.__dcmName = dcmName
        self.__attributes = {}
@@ -97,6 +98,10 @@ class DicomInstance():
        """
        Returns a DicomAttribute if tag is found, otherwise None.
        """
+       attr = self.header().attributeByTag(tag)
+       if attr != None:
+          return attr
+         
        if self.__attributes.has_key(tag):
           return self.__attributes[tag]
        else:
@@ -137,24 +142,33 @@ class DicomInstance():
 # -----------------------------------------------------------------------------
 def main():
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "hp")
+    (options, args)=getopt.getopt(sys.argv[1:], "s:ph")
     
     # ---
-    # Check for help option.
+    # Check for source option.
     # ---
-    help = False
-    skipPrivate = False
+    source = ""
     for opt in options:
-        if opt[0] == "-h":
-           help = True
+        if opt[0] == "-s":
+           source = opt[1]
+           
+    # ---
+    # Check for switches.
+    # ---
+    skipPrivate = False
+    help = False
+    for opt in options:
         if opt[0] == "-p":
            skipPrivate = True
+        if opt[0] == "-h":
+           help = True
     
     try:
        if len(args) < 1 or help:
           print "Usage", progName, "[options] <dicom_file>"
-          print "  -h: displays usage"
-          print "  -p: skip private tags"
+          print "  -s <source>: source of the DICOM file, ie. -s \"UV\""
+          print "  -p:          skip private tags"
+          print "  -h:          displays usage"
           sys.exit(1)
           
        # ---
@@ -162,7 +176,7 @@ def main():
        # ---
        dcmName = args[0];
        dataDictionary = DCM4CHE_Dictionary()
-       instance = DicomInstance(dcmName, dataDictionary, skipPrivate)
+       instance = DicomInstance(dcmName, dataDictionary, skipPrivate, source)
        instance.debug()
                         
     except Exception, exception:

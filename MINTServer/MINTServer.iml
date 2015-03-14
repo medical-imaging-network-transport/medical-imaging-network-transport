@@ -6,6 +6,9 @@
         <webroots>
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/src" />
+        </sourceRoots>
       </configuration>
     </facet>
   </component>
@@ -34,4 +37,3 @@
     <orderEntry type="library" name="MINTServer WEB-INF/lib" level="project" />
   </component>
 </module>
-

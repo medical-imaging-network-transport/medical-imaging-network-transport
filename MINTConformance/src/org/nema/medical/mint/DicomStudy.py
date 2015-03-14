@@ -43,7 +43,7 @@ from org.nema.medical.mint.DicomHeader        import DicomHeader
 # DicomStudy
 # -----------------------------------------------------------------------------
 class DicomStudy():
-   def __init__(self, dcmDir, dataDictionary):
+   def __init__(self, dcmDir, dataDictionary, skipPrivate=False, source=""):
    
        if not os.path.isdir(dcmDir):
           raise IOError("Directory does not exist - "+dcmDir)
@@ -54,6 +54,8 @@ class DicomStudy():
        self.__seriesInstanceUIDs = []
        self.__dataDictionary = dataDictionary
        self.__output = None
+       self.__skipPrivate = skipPrivate
+       self.__source = source
  
        self.__read()
 
@@ -63,13 +65,21 @@ class DicomStudy():
    def setOutput(self, output):
        if output == "": return
        if self.__output != None: self.__output.close()
-       if os.access(output, os.F_OK):
-          raise IOError("File already exists - "+output)
        self.__output = open(output, "w")
        
    def studyInstanceUID(self):
        return self.__studyInstanceUID
-       
+
+   def attributeByTag(self, tag):
+       attr = None
+       if self.numSeries() > 0:
+          series = self.series(0)
+          if series != None and series.numInstances() > 0:
+             instance = series.instance(0)
+             if instance != None:
+                attr = instance.attributeByTag(tag)
+       return attr
+      
    def numSeries(self):
        return len(self.__series)
        
@@ -83,6 +93,18 @@ class DicomStudy():
    def seriesByUID(self, seriesInstanceUID):
        return self.__seriesByUID[seriesInstanceUID]
        
+   def dataDictionary(self):
+       return self.__dataDictionary
+
+   def printTag(self, tag):
+       val = None
+       attr = self.attributeByTag(tag)
+       if attr != None: val = attr.val()
+       if self.__output == None:
+          print val
+       else:
+          self.__output.write(val)
+
    def debug(self):
        if self.__output == None:
           print "> Study", self.studyInstanceUID()
@@ -103,7 +125,7 @@ class DicomStudy():
                   dcmNames.append(filename)
 
        for dcmName in dcmNames:
-           instance = DicomInstance(dcmName, self.__dataDictionary)
+           instance = DicomInstance(dcmName, self.__dataDictionary, self.__skipPrivate, self.__source)
 	              
            if self.__studyInstanceUID == "":
               self.__studyInstanceUID = instance.studyInstanceUID()
@@ -126,7 +148,7 @@ class DicomStudy():
 # -----------------------------------------------------------------------------
 def main():
     progName = sys.argv[0]
-    (options, args)=getopt.getopt(sys.argv[1:], "o:h")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:s:t:ph")
                
     # ---
     # Check for output option.
@@ -135,21 +157,46 @@ def main():
     for opt in options:
         if opt[0] == "-o":
            output = opt[1]
+           if os.access(output, os.F_OK):
+              raise IOError("File already exists - "+output)
            
     # ---
-    # Check for help option.
+    # Check for source option.
     # ---
+    source = ""
+    for opt in options:
+        if opt[0] == "-s":
+           source = opt[1]
+
+    # ---
+    # Check for tag output option.
+    # ---
+    outputTag = ""
+    for opt in options:
+        if opt[0] == "-t":
+           outputTag = opt[1]
+           
+    # ---
+    # Check for switches.
+    # ---
+    skipPrivate = False
     help = False
     for opt in options:
         if opt[0] == "-h":
            help = True
-           
+        if opt[0] == "-p":
+           skipPrivate = True
+
     try:
        if help or len(args) < 1:
 
           print "Usage", progName, "[options] <dicom_dir>"
-	  print "  -o <output>: output filename (defaults to stdout)"
-	  print "  -h:          displays usage"
+          print "  -o <output>:     output filename (defaults to stdout)"
+	  print "  -s <source>:     source of the DICOM file, ie. -s \"UV\""
+	  print "  -t <output tag>: outputs tag (ie. -t 00020010)"
+	  print "  -p:              skip private tags"
+	  print "  -h:              displays usage"
+
           sys.exit(1)
           
        # ---
@@ -157,9 +204,14 @@ def main():
        # ---
        dcmDir = args[0];
        dataDictionary = DCM4CHE_Dictionary()
-       study = DicomStudy(dcmDir, dataDictionary)
+       study = DicomStudy(dcmDir, dataDictionary, skipPrivate, source)
        study.setOutput(output)
-       study.debug()
+
+       if outputTag != "":
+          study.printTag(outputTag)
+       else:
+          study.debug()
+
        study.tidy()
        
     except Exception, exception:

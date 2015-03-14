@@ -63,6 +63,7 @@ class DicomAttribute():
    DEBUG = False
    skipPrivate = False
    skipItems = False
+   source = ""
    
    MAX_BINARY_LENGTH           = 256
    UNDEFINED_LENGTH            = 0xffffffff
@@ -71,17 +72,22 @@ class DicomAttribute():
    ITEM_TAG                    = "fffee000"
    ITEM_DELIMITATION_TAG       = "fffee00d"
    SQ_DELIMITATION_TAG         = "fffee0dd"
-   SKIPPED_TAG                 = "11111111"
+   SKIPPED_TAG                 = "########"
    
    reservedVRs = ("OB", "OW", "OF", "SQ", "UT", "UN")
    binaryVRs   = ("OB", "OW", "UN", "FL", "FD")
-
+   allVRs = {"CS", "SH", "LO", "ST", "LT", "UT", "AE", "PN", "UI", "DA", "TM", "DT", "AS", "IS", "DS", "SS", "US", "SL", "UL", "AT", "FL", "FD", "OB", "OW", "OF", "SQ", "UN" }
+   
    # Other Binary VRs that are represented as text for clarity
    # ("SS", "US", "SL", "UL", "FL", "FD", "OF", "AT")
       
    def setSkipPrivate(skipPrivate):
        DicomAttribute.skipPrivate = skipPrivate
    setSkipPrivate = staticmethod(setSkipPrivate)
+
+   def setSource(source):
+       DicomAttribute.source = source
+   setSource = staticmethod(setSource)
 
    def __init__(self, dcm, dataDictionary, transferSyntax, bytesToRead=0):
           
@@ -127,11 +133,17 @@ class DicomAttribute():
           pass # no VR
        elif transferSyntax.isExplicit() or self.isPart10Header():
           self.__vr=self.__readDicom(dcm, 2)
-       
+
        # ---
-       # Read the length
+       # Read the VL
        # ---
-       if self.__vr in self.reservedVRs: # Explicit with reserve
+       if self.isTransferSyntax() and self.__vr not in DicomAttribute.allVRs and DicomAttribute.source=="UV":
+          print "Warning - corrupt VR in Transfer Syntax UID tag"
+          vl=self.__vr
+          self.__vr = "UN"
+          self.__readDicom(dcm, 2)
+          self.__vl = transferSyntax.unpack("h", vl) # short
+       elif self.__vr in self.reservedVRs: # Explicit with reserve
           self.__readDicom(dcm, 2) # throw away reserve
           vl=self.__readDicom(dcm, 4)
           self.__vl = transferSyntax.unpack("L", vl) # unsigned long
@@ -149,8 +161,19 @@ class DicomAttribute():
           # If this is private and the length is unknown promote to sequence
           # ---
           if self.isPrivate() and self.__vl == self.UNDEFINED_LENGTH:
-             self.promote("SQ")
-                
+             self.promote("SQ")                
+ 
+       # ---
+       # Promote standard DICOM tags
+       # ---
+       vrs = dataDictionary.vrs(self.__tag)
+       # TODO: What to do if multiple VRs are present?
+       vr=vrs[0] 
+       if self.__vr != vr:
+          if DicomAttribute.DEBUG: 
+             print "DicomAttribute: Info - Promoting ", self.__vr, "to", vr
+          self.promote(vr)
+
        if DicomAttribute.DEBUG:
           print self.__tag, self.__vr, self.__vl,
           if   self.isPrivate()     : print "<Private>",
@@ -177,9 +200,6 @@ class DicomAttribute():
        elif self.isPixelData() and self.__vl == self.UNDEFINED_LENGTH:
             self.__readCompressed(dcm)
 
-       elif self.isItemStart() and self.__vl == 4:
-            self.__readFragment(dcm)
-
        elif self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
             self.__readUndefinedItems(dcm)
 
@@ -192,7 +212,8 @@ class DicomAttribute():
        # ---
        # Read the val
        # ---
-       self.__readVal(dcm)
+       self.__readVal(dcm)       
+       if self.isTransferSyntax(): DicomTransfer(self.val()) # Validate TS
        if DicomAttribute.DEBUG: print self.valstr()
        
    def group(self)    : return self.__tag[0:4]
@@ -259,26 +280,36 @@ class DicomAttribute():
        # Only promote unknown VR's.
        if self.__vr != "UN": return
 
-       # Promote the VR.      
-       self.__vr = vr    
-      
+       # ---
+       # 2011 PS3.5 Section 6.2.2 Unknown (UN) Value Representation
+       # 
+       # Note 2: If at some point an application knows the actual VR for an Attribute of VR UN
+       # (e.g. has its own applicable data dictionary), it can assume that the Value Field of the
+       # Attribute is encoded in Little Endian byte ordering with implicit VR encoding,
+       # irrespective of the current Transfer Syntax.
+       # ---
+       self.__vr = vr  
+       self.__transferSyntax = DicomTransfer(DicomTransfer.IMPLICIT_VR_LITTLE_ENDIAN)
+
        # If we are promoting from UN to another binary, we are done.
-       if self.isBinary(): return
+       if self.isBinary() and self.__bytes == "": return
        
        # ---
-       # If the promotion changes the val from inline binary to text, we need to unpack again.
+       # If the promotion changes the val from inline binary to text, we need to decode again.
        # ---
-       if self.__bytes != "":
+       if self.__bytes != "" and self.__bytes != None:
           self.__val = base64.b64decode(self.__bytes)
           self.__unpackToString()
           self.__bytes = ""
 
    def debug(self, output=None, indent=""):
 
+       if self.__tag == self.SKIPPED_TAG: return
+
        # ---
        # Output tag information.
        # ---
-       if self.isItemStart():
+       if self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
           if output==None:
              print indent+"<item>",
           else:
@@ -292,7 +323,7 @@ class DicomAttribute():
        # ---
        # Output tag value.
        # ---
-       if self.isItemStart():
+       if self.isItemStart() and self.__vl == self.UNDEFINED_LENGTH:
           pass
 
        elif self.isItemStop():
@@ -325,7 +356,7 @@ class DicomAttribute():
        # ---
        # Output tag description.
        # ---
-       if (self.isItemStart() and self.vl() != 0):
+       if (self.isItemStart() and self.vl() == self.UNDEFINED_LENGTH):
           if output==None:
              print indent+"</item>"
           else:
@@ -346,6 +377,7 @@ class DicomAttribute():
        done = False
        while not done:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): done = True
           if not done and not item.isGroupLength():
@@ -356,6 +388,7 @@ class DicomAttribute():
        sequenceBytesToRead = self.__vl
        while sequenceBytesToRead > 0:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           sequenceBytesToRead -= item.bytesRead()
           if not item.isGroupLength():
@@ -369,26 +402,7 @@ class DicomAttribute():
        DicomAttribute.skipItems = True
        while DicomAttribute.skipItems:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
-          self.__bytesRead += item.bytesRead()
-          if item.isSequenceStop(): 
-             DicomAttribute.skipItems = False
-          else:
-             self.__items.append(item)
-
-   def __readFragment(self, dcm):
-
-       # ---
-       # Read frame number
-       # ---
-       vl=self.__readDicom(dcm, self.vl())
-       frameNumber = self.__transferSyntax.unpack("L", vl) # unsigned long
-       
-       # ---
-       # Skip over item
-       # ---
-       DicomAttribute.skipItems = True
-       while DicomAttribute.skipItems:
-          item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")          
           self.__bytesRead += item.bytesRead()
           if item.isSequenceStop(): 
              DicomAttribute.skipItems = False
@@ -403,6 +417,7 @@ class DicomAttribute():
        done = False
        while not done:
           item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+          if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           if item.isItemStop() or item.isSequenceStop(): done = True
           if not done and not item.isGroupLength():
@@ -414,8 +429,10 @@ class DicomAttribute():
        while itemBytesToRead > 0:
           if DicomAttribute.skipItems:
              item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax, itemBytesToRead)
+             if not item.isValid(): raise IOError("End of file found unexpectedly")
           else:
              item = DicomAttribute(dcm, self.__dataDictionary, self.__transferSyntax)
+             if not item.isValid(): raise IOError("End of file found unexpectedly")
           self.__bytesRead += item.bytesRead()
           itemBytesToRead -= item.bytesRead()
           if not item.isGroupLength():

@@ -81,8 +81,6 @@ class DicomStudyCompare():
    def setOutput(self, output):
        if output == "": return
        if self.__output != None: self.__output.close()
-       if os.access(output, os.F_OK):
-          raise IOError("File already exists - "+output)
        self.__output = open(output, "w")
        
    def setExclude(self, exclude):
@@ -201,11 +199,11 @@ class DicomStudyCompare():
        # ---
        header1 = instance1.header()
        header2 = instance2.header()
-       self.__check("Number of header tags",
-                    header1.numAttributes(),
-                    header2.numAttributes(),
-                    instance1.seriesInstanceUID(),
-                    instance1.sopInstanceUID())
+       self.__warn("Number of header tags",
+                   header1.numAttributes(),
+                   header2.numAttributes(),
+                   instance1.seriesInstanceUID(),
+                   instance1.sopInstanceUID())
        
        # ---
        # Check header elements.
@@ -218,7 +216,7 @@ class DicomStudyCompare():
                            tag,
                            instance1.seriesInstanceUID(),
                            instance1.sopInstanceUID())
-           
+
        # ---
        # Check data elements.
        # ---
@@ -231,7 +229,7 @@ class DicomStudyCompare():
                            instance1.seriesInstanceUID(),
                            instance1.sopInstanceUID())
                                   
-   def __check(self, msg, obj1, obj2, series="", sop=""):
+   def __check(self, msg, obj1, obj2, series="", sop="", parentTag=""):
        if obj1 != obj2:
           self.__count += 1
           print "- Study Instance UID", self.__studyInstanceUID
@@ -239,9 +237,11 @@ class DicomStudyCompare():
              print " - Series Instance UID", series
              if sop != "":
                 print "  - SOP Instance UID", sop
+                if parentTag != "":
+                   print "   - Tag", parentTag
           print "ERROR:", msg, ":", obj1, "!=", obj2
        
-   def __warn(self, msg, obj1, obj2, series="", sop=""):
+   def __warn(self, msg, obj1, obj2, series="", sop="", parentTag=""):
        if obj1 != obj2 and self.__warnings:
           self.__warningCount += 1
           print "- Study Instance UID", self.__studyInstanceUID
@@ -249,6 +249,8 @@ class DicomStudyCompare():
              print " - Series Instance UID", series
              if sop != "":
                 print "  - SOP Instance UID", sop
+                if parentTag != "":
+                   print "   - Tag", parentTag
           print "WARNING:", msg, ":", obj1, "!=", obj2
        
    def __exception(self, msg, exception, series="", sop=""):
@@ -277,18 +279,18 @@ class DicomStudyCompare():
               self.__excludedTags += 1
               return
           
+       attr1 = obj1.attributeByTag(tag)
        attr2 = obj2.attributeByTag(tag)
        if attr2 == None:
           self.__check("Data Element", 
-                       tag, 
+                       attr1.tag()+" "+attr1.valstr(), 
                        "None", 
                        series, 
                        sop)
        else:
-          attr1 = obj1.attributeByTag(tag)
           self.__checkAttribute(attr1, attr2, series, sop)
              
-   def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
+   def __checkAttribute(self, attr1, attr2, seriesInstanceUID, sopInstanceUID, parentTag=""):
           
        for exclude in self.__exclude:
            search = re.search(exclude, attr1.tag())
@@ -296,12 +298,30 @@ class DicomStudyCompare():
               self.__excludedTags += 1
               return
 
+       # ---
+       # The new study may have a more explicit VR so promote
+       # original DICOM tag if necessary.
+       # ---
+       if attr1.vr() == "UN" and attr2.vr() != "UN":
+          vrs = self.__dicom1.dataDictionary().vrs(attr1.tag())
+          # TODO: What to do if multiple VRs are present?
+          vr = vrs[0]
+          if vr != "UN":
+             self.__warn("Promoting VR "+attr1.tag(),
+                         attr1.vr(),
+                         vr,
+                         seriesInstanceUID, 
+                         sopInstanceUID)
+
+             attr1.promote(vr)
+
        if attr1.vr() != "":
           self.__check(attr1.tag()+" VR",
                        attr1.vr(),
                        attr2.vr(),
                        seriesInstanceUID, 
-                       sopInstanceUID)
+                       sopInstanceUID,
+                       parentTag)
 
        # ---
        # Check binary items and values.
@@ -322,11 +342,19 @@ class DicomStudyCompare():
           if len(val1) > 0 and not val1[-1].isalnum(): val1 = val1.rstrip(val1[-1])
           if len(val2) > 0 and not val2[-1].isalnum(): val2 = val1.rstrip(val2[-1])
 
-          self.__check(attr1.tag()+" Value",
-                       val1,
-                       val2,
-                       seriesInstanceUID, 
-                       sopInstanceUID)
+          if attr1.isPart10Header():
+              self.__warn(attr1.tag()+" Value",
+                          val1,
+                          val2,
+                          seriesInstanceUID, 
+                          sopInstanceUID)
+          else:
+              self.__check(attr1.tag()+" Value",
+                           val1,
+                           val2,
+                           seriesInstanceUID, 
+                           sopInstanceUID,
+                           parentTag)
 
           self.__textTagsCompared += 1
           
@@ -338,7 +366,8 @@ class DicomStudyCompare():
                          attr1.val(),
                          attr2.val(),
                          seriesInstanceUID, 
-                         sopInstanceUID)
+                         sopInstanceUID,
+                         parentTag)
 
        # Check for sequence  
        if attr1.vr() == "SQ":
@@ -353,13 +382,14 @@ class DicomStudyCompare():
                     numItems1,
                     numItems2,
                     seriesInstanceUID, 
-                    sopInstanceUID)
+                    sopInstanceUID,
+                    parentTag)
 
        if numItems1 == numItems2:
           for i in range(0, numItems1):
               item1 = attr1.item(i)
               item2 = attr2.item(i)
-              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID)          
+              self.__checkAttribute(item1, item2, seriesInstanceUID, sopInstanceUID, attr1.tag())          
               self.__itemsCompared += 1
 
    def __checkBinary(self, attr1, attr2, seriesInstanceUID, sopInstanceUID):
@@ -485,12 +515,8 @@ class DicomStudyCompare():
 # main
 # -----------------------------------------------------------------------------
 def main():
-   
-    # ---
-    # Get options.
-    # ---
     progName = os.path.basename(sys.argv[0])
-    (options, args)=getopt.getopt(sys.argv[1:], "o:x:vlwh")
+    (options, args)=getopt.getopt(sys.argv[1:], "o:s:x:lpvwh")
 
     # ---
     # Check for output option.
@@ -499,6 +525,16 @@ def main():
     for opt in options:
         if opt[0] == "-o":
            output = opt[1]
+           if os.access(output, os.F_OK):
+              raise IOError("File already exists - "+output)
+
+    # ---
+    # Check for source option.
+    # ---
+    source = ""
+    for opt in options:
+        if opt[0] == "-s":
+           source = opt[1]
 
     # ---
     # Check for exclude option.
@@ -508,36 +544,24 @@ def main():
         if opt[0] == "-x":
            patterns = opt[1].replace('n', '.')
            exclude = patterns.split(',')
-
-    # ---
-    # Check for verbose option.
-    # ---
-    verbose = False
-    for opt in options:
-        if opt[0] == "-v":
-           verbose = True
            
     # ---
-    # Check for lazy option.
+    # Check for switches.
     # ---
     lazy = False
+    skipPrivate = False
+    verbose = False
+    warnings = False
+    help = False
     for opt in options:
         if opt[0] == "-l":
            lazy = True
-           
-    # ---
-    # Check for warning option.
-    # ---
-    warnings = False
-    for opt in options:
+        if opt[0] == "-p":
+           skipPrivate = True
+        if opt[0] == "-v":
+           verbose = True
         if opt[0] == "-w":
            warnings = True
-           
-    # ---
-    # Check for help option.
-    # ---
-    help = False
-    for opt in options:
         if opt[0] == "-h":
            help = True
            
@@ -549,11 +573,14 @@ def main():
        if help or argc < 2:
           print "Usage:", progName, "[options] <ref_dicom_study_dir> <new_dicom_study_dir>"
           print "  -o <output>:  output filename (defaults to stdout)"
-          print "  -x <exclude>: list of tags to exclude, ie. \"08590030,600001nn\""
-          print "  -v:           verbose"
+          print "  -s <source>:  source of the reference DICOM file, ie. -s \"UV\""
+          print "  -x <exclude>: list of tags to exclude, ie. -x \"08590030,600001nn\""
           print "  -l:           lazy check (skips binary content)"
+          print "  -p:           skip private tags"
+          print "  -v:           verbose"
           print "  -w:           show warnings"
           print "  -h:           displays usage"
+
           sys.exit(1)
           
        # ---
@@ -564,8 +591,8 @@ def main():
 
        dataDictionary = DCM4CHE_Dictionary()
      
-       refDicomStudy = DicomStudy(refDicomStudyDir, dataDictionary)
-       newDicomStudy = DicomStudy(newDicomStudyDir, dataDictionary)
+       refDicomStudy = DicomStudy(refDicomStudyDir, dataDictionary, skipPrivate, source)
+       newDicomStudy = DicomStudy(newDicomStudyDir, dataDictionary, skipPrivate)
      
        studies = DicomStudyCompare(refDicomStudy, newDicomStudy)
        studies.setVerbose(verbose)

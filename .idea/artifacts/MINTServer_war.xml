@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="MINTServer:war">
+    <output-path>$PROJECT_DIR$/MINTServer/target</output-path>
+    <root id="archive" name="MINTServer.war-1.2.0.war">
+      <element id="artifact" artifact-name="MINTServer:war exploded" />
+    </root>
+  </artifact>
+</component>
