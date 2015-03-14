@@ -1,0 +1,82 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+}
+
+group = 'nema-medical'
+archivesBaseName = 'mint'
+version = '1.2.1-SNAPSHOT'
+
+configurations {
+    jibxBinding
+}
+
+dependencies {
+    compile (
+            [group: 'com.google.protobuf', name: 'protobuf-java', version: '2.3.0'],
+            [group: 'commons-codec', name: 'commons-codec', version: '1.6'],
+            [group: 'joda-time', name: 'joda-time', version: '2.8.2'],
+            [group: 'org.jibx', name: 'jibx-run', version: '1.3.0']
+    )
+
+    testCompile (
+            [group: 'junit', name: 'junit', version: '4.10']
+    )
+
+    jibxBinding (
+            [group: 'org.jibx', name: 'jibx-bind', version: '1.3.0']
+    )
+}
+
+task javadocJar(type: Jar){
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+//Runs the Jibx bindings using an ant task
+task jibxBind << {
+    logger.lifecycle('Compiling jibx bindings')
+    def buildDirPath = project.buildDir.path
+    def projectPath = project.getProjectDir()
+    def bindingDir = file("${projectPath}/config")
+    def bindingClassPath = sourceSets.main.compileClasspath.getAsPath() + File.pathSeparator + "${buildDirPath}/classes/main"
+    if (bindingDir.exists()){
+        logger.info("Compiling jibx binding files")
+        ant {
+            taskdef(
+                    name: 'bind',
+                    classname: 'org.jibx.binding.ant.CompileTask',
+                    classpath: configurations.jibxBinding.asPath
+            )
+            bind(
+                    verbose: 'true'
+            ) {
+                bindingfileset(dir: bindingDir) {
+                    include(name: '**/*.jibx')
+                }
+                classpath {
+
+                    pathelement(path: bindingClassPath)
+                }
+            }
+        }
+    } else {
+        logger.info("No jibx binding folder")
+    }
+}
+jibxBind.description = "Compiles jibx bindings"
+
+//Runs the Jibx bindings
+compileJava.finalizedBy jibxBind
+classes.mustRunAfter jibxBind
