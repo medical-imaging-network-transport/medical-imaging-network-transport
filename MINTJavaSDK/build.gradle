@@ -1,11 +1,13 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://repository.apache.org/content/repositories/snapshots'
-    }
 }
+
+group = 'nema-medical'
+archivesBaseName = 'mint'
+version = '2.0-SNAPSHOT'
 
 configurations {
     jibxBinding
@@ -26,6 +28,20 @@ dependencies {
     jibxBinding (
             [group: 'org.jibx', name: 'jibx-bind', version: '1.2.5']
     )
+}
+
+task javadocJar(type: Jar){
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
 }
 
 //Runs the Jibx bindings using an ant task
