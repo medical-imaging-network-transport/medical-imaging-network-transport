@@ -1,0 +1,6 @@
+# Backlog #
+  * Add support for querying by Universal Entity ID (0040,0032) and Universal Entity ID Type (0040,0033)
+  * Explore mechanism to allow binary item access via a different URI than the one relative to the metadata.  The idea here is to allow a client to read the binary data directly from where it is being stored rather than going through a proxy.  A few use cases:
+    * Store the binary items in an HTTP storage system like Caringo or Dell Object store.  Performance is improved if the client can read the binary item directly
+    * A de-identification service could implement the MINT api and serve up de-identified metadata but allow the client to retrieve the binary items directly from the MINT service.  Performance would be improved
+  * From original MINTStudyMetadataFormat document: What is an acceptable number of significant digits for the string representation of single- and double-precision floating point numbers (that came from FL and FD DICOM attributes)? The supplement 118 specification does not comment on this but it would be preferable to have this defined for both single- and double-precision floating point numbers.
