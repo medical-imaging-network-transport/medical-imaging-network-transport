@@ -40,8 +40,8 @@ import org.nema.medical.mint.metadata.GPB.SeriesData;
  */
 public class Series implements AttributeContainer, Excludable
 {
-    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
-    private final Map<Integer,Attribute> normalizedInstanceAttributeMap = new TreeMap<Integer,Attribute>();
+    private final Map<Long,Attribute> attributeMap = new TreeMap<Long,Attribute>();
+    private final Map<Long,Attribute> normalizedInstanceAttributeMap = new TreeMap<Long,Attribute>();
     private final Map<String, Instance> instances = new TreeMap<String, Instance>();
     private String seriesInstanceUID;
     private boolean excluded;
@@ -51,7 +51,7 @@ public class Series implements AttributeContainer, Excludable
      * @return the attribute for the given tag
      */
     public Attribute getAttribute(final int tag) {
-        return attributeMap.get(tag);
+        return attributeMap.get(toUint32(tag));
     }
 
     /**
@@ -59,7 +59,7 @@ public class Series implements AttributeContainer, Excludable
      * @param attr
      */
     public void putAttribute(final Attribute attr) {
-        attributeMap.put(attr.getTag(), attr);
+        attributeMap.put(toUint32(attr.getTag()), attr);
     }
 
     /**
@@ -67,7 +67,7 @@ public class Series implements AttributeContainer, Excludable
      * @param tag
      */
     public void removeAttribute(final int tag) {
-        attributeMap.remove(tag);
+        attributeMap.remove(toUint32(tag));
     }
 
     /**
@@ -86,7 +86,7 @@ public class Series implements AttributeContainer, Excludable
      * @return the normalized instance attribute for the given tag
      */
     public Attribute getNormalizedInstanceAttribute(final int tag) {
-        return normalizedInstanceAttributeMap.get(tag);
+        return normalizedInstanceAttributeMap.get(toUint32(tag));
     }
 
     /**
@@ -94,7 +94,7 @@ public class Series implements AttributeContainer, Excludable
      * @param attr
      */
     public void putNormalizedInstanceAttribute(final Attribute attr) {
-        normalizedInstanceAttributeMap.put(attr.getTag(), attr);
+        normalizedInstanceAttributeMap.put(toUint32(attr.getTag()), attr);
     }
 
     /**
@@ -102,7 +102,7 @@ public class Series implements AttributeContainer, Excludable
      * @param tag
      */
     public void removeNormalizedInstanceAttribute(final int tag) {
-        normalizedInstanceAttributeMap.remove(tag);
+        normalizedInstanceAttributeMap.remove(toUint32(tag));
     }
 
     /**
@@ -251,5 +251,9 @@ public class Series implements AttributeContainer, Excludable
         }
         SeriesData data = builder.build();
         return data;
+    }
+
+    private Long toUint32(int tag) {
+        return tag & 0x00000000FFFFFFFFL;
     }
 }
