@@ -35,13 +35,13 @@ import org.nema.medical.mint.metadata.GPB.ItemData;
  * </pre>
  */
 public class Item implements AttributeContainer, Cloneable {
-    private Map<Integer, Attribute> attributeMap = new TreeMap<Integer, Attribute>();
+    private Map<Long, Attribute> attributeMap = new TreeMap<Long, Attribute>();
 
     @Override
     public Object clone() throws CloneNotSupportedException {
         final Item clone = (Item) super.clone();
-        clone.attributeMap = new TreeMap<Integer, Attribute>(attributeMap);
-        for (final Map.Entry<Integer, Attribute> entry: attributeMap.entrySet()) {
+        clone.attributeMap = new TreeMap<Long, Attribute>(attributeMap);
+        for (final Map.Entry<Long, Attribute> entry: attributeMap.entrySet()) {
             clone.attributeMap.put(entry.getKey(), (Attribute) entry.getValue().clone());
         }
         return clone;
@@ -68,7 +68,7 @@ public class Item implements AttributeContainer, Cloneable {
      * @return the attribute for the given tag
      */
     public Attribute getAttribute(final int tag) {
-        return attributeMap.get(tag);
+        return attributeMap.get(toUint32(tag));
     }
 
     /**
@@ -77,7 +77,7 @@ public class Item implements AttributeContainer, Cloneable {
      * @param attr
      */
     public void putAttribute(final Attribute attr) {
-        attributeMap.put(attr.getTag(), attr);
+        attributeMap.put(toUint32(attr.getTag()), attr);
     }
 
     /**
@@ -86,7 +86,7 @@ public class Item implements AttributeContainer, Cloneable {
      * @param tag
      */
     public void removeAttribute(final int tag) {
-        attributeMap.remove(tag);
+        attributeMap.remove(toUint32(tag));
     }
 
     /**
@@ -118,5 +118,9 @@ public class Item implements AttributeContainer, Cloneable {
         }
         ItemData data = builder.build();
         return data;
+    }
+
+    private Long toUint32(int tag) {
+        return tag & 0x00000000FFFFFFFFL;
     }
 }

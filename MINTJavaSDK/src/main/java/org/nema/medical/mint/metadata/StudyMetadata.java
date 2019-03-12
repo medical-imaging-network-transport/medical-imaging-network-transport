@@ -44,7 +44,7 @@ import org.nema.medical.mint.metadata.GPB.StudyData;
  */
 public class StudyMetadata implements AttributeContainer, StudySummary
 {
-    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
+    private final Map<Long,Attribute> attributeMap = new TreeMap<Long,Attribute>();
     private final Map<String,Series> seriesMap = new TreeMap<String,Series>();
     private String studyInstanceUID;
 
@@ -52,7 +52,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
 	 * @see org.nema.medical.mint.metadata.StudySummary#getAttribute(int)
 	 */
     public Attribute getAttribute(final int tag) {
-        return attributeMap.get(tag);
+        return attributeMap.get(toUint32(tag));
     }
 
     /* (non-Javadoc)
@@ -68,7 +68,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
      * @param attr
      */
     public void putAttribute(final Attribute attr) {
-        attributeMap.put(attr.getTag(), attr);
+        attributeMap.put(toUint32(attr.getTag()), attr);
     }
 
     /**
@@ -76,7 +76,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
      * @param tag
      */
     public void removeAttribute(final int tag) {
-        attributeMap.remove(tag);
+        attributeMap.remove(toUint32(tag));
     }
     
     /* (non-Javadoc)
@@ -254,5 +254,7 @@ public class StudyMetadata implements AttributeContainer, StudySummary
         return builder.build();
     }
 
-
+    private Long toUint32(int tag) {
+        return tag & 0x00000000FFFFFFFFL;
+    }
 }
