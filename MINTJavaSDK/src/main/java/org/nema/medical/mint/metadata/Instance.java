@@ -37,7 +37,7 @@ import org.nema.medical.mint.metadata.GPB.InstanceData;
  */
 public class Instance implements AttributeContainer, Excludable
 {
-    private final Map<Integer,Attribute> attributeMap = new TreeMap<Integer,Attribute>();
+    private final Map<Long,Attribute> attributeMap = new TreeMap<Long, Attribute>();
     private String sopInstanceUID;
     private String transferSyntaxUID;
     private boolean excluded;
@@ -47,7 +47,7 @@ public class Instance implements AttributeContainer, Excludable
      * @return the attribute for the given tag (in hex)
      */
     public Attribute getAttribute(final int tag) {
-        return attributeMap.get(tag);
+        return attributeMap.get(toUint32(tag));
     }
 
     // todo pull into superclass
@@ -61,7 +61,7 @@ public class Instance implements AttributeContainer, Excludable
      * @param attr
      */
     public void putAttribute(final Attribute attr) {
-        attributeMap.put(attr.getTag(), attr);
+        attributeMap.put(toUint32(attr.getTag()), attr);
     }
 
     /**
@@ -69,7 +69,7 @@ public class Instance implements AttributeContainer, Excludable
      * @param tag
      */
     public void removeAttribute(final int tag) {
-        attributeMap.remove(tag);
+        attributeMap.remove(toUint32(tag));
     }
 
     /**
@@ -169,5 +169,9 @@ public class Instance implements AttributeContainer, Excludable
         }
         InstanceData data = builder.build();
         return data;
+    }
+
+    private Long toUint32(int tag) {
+        return tag & 0x00000000FFFFFFFFL;
     }
 }
