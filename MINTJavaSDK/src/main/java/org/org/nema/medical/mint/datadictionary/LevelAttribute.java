@@ -1,5 +1,5 @@
 /*
- *   Copyright 2010 MINT Working Group
+ *   Copyright 2010-2011 MINT Working Group
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,46 +19,27 @@ package org.nema.medical.mint.datadictionary;
 /** 
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="attributeType">
- *   &lt;xs:simpleContent>
- *     &lt;xs:extension base="xs:string">
- *       &lt;xs:attribute type="xs:string" use="optional" name="tag"/>
- *       &lt;xs:attribute type="xs:string" use="optional" name="desc"/>
- *     &lt;/xs:extension>
- *   &lt;/xs:simpleContent>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="attributeType"&gt;
+ *   &lt;xs:simpleContent&gt;
+ *     &lt;xs:extension base="xs:string"&gt;
+ *       &lt;xs:attribute type="xs:hexBinary" use="optional" name="tag"/&gt;
+ *       &lt;xs:attribute type="xs:string" use="optional" name="desc"/&gt;
+ *     &lt;/xs:extension&gt;
+ *   &lt;/xs:simpleContent&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
-public class AttributeType
+public class LevelAttribute
 {
-    private String string;
-    private String tag;
+    private int tag;
     private String desc;
 
-    /** 
-     * Get the extension value.
-     * 
-     * @return value
-     */
-    public String getString() {
-        return string;
-    }
-
-    /** 
-     * Set the extension value.
-     * 
-     * @param string
-     */
-    public void setString(String string) {
-        this.string = string;
-    }
-
-    /** 
+    /**
      * Get the 'tag' attribute value.
      * 
      * @return value
      */
-    public String getTag() {
+    public int getTag() {
         return tag;
     }
 
@@ -67,7 +48,7 @@ public class AttributeType
      * 
      * @param tag
      */
-    public void setTag(String tag) {
+    public void setTag(int tag) {
         this.tag = tag;
     }
 

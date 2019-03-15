@@ -21,17 +21,17 @@ import org.nema.medical.mint.metadata.StudyIO;
 /**
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="elementType">
- *   &lt;xs:simpleContent>
- *     &lt;xs:extension base="xs:string">
- *       &lt;xs:attribute type="xs:string" use="required" name="tag"/>
- *       &lt;xs:attribute type="xs:string" use="required" name="keyword"/>
- *       &lt;xs:attribute type="xs:string" use="required" name="vr"/>
- *       &lt;xs:attribute type="xs:string" use="optional" name="vm"/>
- *       &lt;xs:attribute type="xs:string" use="optional" name="ret"/>
- *     &lt;/xs:extension>
- *   &lt;/xs:simpleContent>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="elementType"&gt;
+ *   &lt;xs:simpleContent&gt;
+ *     &lt;xs:extension base="xs:string"&gt;
+ *       &lt;xs:attribute type="xs:string" use="required" name="tag"/&gt;
+ *       &lt;xs:attribute type="xs:string" use="required" name="keyword"/&gt;
+ *       &lt;xs:attribute type="xs:string" use="required" name="vr"/&gt;
+ *       &lt;xs:attribute type="xs:string" use="optional" name="vm"/&gt;
+ *       &lt;xs:attribute type="xs:string" use="optional" name="ret"/&gt;
+ *     &lt;/xs:extension&gt;
+ *   &lt;/xs:simpleContent&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class ElementType

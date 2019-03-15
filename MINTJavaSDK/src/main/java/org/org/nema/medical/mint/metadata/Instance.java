@@ -27,12 +27,12 @@ import org.nema.medical.mint.metadata.GPB.InstanceData;
 /**
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="InstanceType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="0" maxOccurs="unbounded"/>
- *   &lt;/xs:sequence>
- *   &lt;xs:attribute type="xs:string" use="required" name="xfer"/>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="InstanceType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="0" maxOccurs="unbounded"/&gt;
+ *   &lt;/xs:sequence&gt;
+ *   &lt;xs:attribute type="xs:string" use="required" name="xfer"/&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class Instance implements AttributeContainer, Excludable

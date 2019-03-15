@@ -29,18 +29,19 @@ import com.google.protobuf.ByteString;
 
 /**
  * Schema fragment(s) for this class:
+ *
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="AttrType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:ItemType" name="Item" minOccurs="0" maxOccurs="1"/>
- *   &lt;/xs:sequence>
- *   &lt;xs:attribute type="xs:string" use="required" name="tag"/>
- *   &lt;xs:attribute type="xs:string" use="required" name="vr"/>
- *   &lt;xs:attribute type="xs:string" use="optional" name="val"/>
- *   &lt;xs:attribute type="xs:string" use="optional" name="bid"/>
- *   &lt;xs:attribute type="xs:string" use="optional" name="bsize"/>
- *   &lt;xs:attribute type="xs:string" use="optional" name="bytes"/>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="AttrType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:ItemType" name="Item" minOccurs="0" maxOccurs="1"/&gt;
+ *   &lt;/xs:sequence&gt;
+ *   &lt;xs:attribute type="xs:string" use="required" name="tag"/&gt;
+ *   &lt;xs:attribute type="xs:string" use="required" name="vr"/&gt;
+ *   &lt;xs:attribute type="xs:string" use="optional" name="val"/&gt;
+ *   &lt;xs:attribute type="xs:string" use="optional" name="bid"/&gt;
+ *   &lt;xs:attribute type="xs:string" use="optional" name="bsize"/&gt;
+ *   &lt;xs:attribute type="xs:string" use="optional" name="bytes"/&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class Attribute implements Cloneable, Excludable {

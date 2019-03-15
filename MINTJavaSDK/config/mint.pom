@@ -5,7 +5,7 @@
   <groupId>nema-medical</groupId>
   <artifactId>mint</artifactId>
   <name>mint</name>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <url>http://code.google.com/p/medical-imaging-network-transport/</url>
   <description>Medical Imaging Network Transport Java SDK</description>
   <licenses>
@@ -33,13 +33,13 @@
 	<dependency>
 		<groupId>org.jibx</groupId>
 		<artifactId>jibx-run</artifactId>
-		<version>1.2.2</version>
+		<version>1.3.0</version>
 		<scope>compile</scope>
 	</dependency>
 	<dependency>
 		<groupId>commons-codec</groupId>
 		<artifactId>commons-codec</artifactId>
-		<version>1.3</version>
+		<version>1.6</version>
 		<scope>compile</scope>
 	</dependency>
   </dependencies>

@@ -23,12 +23,12 @@ import java.util.*;
 /** 
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="attributesType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:elementType" name="element" minOccurs="0" maxOccurs="unbounded"/>
- *   &lt;/xs:sequence>
- *   &lt;xs:attribute type="xs:string" name="unknown-attributes"/>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="attributesType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:elementType" name="element" minOccurs="0" maxOccurs="unbounded"/&gt;
+ *   &lt;/xs:sequence&gt;
+ *   &lt;xs:attribute type="xs:string" name="unknown-attributes"/&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class AttributesType implements Iterable<ElementType>

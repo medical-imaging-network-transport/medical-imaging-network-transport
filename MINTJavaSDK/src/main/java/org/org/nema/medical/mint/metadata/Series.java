@@ -28,14 +28,14 @@ import org.nema.medical.mint.metadata.GPB.SeriesData;
 /**
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="SeriesType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="1" maxOccurs="1"/>
- *     &lt;xs:element type="ns:NormalizedInstanceAttributesType" name="NormalizedInstanceAttributes" minOccurs="1" maxOccurs="1"/>
- *     &lt;xs:element type="ns:InstancesType" name="Instances" minOccurs="1" maxOccurs="1"/>
- *   &lt;/xs:sequence>
- *   &lt;xs:attribute type="xs:string" use="required" name="seriesInstanceUID"/>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="SeriesType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="1" maxOccurs="1"/&gt;
+ *     &lt;xs:element type="ns:NormalizedInstanceAttributesType" name="NormalizedInstanceAttributes" minOccurs="1" maxOccurs="1"/&gt;
+ *     &lt;xs:element type="ns:InstancesType" name="Instances" minOccurs="1" maxOccurs="1"/&gt;
+ *   &lt;/xs:sequence&gt;
+ *   &lt;xs:attribute type="xs:string" use="required" name="seriesInstanceUID"/&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class Series implements AttributeContainer, Excludable

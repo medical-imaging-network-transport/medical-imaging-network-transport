@@ -33,13 +33,13 @@ import org.nema.medical.mint.metadata.GPB.StudyData;
 /**
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="StudyMetaType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="1" maxOccurs="1"/>
- *     &lt;xs:element type="ns:SeriesListType" name="SeriesList"/>
- *   &lt;/xs:sequence>
- *   &lt;xs:attribute type="xs:string" use="required" name="studyInstanceUID"/>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="StudyMetaType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:AttributesType" name="Attributes" minOccurs="1" maxOccurs="1"/&gt;
+ *     &lt;xs:element type="ns:SeriesListType" name="SeriesList"/&gt;
+ *   &lt;/xs:sequence&gt;
+ *   &lt;xs:attribute type="xs:string" use="required" name="studyInstanceUID"/&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
 public class StudyMetadata implements AttributeContainer, StudySummary

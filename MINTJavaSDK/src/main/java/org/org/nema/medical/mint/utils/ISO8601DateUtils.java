@@ -10,7 +10,7 @@ public interface ISO8601DateUtils {
 	 * 				The string formatted according to the ISO8601 basic format.
 	 * 				(yyyyMMdd'T'HHmmss.SSS'Z' or yyyyMMdd'T'HHmmss'Z')
 	 * @return the Date object represented by the string
-	 * @throws ParseException
+	 * @throws DateTimeParseException
 	 */
     public Date parseISO8601Basic(final String dateStr) throws DateTimeParseException;
     
@@ -20,7 +20,7 @@ public interface ISO8601DateUtils {
      * 				The string formatted according to the ISO8601 basic format.
      * 				Should be appended with 'Z' to indicate a utc time.
      * @return the Date object represented by the string
-     * @throws ParseException
+     * @throws DateTimeParseException
      */
     public Date parseISO8601BasicUTC(String dateStr) throws DateTimeParseException;
     /**
@@ -28,7 +28,7 @@ public interface ISO8601DateUtils {
      * @param dateStr
      * 				The string formatted according to the ISO8601 basic format (date only).
      * @return the Date object represented by the string
-     * @throws ParseException
+     * @throws DateTimeParseException
      */
     public Date parseISO8601DateBasic(final String dateStr) throws DateTimeParseException;
 }

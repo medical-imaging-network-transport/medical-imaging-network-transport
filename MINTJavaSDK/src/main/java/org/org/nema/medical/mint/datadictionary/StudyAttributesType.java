@@ -22,14 +22,14 @@ import java.util.List;
 /** 
  * Schema fragment(s) for this class:
  * <pre>
- * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="series-attributesType">
- *   &lt;xs:sequence>
- *     &lt;xs:element type="ns:attributeType" name="attribute" minOccurs="0" maxOccurs="unbounded"/>
- *   &lt;/xs:sequence>
- * &lt;/xs:complexType>
+ * &lt;xs:complexType xmlns:ns="http://medical.nema.org/mint" xmlns:xs="http://www.w3.org/2001/XMLSchema" name="study-attributesType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element type="ns:attributeType" name="attribute" minOccurs="0" maxOccurs="unbounded"/&gt;
+ *   &lt;/xs:sequence&gt;
+ * &lt;/xs:complexType&gt;
  * </pre>
  */
-public class SeriesAttributesType
+public class StudyAttributesType
 {
     private List<AttributeType> attributeList = new ArrayList<AttributeType>();
 
